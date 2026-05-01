@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,69 +11,148 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Menu, Monitor, Moon, Sun } from 'lucide-react';
+import { User, Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { useState } from 'react';
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/components/ui/combobox';
+
+const subjects = ['数学', '语文', '英语', '物理', '化学'];
+
+// 定义每个学科的动态导航按钮
+const subjectNavItems: Record<string, { 
+  navButtons: { label: string; href: string }[];
+}> = {
+  数学: {
+    navButtons: [
+      { label: '代数', href: '/math/algebra' },
+      { label: '几何', href: '/math/geometry' },
+      { label: '函数', href: '/math/function' },
+      { label: '概率统计', href: '/math/probability' },
+      { label: '微积分', href: '/math/calculus' },
+    ],
+  },
+  语文: {
+    navButtons: [
+      { label: '诗词鉴赏', href: '/chinese/poetry' },
+      { label: '阅读理解', href: '/chinese/reading' },
+      { label: '作文素材', href: '/chinese/writing' },
+      { label: '文言文', href: '/chinese/classical' },
+      { label: '现代文', href: '/chinese/modern' },
+    ],
+  },
+  英语: {
+    navButtons: [
+      { label: '完形填空', href: '/english/cloze' },
+      { label: '语法填空', href: '/english/grammar' },
+      { label: '阅读', href: '/english/reading' },
+      { label: '七选五', href: '/english/seven-choose-five' },
+      { label: '阅读表达', href: '/english/reading-expression' },
+      { label: '作文', href: '/english/writing' },
+    ],
+  },
+  物理: {
+    navButtons: [
+      { label: '力学', href: '/physics/mechanics' },
+      { label: '电磁学', href: '/physics/electromagnetism' },
+      { label: '热学', href: '/physics/thermodynamics' },
+      { label: '光学', href: '/physics/optics' },
+      { label: '实验题', href: '/physics/experiment' },
+    ],
+  },
+  化学: {
+    navButtons: [
+      { label: '化学方程式', href: '/chemistry/equations' },
+      { label: '有机化学', href: '/chemistry/organic' },
+      { label: '无机化学', href: '/chemistry/inorganic' },
+      { label: '实验操作', href: '/chemistry/experiment' },
+      { label: '元素周期', href: '/chemistry/periodic' },
+    ],
+  },
+};
 
 export default function Header() {
-  // 临时用户信息，demo阶段使用
   const currentUser = {
     name: 'Demo User',
-    role: 'admin', // demo阶段默认管理员权限
+    role: 'admin',
   };
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [subject, setSubject] = useState('英语'); // 默认英语
+
+  const currentNavItems = subjectNavItems[subject];
 
   return (
-    <header className="border-b bg-background">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="text-xl font-bold">
-              广学五题坊
-            </Link>
-            <nav className="hidden md:flex space-x-6">
-              <Link href="/" className="text-sm font-medium hover:text-primary">
-                首页
-              </Link>
-              <Link href="/problems" className="text-sm font-medium hover:text-primary">
-                题库
-              </Link>
-              <Link href="/games" className="text-sm font-medium hover:text-primary">
-                游戏中心
-              </Link>
-              {currentUser.role === 'admin' && (
-                <Link href="/users" className="text-sm font-medium hover:text-primary">
-                  用户管理
-                </Link>
-              )}
-            </nav>
+    <header className="sticky top-0 z-50 w-full bg-background">
+      <div className="container mx-auto px-6">
+        <div className="flex h-16 items-center">
+          {/* 移动端菜单按钮 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="flex lg:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
+
+          {/* Logo */}
+          <Link href="/" className="hidden lg:flex items-center">
+            <span className="text-xl font-bold text-foreground">广学题库</span>
+          </Link>
+
+          {/* 学科选择器 */}
+          <div className="ml-6 min-w-[160px]">
+            <Combobox items={subjects} value={subject} onValueChange={(value) => value && setSubject(value)}>
+              <ComboboxInput placeholder="选择学科" />
+              <ComboboxContent>
+                <ComboboxEmpty>暂无匹配学科。</ComboboxEmpty>
+                <ComboboxList>
+                  {(item) => (
+                    <ComboboxItem key={item} value={item}>
+                      {item}
+                    </ComboboxItem>
+                  )}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
           </div>
-          
-          <div className="flex items-center space-x-2 md:space-x-4">
-            {/* 移动端菜单按钮 */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
-            
-            {/* 主题切换 */}
+
+          {/* 动态导航按钮 */}
+          <nav className="ml-6 hidden flex-1 items-center gap-2 lg:flex">
+            {currentNavItems.navButtons.map((item, index) => (
+              <Button
+                key={index}
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-8 px-3 text-sm"
+              >
+                <Link href={item.href}>
+                  {item.label}
+                </Link>
+              </Button>
+            ))}
+          </nav>
+
+          {/* 右侧功能区域 */}
+          <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             
-            {/* 用户信息 - 移动端隐藏 */}
-            <span className="hidden md:inline text-sm text-muted-foreground">
+            <span className="hidden text-sm text-muted-foreground sm:inline">
               {currentUser.name} ({currentUser.role})
             </span>
             
-            {/* 用户菜单 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <User className="h-4 w-4" />
+                  <span className="sr-only">用户菜单</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -85,48 +165,28 @@ export default function Header() {
                   <Link href="/settings">设置</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem className="text-destructive">
                   退出登录
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
-        
+
         {/* 移动端菜单 */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t pt-4">
-            <nav className="flex flex-col space-y-4">
-              <Link 
-                href="/" 
-                className="text-sm font-medium hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                首页
-              </Link>
-              <Link 
-                href="/problems" 
-                className="text-sm font-medium hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                题库
-              </Link>
-              <Link 
-                href="/games" 
-                className="text-sm font-medium hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                游戏中心
-              </Link>
-              {currentUser.role === 'admin' && (
-                <Link 
-                  href="/users" 
+          <div className="lg:hidden border-t pt-4 pb-4">
+            <nav className="flex flex-col gap-3">
+              {currentNavItems.navButtons.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
                   className="text-sm font-medium hover:text-primary"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  用户管理
+                  {item.label}
                 </Link>
-              )}
+              ))}
             </nav>
           </div>
         )}
