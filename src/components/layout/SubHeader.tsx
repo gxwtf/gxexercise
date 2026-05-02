@@ -24,14 +24,14 @@ export default function SubHeader({
 
   const leftContent = (
     <div className="flex items-center">
-      <Link href="/" className="hidden lg:flex items-center">
+      <Link href="/questions" className="hidden lg:flex items-center">
         <span className="text-xl font-bold text-foreground">广学题库</span>
       </Link>
 
       <div className="ml-6 min-w-[160px]">
         <Combobox items={subjects} value={subject} onValueChange={(value) => {
           if (value && subjectToRoute[value]) {
-            router.push(`/${subjectToRoute[value]}`);
+            router.push(`/questions/${subjectToRoute[value]}`);
           }
         }}>
           <ComboboxInput placeholder="选择学科" />

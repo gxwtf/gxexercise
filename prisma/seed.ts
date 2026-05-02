@@ -126,14 +126,14 @@ async function main() {
 
         await prisma.question.create({
           data: {
-            title: `${category} - ${title} (${year}年第${Math.floor(Math.random() * 50 + 1)}题)`,
+            title,
             subject,
             questionType,
             category,
             year,
             source,
             tags: randomTags(subject, category),
-            imageUrl: Math.random() > 0.7 ? `https://picsum.photos/seed/${questionCount}/400/300` : null,
+            imageUrl: `https://picsum.photos/seed/${questionCount}/400/300`,
           },
         });
         questionCount++;

@@ -37,7 +37,7 @@ export default function Header() {
           <DropdownMenuContent align="start">
             {subjects.map((subject) => (
               <DropdownMenuItem key={subject} asChild>
-                <Link href={`/${subjectToRoute[subject]}`}>
+                <Link href={`/questions/${subjectToRoute[subject]}`}>
                   {subject}
                 </Link>
               </DropdownMenuItem>

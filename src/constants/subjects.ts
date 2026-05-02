@@ -65,7 +65,7 @@ export const subjectNavItems: Record<string, {
     {
       navButtons: (categoriesBySubject[subject] || []).map(category => ({
         label: category,
-        href: `/${subjectToRoute[subject]}/${categoryToRoute[category]}`,
+        href: `/questions/${subjectToRoute[subject]}/${categoryToRoute[category]}`,
       })),
     },
   ])
