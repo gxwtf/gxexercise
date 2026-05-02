@@ -16,53 +16,57 @@ export const routeToSubject: Record<string, string> = {
   'chemistry': '化学',
 };
 
+export const categoriesBySubject: Record<string, string[]> = {
+  '数学': ['代数', '几何', '函数', '概率统计', '微积分'],
+  '语文': ['诗词鉴赏', '阅读理解', '作文素材', '文言文', '现代文'],
+  '英语': ['完形填空', '语法填空', '阅读', '七选五', '阅读表达', '作文'],
+  '物理': ['力学', '电磁学', '热学', '光学', '实验题'],
+  '化学': ['化学方程式', '有机化学', '无机化学', '实验操作', '元素周期'],
+};
+
+export const categoryToRoute: Record<string, string> = {
+  '代数': 'algebra',
+  '几何': 'geometry',
+  '函数': 'function',
+  '概率统计': 'probability',
+  '微积分': 'calculus',
+  '诗词鉴赏': 'poetry',
+  '阅读理解': 'reading',
+  '作文素材': 'writing',
+  '文言文': 'classical',
+  '现代文': 'modern',
+  '完形填空': 'cloze',
+  '语法填空': 'grammar',
+  '阅读': 'reading',
+  '七选五': 'seven-choose-five',
+  '阅读表达': 'reading-expression',
+  '作文': 'writing',
+  '力学': 'mechanics',
+  '电磁学': 'electromagnetism',
+  '热学': 'thermodynamics',
+  '光学': 'optics',
+  '实验题': 'experiment',
+  '化学方程式': 'equations',
+  '有机化学': 'organic',
+  '无机化学': 'inorganic',
+  '实验操作': 'experiment',
+  '元素周期': 'periodic',
+};
+
+export const routeToCategory: Record<string, string> = Object.fromEntries(
+  Object.entries(categoryToRoute).map(([k, v]) => [v, k])
+);
+
 export const subjectNavItems: Record<string, {
   navButtons: { label: string; href: string }[];
-}> = {
-  '数学': {
-    navButtons: [
-      { label: '代数', href: '/math/algebra' },
-      { label: '几何', href: '/math/geometry' },
-      { label: '函数', href: '/math/function' },
-      { label: '概率统计', href: '/math/probability' },
-      { label: '微积分', href: '/math/calculus' },
-    ],
-  },
-  '语文': {
-    navButtons: [
-      { label: '诗词鉴赏', href: '/chinese/poetry' },
-      { label: '阅读理解', href: '/chinese/reading' },
-      { label: '作文素材', href: '/chinese/writing' },
-      { label: '文言文', href: '/chinese/classical' },
-      { label: '现代文', href: '/chinese/modern' },
-    ],
-  },
-  '英语': {
-    navButtons: [
-      { label: '完形填空', href: '/english/cloze' },
-      { label: '语法填空', href: '/english/grammar' },
-      { label: '阅读', href: '/english/reading' },
-      { label: '七选五', href: '/english/seven-choose-five' },
-      { label: '阅读表达', href: '/english/reading-expression' },
-      { label: '作文', href: '/english/writing' },
-    ],
-  },
-  '物理': {
-    navButtons: [
-      { label: '力学', href: '/physics/mechanics' },
-      { label: '电磁学', href: '/physics/electromagnetism' },
-      { label: '热学', href: '/physics/thermodynamics' },
-      { label: '光学', href: '/physics/optics' },
-      { label: '实验题', href: '/physics/experiment' },
-    ],
-  },
-  '化学': {
-    navButtons: [
-      { label: '化学方程式', href: '/chemistry/equations' },
-      { label: '有机化学', href: '/chemistry/organic' },
-      { label: '无机化学', href: '/chemistry/inorganic' },
-      { label: '实验操作', href: '/chemistry/experiment' },
-      { label: '元素周期', href: '/chemistry/periodic' },
-    ],
-  },
-};
+}> = Object.fromEntries(
+  subjects.map(subject => [
+    subject,
+    {
+      navButtons: (categoriesBySubject[subject] || []).map(category => ({
+        label: category,
+        href: `/${subjectToRoute[subject]}/${categoryToRoute[category]}`,
+      })),
+    },
+  ])
+);

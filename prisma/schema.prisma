@@ -16,6 +16,7 @@ model Question {
   imageUrl    String?   @db.VarChar(500)
   subject     String    @db.VarChar(100)
   questionType String   @db.VarChar(100)
+  category    String?    @db.VarChar(100)
   year        Int?
   source      String    @db.VarChar(200)
   tags        String[]
@@ -23,6 +24,7 @@ model Question {
   updatedAt   DateTime  @updatedAt
 
   @@index([subject])
+  @@index([category])
   @@index([questionType])
   @@index([year])
 }

@@ -1,5 +1,10 @@
-import { QuestionList } from '@/components/QuestionList'
+import { prisma } from "@/lib/prisma";
+import { QuestionOverview } from "@/components/QuestionOverview";
 
-export default function Home() {
-  return <QuestionList />
+export default async function QuestionsPage() {
+  const questions = await prisma.question.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return <QuestionOverview initialQuestions={questions} />;
 }
