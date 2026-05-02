@@ -193,6 +193,11 @@ export interface EnglishReadingProps {
   content: string | React.ReactNode;
   customComponents?: Record<string, React.ComponentType<CustomComponentProps>>;
   className?: string;
+  // 新增：挖空相关
+  blanks?: Record<string, string>; // blankId => optionId
+  options?: { id: string; label: string }[];
+  onBlankClick?: (blankId: string) => void;
+  onRemove?: (blankId: string) => void;
 }
 
 // 英文文章阅读组件
@@ -201,6 +206,10 @@ export function EnglishReading({
   content,
   customComponents = {},
   className,
+  blanks = {},
+  options = [],
+  onBlankClick,
+  onRemove,
 }: EnglishReadingProps) {
   // 合并默认排版组件和自定义组件
   const Components = { ...Typography, ...customComponents };
@@ -213,7 +222,29 @@ export function EnglishReading({
         .filter(Boolean)
         .map((paragraph, index) => (
           <Components.P key={index} className="text-justify leading-relaxed">
-            {paragraph}
+            {paragraph.split(/(\[blank\d+\])/).map((part, idx) => {
+              const blankMatch = part.match(/\[blank(\d+)\]/);
+              if (blankMatch) {
+                const blankId = blankMatch[1];
+                const filledOptionId = blanks[blankId];
+                const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null;
+
+                return (
+                  <span
+                    key={idx}
+                    onClick={() => filledOption ? (onRemove && onRemove(blankId)) : (onBlankClick && onBlankClick(blankId))}
+                    style={{
+                      cursor: 'pointer',
+                      color: filledOption ? '#a31f24' : 'inherit',
+                      fontWeight: filledOption ? '500' : 'normal',
+                    }}
+                  >
+                    {filledOption ? `[${filledOption.label}]` : '[■]'}
+                  </span>
+                );
+              }
+              return <span key={idx}>{part}</span>;
+            })}
           </Components.P>
         ));
     }

@@ -26,7 +26,6 @@ export function BlankFillingQuestion({ availableOptions, selectedOption, onOptio
     <div className="space-y-6">
       {/* 待选选项 */}
       <div>
-        <h4 className="font-semibold mb-3">Available Options:</h4>
         <RadioGroup value={selectedOption || ''} onValueChange={(value) => onOptionSelect(value || null)}>
           {availableOptions.map(option => (
             <FieldLabel key={option.id}>

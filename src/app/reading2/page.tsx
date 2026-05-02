@@ -3,6 +3,7 @@
 import * as React from 'react'
 import EnglishReading from '@/components/article/english-reading'
 import { BlankFillingQuestion } from '@/components/question/BlankFillingQuestion'
+import { useBlankFillingLogic } from '@/components/question/BlankFillingLogic'
 import { QuestionSection } from '@/components/QuestionSection'
 import { Separator } from '@/components/ui/separator'
 
@@ -29,60 +30,20 @@ As we continue to develop and implement AI technologies, it is crucial that we d
         { id: 'g', label: 'Therefore,' }
     ]
 
-    const [filledBlanks, setFilledBlanks] = React.useState<Record<string, string>>({})
-    const [selectedOption, setSelectedOption] = React.useState<string | null>(null)
-
-    // 计算可用选项
-    const availableOptions = sampleOptions.filter(option => !Object.values(filledBlanks).includes(option.id))
-
-    // 处理选项选择
-    const handleOptionSelect = (optionId: string | null) => {
-        setSelectedOption(optionId)
-    }
-
-    // 处理blank点击
-    const handleBlankClick = (blankId: string) => {
-        const hasSelected = !!selectedOption
-        const hasFilled = !!filledBlanks[blankId]
-
-        if (hasFilled && !hasSelected) {
-            // 情况1：有填充但没有选中选项 - 移除并设为选中
-            const oldOptionId = filledBlanks[blankId]
-            setFilledBlanks(prev => {
-                const newFilled = { ...prev }
-                delete newFilled[blankId]
-                return newFilled
-            })
-            setSelectedOption(oldOptionId)
-        } else if (hasFilled && hasSelected) {
-            // 情况2：有填充且选中了新选项 - 先移除旧的，再填入新的
-            const oldOptionId = filledBlanks[blankId]
-            setFilledBlanks(prev => {
-                const newFilled = { ...prev }
-                delete newFilled[blankId]
-                newFilled[blankId] = selectedOption
-                return newFilled
-            })
-            setSelectedOption(oldOptionId) // 将旧的选项设为选中状态
-        } else if (!hasFilled && hasSelected) {
-            // 情况3：没有填充但有选中选项 - 直接填入
-            setFilledBlanks(prev => ({
-                ...prev,
-                [blankId]: selectedOption
-            }))
-            setSelectedOption(null)
+    // 使用封装的逻辑组件
+    const {
+        filledBlanks,
+        selectedOption,
+        availableOptions,
+        handleOptionSelect,
+        handleBlankClick,
+        handleRemove
+    } = useBlankFillingLogic({
+        options: sampleOptions,
+        onStateChange: (state) => {
+            console.log('状态变化:', state)
         }
-        // 情况4：既没有填充也没有选中 - 不做任何事
-    }
-
-    // 处理移除
-    const handleRemove = (blankId: string) => {
-        setFilledBlanks(prev => {
-            const newFilled = { ...prev }
-            delete newFilled[blankId]
-            return newFilled
-        })
-    }
+    })
 
     return (
         <div className="min-h-screen bg-background">
@@ -105,7 +66,7 @@ As we continue to develop and implement AI technologies, it is crucial that we d
 
                 {/* 右侧题目区域 */}
                 <div className="flex-1 p-6 overflow-y-auto">
-                    <QuestionSection title="Fill in the Blanks">
+                    <QuestionSection title="根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项。选项中有两项为多余选项。">
                         <BlankFillingQuestion
                             availableOptions={availableOptions}
                             selectedOption={selectedOption}
