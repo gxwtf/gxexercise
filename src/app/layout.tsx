@@ -1,7 +1,9 @@
+// 只包含footer的总布局
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Layout from "@/components/layout/Layout";
+import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 const geistSans = Geist({
@@ -30,7 +32,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <Layout>{children}</Layout>
+          <div className="min-h-screen flex flex-col">
+            {children}
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
