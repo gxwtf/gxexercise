@@ -2,61 +2,106 @@ import type { MDXComponents } from 'mdx/types'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { useBlankContext, ClozeContext } from '@/components/article/english-reading'
+import { Input as ShadcnInput } from "@/components/ui/input"
 
 // Blank组件
 function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
-  const context = useBlankContext()
-  
-  if (!context) {
-    return <span {...props}>{children}</span>
-  }
+    const context = useBlankContext()
 
-  const { blanks, options, onBlankClick, onRemove, getNextBlankId } = context
-  
-  // 生成唯一的blankId
-  const blankId = React.useMemo(() => getNextBlankId(), [getNextBlankId])
-  
-  const filledOptionId = blanks[blankId]
-  const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
+    if (!context) {
+        return <span {...props}>{children}</span>
+    }
 
-  return (
-    <span
-      onClick={() => filledOption ? onRemove?.(blankId) : onBlankClick?.(blankId)}
-      className={cn(
-        'inline rounded px-1 py-0.5 text-base font-normal transition cursor-pointer',
-        'align-baseline leading-normal',
-        filledOption ? 'text-[#A31F24] font-medium' : 'text-black'
-      )}
-      {...props}
-    >
-      {filledOption ? `[${filledOption.label}]` : '[■]'}
-    </span>
-  )
+    const { blanks, options, onBlankClick, onRemove, getNextBlankId } = context
+
+    // 生成唯一的blankId
+    const blankId = React.useMemo(() => getNextBlankId(), [getNextBlankId])
+
+    const filledOptionId = blanks[blankId]
+    const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
+
+    return (
+        <span
+            onClick={() => filledOption ? onRemove?.(blankId) : onBlankClick?.(blankId)}
+            className={cn(
+                'inline rounded px-1 py-0.5 text-base font-normal transition cursor-pointer',
+                'align-baseline leading-normal',
+                filledOption ? 'text-[#A31F24] font-medium' : 'text-black'
+            )}
+            {...props}
+        >
+            {filledOption ? `[${filledOption.label}]` : '[■]'}
+        </span>
+    )
 }
 
 // ClozeBlank组件 - 用于完形填空的长下划线格式
 function ClozeBlank({
-  questionNumber,
-  ...props
+    questionNumber,
+    ...props
 }: React.HTMLAttributes<HTMLSpanElement> & { questionNumber?: number }) {
-  const context = React.useContext(ClozeContext);
-  const questionNumberRef = React.useRef<number | undefined>(questionNumber);
+    const context = React.useContext(ClozeContext);
+    const questionNumberRef = React.useRef<number | undefined>(questionNumber);
 
-  if (questionNumberRef.current === undefined) {
-    if (!context) {
-      return <span {...props}>____?____</span>;
+    if (questionNumberRef.current === undefined) {
+        if (!context) {
+            return <span {...props}>____?____</span>;
+        }
+        questionNumberRef.current = context.getNextQuestionNumber();
     }
-    questionNumberRef.current = context.getNextQuestionNumber();
-  }
 
-  return (
-    <span {...props}>
-      ____{questionNumberRef.current}____
-    </span>
-  )
+    return (
+        <span {...props}>
+            ____{questionNumberRef.current}____
+        </span>
+    )
 }
 
 ClozeBlank.displayName = 'ClozeBlank'
+
+// Input填空题组件
+function Input({
+    onChange,
+    ...props
+}: React.HTMLAttributes<HTMLSpanElement> & { onChange?: (value: string) => void }) {
+    const context = React.useContext(ClozeContext);
+    const questionNumberRef = React.useRef<number | undefined>(undefined);
+
+    if (questionNumberRef.current === undefined) {
+        if (!context) {
+            return (
+                <span className="inline-flex items-center h-8" {...props}>
+                    <span className="text-sm font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">?</span>
+                    <ShadcnInput
+                        type="text"
+                        className="w-30 rounded-l-none h-8"
+                        onChange={(e) => onChange?.(e.target.value)}
+                    />
+                </span>
+            );
+        }
+        questionNumberRef.current = context.getNextQuestionNumber();
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange?.(e.target.value);
+    };
+
+    return (
+        <span className="inline-flex items-center h-7" {...props}>
+            <span className="text-sm font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">
+                {questionNumberRef.current}
+            </span>
+            <ShadcnInput
+                type="text"
+                className="w-30 rounded-l-none h-7"
+                onChange={handleChange}
+            />
+        </span>
+    )
+}
+
+Input.displayName = 'Input'
 
 const Typography = {
     H1: React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
@@ -237,6 +282,7 @@ const components: MDXComponents = {
     code: Typography.InlineCode,
     Blank,
     ClozeBlank,
+    Input,
 }
 
 export function useMDXComponents(): MDXComponents {
