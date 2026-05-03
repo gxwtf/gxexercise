@@ -39,10 +39,7 @@ As we continue to develop and implement AI technologies, it is crucial that we d
         handleBlankClick,
         handleRemove
     } = useBlankFillingLogic({
-        options: sampleOptions,
-        onStateChange: (state) => {
-            console.log('状态变化:', state)
-        }
+        options: sampleOptions
     })
 
     return (

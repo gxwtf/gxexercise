@@ -26,14 +26,29 @@ export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
     <div className="space-y-6">
       {questions.map((question, index) => (
         <div key={question.id} className="space-y-4">
-          <h3 className="text-lg font-medium">
-            {index + 1}. {question.stem}
-          </h3>
-          <ChoiceQuestion
-            type={question.type}
-            options={question.options}
-            onChange={(selected) => onChange(question.id, selected)}
-          />
+          {question.stem ? (
+            <>
+              <h3 className="text-lg font-medium">
+                {index + 1}. {question.stem}
+              </h3>
+              <ChoiceQuestion
+                type={question.type}
+                options={question.options}
+                onChange={(selected) => onChange(question.id, selected)}
+              />
+            </>
+          ) : (
+            <div className="flex items-center gap-4">
+              <span className="text-lg font-medium min-w-[30px]">
+                {index + 1}.
+              </span>
+              <ChoiceQuestion
+                type={question.type}
+                options={question.options}
+                onChange={(selected) => onChange(question.id, selected)}
+              />
+            </div>
+          )}
         </div>
       ))}
     </div>

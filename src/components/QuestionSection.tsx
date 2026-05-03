@@ -16,7 +16,7 @@ export function QuestionSection({ title, children, className }: QuestionSectionP
     >
       {title ? (
         <header>
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h3 className="text-lg font-medium">{title}</h3>
         </header>
       ) : null}
       {children}
