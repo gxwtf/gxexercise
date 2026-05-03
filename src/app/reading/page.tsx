@@ -11,7 +11,7 @@ export default function ReadingPage() {
   // 示例选择题
   const questions = [
     {
-      id: '1',
+      id: '27',
       stem: 'What does the underlined expression "these workarounds" in Paragraph 4 refer to?',
       type: 'single' as const,
       options: [
@@ -22,7 +22,7 @@ export default function ReadingPage() {
       ]
     },
     {
-      id: '2',
+      id: '28',
       stem: 'What is Paragraph 5 mainly about?',
       type: 'single' as const,
       options: [
@@ -33,7 +33,7 @@ export default function ReadingPage() {
       ]
     },
     {
-      id: '3',
+      id: '29',
       stem: 'What can we learn from the passage?',
       type: 'single' as const,
       options: [
@@ -44,7 +44,7 @@ export default function ReadingPage() {
       ]
     },
     {
-      id: '4',
+      id: '30',
       stem: 'What\'s the main purpose of the passage?',
       type: 'single' as const,
       options: [
