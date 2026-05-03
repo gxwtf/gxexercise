@@ -183,12 +183,15 @@ export default function ClozePage() {
     // 这里可以添加提交答案的逻辑
   }
 
+  // 提取题目ID列表
+  const questionIds = questions.map(q => q.id)
+
   return (
     <div className="h-screen overflow-hidden bg-background">
       <div className="flex h-screen">
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
-          <EnglishReading>
+          <EnglishReading startQuestionNumber={Number(questionIds[0])}>
             <ClozeContent />
           </EnglishReading>
         </div>

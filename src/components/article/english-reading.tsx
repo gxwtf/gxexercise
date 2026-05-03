@@ -18,11 +18,8 @@ export interface BlankContextValue {
 
 export const BlankContext = React.createContext<BlankContextValue | null>(null);
 
-// Cloze上下文，用于自动分配题目ID
 export interface ClozeContextValue {
-  questionIds: string[];
-  currentQuestionIndex: number;
-  incrementQuestionIndex: () => void;
+  getNextQuestionNumber: () => number;
 }
 
 export const ClozeContext = React.createContext<ClozeContextValue | null>(null);
@@ -49,7 +46,7 @@ export interface EnglishReadingProps {
   options?: BlankOption[];
   onBlankClick?: (blankId: string) => void;
   onRemove?: (blankId: string) => void;
-  questionIds?: string[]; // 用于Cloze组件的题目ID列表
+  startQuestionNumber?: number; // 起始题号
 }
 
 function replaceBlankTokens(
@@ -120,7 +117,7 @@ export function EnglishReading({
   options = [],
   onBlankClick,
   onRemove,
-  questionIds = [],
+  startQuestionNumber = 1,
 }: EnglishReadingProps) {
   const blankIndexRef = React.useRef(0);
   blankIndexRef.current = 0;
@@ -130,12 +127,13 @@ export function EnglishReading({
     return String(blankIndexRef.current);
   }, []);
 
-  const clozeIndexRef = React.useRef(0);
-  clozeIndexRef.current = 0;
+  const clozeNumberRef = React.useRef(startQuestionNumber ?? 1);
+  clozeNumberRef.current = startQuestionNumber ?? 1;
 
-  const incrementClozeIndex = React.useCallback(() => {
-    clozeIndexRef.current += 1;
-    return clozeIndexRef.current;
+  const getNextQuestionNumber = React.useCallback(() => {
+    const next = clozeNumberRef.current;
+    clozeNumberRef.current += 1;
+    return next;
   }, []);
 
   const blankContextValue = React.useMemo(
@@ -151,16 +149,21 @@ export function EnglishReading({
 
   const clozeContextValue = React.useMemo(
     () => ({
-      questionIds,
-      currentQuestionIndex: clozeIndexRef.current,
-      incrementQuestionIndex: incrementClozeIndex,
+      getNextQuestionNumber,
     }),
-    [questionIds, incrementClozeIndex]
+    [getNextQuestionNumber]
   );
 
   const renderedContent = () => {
     if (!children) return null;
-    return replaceBlankTokens(children, getNextBlankId, blanks, options, onBlankClick, onRemove);
+    return replaceBlankTokens(
+      children,
+      getNextBlankId,
+      blanks,
+      options,
+      onBlankClick,
+      onRemove
+    );
   };
 
   return (

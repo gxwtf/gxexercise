@@ -1,7 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import { useBlankContext } from '@/components/article/english-reading'
+import { useBlankContext, ClozeContext } from '@/components/article/english-reading'
 
 // Blank组件
 function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
@@ -35,19 +35,28 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
 }
 
 // ClozeBlank组件 - 用于完形填空的长下划线格式
-function ClozeBlank({ id, ...props }: { id: string } & React.HTMLAttributes<HTMLSpanElement>) {
+function ClozeBlank({
+  questionNumber,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement> & { questionNumber?: number }) {
+  const context = React.useContext(ClozeContext);
+  const questionNumberRef = React.useRef<number | undefined>(questionNumber);
+
+  if (questionNumberRef.current === undefined) {
+    if (!context) {
+      return <span {...props}>____?____</span>;
+    }
+    questionNumberRef.current = context.getNextQuestionNumber();
+  }
+
   return (
-    <span
-      className={cn(
-        'inline-block mx-1 font-mono text-base font-normal',
-        'align-baseline leading-normal text-black'
-      )}
-      {...props}
-    >
-      ____{id}____
+    <span {...props}>
+      ____{questionNumberRef.current}____
     </span>
   )
 }
+
+ClozeBlank.displayName = 'ClozeBlank'
 
 const Typography = {
     H1: React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
