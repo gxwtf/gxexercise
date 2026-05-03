@@ -109,7 +109,7 @@ const Typography = {
             <h1
                 ref={ref}
                 className={cn(
-                    'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl',
+                    'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mt-12 mb-6',
                     className
                 )}
                 {...props}
@@ -122,7 +122,7 @@ const Typography = {
             <h2
                 ref={ref}
                 className={cn(
-                    'scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-0',
+                    'scroll-m-20 text-3xl font-semibold tracking-tight transition-colors mt-10 mb-4',
                     className
                 )}
                 {...props}
@@ -134,7 +134,7 @@ const Typography = {
         ({ className, ...props }, ref) => (
             <h3
                 ref={ref}
-                className={cn('scroll-m-20 text-2xl font-semibold tracking-tight', className)}
+                className={cn('scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4', className)}
                 {...props}
             />
         )
@@ -144,7 +144,7 @@ const Typography = {
         ({ className, ...props }, ref) => (
             <h4
                 ref={ref}
-                className={cn('scroll-m-20 text-xl font-semibold tracking-tight', className)}
+                className={cn('scroll-m-20 text-xl font-semibold tracking-tight mt-6 mb-3', className)}
                 {...props}
             />
         )
@@ -154,7 +154,7 @@ const Typography = {
         ({ className, ...props }, ref) => (
             <p
                 ref={ref}
-                className={cn('leading-7 [&:not(:first-child)]:mt-6', className)}
+                className={cn('leading-7 [&:not(:first-child)]:mt-4', className)}
                 {...props}
             />
         )
