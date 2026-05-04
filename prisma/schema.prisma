@@ -11,20 +11,91 @@ datasource db {
 }
 
 model Question {
-  id          String    @id @default(cuid())
-  title       String    @db.VarChar(255)
-  imageUrl    String?   @db.VarChar(500)
-  subject     String    @db.VarChar(100)
-  questionType String   @db.VarChar(100)
-  category    String?    @db.VarChar(100)
-  year        Int?
-  source      String    @db.VarChar(200)
-  tags        String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String     @id @default(cuid())
+  questionType   String     @db.VarChar(100)
+  content        String     @db.Text @default("")
+  options        Json?
+  answer         String     @default("")
+  analysis       String?    @db.Text
+  score          Int        @default(5)
+  showOnHomepage Boolean    @default(true)
+  correctRate    Decimal?   @db.Decimal(5, 4)
+  subject        String     @db.VarChar(100)
+  source         String     @db.VarChar(200)
+  grade          String?    @db.VarChar(50)
+  category       String     @db.VarChar(100) @default("")
+  year           Int?
+  tags           String[]
+  imageUrl       String?    @db.VarChar(500)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  groupItems     GroupItem[]
+
+  @@index([subject])
+  @@index([questionType])
+  @@index([category])
+  @@index([year])
+}
+
+model QuestionGroup {
+  id        String      @id @default(cuid())
+  title     String      @db.VarChar(255)
+  content   String      @db.Text
+  subject   String      @db.VarChar(100)
+  source    String      @db.VarChar(200)
+  grade     String?     @db.VarChar(50)
+  category  String      @db.VarChar(100)
+  tags      String[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  groupItems GroupItem[]
 
   @@index([subject])
   @@index([category])
-  @@index([questionType])
-  @@index([year])
+}
+
+model GroupItem {
+  id         String        @id @default(cuid())
+  groupId    String
+  questionId String
+  orderIndex Int
+
+  group      QuestionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  question   Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, questionId])
+  @@index([groupId])
+}
+
+model TestPaper {
+  id          String      @id @default(cuid())
+  title       String      @db.VarChar(255)
+  description String?     @db.Text
+  subject     String      @db.VarChar(100)
+  source      String      @db.VarChar(200)
+  grade       String?     @db.VarChar(50)
+  totalScore  Int?
+  duration    Int?
+  tags        String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  paperItems  PaperItem[]
+
+  @@index([subject])
+}
+
+model PaperItem {
+  id         String     @id @default(cuid())
+  paperId    String
+  itemId     String
+  itemType   String     @db.VarChar(20)
+  orderIndex Int
+
+  paper      TestPaper  @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@unique([paperId, itemId])
+  @@index([paperId])
 }

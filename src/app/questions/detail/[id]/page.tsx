@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { QuestionOverview } from "@/components/QuestionOverview";
 import { notFound } from "next/navigation";
+import { transformQuestion } from "@/lib/transformers";
 
 interface PageProps {
   params: Promise<{
@@ -19,5 +20,5 @@ export default async function QuestionDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <QuestionOverview initialQuestions={[question]} />;
+  return <QuestionOverview initialQuestions={[transformQuestion(question)]} />;
 }
