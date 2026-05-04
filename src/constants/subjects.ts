@@ -17,11 +17,11 @@ export const routeToSubject: Record<string, string> = {
 };
 
 export const categoriesBySubject: Record<string, string[]> = {
-  '数学': ['代数', '几何', '函数', '概率统计', '微积分'],
-  '语文': ['诗词鉴赏', '阅读理解', '作文素材', '文言文', '现代文'],
-  '英语': ['完形填空', '语法填空', '阅读', '七选五', '阅读表达', '作文'],
-  '物理': ['力学', '电磁学', '热学', '光学', '实验题'],
-  '化学': ['化学方程式', '有机化学', '无机化学', '实验操作', '元素周期'],
+  '数学': ['代数', '几何', '函数', '概率统计', '微积分', '套卷'],
+  '语文': ['诗词鉴赏', '阅读理解', '作文素材', '文言文', '现代文', '套卷'],
+  '英语': ['完形填空', '语法填空', '阅读', '七选五', '阅读表达', '作文', '套卷'],
+  '物理': ['力学', '电磁学', '热学', '光学', '实验题', '套卷'],
+  '化学': ['化学方程式', '有机化学', '无机化学', '实验操作', '元素周期', '套卷'],
 };
 
 export const categoryToRoute: Record<string, string> = {
@@ -51,6 +51,7 @@ export const categoryToRoute: Record<string, string> = {
   '无机化学': 'inorganic',
   '实验操作': 'experiment',
   '元素周期': 'periodic',
+  '套卷': 'test-paper',
 };
 
 export const routeToCategory: Record<string, string> = Object.fromEntries(
