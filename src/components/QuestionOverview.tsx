@@ -120,9 +120,10 @@ export function QuestionOverview({
             <div className="space-y-2 mb-6">
               {categoryOptions.map((option) => (
                 <Button
+                  size="lg"
                   key={option.value}
                   variant={selectedCategory === option.value ? "default" : "outline"}
-                  className="w-full justify-start px-3 py-2 text-sm font-medium"
+                  className="w-full"
                   onClick={() => setSelectedCategory(option.value)}
                 >
                   {option.label}
@@ -169,7 +170,7 @@ export function QuestionOverview({
 
           {/* 右侧内容区域 */}
           <div className="flex-1">
-            <div className="bg-card rounded-xl shadow-sm p-4 mb-6 border border-border">
+            <div className="bg-card rounded-xl mb-6">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -183,9 +184,10 @@ export function QuestionOverview({
             </div>
 
             {isTestPaperPage ? (
-              // 套卷页面：只显示套卷内容
+              // 套卷页面：只显示套卷内容，每行一个
               <div>
-                <div className="grid gap-4">
+                <h2 className="text-2xl font-bold mb-6">{subject}套卷练习</h2>
+                <div className="grid grid-cols-1 gap-4">
                   {testPapers
                     .filter(paper => paper.subject === subject)
                     .map((paper) => (
@@ -218,7 +220,7 @@ export function QuestionOverview({
             ) : filteredQuestions.length > 0 ? (
               // 普通题目页面：显示题目和套卷推荐
               <>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {filteredQuestions.map((question, index) => (
                     <div
                       key={question.id}
