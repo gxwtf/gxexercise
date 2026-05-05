@@ -33,8 +33,7 @@ export default async function QuestionsPage() {
   return (
     <QuestionOverview
       initialQuestions={questions}
-      initialGroups={groups}
-      initialPapers={papers}
+      initialTestPapers={papers}
     />
   );
 }
