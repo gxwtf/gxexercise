@@ -93,7 +93,7 @@ function randomPick<T>(arr: readonly T[]): T {
 }
 
 function randomYear(): number {
-  return Math.floor(Math.random() * (2025 - 2018 + 1)) + 2018;
+  return Math.floor(Math.random() * (2026 - 2020 + 1)) + 2020;
 }
 
 function randomScore(): number {
@@ -110,6 +110,12 @@ function randomCorrectRate(): number | null {
     return parseFloat((Math.random() * 0.6 + 0.3).toFixed(2));
   }
   return null;
+}
+
+function randomGrade(): string | null {
+  const grades = ["高一", "高二", "高三"];
+  // 有70%的概率分配年级，30%的概率不分配
+  return Math.random() > 0.3 ? randomPick(grades) : null;
 }
 
 function randomTags(subject: string, category: string): string[] {
@@ -162,7 +168,7 @@ async function main() {
 
         const questionType = randomPick(questionTypes);
         const year = randomYear();
-        const sources = ["高考真题", "模拟试卷", "期中考试", "期末考试", "竞赛题", "练习题"];
+        const sources = ["高考真题", "高考模拟", "各区期末", "广学模拟", "竞赛题", "练习题"];
         const source = randomPick(sources);
 
         const optionsData = template.options ? JSON.parse(JSON.stringify(template.options)) : undefined;
@@ -246,6 +252,8 @@ async function main() {
           description: `## 考试说明\n\n本试卷共包含若干题目，满分100分，考试时间120分钟。\n\n### 注意事项\n\n1. 答题前请将姓名、准考证号填写在答题卡上。\n2. 选择题用2B铅笔填涂，非选择题用黑色签字笔作答。`,
           subject,
           source,
+          grade: randomGrade(),
+          year: randomYear(),
           totalScore: 100,
           duration: 120,
           tags: ["套卷", source],

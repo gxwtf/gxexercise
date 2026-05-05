@@ -1,7 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { routeToSubject } from "@/constants/subjects";
-import { QuestionOverview } from "@/components/QuestionOverview";
-import { transformQuestions } from "@/lib/transformers";
+import { redirect } from "next/navigation";
+import { routeToSubject, categoriesBySubject, categoryToRoute } from "@/constants/subjects";
 
 interface PageProps {
   params: Promise<{
@@ -13,46 +11,25 @@ export default async function SubjectPage({ params }: PageProps) {
   const { subject } = await params;
   const subjectName = routeToSubject[subject] || subject;
 
-  const questions = transformQuestions(
-    await prisma.question.findMany({
-      where: {
-        subject: subjectName,
-        showOnHomepage: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-  );
+  // 获取该学科的第一个分类
+  const categories = categoriesBySubject[subjectName] || [];
+  if (categories.length > 0) {
+    // 排除"套卷"分类，优先显示其他分类
+    const nonTestPaperCategories = categories.filter(cat => cat !== '套卷');
+    const firstCategory = nonTestPaperCategories.length > 0 ? nonTestPaperCategories[0] : categories[0];
+    const categoryRoute = categoryToRoute[firstCategory] || firstCategory.toLowerCase();
+    
+    // 重定向到第一个分类页面
+    redirect(`/questions/${subject}/${categoryRoute}`);
+  }
 
-  const groups = await prisma.questionGroup.findMany({
-    where: {
-      subject: subjectName,
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      groupItems: {
-        orderBy: { orderIndex: "asc" },
-      },
-    },
-  });
-
-  const papers = await prisma.testPaper.findMany({
-    where: {
-      subject: subjectName,
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      paperItems: {
-        orderBy: { orderIndex: "asc" },
-      },
-    },
-  });
-
+  // 如果没有分类，显示错误页面
   return (
-    <QuestionOverview
-      initialQuestions={questions}
-      initialGroups={groups}
-      initialPapers={papers}
-      subject={subjectName}
-    />
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">页面未找到</h1>
+        <p className="text-muted-foreground">该学科暂无可用分类</p>
+      </div>
+    </div>
   );
 }

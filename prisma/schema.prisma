@@ -76,6 +76,7 @@ model TestPaper {
   subject     String      @db.VarChar(100)
   source      String      @db.VarChar(200)
   grade       String?     @db.VarChar(50)
+  year        Int?
   totalScore  Int?
   duration    Int?
   tags        String[]
@@ -85,6 +86,7 @@ model TestPaper {
   paperItems  PaperItem[]
 
   @@index([subject])
+  @@index([year])
 }
 
 model PaperItem {

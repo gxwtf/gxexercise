@@ -56,8 +56,7 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
   return (
     <QuestionOverview
       initialQuestions={questions}
-      initialGroups={groups}
-      initialPapers={papers}
+      initialTestPapers={papers}
       subject={subjectName}
       category={categoryName}
     />

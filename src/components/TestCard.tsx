@@ -14,7 +14,8 @@ interface TestCardProps {
     id: string
     title: string
     type: string
-    year: string
+    year: number | null
+    grade: string | null
     subject: string
     onStart?: (id: string) => void
 }
@@ -24,6 +25,7 @@ export function TestCard({
     title,
     type,
     year,
+    grade,
     subject,
     onStart
 }: TestCardProps) {
@@ -40,9 +42,16 @@ export function TestCard({
                     <Badge variant="destructive" className="text-xs">
                         {type}
                     </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                        {year}
-                    </Badge>
+                    {year && (
+                        <Badge variant="secondary" className="text-xs">
+                            {year}年
+                        </Badge>
+                    )}
+                    {grade && (
+                        <Badge variant="outline" className="text-xs">
+                            {grade}
+                        </Badge>
+                    )}
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
