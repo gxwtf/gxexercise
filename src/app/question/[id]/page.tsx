@@ -5,27 +5,6 @@ import dynamic from 'next/dynamic';
 // 动态导入客户端组件
 const Cloze = dynamic(() => import("@/components/question-group/cloze"));
 
-// 将 Prisma 数据类型转换为普通数字（处理可能的 Decimal 类型）
-function convertDecimals(obj: any): any {
-  if (obj === null || obj === undefined) {
-    return obj;
-  }
-  
-  if (typeof obj === 'object') {
-    if (obj.constructor?.name === 'Decimal') {
-      return Number(obj);
-    }
-    
-    const converted: any = Array.isArray(obj) ? [] : {};
-    for (const key in obj) {
-      converted[key] = convertDecimals(obj[key]);
-    }
-    return converted;
-  }
-  
-  return obj;
-}
-
 interface PageProps {
   params: Promise<{
     id: string;
@@ -50,11 +29,8 @@ async function QuestionPageContent({ id }: { id: string }) {
     notFound();
   }
 
-  // 将数据转换为前端可用的格式
-  const convertedGroup = convertDecimals(questionGroup);
-  
   // 构建题目数组
-  const questions = convertedGroup.groupItems.map((item: any) => ({
+  const questions = questionGroup.groupItems.map((item: any) => ({
     id: item.question.id,
     stem: item.question.content,
     type: 'single' as const,
@@ -62,7 +38,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }));
 
   // 如果是完形填空类型，则使用完形填空组件
-  if (convertedGroup.questionType === 'cloze') {
+  if (questionGroup.questionType === 'cloze') {
     return (
       <Cloze 
         questions={questions} 
@@ -73,8 +49,8 @@ async function QuestionPageContent({ id }: { id: string }) {
   // 如果是其他题型，可以扩展其他组件
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">题组: {convertedGroup.title}</h1>
-      <p>题型: {convertedGroup.questionType}</p>
+      <h1 className="text-2xl font-bold mb-4">题组: {questionGroup.title}</h1>
+      <p>题型: {questionGroup.questionType}</p>
       <p>暂不支持的题型</p>
       {/* 在这里可以添加其他题型的支持 */}
     </div>

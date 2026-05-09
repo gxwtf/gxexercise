@@ -24,12 +24,12 @@ interface ChoiceFieldProps {
 export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
   return (
     <div className="space-y-6">
-      {questions.map((question) => (
+      {questions.map((question, index) => (
         <div key={question.id} className="space-y-4">
           {question.stem ? (
             <>
               <h3 className="text-lg font-medium">
-                {question.id}. {question.stem}
+                {index + 1}. {question.stem}
               </h3>
               <ChoiceQuestion
                 type={question.type}
@@ -40,7 +40,7 @@ export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
           ) : (
             <div className="flex items-center gap-4">
               <span className="text-lg font-medium min-w-[30px]">
-                {question.id}.
+                {index + 1}.
               </span>
               <ChoiceQuestion
                 type={question.type}
