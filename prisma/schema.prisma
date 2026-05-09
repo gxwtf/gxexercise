@@ -18,7 +18,7 @@ model Question {
   answer         String     @default("")
   analysis       String?    @db.Text
   score          Int        @default(5)
-  correctRate    Decimal?   @db.Decimal(5, 4)
+  correctRate    Float?     @db.Real
   subject        String     @db.VarChar(100)
   source         String     @db.VarChar(200)
   grade          String?    @db.VarChar(50)

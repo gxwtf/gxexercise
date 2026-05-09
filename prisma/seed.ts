@@ -2,8 +2,6 @@ import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { subjects, categoriesBySubject } from "../src/constants/subjects";
-import { questionTypes } from "../src/constants/questionTypes";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -14,258 +12,274 @@ const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-const questionTemplates = [
+// 完形填空文章内容
+const clozeArticle = `I'm not a professional <ClozeBlank />. My husband and I had suddenly decided on a wild holiday after watching several videos on rock climbing. Our first climb was <ClozeBlank /> than I had imagined, as it required much arm strength. I'm pretty active and fit, but my arm muscles aren't the strongest. Yet we managed to <ClozeBlank /> the route and it was quite fun.
+
+Soon we tried the next climb. I stood at the bottom of a cliff, wondering whether I should climb or not. I was <ClozeBlank /> — half of me wanted to back out, while the other half felt like I should go for it. My husband was above me, just a little farther up the cliff face. He was <ClozeBlank />— or appeared to be at least— and was willing me on.
+
+I carried on until there seemed to be fewer pegs (攀岩的岩点). I had to stretch my leg to <ClozeBlank /> the next peg, which was hard to land on, because it was so skinny. I hesitated. I knew if I <ClozeBlank /> myself, I could miss it and fall. As fear was beginning to <ClozeBlank />, my legs started to shake. I knew if I allowed this panic to flood me, I might fall. So I <ClozeBlank /> my head, visualized where my foot would land on the peg, managed to stop my legs from <ClozeBlank /> and went for it. Phew! I <ClozeBlank /> it. I was on the peg. It was smaller than the last. I could only fit one foot on, the other balanced on top. I felt <ClozeBlank /> for a moment— we were halfway through and had passed the trickiest part.
+
+Thirty meters high— we were near the top. By this point, the rock was sticking outward, which was dangerous. But I couldn't afford to panic now. I managed to blank my mind and drag myself around the rock, transforming my fear into the <ClozeBlank /> I needed. I grabbed the handhold and swung my foot around onto the rock. For the first time, I experienced fear as being separate from myself. I realized that I actually had the power to notice myself feeling fear and I knew exactly what I needed to do: to breathe, and take the leap (跳跃) with <ClozeBlank />.
+
+Finally, I reached the top and felt excited. Something had <ClozeBlank />. Fear is unbelievably powerful, but now I know, so am I.`;
+
+// 完形填空的题目和答案
+const clozeQuestions = [
   {
-    titleTemplate: "已知函数 f(x) = {param1}，求该函数的导数",
-    param1: ["x² + 2x + 1", "sin(x)", "eˣ", "ln(x)", "x³ - 3x"],
-    options: [{"A": "2x + 2"}, {"B": "cos(x)"}, {"C": "eˣ"}, {"D": "1/x"}],
-    answer: "A",
-  },
-  {
-    titleTemplate: "化简下列各式：{param1}",
-    param1: ["(a+b)²", "(a-b)(a+b)", "√{param1}", "log₂(8)", "3⁴"],
-    options: [{"A": "a² + 2ab + b²"}, {"B": "a² - b²"}, {"C": "3"}, {"D": "81"}],
-    answer: "A",
-  },
-  {
-    titleTemplate: "求解方程：{param1}",
-    param1: ["2x + 5 = 10", "x² - 4 = 0", "3x - 7 = 14", "x² + x - 6 = 0"],
-    options: [{"A": "x = 2.5"}, {"B": "x = ±2"}, {"C": "x = 7"}, {"D": "x = 2 或 x = -3"}],
-    answer: "A",
-  },
-  {
-    titleTemplate: "证明：{param1}",
-    param1: [
-      "等腰三角形两底角相等",
-      "平行四边形的对角线互相平分",
-      "直角三角形的勾股定理",
+    id: '1',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'walker' },
+      { id: 'b', label: 'climber' },
+      { id: 'c', label: 'coach' },
+      { id: 'd', label: 'rescuer' }
     ],
-    answer: "证明过程...",
+    answer: 'b',
+    correctRate: 0.75,
+    score: 5
   },
   {
-    titleTemplate: "阅读下面的文言文，完成后面的题目：{param1}",
-    param1: [
-      "《劝学》节选",
-      "《师说》节选",
-      "《阿房宫赋》节选",
-      "《赤壁赋》节选",
+    id: '2',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'safer' },
+      { id: 'b', label: 'faster' },
+      { id: 'c', label: 'harder' },
+      { id: 'd', label: 'smoother' }
     ],
-    options: [{"A": "选项A"}, {"B": "选项B"}, {"C": "选项C"}, {"D": "选项D"}],
-    answer: "B",
+    answer: 'c',
+    correctRate: 0.65,
+    score: 5
   },
   {
-    titleTemplate: "The weather forecast says it _____ rain tomorrow.",
-    param1: ["will", "is going to", "shall", "would"],
-    options: [{"A": "will"}, {"B": "is going to"}, {"C": "shall"}, {"D": "would"}],
-    answer: "B",
-  },
-  {
-    titleTemplate: "如图所示，在光滑水平面上，质量为 m 的物块在水平恒力 F 作用下运动，求物体的加速度。",
-    param1: [],
-    options: [{"A": "a = F/m"}, {"B": "a = m/F"}, {"C": "a = Fm"}, {"D": "a = F - m"}],
-    answer: "A",
-  },
-  {
-    titleTemplate: "写出下列化学方程式：{param1}",
-    param1: [
-      "碳酸钙与盐酸反应",
-      "铁在氧气中燃烧",
-      "水的电解",
-      "氢氧化钠与硫酸反应",
+    id: '3',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'plan' },
+      { id: 'b', label: 'track' },
+      { id: 'c', label: 'accept' },
+      { id: 'd', label: 'complete' }
     ],
-    answer: "CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑",
+    answer: 'd',
+    correctRate: 0.7,
+    score: 5
   },
   {
-    titleTemplate: "完形填空：阅读下面的短文，从每小题的四个选项中选出最佳答案。",
-    param1: [],
-    options: [{"A": "选项A"}, {"B": "选项B"}, {"C": "选项C"}, {"D": "选项D"}],
-    answer: "C",
+    id: '4',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'torn' },
+      { id: 'b', label: 'hurt' },
+      { id: 'c', label: 'serious' },
+      { id: 'd', label: 'excited' }
+    ],
+    answer: 'a',
+    correctRate: 0.6,
+    score: 5
   },
   {
-    titleTemplate: "七选五题：阅读下面的短文，根据短文内容从每小题的七个选项中选出五个最佳选项。",
-    param1: [],
-    answer: "A, C, E, F, G",
+    id: '5',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'sad' },
+      { id: 'b', label: 'calm' },
+      { id: 'c', label: 'scared' },
+      { id: 'd', label: 'lucky' }
+    ],
+    answer: 'c',
+    correctRate: 0.8,
+    score: 5
   },
+  {
+    id: '6',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'fix' },
+      { id: 'b', label: 'kick' },
+      { id: 'c', label: 'break' },
+      { id: 'd', label: 'reach' }
+    ],
+    answer: 'd',
+    correctRate: 0.72,
+    score: 5
+  },
+  {
+    id: '7',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'doubted' },
+      { id: 'b', label: 'comforted' },
+      { id: 'c', label: 'satisfied' },
+      { id: 'd', label: 'disappointed' }
+    ],
+    answer: 'a',
+    correctRate: 0.68,
+    score: 5
+  },
+  {
+    id: '8',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'run out' },
+      { id: 'b', label: 'give in' },
+      { id: 'c', label: 'take hold' },
+      { id: 'd', label: 'break down' }
+    ],
+    answer: 'c',
+    correctRate: 0.75,
+    score: 5
+  },
+  {
+    id: '9',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'nodded' },
+      { id: 'b', label: 'cleared' },
+      { id: 'c', label: 'raised' },
+      { id: 'd', label: 'clouded' }
+    ],
+    answer: 'b',
+    correctRate: 0.65,
+    score: 5
+  },
+  {
+    id: '10',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'aching' },
+      { id: 'b', label: 'moving' },
+      { id: 'c', label: 'shaking' },
+      { id: 'd', label: 'twisting' }
+    ],
+    answer: 'c',
+    correctRate: 0.78,
+    score: 5
+  },
+  {
+    id: '11',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'left' },
+      { id: 'b', label: 'made' },
+      { id: 'c', label: 'missed' },
+      { id: 'd', label: 'changed' }
+    ],
+    answer: 'b',
+    correctRate: 0.71,
+    score: 5
+  },
+  {
+    id: '12',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'relieved' },
+      { id: 'b', label: 'nervous' },
+      { id: 'c', label: 'hesitant' },
+      { id: 'd', label: 'regretful' }
+    ],
+    answer: 'a',
+    correctRate: 0.69,
+    score: 5
+  },
+  {
+    id: '13',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'joy' },
+      { id: 'b', label: 'honesty' },
+      { id: 'c', label: 'pride' },
+      { id: 'd', label: 'strength' }
+    ],
+    answer: 'd',
+    correctRate: 0.73,
+    score: 5
+  },
+  {
+    id: '14',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'surprise' },
+      { id: 'b', label: 'gratitude' },
+      { id: 'c', label: 'curiosity' },
+      { id: 'd', label: 'confidence' }
+    ],
+    answer: 'd',
+    correctRate: 0.67,
+    score: 5
+  },
+  {
+    id: '15',
+    questionType: 'choice',
+    options: [
+      { id: 'a', label: 'mixed' },
+      { id: 'b', label: 'dropped' },
+      { id: 'c', label: 'shifted' },
+      { id: 'd', label: 'darkened' }
+    ],
+    answer: 'c',
+    correctRate: 0.74,
+    score: 5
+  }
 ];
 
-function randomPick<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function randomYear(): number {
-  return Math.floor(Math.random() * (2026 - 2020 + 1)) + 2020;
-}
-
-function randomScore(): number {
-  const scores = [2, 3, 4, 5, 6, 8, 10, 12, 15];
-  return randomPick(scores);
-}
-
-// 移除了 randomShowOnHomepage 函数
-
-function randomCorrectRate(): number | null {
-  if (Math.random() > 0.3) {
-    return parseFloat((Math.random() * 0.6 + 0.3).toFixed(2));
-  }
-  return null;
-}
-
-function randomGrade(): string | null {
-  const grades = ["高一", "高二", "高三"];
-  // 有70%的概率分配年级，30%的概率不分配
-  return Math.random() > 0.3 ? randomPick(grades) : null;
-}
-
-function randomTags(subject: string, category: string): string[] {
-  const commonTags = ["基础", "提高", "拓展", "高考真题", "模拟题", "竞赛题"];
-  const subjectTags: Record<string, string[]> = {
-    "数学": ["导数", "积分", "几何", "代数", "概率"],
-    "语文": ["阅读", "写作", "文言文", "诗词", "现代文"],
-    "英语": ["语法", "词汇", "阅读", "写作", "完形"],
-    "物理": ["力学", "电磁学", "光学", "热学", "实验"],
-    "化学": ["反应", "方程式", "有机", "无机", "元素"],
-  };
-  const tags = [...(subjectTags[subject] || []), ...commonTags];
-  const count = Math.floor(Math.random() * 3) + 1;
-  const selected: string[] = [];
-  for (let i = 0; i < count && tags.length > 0; i++) {
-    const idx = Math.floor(Math.random() * tags.length);
-    selected.push(tags[idx]);
-    tags.splice(idx, 1);
-  }
-  return selected;
-}
-
 async function main() {
-  console.log("开始创建题目数据...");
+  console.log("开始创建完形填空题目数据...");
 
-  await prisma.paperItem.deleteMany();
+  // 删除已有的相关数据
   await prisma.groupItem.deleteMany();
-  await prisma.testPaper.deleteMany();
   await prisma.questionGroup.deleteMany();
   await prisma.question.deleteMany();
 
-  let questionCount = 0;
-  let groupCount = 0;
-  let paperCount = 0;
+  // 创建完形填空的题目组
+  const questionGroup = await prisma.questionGroup.create({
+    data: {
+      title: "完形填空练习 - 勇敢面对恐惧",
+      content: clozeArticle,
+      questionType: "cloze",
+      score: 75, // 总分是15道题×5分
+      subject: "英语",
+      source: "练习题",
+      category: "完形填空",
+      grade: "高三",
+      tags: ["完形填空", "英语", "高三", "练习"],
+      imageUrl: "https://picsum.photos/seed/cloze-exercise/400/300",
+    },
+  });
 
-  for (const subject of subjects) {
-    const subjectCategories = categoriesBySubject[subject] || [];
-    for (const category of subjectCategories) {
-      if (category === "套卷") continue;
+  console.log(`创建了完形填空题目组: ${questionGroup.title}`);
 
-      const countPerCategory = Math.floor(Math.random() * 8) + 3;
-      for (let i = 0; i < countPerCategory; i++) {
-        const template = randomPick(questionTemplates);
-        let content = template.titleTemplate;
+  // 创建15个选择题
+  for (const q of clozeQuestions) {
+    const question = await prisma.question.create({
+      data: {
+        content: "", // 完形填空的选择题不需要题干
+        questionType: q.questionType,
+        options: q.options,
+        answer: q.answer,
+        analysis: `第${q.id}题解析: 根据上下文语境选择最合适的词汇。`,
+        score: q.score,
+        correctRate: q.correctRate,
+        subject: "英语",
+        source: "练习题",
+        category: "完形填空",
+        grade: "高三",
+        tags: ["完形填空", "选择题", "英语", `第${q.id}题`],
+      },
+    });
 
-        if (template.param1 && template.param1.length > 0) {
-          const param = randomPick(template.param1);
-          content = content.replace("{param1}", param);
-        }
+    // 将题目关联到题目组
+    await prisma.groupItem.create({
+      data: {
+        groupId: questionGroup.id,
+        questionId: question.id,
+        orderIndex: parseInt(q.id) - 1, // 从0开始排序
+      },
+    });
 
-        const questionType = randomPick(questionTypes);
-        const year = randomYear();
-        const sources = ["高考真题", "高考模拟", "各区期末", "广学模拟", "竞赛题", "练习题"];
-        const source = randomPick(sources);
-        const grade = randomGrade();
-        const tags = randomTags(subject, category);
-
-        const optionsData = template.options ? JSON.parse(JSON.stringify(template.options)) : undefined;
-        
-        // 创建题目
-        const question = await prisma.question.create({
-          data: {
-            content,
-            questionType,
-            options: optionsData,
-            answer: template.answer,
-            analysis: "本题考查..." + content.substring(0, 50),
-            score: randomScore(),
-            correctRate: randomCorrectRate(),
-            subject,
-            source,
-            category,
-            year,
-            grade,
-            tags,
-          },
-        });
-        questionCount++;
-
-        // 创建对应的组题（每个题目对应一个组题）
-        const group = await prisma.questionGroup.create({
-          data: {
-            title: content.length > 100 ? content.substring(0, 100) + '...' : content,
-            content: content,
-            questionType: questionType,
-            score: question.score,
-            subject,
-            source,
-            category,
-            grade,
-            tags,
-            imageUrl: `https://picsum.photos/seed/group-${groupCount}/400/300`,
-          },
-        });
-
-        // 将题目关联到组题
-        await prisma.groupItem.create({
-          data: {
-            groupId: group.id,
-            questionId: question.id,
-            orderIndex: 0,
-          },
-        });
-
-        groupCount++;
-      }
-    }
+    console.log(`创建了第${q.id}题`);
   }
 
-  console.log(`成功创建 ${questionCount} 道题目和 ${groupCount} 个组题！`);
-
-  for (const subject of subjects) {
-    const papersPerSubject = Math.floor(Math.random() * 2) + 1;
-    for (let p = 0; p < papersPerSubject; p++) {
-      const sources = ["高考真题", "模拟试卷", "期中测试", "期末测试"];
-      const source = randomPick(sources);
-
-      const paper = await prisma.testPaper.create({
-        data: {
-          title: `${subject} ${source} ${p + 1}`,
-          description: `## 考试说明\n\n本试卷共包含若干题目，满分100分，考试时间120分钟。\n\n### 注意事项\n\n1. 答题前请将姓名、准考证号填写在答题卡上。\n2. 选择题用2B铅笔填涂，非选择题用黑色签字笔作答。`,
-          subject,
-          source,
-          grade: randomGrade(),
-          year: randomYear(),
-          totalScore: 100,
-          duration: 120,
-          tags: ["套卷", source],
-        },
-      });
-
-      const questions = await prisma.question.findMany({
-        where: { subject },
-        take: Math.floor(Math.random() * 8) + 5,
-      });
-
-      questions.forEach((q, index) => {
-        prisma.paperItem.create({
-          data: {
-            paperId: paper.id,
-            itemId: q.id,
-            itemType: "Question",
-            orderIndex: index,
-          },
-        });
-      });
-
-      paperCount++;
-    }
-  }
-
-  console.log(`成功创建 ${paperCount} 套试卷！`);
+  console.log("完形填空题目数据创建完成！");
 }
 
 main()

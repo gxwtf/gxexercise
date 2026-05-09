@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card"
 import { ProgressCircle } from "@/components/ui/progress-circle"
 import { Users, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 interface QuestionCardProps {
   id: string
@@ -29,6 +30,7 @@ interface QuestionCardProps {
 const defaultImageUrl = 'https://neeko-copilot.bytedance.net/api/text2image?prompt=education%20learning%20exam%20question%20abstract%20blue%20gradient&image_size=square'
 
 export function QuestionCard({
+  id,
   title,
   imageUrl,
   subject,
@@ -78,12 +80,16 @@ export function QuestionCard({
       <CardFooter>
         {/* 按钮区域 */}
         <div className="flex gap-2 w-full">
-          <Button className="flex-1">
-            开始练习
-          </Button>
-          <Button variant="outline" className="flex-1">
-            回顾/学习
-          </Button>
+          <Link href={`/question/${id}`} className="w-full">
+            <Button className="w-full">
+              开始练习
+            </Button>
+          </Link>
+          <Link href={`/question/${id}/review`} className="w-full">
+            <Button variant="outline" className="w-full">
+              回顾/学习
+            </Button>
+          </Link>
         </div>
       </CardFooter>
     </Card>
