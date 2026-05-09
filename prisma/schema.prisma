@@ -18,7 +18,6 @@ model Question {
   answer         String     @default("")
   analysis       String?    @db.Text
   score          Int        @default(5)
-  showOnHomepage Boolean    @default(true)
   correctRate    Decimal?   @db.Decimal(5, 4)
   subject        String     @db.VarChar(100)
   source         String     @db.VarChar(200)
@@ -26,7 +25,6 @@ model Question {
   category       String     @db.VarChar(100) @default("")
   year           Int?
   tags           String[]
-  imageUrl       String?    @db.VarChar(500)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
@@ -39,18 +37,21 @@ model Question {
 }
 
 model QuestionGroup {
-  id        String      @id @default(cuid())
-  title     String      @db.VarChar(255)
-  content   String      @db.Text
-  subject   String      @db.VarChar(100)
-  source    String      @db.VarChar(200)
-  grade     String?     @db.VarChar(50)
-  category  String      @db.VarChar(100)
-  tags      String[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id           String      @id @default(cuid())
+  title        String      @db.VarChar(255)
+  content      String      @db.Text
+  questionType String      @db.VarChar(100)
+  score        Int         @default(0)
+  subject      String      @db.VarChar(100)
+  source       String      @db.VarChar(200)
+  grade        String?     @db.VarChar(50)
+  category     String      @db.VarChar(100)
+  tags         String[]
+  imageUrl     String?     @db.VarChar(500)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  groupItems GroupItem[]
+  groupItems   GroupItem[]
 
   @@index([subject])
   @@index([category])

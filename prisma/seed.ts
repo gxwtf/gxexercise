@@ -101,9 +101,7 @@ function randomScore(): number {
   return randomPick(scores);
 }
 
-function randomShowOnHomepage(): boolean {
-  return Math.random() > 0.2;
-}
+// 移除了 randomShowOnHomepage 函数
 
 function randomCorrectRate(): number | null {
   if (Math.random() > 0.3) {
@@ -170,10 +168,13 @@ async function main() {
         const year = randomYear();
         const sources = ["高考真题", "高考模拟", "各区期末", "广学模拟", "竞赛题", "练习题"];
         const source = randomPick(sources);
+        const grade = randomGrade();
+        const tags = randomTags(subject, category);
 
         const optionsData = template.options ? JSON.parse(JSON.stringify(template.options)) : undefined;
         
-        await prisma.question.create({
+        // 创建题目
+        const question = await prisma.question.create({
           data: {
             content,
             questionType,
@@ -181,64 +182,48 @@ async function main() {
             answer: template.answer,
             analysis: "本题考查..." + content.substring(0, 50),
             score: randomScore(),
-            showOnHomepage: randomShowOnHomepage(),
             correctRate: randomCorrectRate(),
             subject,
             source,
             category,
             year,
-            tags: randomTags(subject, category),
-            imageUrl: `https://picsum.photos/seed/${questionCount}/400/300`,
+            grade,
+            tags,
           },
         });
         questionCount++;
+
+        // 创建对应的组题（每个题目对应一个组题）
+        const group = await prisma.questionGroup.create({
+          data: {
+            title: content.length > 100 ? content.substring(0, 100) + '...' : content,
+            content: content,
+            questionType: questionType,
+            score: question.score,
+            subject,
+            source,
+            category,
+            grade,
+            tags,
+            imageUrl: `https://picsum.photos/seed/group-${groupCount}/400/300`,
+          },
+        });
+
+        // 将题目关联到组题
+        await prisma.groupItem.create({
+          data: {
+            groupId: group.id,
+            questionId: question.id,
+            orderIndex: 0,
+          },
+        });
+
+        groupCount++;
       }
     }
   }
 
-  console.log(`成功创建 ${questionCount} 道题目！`);
-
-  for (const subject of subjects) {
-    const groupsPerSubject = Math.floor(Math.random() * 3) + 2;
-    for (let g = 0; g < groupsPerSubject; g++) {
-      const categories = categoriesBySubject[subject] || [];
-      const category = randomPick(categories.filter(c => c !== "套卷"));
-      const sources = ["高考真题", "模拟试卷", "阅读理解专项"];
-      const source = randomPick(sources);
-
-      const groupQuestions = await prisma.question.findMany({
-        where: { subject, category, showOnHomepage: true },
-        take: Math.floor(Math.random() * 3) + 2,
-      });
-
-      if (groupQuestions.length < 2) continue;
-
-      const group = await prisma.questionGroup.create({
-        data: {
-          title: `${subject} ${category} 组题 ${g + 1}`,
-          content: `## 阅读材料\n\n这是一篇关于${category}的阅读材料，阅读后回答下列问题。\n\n文章内容...`,
-          subject,
-          source,
-          category,
-          tags: ["组题", category],
-        },
-      });
-
-      groupQuestions.forEach((q, index) => {
-        prisma.groupItem.create({
-          data: {
-            groupId: group.id,
-            questionId: q.id,
-            orderIndex: index,
-          },
-        });
-      });
-
-      groupCount++;
-    }
-  }
-
-  console.log(`成功创建 ${groupCount} 个组题！`);
+  console.log(`成功创建 ${questionCount} 道题目和 ${groupCount} 个组题！`);
 
   for (const subject of subjects) {
     const papersPerSubject = Math.floor(Math.random() * 2) + 1;
@@ -261,7 +246,7 @@ async function main() {
       });
 
       const questions = await prisma.question.findMany({
-        where: { subject, showOnHomepage: true },
+        where: { subject },
         take: Math.floor(Math.random() * 8) + 5,
       });
 

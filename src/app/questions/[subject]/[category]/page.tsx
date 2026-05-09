@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { routeToSubject, routeToCategory } from "@/constants/subjects";
 import { QuestionOverview } from "@/components/QuestionOverview";
-import { transformQuestions } from "@/lib/transformers";
 
 interface PageProps {
   params: Promise<{
@@ -17,17 +16,7 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
 
   const isTestPaperCategory = categoryName === '套卷';
 
-  const questions = transformQuestions(
-    await prisma.question.findMany({
-      where: {
-        subject: subjectName,
-        category: categoryName,
-        showOnHomepage: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-  );
-
+  // 查询 QuestionGroup
   const groups = isTestPaperCategory ? [] : await prisma.questionGroup.findMany({
     where: {
       subject: subjectName,
@@ -37,6 +26,9 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
     include: {
       groupItems: {
         orderBy: { orderIndex: "asc" },
+        include: {
+          question: true
+        }
       },
     },
   });
@@ -55,7 +47,7 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
 
   return (
     <QuestionOverview
-      initialQuestions={questions}
+      initialGroups={groups}
       initialTestPapers={papers}
       subject={subjectName}
       category={categoryName}

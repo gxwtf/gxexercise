@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { QuestionCard } from "./QuestionCard";
 import { TestCard } from "./TestCard";
 import { Search, FileText } from "lucide-react";
@@ -9,9 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { QuestionType } from "@/constants/questionTypes";
 
-type TransformedQuestion = {
+type Question = {
   id: string;
   questionType: string;
   content: string;
@@ -19,7 +18,6 @@ type TransformedQuestion = {
   answer: string;
   analysis?: string | null;
   score: number;
-  showOnHomepage: boolean;
   correctRate: number | null;
   subject: string;
   source: string;
@@ -30,6 +28,31 @@ type TransformedQuestion = {
   imageUrl?: string | null;
   createdAt: Date;
   updatedAt: Date;
+};
+
+type GroupItem = {
+  id: string;
+  groupId: string;
+  questionId: string;
+  orderIndex: number;
+  question: Question;
+};
+
+type QuestionGroup = {
+  id: string;
+  title: string;
+  content: string;
+  questionType: string;
+  score: number;
+  subject: string;
+  source: string;
+  grade?: string | null;
+  category: string;
+  tags: string[];
+  imageUrl?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  groupItems: GroupItem[];
 };
 
 type TestPaper = {
@@ -48,7 +71,7 @@ type TestPaper = {
 };
 
 interface QuestionOverviewProps {
-  initialQuestions?: TransformedQuestion[];
+  initialGroups?: QuestionGroup[];
   initialTestPapers?: TestPaper[];
   subject?: string;
   category?: string;
@@ -56,7 +79,7 @@ interface QuestionOverviewProps {
 }
 
 export function QuestionOverview({
-  initialQuestions = [],
+  initialGroups = [],
   initialTestPapers = [],
   subject,
   category,
@@ -72,6 +95,27 @@ export function QuestionOverview({
   // 使用从props传入的套卷数据
   const testPapers = initialTestPapers;
 
+  // 过滤套卷数据
+  const filteredTestPapers = useMemo(() => {
+    return testPapers.filter((paper) => {
+      const matchesSearch =
+        paper.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        paper.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        paper.tags.some((tag) =>
+          tag.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      const matchesSubject = !subject || paper.subject === subject;
+
+      // 套卷新增筛选条件
+      const matchesCategoryFilter = selectedCategory === "all" || paper.source === selectedCategory;
+      const matchesYearFilter = selectedYear === "all" || paper.year?.toString() === selectedYear;
+      const matchesGradeFilter = selectedGrade === "all" || paper.grade === selectedGrade;
+
+      return matchesSearch && matchesSubject &&
+        matchesCategoryFilter && matchesYearFilter && matchesGradeFilter;
+    });
+  }, [testPapers, searchTerm, subject, selectedCategory, selectedYear, selectedGrade]);
+
   // 筛选选项 - 固定的四个选项
   const categoryOptions = [
     { value: "all", label: "全部题型" },
@@ -81,15 +125,17 @@ export function QuestionOverview({
     { value: "广学模拟", label: "广学模拟" }
   ];
 
-  // 动态生成年份选项
+  // 动态生成年份选项（从组题关联的题目中提取）
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
     const years = [{ value: "all", label: "全部" }];
     
-    // 从题目数据中提取所有年份
+    // 从组题关联的题目中提取所有年份
     const uniqueYears = new Set<number>();
-    initialQuestions.forEach(q => {
-      if (q.year) uniqueYears.add(q.year);
+    initialGroups.forEach(group => {
+      group.groupItems.forEach(item => {
+        if (item.question && item.question.year) uniqueYears.add(item.question.year);
+      });
     });
     
     // 添加最近5年
@@ -105,31 +151,30 @@ export function QuestionOverview({
       });
     
     return years;
-  }, [initialQuestions]);
+  }, [initialGroups]);
 
-  // 动态生成年级选项
+  // 动态生成年级选项（从组题中提取）
   const gradeOptions = useMemo(() => {
     const grades = [{ value: "all", label: "全部" }];
     
-    // 从题目数据中提取所有年级标签
+    // 从组题数据中提取所有年级
     const uniqueGrades = new Set<string>();
-    initialQuestions.forEach(q => {
-      q.tags.forEach(tag => {
-        if (tag.includes("高一") || tag.includes("高二") || tag.includes("高三")) {
-          uniqueGrades.add(tag);
-        }
+    initialGroups.forEach(group => {
+      if (group.grade) uniqueGrades.add(group.grade);
+      group.groupItems.forEach(item => {
+        if (item.question && item.question.grade) uniqueGrades.add(item.question.grade!);
       });
     });
     
     // 添加标准年级选项
     ["高一", "高二", "高三"].forEach(grade => {
-      if (Array.from(uniqueGrades).some(g => g.includes(grade))) {
+      if (uniqueGrades.has(grade)) {
         grades.push({ value: grade, label: grade });
       }
     });
     
     return grades;
-  }, [initialQuestions]);
+  }, [initialGroups]);
 
   // 处理套卷开始练习
   const handleStartTest = (testId: string) => {
@@ -137,26 +182,30 @@ export function QuestionOverview({
     // 这里可以添加跳转到套卷练习页面的逻辑
   };
 
-  const filteredQuestions = useMemo(() => {
-    return initialQuestions.filter((question) => {
+  const filteredGroups = useMemo(() => {
+    return initialGroups.filter((group) => {
       const matchesSearch =
-        question.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        question.tags.some((tag) =>
+        group.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        group.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        group.tags.some((tag) =>
           tag.toLowerCase().includes(searchTerm.toLowerCase())
         );
-      const matchesSubject = !subject || question.subject === subject;
-      const matchesCategory = !category || question.category === category;
-      const matchesType = !questionType || question.questionType === questionType;
+      const matchesSubject = !subject || group.subject === subject;
+      const matchesCategory = !category || group.category === category;
+      const matchesType = !questionType || group.questionType === questionType;
 
       // 新增筛选条件
-      const matchesCategoryFilter = selectedCategory === "all" || question.source === selectedCategory;
-      const matchesYearFilter = selectedYear === "all" || question.year?.toString() === selectedYear;
-      const matchesGradeFilter = selectedGrade === "all" || question.tags.includes(selectedGrade);
+      const matchesCategoryFilter = selectedCategory === "all" || group.source === selectedCategory;
+      const matchesYearFilter = selectedYear === "all" || 
+        group.groupItems.some(item => item.question.year?.toString() === selectedYear);
+      const matchesGradeFilter = selectedGrade === "all" || 
+        group.grade === selectedGrade ||
+        group.groupItems.some(item => item.question.grade === selectedGrade);
 
       return matchesSearch && matchesSubject && matchesCategory && matchesType &&
         matchesCategoryFilter && matchesYearFilter && matchesGradeFilter;
     });
-  }, [initialQuestions, searchTerm, subject, category, questionType, selectedCategory, selectedYear, selectedGrade]);
+  }, [initialGroups, searchTerm, subject, category, questionType, selectedCategory, selectedYear, selectedGrade]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -238,7 +287,7 @@ export function QuestionOverview({
               <div>
                 <h2 className="text-2xl font-bold mb-6">{subject}套卷练习</h2>
                 <div className="grid grid-cols-1 gap-4">
-                  {testPapers.map((paper) => (
+                  {filteredTestPapers.map((paper) => (
                     <TestCard
                       key={paper.id}
                       id={paper.id}
@@ -252,7 +301,7 @@ export function QuestionOverview({
                   ))}
                 </div>
 
-                {testPapers.length === 0 && (
+                {filteredTestPapers.length === 0 && (
                   <div className="text-center py-16 bg-card rounded-xl border border-border">
                     <div className="text-muted-foreground mb-2">
                       <FileText className="w-12 h-12 mx-auto" />
@@ -266,25 +315,24 @@ export function QuestionOverview({
                   </div>
                 )}
               </div>
-            ) : filteredQuestions.length > 0 ? (
-              // 普通题目页面：显示题目和套卷推荐
+            ) : filteredGroups.length > 0 ? (
+              // 普通题目页面：显示组题和套卷推荐
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {filteredQuestions.map((question, index) => (
+                  {filteredGroups.map((group, index) => (
                     <div
-                      key={question.id}
+                      key={group.id}
                       className="animate-in fade-in slide-in-from-bottom-4 duration-500"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <QuestionCard
-                        id={question.id}
-                        title={question.content.length > 100 ? question.content.substring(0, 100) + '...' : question.content}
-                        imageUrl={question.imageUrl ?? undefined}
-                        subject={question.subject}
-                        questionType={question.questionType}
-                        year={question.year ?? undefined}
-                        source={question.source}
-                        tags={question.tags}
+                        id={group.id}
+                        title={group.title.length > 100 ? group.title.substring(0, 100) + '...' : group.title}
+                        imageUrl={group.imageUrl ?? undefined}
+                        subject={group.subject}
+                        questionType={group.questionType}
+                        source={group.source}
+                        tags={group.tags}
                       />
                     </div>
                   ))}
@@ -313,7 +361,7 @@ export function QuestionOverview({
                 )}
               </>
             ) : (
-              // 无匹配题目
+              // 无匹配组题
               <div className="text-center py-16 bg-card rounded-xl border border-border">
                 <div className="text-muted-foreground mb-2">
                   <Search className="w-12 h-12 mx-auto" />
@@ -329,7 +377,7 @@ export function QuestionOverview({
 
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
-                当前显示 {filteredQuestions.length} 道题目
+                当前显示 {filteredGroups.length} 个组题
               </p>
             </div>
           </div>
