@@ -6,6 +6,7 @@ import Grammar from "@/components/question-group/grammar";
 import EnReading from "@/components/question-group/en-reading";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
 import ReadingExpression from "@/components/question-group/reading-expression";
+import EnWriting from "@/components/question-group/en-writing";
 
 interface PageProps {
   params: Promise<{
@@ -113,6 +114,18 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <ReadingExpression 
         questions={questions as any} 
+        mdxSource={mdxSource}
+      />
+    );
+  }
+
+  // 如果是英语写作类型，则使用英语写作组件
+  if (questionGroup.questionType === 'en-writing') {
+    // 序列化数据库中的 MDX 内容
+    const mdxSource = await serialize(questionGroup.content || '');
+    
+    return (
+      <EnWriting 
         mdxSource={mdxSource}
       />
     );

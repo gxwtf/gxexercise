@@ -689,6 +689,64 @@ I've completed my doctorate and am now an independent academic researcher. I hav
   }
 
   console.log("阅读表达题目数据创建完成！");
+
+  // 英语写作题目内容
+  const enWritingArticle = `假设你是红星中学高二学生李华。你的英国好友Jim来信告诉你，下个月他将作为志愿者接待一位赴英中国交换生，并向你征求建议。请你用英文给他回信，内容包括：
+
+1. 接待建议；
+2. 说明理由。
+
+注意：
+
+1. 词数不少于80；
+2. 开头和结尾已给出，不计入总词数。`;
+
+  // 创建英语写作的题目组
+  const enWritingGroup = await prisma.questionGroup.create({
+    data: {
+      title: "英语写作练习 - 给英国好友的回信",
+      content: enWritingArticle,
+      questionType: "en-writing",
+      score: 25, // 写作题分数
+      subject: "英语",
+      source: "练习题",
+      category: "英语写作",
+      grade: "高三",
+      tags: ["英语写作", "书信", "建议", "英语", "高三", "练习"],
+      imageUrl: "https://picsum.photos/seed/en-writing/400/300",
+    },
+  });
+
+  console.log(`创建了英语写作题目组: ${enWritingGroup.title}`);
+
+  // 创建英语写作题目
+  const enWritingQuestion = await prisma.question.create({
+    data: {
+      content: enWritingArticle,
+      questionType: 'input',
+      options: [],
+      answer: '', // 写作题没有固定答案
+      analysis: '写作题评分标准：内容要点完整（接待建议和理由），语言表达准确流畅，结构清晰，词数符合要求。',
+      score: 25,
+      correctRate: 0.7,
+      subject: "英语",
+      source: "练习题",
+      category: "英语写作",
+      grade: "高三",
+      tags: ["英语写作", "书信", "英语"],
+    },
+  });
+
+  // 将题目关联到题目组
+  await prisma.groupItem.create({
+    data: {
+      groupId: enWritingGroup.id,
+      questionId: enWritingQuestion.id,
+      orderIndex: 0,
+    },
+  });
+
+  console.log("英语写作题目数据创建完成！");
 }
 
 main()
