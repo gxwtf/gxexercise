@@ -585,6 +585,110 @@ As we continue to develop and implement AI technologies, it is crucial that we d
   });
 
   console.log("七选五题目数据创建完成！");
+
+  // 阅读表达文章内容
+  const readingExpressionArticle = `Life felt like a mountain hike with designated stops — high school, college — where I could figure out my direction. I chose chemistry as my college major because it seemed to provide different career options. Learning organic chemistry reactions wasn't frustrating or boring, but I did not "love" my subject.
+
+After finishing my undergraduate degree, I wanted financial independence. I looked for jobs but most needed a master's degree. I got into a graduate program and chose it, though I didn't plan to continue to a Ph.D.
+
+However, I began to question my belief that I was not suited for a Ph. D. when I started the laboratory research project. I spent a lot of time in the lab and never felt bored. Mastering my project required constant learning and discovering. I started to prefer experiments over classes.
+
+As my master's was drawing to a close, my confusion peaked. With my scores, I was in a good position to be hired by government-funded companies — a great opportunity I didn't want to waste. And everyone I talked to advised securing a stable job instead of pursuing a Ph. D., so I continued on to the interview stage. Still, I couldn't ignore my growing interest in research. One week before my scheduled interview with my top-choice company, I backed out. I was going to pursue a Ph. D.
+
+I've completed my doctorate and am now an independent academic researcher. I have worked with others who are far more enthusiastic and were always sure they wanted to be scientists. I wondered how I traveled so far without "love" for the subject. Over the years, though, I have realized that neither success nor failure makes me go overboard or slip into depression. There are ups and downs, but it just feels right every morning to go to the laboratory and do experiments to learn something new. Although I have started my career as a"reluctant" (不情愿的) chemist, I am now ready to proclaim my love for what I do. All the way I try to see the relevant problems and solve them for my own satisfaction. That makes me no less capable than my peers, and no less deserving of a space in science.`;
+
+  // 创建阅读表达的题目组
+  const readingExpressionGroup = await prisma.questionGroup.create({
+    data: {
+      title: "阅读表达练习 - 一位化学家的职业选择",
+      content: readingExpressionArticle,
+      questionType: "reading-expression",
+      score: 40, // 总分是4道题
+      subject: "英语",
+      source: "练习题",
+      category: "阅读表达",
+      grade: "高三",
+      tags: ["阅读表达", "英语", "高三", "练习", "职业选择"],
+      imageUrl: "https://picsum.photos/seed/reading-expression/400/300",
+    },
+  });
+
+  console.log(`创建了阅读表达题目组: ${readingExpressionGroup.title}`);
+
+  // 创建阅读表达题目
+  const readingExpressionQuestions = [
+    {
+      id: '53',
+      questionType: 'input',
+      content: 'Why did the author choose chemistry as his college major?',
+      answer: 'Because it seemed to provide different career options.',
+      analysis: '根据文章第一段第二句："I chose chemistry as my college major because it seemed to provide different career options."',
+      score: 10,
+      correctRate: 0.75,
+    },
+    {
+      id: '54',
+      questionType: 'input',
+      content: 'When did the author begin to question his belief about not being suited for a Ph. D.?',
+      answer: 'When he started the laboratory research project.',
+      analysis: '根据文章第三段第一句："However, I began to question my belief that I was not suited for a Ph. D. when I started the laboratory research project."',
+      score: 10,
+      correctRate: 0.7,
+    },
+    {
+      id: '55',
+      questionType: 'input',
+      content: 'Please decide which part is false in the following statement, then underline it and explain why.',
+      // subContent: '➢ The author decided to pursue a Ph. D. because he failed in the job interview.',
+      answer: 'The false part is "because he failed in the job interview". According to the passage, the author backed out of the interview one week before it was scheduled, not because he failed.',
+      analysis: '根据文章第四段："One week before my scheduled interview with my top-choice company, I backed out." 作者是在面试前一周主动退出的，并非面试失败。',
+      score: 10,
+      correctRate: 0.65,
+    },
+    {
+      id: '56',
+      questionType: 'input',
+      content: 'Do you think it\'s necessary for people to love what they do? Why or why not? (In about 40 words)',
+      answer: 'Answers may vary. A possible answer: It\'s not absolutely necessary at first, but developing love for what you do can bring more satisfaction and motivation in the long run.',
+      analysis: '这是开放性问题，答案因人而异。合理即可。',
+      score: 10,
+      correctRate: 0.8,
+    },
+  ];
+
+  for (const q of readingExpressionQuestions) {
+    const question = await prisma.question.create({
+      data: {
+        content: q.content,
+        questionType: q.questionType,
+        options: [],
+        answer: q.answer,
+        analysis: q.analysis,
+        score: q.score,
+        correctRate: q.correctRate,
+        subject: "英语",
+        source: "练习题",
+        category: "阅读表达",
+        grade: "高三",
+        tags: ["阅读表达", "问答题", "英语", `第${q.id}题`],
+        // 存储 subContent 用于特殊题目
+        // subContent: q.subContent || '',
+      },
+    });
+
+    // 将题目关联到题目组
+    await prisma.groupItem.create({
+      data: {
+        groupId: readingExpressionGroup.id,
+        questionId: question.id,
+        orderIndex: readingExpressionQuestions.indexOf(q),
+      },
+    });
+
+    console.log(`创建了阅读表达第${q.id}题`);
+  }
+
+  console.log("阅读表达题目数据创建完成！");
 }
 
 main()

@@ -5,34 +5,22 @@ import EnglishReading from '@/components/article/english-reading'
 import { QuestionSection } from '@/components/QuestionSection'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
-import Reading3Content from '@/content/reading3.mdx'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMDXComponents } from '@/mdx-components'
 
-export default function Reading3Page() {
-  // 阅读表达题目
-  const questions = [
-    {
-      id: '53',
-      stem: 'Why did the author choose chemistry as his college major?',
-      type: 'text' as const
-    },
-    {
-      id: '54',
-      stem: 'When did the author begin to question his belief about not being suited for a Ph. D.?',
-      type: 'text' as const
-    },
-    {
-      id: '55',
-      stem: 'Please decide which part is false in the following statement, then underline it and explain why.',
-      subStem: '➢ The author decided to pursue a Ph. D. because he failed in the job interview.',
-      type: 'text' as const
-    },
-    {
-      id: '56',
-      stem: 'Do you think it\'s necessary for people to love what they do? Why or why not? (In about 40 words)',
-      type: 'text' as const
-    }
-  ]
+interface ReadingExpressionQuestion {
+  id: string
+  stem: string
+  type: 'text' | 'input'
+  subStem?: string
+}
 
+interface ReadingExpressionProps {
+  questions: ReadingExpressionQuestion[]
+  mdxSource: MDXRemoteSerializeResult
+}
+
+export default function ReadingExpression({ questions, mdxSource }: ReadingExpressionProps) {
   // 存储用户答案
   const [answers, setAnswers] = React.useState<Record<string, string>>({})
 
@@ -44,13 +32,15 @@ export default function Reading3Page() {
     }))
   }
 
+  const components = useMDXComponents()
+
   return (
     <div className="h-screen overflow-hidden bg-background">
       <div className="flex h-screen">
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
           <EnglishReading>
-            <Reading3Content />
+            <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>
         </div>
 

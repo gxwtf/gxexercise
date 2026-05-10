@@ -5,6 +5,7 @@ import Cloze from "@/components/question-group/cloze";
 import Grammar from "@/components/question-group/grammar";
 import EnReading from "@/components/question-group/en-reading";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
+import ReadingExpression from "@/components/question-group/reading-expression";
 
 interface PageProps {
   params: Promise<{
@@ -33,12 +34,13 @@ async function QuestionPageContent({ id }: { id: string }) {
   // 构建题目数组（根据题型类型）
   const questions = questionGroup.groupItems.map((item: any) => {
     if (item.question.questionType === 'input') {
-      // 填空题
+      // 填空题/阅读表达题
       return {
         id: item.question.id,
         stem: item.question.content,
         type: 'input' as const,
-        answer: item.question.answer || ''
+        answer: item.question.answer || '',
+        subStem: item.question.subContent || ''
       };
     } else {
       // 默认选择题
@@ -97,6 +99,19 @@ async function QuestionPageContent({ id }: { id: string }) {
     
     return (
       <SevenChooseFive 
+        questions={questions as any} 
+        mdxSource={mdxSource}
+      />
+    );
+  }
+
+  // 如果是阅读表达类型，则使用阅读表达组件
+  if (questionGroup.questionType === 'reading-expression') {
+    // 序列化数据库中的 MDX 内容
+    const mdxSource = await serialize(questionGroup.content || '');
+    
+    return (
+      <ReadingExpression 
         questions={questions as any} 
         mdxSource={mdxSource}
       />
