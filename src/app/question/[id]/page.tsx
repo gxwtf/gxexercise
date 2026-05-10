@@ -1,9 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import dynamic from 'next/dynamic';
-
-// 动态导入客户端组件
-const Cloze = dynamic(() => import("@/components/question-group/cloze"));
+import { serialize } from 'next-mdx-remote/serialize';
+import Cloze from "@/components/question-group/cloze";
 
 interface PageProps {
   params: Promise<{
@@ -39,9 +37,13 @@ async function QuestionPageContent({ id }: { id: string }) {
 
   // 如果是完形填空类型，则使用完形填空组件
   if (questionGroup.questionType === 'cloze') {
+    // 序列化数据库中的 MDX 内容
+    const mdxSource = await serialize(questionGroup.content || '');
+    
     return (
       <Cloze 
         questions={questions} 
+        mdxSource={mdxSource}
       />
     );
   }

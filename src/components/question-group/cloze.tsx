@@ -5,7 +5,8 @@ import EnglishReading from '@/components/article/english-reading'
 import { ChoiceField } from '@/components/question/ChoiceField'
 import { QuestionSection } from '@/components/QuestionSection'
 import { Separator } from '@/components/ui/separator'
-import ClozeContent from '@/content/cloze.mdx'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMDXComponents } from '@/mdx-components'
 
 interface ClozeQuestion {
   id: string
@@ -16,12 +17,15 @@ interface ClozeQuestion {
 
 interface ClozeProps {
   questions: ClozeQuestion[]
+  mdxSource: MDXRemoteSerializeResult
 }
 
-export default function Cloze({ questions }: ClozeProps) {
+export default function Cloze({ questions, mdxSource }: ClozeProps) {
   const onAnswerChange = (questionId: string, selected: string[]) => {
     console.log(`Question ${questionId} selected:`, selected);
   }
+
+  const components = useMDXComponents()
 
   return (
     <div className="h-screen overflow-hidden bg-background">
@@ -29,7 +33,7 @@ export default function Cloze({ questions }: ClozeProps) {
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
           <EnglishReading startQuestionNumber={1}>
-            <ClozeContent />
+            <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>
         </div>
 
