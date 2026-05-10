@@ -36,7 +36,7 @@ export const categoryToRoute: Record<string, string> = {
   '文言文': 'classical',
   '现代文': 'modern',
   '完形填空': 'cloze',
-  '语法填空': 'grammarr',
+  '语法填空': 'grammar',
   '阅读': 'en-reading',
   '七选五': 'seven-choose-five',
   '阅读表达': 'reading-expression',

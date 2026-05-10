@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { serialize } from 'next-mdx-remote/serialize';
 import Cloze from "@/components/question-group/cloze";
 import Grammar from "@/components/question-group/grammar";
+import EnReading from "@/components/question-group/en-reading";
 
 interface PageProps {
   params: Promise<{
@@ -69,6 +70,19 @@ async function QuestionPageContent({ id }: { id: string }) {
     
     return (
       <Grammar 
+        questions={questions as any} 
+        mdxSource={mdxSource}
+      />
+    );
+  }
+
+  // 如果是英语阅读类型，则使用英语阅读组件
+  if (questionGroup.questionType === 'en-reading') {
+    // 序列化数据库中的 MDX 内容
+    const mdxSource = await serialize(questionGroup.content || '');
+    
+    return (
+      <EnReading 
         questions={questions as any} 
         mdxSource={mdxSource}
       />

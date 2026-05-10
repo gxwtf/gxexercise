@@ -357,6 +357,135 @@ async function main() {
   }
 
   console.log("语法填空题目数据创建完成！");
+
+  // 英语阅读文章内容
+  const readingArticle = `# D
+
+A pair of papers, published in the scientific journal Nature, touts (标榜) the potential of new AI weather forecasting approaches — systems that could produce faster and more accurate results than traditional models. They are part of a new wave of AI models sweeping the meteorology (气象学) community worldwide.
+
+Conventional forecasts rely on a system known as numerical weather prediction. It's a kind of mathematical model that uses complex equations (方程式) to predict the way weather systems change over time and space. These equations describe the actual physics behind the movement of air and water in the atmosphere and the oceans. Because there's so much math and physics involved, numerical weather models require extremely high levels of computational power. That makes them expensive and time-consuming to run. It also limits the fine-scale processes that these models can accurately capture.
+
+Scientists have come up with various ways to get around these difficulties in traditional models. One strategy is a method known as parameterization — that's when scientists replace the actual physical equations in a model with a simplified program that generally captures the process without forcing the model to represent the actual physics.
+
+But artificial intelligence could replace **these workarounds**, enthusiasts argue, with potentially faster and more accurate results.
+
+AI models don't have to represent actual physics in the form of mathematical equations. Instead, they take in large amounts of historical weather data and learn to recognize patterns. They then use these patterns to make predictions when presented with new data on present-day weather conditions.
+
+In principle, the much faster computational speed could provide immense benefits. But some experts note that the changing climate may pose a unique challenge for developing AI weather models. AI systems rely on historical weather data to teach them how to produce accurate forecasts. But certain kinds of weather events, such as heat waves and hurricanes, are growing more intense as the planet warms — and in some cases, they're becoming so extreme that there are few examples at all in the historical record. That could make it difficult for AI weather models to accurately simulate (模拟) events that are record-breaking or have never been seen before.
+
+Accurately forecasting extreme weather events is one of the most crucial functions for weather models, enabling decision-makers to issue public safety announcements or facilitate evacuations (疏散) with enough time to protect high-risk populations. But if AI models are presented with weather conditions that are entirely foreign to them, it may be hard to predict how they'll react. The authors of the 2021 Royal Society paper point out that when it comes to capturing extremes with limited data, AI systems have produced mixed results — some have performed well while others not that satisfactorily.
+
+Hybrid models that include both AI components and numerical model components may run into fewer difficulties with record-breaking events, Russ Schumacher, Colorado's state climatologist, suggested. He noted that numerical models and AI models may end up with different strengths, and human experience will remain valuable for communicating information about the weather.`;
+
+  // 创建英语阅读的题目组
+  const readingQuestionGroup = await prisma.questionGroup.create({
+    data: {
+      title: "AI天气预报",
+      content: readingArticle,
+      questionType: "en-reading",
+      score: 20, // 总分是4道题×5分
+      subject: "英语",
+      source: "练习题",
+      category: "阅读",
+      grade: "高三",
+      tags: ["阅读", "英语", "高三", "练习", "AI", "天气"],
+      imageUrl: "https://picsum.photos/seed/reading-exercise/400/300",
+    },
+  });
+
+  console.log(`创建了英语阅读题目组: ${readingQuestionGroup.title}`);
+
+  // 创建4个阅读选择题
+  const readingQuestions = [
+    {
+      id: '27',
+      questionType: 'choice',
+      content: 'What does the underlined expression "these workarounds" in Paragraph 4 refer to?',
+      options: [
+        { id: 'a', label: 'High costs.' },
+        { id: 'b', label: 'Various methods.' },
+        { id: 'c', label: 'Weather systems.' },
+        { id: 'd', label: 'Inaccurate results.' }
+      ],
+      answer: 'b',
+      correctRate: 0.65,
+      score: 5
+    },
+    {
+      id: '28',
+      questionType: 'choice',
+      content: 'What is Paragraph 5 mainly about?',
+      options: [
+        { id: 'a', label: 'The advantages of artificial intelligence.' },
+        { id: 'b', label: 'The application of mathematical equations.' },
+        { id: 'c', label: 'The fast collection of historical weather data.' },
+        { id: 'd', label: 'The working principles of AI weather models.' }
+      ],
+      answer: 'd',
+      correctRate: 0.7,
+      score: 5
+    },
+    {
+      id: '29',
+      questionType: 'choice',
+      content: 'What can we learn from the passage?',
+      options: [
+        { id: 'a', label: 'Decision-makers find AI forecasts more reliable.' },
+        { id: 'b', label: 'AI models will eventually replace numerical ones.' },
+        { id: 'c', label: 'Lack of relevant weather data challenges AI systems.' },
+        { id: 'd', label: 'AI weather models help to prevent extreme climate events.' }
+      ],
+      answer: 'c',
+      correctRate: 0.6,
+      score: 5
+    },
+    {
+      id: '30',
+      questionType: 'choice',
+      content: "What's the main purpose of the passage?",
+      options: [
+        { id: 'a', label: 'To raise global climate change awareness.' },
+        { id: 'b', label: 'To stress the importance of the historical record.' },
+        { id: 'c', label: 'To compare the strengths of weather prediction methods.' },
+        { id: 'd', label: 'To suggest a way to improve weather prediction accuracy.' }
+      ],
+      answer: 'd',
+      correctRate: 0.68,
+      score: 5
+    },
+  ];
+
+  for (const q of readingQuestions) {
+    const question = await prisma.question.create({
+      data: {
+        content: q.content,
+        questionType: q.questionType,
+        options: q.options,
+        answer: q.answer,
+        analysis: `第${q.id}题解析: 根据文章内容选择正确答案。`,
+        score: q.score,
+        correctRate: q.correctRate,
+        subject: "英语",
+        source: "练习题",
+        category: "阅读理解",
+        grade: "高三",
+        tags: ["阅读理解", "选择题", "英语", `第${q.id}题`],
+      },
+    });
+
+    // 将题目关联到题目组
+    await prisma.groupItem.create({
+      data: {
+        groupId: readingQuestionGroup.id,
+        questionId: question.id,
+        orderIndex: readingQuestions.indexOf(q),
+      },
+    });
+
+    console.log(`创建了英语阅读第${q.id}题`);
+  }
+
+  console.log("英语阅读题目数据创建完成！");
 }
 
 main()
