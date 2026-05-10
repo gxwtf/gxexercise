@@ -4,6 +4,7 @@ import { serialize } from 'next-mdx-remote/serialize';
 import Cloze from "@/components/question-group/cloze";
 import Grammar from "@/components/question-group/grammar";
 import EnReading from "@/components/question-group/en-reading";
+import SevenChooseFive from "@/components/question-group/seven-choose-five";
 
 interface PageProps {
   params: Promise<{
@@ -83,6 +84,19 @@ async function QuestionPageContent({ id }: { id: string }) {
     
     return (
       <EnReading 
+        questions={questions as any} 
+        mdxSource={mdxSource}
+      />
+    );
+  }
+
+  // 如果是七选五类型，则使用七选五组件
+  if (questionGroup.questionType === 'seven-choose-five') {
+    // 序列化数据库中的 MDX 内容
+    const mdxSource = await serialize(questionGroup.content || '');
+    
+    return (
+      <SevenChooseFive 
         questions={questions as any} 
         mdxSource={mdxSource}
       />
