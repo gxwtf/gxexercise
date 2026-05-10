@@ -710,9 +710,9 @@ I've completed my doctorate and am now an independent academic researcher. I hav
       score: 25, // 写作题分数
       subject: "英语",
       source: "练习题",
-      category: "英语写作",
+      category: "作文",
       grade: "高三",
-      tags: ["英语写作", "书信", "建议", "英语", "高三", "练习"],
+      tags: ["作文", "书信", "建议", "英语", "高三", "练习"],
       imageUrl: "https://picsum.photos/seed/en-writing/400/300",
     },
   });
