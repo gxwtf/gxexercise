@@ -2,9 +2,9 @@
 
 import * as React from 'react'
 import EnglishReading from '@/components/article/english-reading'
-import GrammaContent from '@/content/gramma.mdx'
+import GrammarContent from '@/content/grammar.mdx'
 
-export default function GrammaPage() {
+export default function GrammarPage() {
   // 存储用户填写的答案
   const [answers, setAnswers] = React.useState<Record<string, string>>({})
 
@@ -20,7 +20,7 @@ export default function GrammaPage() {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6">
         <EnglishReading startQuestionNumber={11}>
-          <GrammaContent />
+          <GrammarContent />
         </EnglishReading>
       </div>
     </div>

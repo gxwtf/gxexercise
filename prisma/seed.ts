@@ -23,6 +23,19 @@ Thirty meters high— we were near the top. By this point, the rock was sticking
 
 Finally, I reached the top and felt excited. Something had <ClozeBlank />. Fear is unbelievably powerful, but now I know, so am I.`;
 
+// 语法填空文章内容
+const grammarArticle = `## A
+
+Tributes have poured onto Chinese social media following the death of British conservationist Jane Goodall, aged 91, <Input/> story featured in school textbooks and who visited China 17 times. Goodall, best known <Input/> her detailed observations of chimpanzee behavior in Tanzania, dedicated her life to wildlife conservation and environmental protection. Her research revealed that chimpanzees are capable of rational thought and experience emotions such as joy and sorrow — traits once considered unique to humans. She also <Input/> (confirm) that they use tools.
+
+## B
+
+The Tangshan China ceramic Expo, rooted in "China's Northern Porcelain Capital", <Input/> (hold) since 1998 and grown into a national premium ceramic event. Organized annually at Tangshan International Convention and Exhibition Center, it spans over 20,000 square meters with more than 300 exhibitors. It showcases diverse wares such as Tangshan bone china, celadon and purple clay, plus masterpieces by national ceramic artists. <Input/> (highlight) of the expo include on-site master demonstrations, hands-on pottery experiences, and post-expo "porcelain fairs" for affordable purchases, <Input/> (blend) art, trade and public engagement.
+
+## C
+
+Sixteen years ago, Jason was a professor with <Input/> fortune of two million dollars. Today he lives in a small dormitory room. There are certainly no signs <Input/> he is a rich and successful man. But Jason appreciates this change. He is pleased to give up the lifestyle of a rich man. He was tired of <Input/> (regard) as a person who had everything <Input/> many people had nothing. He made the choice to give all his money away. And this, he said, brought him happiness and a sense of success in life.`;
+
 // 完形填空的题目和答案
 const clozeQuestions = [
   {
@@ -280,6 +293,70 @@ async function main() {
   }
 
   console.log("完形填空题目数据创建完成！");
+
+  // 创建语法填空的题目组
+  const grammarQuestionGroup = await prisma.questionGroup.create({
+    data: {
+      title: "语法填空练习 - 综合训练",
+      content: grammarArticle,
+      questionType: "grammar",
+      score: 50, // 总分是10道题×5分
+      subject: "英语",
+      source: "练习题",
+      category: "语法填空",
+      grade: "高三",
+      tags: ["语法填空", "英语", "高三", "练习"],
+      imageUrl: "https://picsum.photos/seed/grammar-exercise/400/300",
+    },
+  });
+
+  console.log(`创建了语法填空题目组: ${grammarQuestionGroup.title}`);
+
+  // 创建10个填空题（语法填空）
+  const grammarQuestions = [
+    { id: '1', answer: 'whose', correctRate: 0.65, score: 5 },
+    { id: '2', answer: 'for', correctRate: 0.72, score: 5 },
+    { id: '3', answer: 'confirmed', correctRate: 0.68, score: 5 },
+    { id: '4', answer: 'has been held', correctRate: 0.6, score: 5 },
+    { id: '5', answer: 'Highlights', correctRate: 0.75, score: 5 },
+    { id: '6', answer: 'blending', correctRate: 0.7, score: 5 },
+    { id: '7', answer: 'a', correctRate: 0.8, score: 5 },
+    { id: '8', answer: 'that', correctRate: 0.78, score: 5 },
+    { id: '9', answer: 'being regarded', correctRate: 0.55, score: 5 },
+    { id: '10', answer: 'while', correctRate: 0.62, score: 5 },
+  ];
+
+  for (const q of grammarQuestions) {
+    const question = await prisma.question.create({
+      data: {
+        content: "", // 语法填空不需要题干
+        questionType: "input",
+        options: [], // 填空题没有选项
+        answer: q.answer,
+        analysis: `第${q.id}题解析: 根据上下文和语法规则填写正确答案。`,
+        score: q.score,
+        correctRate: q.correctRate,
+        subject: "英语",
+        source: "练习题",
+        category: "语法填空",
+        grade: "高三",
+        tags: ["语法填空", "填空题", "英语", `第${q.id}题`],
+      },
+    });
+
+    // 将题目关联到题目组
+    await prisma.groupItem.create({
+      data: {
+        groupId: grammarQuestionGroup.id,
+        questionId: question.id,
+        orderIndex: parseInt(q.id) - 1, // 从0开始排序
+      },
+    });
+
+    console.log(`创建了语法填空第${q.id}题`);
+  }
+
+  console.log("语法填空题目数据创建完成！");
 }
 
 main()

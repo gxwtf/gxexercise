@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { serialize } from 'next-mdx-remote/serialize';
 import Cloze from "@/components/question-group/cloze";
+import Grammar from "@/components/question-group/grammar";
 
 interface PageProps {
   params: Promise<{
@@ -27,13 +28,26 @@ async function QuestionPageContent({ id }: { id: string }) {
     notFound();
   }
 
-  // 构建题目数组
-  const questions = questionGroup.groupItems.map((item: any) => ({
-    id: item.question.id,
-    stem: item.question.content,
-    type: 'single' as const,
-    options: item.question.options || []
-  }));
+  // 构建题目数组（根据题型类型）
+  const questions = questionGroup.groupItems.map((item: any) => {
+    if (item.question.questionType === 'input') {
+      // 填空题
+      return {
+        id: item.question.id,
+        stem: item.question.content,
+        type: 'input' as const,
+        answer: item.question.answer || ''
+      };
+    } else {
+      // 默认选择题
+      return {
+        id: item.question.id,
+        stem: item.question.content,
+        type: 'single' as const,
+        options: item.question.options || []
+      };
+    }
+  });
 
   // 如果是完形填空类型，则使用完形填空组件
   if (questionGroup.questionType === 'cloze') {
@@ -42,7 +56,20 @@ async function QuestionPageContent({ id }: { id: string }) {
     
     return (
       <Cloze 
-        questions={questions} 
+        questions={questions as any} 
+        mdxSource={mdxSource}
+      />
+    );
+  }
+
+  // 如果是语法填空类型，则使用语法填空组件
+  if (questionGroup.questionType === 'grammar') {
+    // 序列化数据库中的 MDX 内容
+    const mdxSource = await serialize(questionGroup.content || '');
+    
+    return (
+      <Grammar 
+        questions={questions as any} 
         mdxSource={mdxSource}
       />
     );
