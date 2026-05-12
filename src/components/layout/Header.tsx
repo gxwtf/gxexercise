@@ -11,12 +11,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import BaseHeader from '@/components/layout/BaseHeader';
 import { subjects, subjectToRoute } from '@/constants/subjects';
+import useSession from '@/lib/use-session';
 
 export default function Header() {
-  const currentUser = {
-    name: 'Demo User',
-    role: 'admin',
-  };
+  const { session } = useSession();
 
   const leftContent = (
     <div className="flex items-center space-x-8">
@@ -47,7 +45,7 @@ export default function Header() {
         <Link href="/games" className="text-sm font-medium hover:text-primary">
           游戏中心
         </Link>
-        {currentUser.role === 'admin' && (
+        {session.isLoggedIn && session.admin && (
           <Link href="/users" className="text-sm font-medium hover:text-primary">
             用户管理
           </Link>
@@ -69,7 +67,7 @@ export default function Header() {
         {subjects.map((subject) => (
           <Link
             key={subject}
-            href={`/${subjectToRoute[subject]}`}
+            href={`/questions/${subjectToRoute[subject]}`}
             className="text-sm font-medium hover:text-primary pl-4"
           >
             {subject}
@@ -82,7 +80,7 @@ export default function Header() {
       >
         游戏中心
       </Link>
-      {currentUser.role === 'admin' && (
+      {session.isLoggedIn && session.admin && (
         <Link
           href="/users"
           className="text-sm font-medium hover:text-primary"
