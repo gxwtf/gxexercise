@@ -102,3 +102,10 @@ model PaperItem {
   @@unique([paperId, itemId])
   @@index([paperId])
 }
+
+model User {
+  id       Int       @id
+
+  @@unique([id])
+  @@index([id])
+}
