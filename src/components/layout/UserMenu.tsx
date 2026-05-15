@@ -4,7 +4,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { User } from 'lucide-react';
+import Image from 'next/image';
 import useSession from '@/lib/use-session';
 import { useRouter } from 'next/navigation';
 import { useAlertContext } from '@/components/alert-provider';
@@ -36,7 +36,7 @@ export default function UserMenu() {
         return (
             <div className="ml-auto flex items-center gap-2">
                 <ThemeToggle />
-                <Button onClick={(e) => {
+                <Button variant="ghost" onClick={(e) => {
                     e.preventDefault()
                     if (typeof window !== 'undefined') {
                         router.push(`/login?back=${window.location.pathname}`)
@@ -48,22 +48,27 @@ export default function UserMenu() {
         );
     }
 
-    const userName = session.real_name || session.username;
-    const userRole = session.admin ? 'admin' : 'user';
+    const userName = session.username;
+    const showAdminBadge = session.admin;
 
     return (
         <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
 
             <span className="hidden text-sm text-muted-foreground sm:inline">
-                {userName} ({userRole})
+                {userName}{showAdminBadge ? ' (admin)' : ''}
             </span>
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <User className="h-4 w-4" />
-                        <span className="sr-only">用户菜单</span>
+                    <Button variant="ghost" size="icon" className="relative h-8 w-8 rounded-full">
+                        <Image
+                            src={`https://gxwtf.cn/avatar?userId=${session.userid}`}
+                            alt={userName}
+                            fill
+                            sizes="32px"
+                            className="rounded-full object-cover"
+                        />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
