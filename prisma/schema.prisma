@@ -29,6 +29,7 @@ model Question {
   updatedAt      DateTime   @updatedAt
 
   groupItems     GroupItem[]
+  submissions    QuestionSubmission[]
 
   @@index([subject])
   @@index([questionType])
@@ -52,6 +53,7 @@ model QuestionGroup {
   updatedAt    DateTime    @updatedAt
 
   groupItems   GroupItem[]
+  submissions  QuestionGroupSubmission[]
 
   @@index([subject])
   @@index([category])
@@ -85,6 +87,7 @@ model TestPaper {
   updatedAt   DateTime    @updatedAt
 
   paperItems  PaperItem[]
+  submissions TestPaperSubmission[]
 
   @@index([subject])
   @@index([year])
@@ -103,8 +106,76 @@ model PaperItem {
   @@index([paperId])
 }
 
+model QuestionSubmission {
+  id              String    @id @default(cuid())
+  userId          Int
+  questionId      String
+  groupSubmissionId String?
+  content         Json?
+  score           Float?    @db.Real
+  isCorrect       Boolean?
+  createdAt       DateTime  @default(now())
+
+  user            User      @relation(fields: [userId], references: [id])
+  question        Question  @relation(fields: [questionId], references: [id])
+  groupSubmission QuestionGroupSubmission? @relation(fields: [groupSubmissionId], references: [id])
+
+  @@index([userId])
+  @@index([questionId])
+  @@index([userId, questionId])
+  @@index([groupSubmissionId])
+}
+
+model QuestionGroupSubmission {
+  id              String    @id @default(cuid())
+  userId          Int
+  questionGroupId String
+  testSubmissionId String?
+  content         Json?
+  score           Float?    @db.Real
+  isCorrect       Boolean?
+  correctNum      Int?
+  totalNum        Int?
+  duration        Int?
+  createdAt       DateTime  @default(now())
+
+  user            User         @relation(fields: [userId], references: [id])
+  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id])
+  submissions     QuestionSubmission[]
+  testSubmission  TestPaperSubmission? @relation(fields: [testSubmissionId], references: [id])
+
+  @@index([userId])
+  @@index([questionGroupId])
+  @@index([userId, questionGroupId])
+  @@index([testSubmissionId])
+}
+
+model TestPaperSubmission {
+  id              String    @id @default(cuid())
+  userId          Int
+  testPaperId     String
+  content         Json?
+  score           Float?    @db.Real
+  duration        Int?
+  startedAt       DateTime?
+  submittedAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  user            User         @relation(fields: [userId], references: [id])
+  testPaper       TestPaper    @relation(fields: [testPaperId], references: [id])
+  groupSubmissions     QuestionGroupSubmission[]
+
+  @@index([userId])
+  @@index([testPaperId])
+  @@index([userId, testPaperId])
+}
+
 model User {
   id       Int       @id
+
+  questionSubmissions      QuestionSubmission[]
+  groupSubmissions         QuestionGroupSubmission[]
+  testPaperSubmissions     TestPaperSubmission[]
 
   @@unique([id])
   @@index([id])
