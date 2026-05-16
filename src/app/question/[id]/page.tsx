@@ -7,6 +7,8 @@ import EnReading from "@/components/question-group/en-reading";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
 import ReadingExpression from "@/components/question-group/reading-expression";
 import EnWriting from "@/components/question-group/en-writing";
+import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
+import { AnswerProvider } from "@/components/question-group/AnswerContext";
 
 interface PageProps {
   params: Promise<{
@@ -15,7 +17,6 @@ interface PageProps {
 }
 
 async function QuestionPageContent({ id }: { id: string }) {
-  // 获取题组及其关联的题目
   const questionGroup = await prisma.questionGroup.findUnique({
     where: { id },
     include: {
@@ -32,10 +33,8 @@ async function QuestionPageContent({ id }: { id: string }) {
     notFound();
   }
 
-  // 构建题目数组（根据题型类型）
   const questions = questionGroup.groupItems.map((item: any) => {
     if (item.question.questionType === 'input') {
-      // 填空题/阅读表达题
       return {
         id: item.question.id,
         stem: item.question.content,
@@ -44,7 +43,6 @@ async function QuestionPageContent({ id }: { id: string }) {
         subStem: item.question.subContent || ''
       };
     } else {
-      // 默认选择题
       return {
         id: item.question.id,
         stem: item.question.content,
@@ -54,90 +52,91 @@ async function QuestionPageContent({ id }: { id: string }) {
     }
   });
 
-  // 如果是完形填空类型，则使用完形填空组件
   if (questionGroup.questionType === 'cloze') {
-    // 序列化数据库中的 MDX 内容
     const mdxSource = await serialize(questionGroup.content || '');
-    
     return (
-      <Cloze 
-        questions={questions as any} 
-        mdxSource={mdxSource}
-      />
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <Cloze 
+          questions={questions as any} 
+          mdxSource={mdxSource}
+        />
+      </>
     );
   }
 
-  // 如果是语法填空类型，则使用语法填空组件
   if (questionGroup.questionType === 'grammar') {
-    // 序列化数据库中的 MDX 内容
     const mdxSource = await serialize(questionGroup.content || '');
-    
     return (
-      <Grammar 
-        questions={questions as any} 
-        mdxSource={mdxSource}
-      />
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <Grammar 
+          questions={questions as any} 
+          mdxSource={mdxSource}
+        />
+      </>
     );
   }
 
-  // 如果是英语阅读类型，则使用英语阅读组件
   if (questionGroup.questionType === 'en-reading') {
-    // 序列化数据库中的 MDX 内容
     const mdxSource = await serialize(questionGroup.content || '');
-    
     return (
-      <EnReading 
-        questions={questions as any} 
-        mdxSource={mdxSource}
-      />
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <EnReading 
+          questions={questions as any} 
+          mdxSource={mdxSource}
+        />
+      </>
     );
   }
 
-  // 如果是七选五类型，则使用七选五组件
   if (questionGroup.questionType === 'seven-choose-five') {
-    // 序列化数据库中的 MDX 内容
     const mdxSource = await serialize(questionGroup.content || '');
-    
     return (
-      <SevenChooseFive 
-        questions={questions as any} 
-        mdxSource={mdxSource}
-      />
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <SevenChooseFive 
+          questions={questions as any} 
+          mdxSource={mdxSource}
+        />
+      </>
     );
   }
 
-  // 如果是阅读表达类型，则使用阅读表达组件
   if (questionGroup.questionType === 'reading-expression') {
-    // 序列化数据库中的 MDX 内容
     const mdxSource = await serialize(questionGroup.content || '');
-    
     return (
-      <ReadingExpression 
-        questions={questions as any} 
-        mdxSource={mdxSource}
-      />
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <ReadingExpression 
+          questions={questions as any} 
+          mdxSource={mdxSource}
+        />
+      </>
     );
   }
 
-  // 如果是英语写作类型，则使用英语写作组件
   if (questionGroup.questionType === 'en-writing') {
-    // 序列化数据库中的 MDX 内容
     const mdxSource = await serialize(questionGroup.content || '');
-    
     return (
-      <EnWriting 
-        mdxSource={mdxSource}
-      />
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <EnWriting 
+          mdxSource={mdxSource}
+        />
+      </>
     );
   }
 
-  // 如果是其他题型，可以扩展其他组件
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">题组: {questionGroup.title}</h1>
-      <p>题型: {questionGroup.questionType}</p>
-      <p>暂不支持的题型</p>
-      {/* 在这里可以添加其他题型的支持 */}
+      <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+      <div className="mt-8">
+        <h1 className="text-2xl font-bold mb-4">题组: {questionGroup.title}</h1>
+        <p>题型: {questionGroup.questionType}</p>
+        <p>暂不支持的题型</p>
+      </div>
     </div>
   );
 }
@@ -145,5 +144,9 @@ async function QuestionPageContent({ id }: { id: string }) {
 export default async function QuestionPage({ params }: PageProps) {
   const { id } = await params;
   
-  return <QuestionPageContent id={id} />;
+  return (
+    <AnswerProvider>
+      <QuestionPageContent id={id} />
+    </AnswerProvider>
+  );
 }

@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
+import { useAnswer } from './AnswerContext'
 
 interface ReadingExpressionQuestion {
   id: string
@@ -21,15 +22,17 @@ interface ReadingExpressionProps {
 }
 
 export default function ReadingExpression({ questions, mdxSource }: ReadingExpressionProps) {
-  // 存储用户答案
-  const [answers, setAnswers] = React.useState<Record<string, string>>({})
+  const { setAnswer } = useAnswer()
+  const [textAnswers, setTextAnswers] = React.useState<Record<string, string>>({})
 
-  // 处理答案变化
   const handleAnswerChange = (questionId: string, answer: string) => {
-    setAnswers(prev => ({
+    setTextAnswers(prev => ({
       ...prev,
       [questionId]: answer
     }))
+    setAnswer(questionId, {
+      answer: answer
+    })
   }
 
   const components = useMDXComponents()
@@ -65,7 +68,7 @@ export default function ReadingExpression({ questions, mdxSource }: ReadingExpre
                   
                   <Textarea
                     placeholder="Please write your answer here..."
-                    value={answers[question.id] || ''}
+                    value={textAnswers[question.id] || ''}
                     onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                     className="min-h-20 resize-y"
                   />

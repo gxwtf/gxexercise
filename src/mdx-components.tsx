@@ -1,10 +1,9 @@
 import type { MDXComponents } from 'mdx/types'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import { useBlankContext, ClozeContext } from '@/components/article/english-reading'
+import { useBlankContext, ClozeContext, useInputChangeContext } from '@/components/article/english-reading'
 import { Input as ShadcnInput } from "@/components/ui/input"
 
-// Blank组件
 function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
     const context = useBlankContext()
 
@@ -14,7 +13,6 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
 
     const { blanks, options, onBlankClick, onRemove, getNextBlankId } = context
 
-    // 生成唯一的blankId
     const blankId = React.useMemo(() => getNextBlankId(), [getNextBlankId])
 
     const filledOptionId = blanks[blankId]
@@ -35,7 +33,6 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
     )
 }
 
-// ClozeBlank组件 - 用于完形填空的长下划线格式
 function ClozeBlank({
     questionNumber,
     ...props
@@ -59,16 +56,17 @@ function ClozeBlank({
 
 ClozeBlank.displayName = 'ClozeBlank'
 
-// Input填空题组件
+// Input填空题组件 - 使用InputChangeContext来保存答案
 function Input({
     onChange,
     ...props
 }: React.HTMLAttributes<HTMLSpanElement> & { onChange?: (value: string) => void }) {
-    const context = React.useContext(ClozeContext);
+    const clozeContext = React.useContext(ClozeContext);
+    const inputChangeContext = useInputChangeContext();
     const questionNumberRef = React.useRef<number | undefined>(undefined);
 
     if (questionNumberRef.current === undefined) {
-        if (!context) {
+        if (!clozeContext) {
             return (
                 <span className="inline-flex items-center h-8" {...props}>
                     <span className="text-sm font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">?</span>
@@ -80,11 +78,15 @@ function Input({
                 </span>
             );
         }
-        questionNumberRef.current = context.getNextQuestionNumber();
+        questionNumberRef.current = clozeContext.getNextQuestionNumber();
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange?.(e.target.value);
+        // 通过 InputChangeContext 传递答案到父组件
+        if (inputChangeContext?.onInputChange && questionNumberRef.current) {
+            inputChangeContext.onInputChange(String(questionNumberRef.current), e.target.value);
+        }
     };
 
     return (

@@ -24,12 +24,22 @@ export interface ClozeContextValue {
 
 export const ClozeContext = React.createContext<ClozeContextValue | null>(null);
 
+export interface InputChangeContextValue {
+  onInputChange?: (questionId: string, value: string) => void;
+}
+
+export const InputChangeContext = React.createContext<InputChangeContextValue | null>(null);
+
 export function useBlankContext() {
   return React.useContext(BlankContext);
 }
 
 export function useClozeContext() {
   return React.useContext(ClozeContext);
+}
+
+export function useInputChangeContext() {
+  return React.useContext(InputChangeContext);
 }
 
 export interface CustomComponentProps {
@@ -46,7 +56,8 @@ export interface EnglishReadingProps {
   options?: BlankOption[];
   onBlankClick?: (blankId: string) => void;
   onRemove?: (blankId: string) => void;
-  startQuestionNumber?: number; // 起始题号
+  onInputChange?: (questionId: string, value: string) => void;
+  startQuestionNumber?: number;
 }
 
 function replaceBlankTokens(
@@ -117,6 +128,7 @@ export function EnglishReading({
   options = [],
   onBlankClick,
   onRemove,
+  onInputChange,
   startQuestionNumber = 1,
 }: EnglishReadingProps) {
   const blankIndexRef = React.useRef(0);
@@ -154,6 +166,13 @@ export function EnglishReading({
     [getNextQuestionNumber]
   );
 
+  const inputChangeContextValue = React.useMemo(
+    () => ({
+      onInputChange,
+    }),
+    [onInputChange]
+  );
+
   const renderedContent = () => {
     if (!children) return null;
     return replaceBlankTokens(
@@ -169,22 +188,24 @@ export function EnglishReading({
   return (
     <BlankContext.Provider value={blankContextValue}>
       <ClozeContext.Provider value={clozeContextValue}>
-        <article
-          className={cn('max-w-4xl mx-auto p-6', className)}
-          style={{ fontFamily: '"Times New Roman", serif' }}
-        >
-          {title ? (
-            <header className="mb-8">
-              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
-                {title}
-              </h1>
-            </header>
-          ) : null}
+        <InputChangeContext.Provider value={inputChangeContextValue}>
+          <article
+            className={cn('max-w-4xl mx-auto p-6', className)}
+            style={{ fontFamily: '"Times New Roman", serif' }}
+          >
+            {title ? (
+              <header className="mb-8">
+                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
+                  {title}
+                </h1>
+              </header>
+            ) : null}
 
-          <div className="prose prose-lg max-w-none dark:prose-invert">
-            {renderedContent()}
-          </div>
-        </article>
+            <div className="prose prose-lg max-w-none dark:prose-invert">
+              {renderedContent()}
+            </div>
+          </article>
+        </InputChangeContext.Provider>
       </ClozeContext.Provider>
     </BlankContext.Provider>
   );

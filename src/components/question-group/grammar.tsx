@@ -4,6 +4,7 @@ import * as React from 'react'
 import EnglishReading from '@/components/article/english-reading'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
+import { useAnswer } from './AnswerContext'
 
 interface GrammarQuestion {
   id: string
@@ -18,13 +19,18 @@ interface GrammarProps {
 }
 
 export default function Grammar({ questions, mdxSource }: GrammarProps) {
-  const [answers, setAnswers] = React.useState<Record<string, string>>({})
+  const { setAnswer } = useAnswer()
 
-  const handleInputChange = (questionId: string, value: string) => {
-    setAnswers(prev => ({
-      ...prev,
-      [questionId]: value
-    }))
+  const handleInputChange = (questionNumber: string, value: string) => {
+    // 根据题号找到对应的题目
+    const questionIndex = parseInt(questionNumber) - 1
+    const question = questions[questionIndex]
+    
+    if (question) {
+      setAnswer(question.id, {
+        answer: value
+      })
+    }
   }
 
   const components = useMDXComponents()
@@ -32,7 +38,10 @@ export default function Grammar({ questions, mdxSource }: GrammarProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6">
-        <EnglishReading startQuestionNumber={1}>
+        <EnglishReading 
+          startQuestionNumber={1}
+          onInputChange={handleInputChange}
+        >
           <MDXRemote {...mdxSource} components={components} />
         </EnglishReading>
       </div>

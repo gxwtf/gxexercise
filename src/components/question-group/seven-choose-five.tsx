@@ -8,6 +8,7 @@ import { QuestionSection } from '@/components/QuestionSection'
 import { Separator } from '@/components/ui/separator'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
+import { useAnswer } from './AnswerContext'
 
 interface SevenChooseFiveQuestion {
   id: string
@@ -22,10 +23,9 @@ interface SevenChooseFiveProps {
 }
 
 export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiveProps) {
-  // 获取所有选项（从第一个题目中获取）
+  const { setAnswer } = useAnswer()
   const options = questions.length > 0 ? questions[0].options : []
 
-  // 使用封装的逻辑组件
   const {
     filledBlanks,
     selectedOption,
@@ -36,6 +36,20 @@ export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiv
   } = useBlankFillingLogic({
     options
   })
+
+  React.useEffect(() => {
+    const blankAnswers: Record<string, string> = {}
+    Object.keys(filledBlanks).forEach(blankId => {
+      blankAnswers[blankId] = filledBlanks[blankId]
+    })
+    
+    questions.forEach((q, index) => {
+      setAnswer(q.id, {
+        filledBlanks: blankAnswers,
+        blankIndex: index + 1
+      })
+    })
+  }, [filledBlanks, questions, setAnswer])
 
   const components = useMDXComponents()
 

@@ -131,7 +131,6 @@ model QuestionGroupSubmission {
   userId          Int
   questionGroupId String
   testSubmissionId String?
-  content         Json?
   score           Float?    @db.Real
   isCorrect       Boolean?
   correctNum      Int?

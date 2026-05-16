@@ -4,14 +4,23 @@ import * as React from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
+import { useAnswer } from './AnswerContext'
 
 interface EnWritingProps {
   mdxSource: MDXRemoteSerializeResult
 }
 
 export default function EnWriting({ mdxSource }: EnWritingProps) {
+  const { setAnswer } = useAnswer()
   const [text, setText] = React.useState('')
   const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length
+
+  React.useEffect(() => {
+    setAnswer('writing', {
+      answer: text,
+      wordCount
+    })
+  }, [text, wordCount, setAnswer])
 
   const components = useMDXComponents()
 

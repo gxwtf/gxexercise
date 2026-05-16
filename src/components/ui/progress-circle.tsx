@@ -10,7 +10,7 @@ interface ProgressCircleProps {
 }
 
 export function ProgressCircle({
-  correct,
+  correct,  
   total,
   size = 48,
   strokeWidth = 6,
@@ -23,14 +23,9 @@ export function ProgressCircle({
   const progress = total > 0 ? correct / total : 0
   const strokeDasharray = `${circumference} ${circumference}`
   const strokeDashoffset = circumference - progress * circumference
-  
-  // 确定颜色
-  const getColor = () => {
-    if (total === 0) return "text-gray-400"
-    if (progress === 0) return "text-red-500"
-    if (progress === 1) return "text-green-500"
-    return "text-blue-500"
-  }
+
+  // 判断是否有答题记录
+  const hasAttempt = total > 0
 
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)}>
@@ -43,29 +38,35 @@ export function ProgressCircle({
           stroke="currentColor"
           strokeWidth={strokeWidth}
           fill="none"
-          className="text-gray-200 opacity-50"
+          className={hasAttempt ? "text-red-400" : "text-gray-200"}
         />
-        {/* 进度圆环 */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          fill="none"
-          strokeDasharray={strokeDasharray}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          className={getColor()}
-          style={{
-            transition: 'stroke-dashoffset 0.3s ease'
-          }}
-        />
+        
+        {/* 进度圆环 - 只有有答题记录时才显示绿色进度 */}
+        {hasAttempt && (
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="text-green-500"
+            style={{
+              transition: 'stroke-dashoffset 0.3s ease'
+            }}
+          />
+        )}
       </svg>
       
       {/* 中间文字 */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] font-medium text-gray-700">
+        <span className={cn(
+          "text-[10px] font-medium",
+          hasAttempt ? "text-gray-700" : "text-gray-400"
+        )}>
           {correct}/{total}
         </span>
       </div>

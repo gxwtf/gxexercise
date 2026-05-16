@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,8 +13,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ProgressCircle } from "@/components/ui/progress-circle"
-import { Users, FileText } from 'lucide-react'
+import { Users, FileText, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+import useSession from '@/lib/use-session'
 
 interface QuestionCardProps {
   id: string
@@ -42,6 +46,32 @@ export function QuestionCard({
   correctCount = 0,
   totalQuestions = 0,
 }: QuestionCardProps) {
+  const { session } = useSession()
+  const [userStats, setUserStats] = useState<{ correctNum: number; totalNum: number } | null>(null)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!session.userid) return
+
+      try {
+        const response = await fetch(
+          `/api/submissions/group/stats?userId=${session.userid}&groupIds=${id}`
+        )
+        const result = await response.json()
+        if (result.success && result.data[id]) {
+          setUserStats(result.data[id])
+        }
+      } catch (error) {
+        console.error('Failed to fetch submission stats:', error)
+      }
+    }
+
+    fetchStats()
+  }, [session.userid, id])
+
+  const displayCorrectCount = userStats?.correctNum ?? correctCount
+  const displayTotalNum = userStats?.totalNum ?? totalQuestions
+
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
       {/* 图片区域 */}
@@ -57,8 +87,8 @@ export function QuestionCard({
       <CardHeader>
         <CardAction>
           <ProgressCircle
-            correct={correctCount}
-            total={totalQuestions}
+            correct={displayCorrectCount}
+            total={displayTotalNum}
           />
         </CardAction>
         <CardTitle className="line-clamp-1">
