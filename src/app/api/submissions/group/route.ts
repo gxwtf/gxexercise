@@ -73,7 +73,6 @@ export async function POST(request: Request) {
       data: {
         userId,
         questionGroupId,
-        content: {},
         score: totalScore,
         isCorrect: isAllCorrect,
         correctNum,
