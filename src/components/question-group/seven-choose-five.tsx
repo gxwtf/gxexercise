@@ -38,16 +38,10 @@ export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiv
   })
 
   React.useEffect(() => {
-    const blankAnswers: Record<string, string> = {}
-    Object.keys(filledBlanks).forEach(blankId => {
-      blankAnswers[blankId] = filledBlanks[blankId]
-    })
-    
     questions.forEach((q, index) => {
-      setAnswer(q.id, {
-        filledBlanks: blankAnswers,
-        blankIndex: index + 1
-      })
+      const blankId = String(index + 1)
+      const answer = filledBlanks[blankId] || ''
+      setAnswer(q.id, { answer })
     })
   }, [filledBlanks, questions, setAnswer])
 

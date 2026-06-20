@@ -92,7 +92,7 @@ pnpm run db:push
 pnpm run db:seed
 
 # 启动开发服务器
-pnpm run dev
+pnpm dev
 ```
 
 ## 数据库配置

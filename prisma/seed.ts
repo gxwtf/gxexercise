@@ -238,7 +238,9 @@ const clozeQuestions = [
 async function main() {
   console.log("开始创建完形填空题目数据...");
 
-  // 删除已有的相关数据
+  // 删除已有的相关数据（按外键依赖顺序）
+  await prisma.questionSubmission.deleteMany();
+  await prisma.questionGroupSubmission.deleteMany();
   await prisma.groupItem.deleteMany();
   await prisma.questionGroup.deleteMany();
   await prisma.question.deleteMany();
@@ -488,101 +490,81 @@ Hybrid models that include both AI components and numerical model components may
   console.log("英语阅读题目数据创建完成！");
 
   // 七选五阅读文章内容
-  const sevenChooseFiveArticle = `# The Future of Artificial Intelligence
+  const sevenChooseFiveArticle = `Cut your sugar, get some exercise, eat your vegetables, sleep well. Every day, we are surrounded by information about how to live longer, healthier, happier lives. <Blank /> It is to engage in the arts.
 
-Artificial intelligence (AI) is transforming various industries at an unprecedented pace.<Blank />From healthcare to finance, AI technologies are revolutionizing how we work and live.
+Over the past few decades, evidence has been increasing to suggest that being more creative works wonders for our health. <Blank /> And the results are astonishing, from music in surgery reducing the amount of painkillers and anti-anxiety medicines needed, to dance programs helping people with Parkinson's disease to walk.
 
-One of the most significant developments in AI is machine learning, which allows computers to learn from data without being explicitly programmed.<Blank />This technology powers everything from recommendation systems to autonomous vehicles.
+But the arts aren't just there for us when we are sick. As a public health scientist, I spend my days looking at data from studies—massive datasets that contain thousands of individuals who have completed questionnaires, had nurse interviews, donated blood samples and undergone brain imaging every few years of their lives. <Blank /> Using complex statistical methods, we can look at the long-term relationship between everyday arts engagement and dozens of health outcomes.
 
-However, the rapid advancement of AI also raises important ethical questions.<Blank />Issues such as data privacy, algorithmic bias, and job displacement need to be carefully considered as we move forward.
+The results are remarkable. Children who engage more with the arts have a reduced risk of developing problems like depression later in life. Adults who participate more frequently in the arts and visit cultural venues are happier and feel more satisfied with their lives over the years and decades that follow. 
 
-Despite these challenges, the potential benefits of AI are enormous.<Blank />In healthcare, AI can help diagnose diseases earlier and more accurately.<Blank />In education, it can provide personalized learning experiences for students.
+<Blank /> Kindergarteners who engage in music activities have increased prosocial skills as they head into primary school. Teenagers who are involved in bands, dance and editing school newspapers are less likely to get involved in antisocial behaviors or crime.
 
-As we continue to develop and implement AI technologies, it is crucial that we do so responsibly and ethically, ensuring that these powerful tools benefit all of humanity.`;
+I want to be clear: I am not suggesting the arts can solve all problems. <Blank /> But the evidence remains that engaging regularly in creative activities that you enjoy is an investment in your health that is worth making.`;
 
   // 创建七选五的题目组
   const sevenChooseFiveGroup = await prisma.questionGroup.create({
     data: {
-      title: "七选五阅读练习 - 人工智能的未来",
+      title: "七选五阅读练习 - 艺术与健康",
       content: sevenChooseFiveArticle,
       questionType: "seven-choose-five",
-      score: 25, // 总分是5道题×5分
+      score: 25,
       subject: "英语",
       source: "练习题",
       category: "七选五",
       grade: "高三",
-      tags: ["七选五", "英语", "高三", "练习", "人工智能"],
+      tags: ["七选五", "英语", "高三", "练习", "艺术", "健康"],
       imageUrl: "https://picsum.photos/seed/seven-choose-five/400/300",
     },
   });
 
   console.log(`创建了七选五题目组: ${sevenChooseFiveGroup.title}`);
 
-  // 创建7个选项（七选五）
+  // 创建7个选项（七选五，所有题目共用）
   const sevenChooseFiveOptions = [
-    {
-      id: 'a',
-      label: 'The Translators without Borders (TWB) Community is a nonprofit helping people get important information and be heard, whatever language they speak.',
-      isAnswer: false
-    },
-    {
-      id: 'b',
-      label: 'In addition, AI is also playing a crucial role in environmental protection and climate change mitigation.',
-      isAnswer: true
-    },
-    {
-      id: 'c',
-      label: 'On the other hand, traditional programming requires explicit instructions for every task.',
-      isAnswer: true
-    },
-    {
-      id: 'd',
-      label: 'As a result, many organizations are investing heavily in AI research and development.',
-      isAnswer: false
-    },
-    {
-      id: 'e',
-      label: 'Furthermore, these ethical concerns are not just theoretical but have real-world implications.',
-      isAnswer: true
-    },
-    {
-      id: 'f',
-      label: 'However, there are still many technical challenges that need to be overcome.',
-      isAnswer: true
-    },
-    {
-      id: 'g',
-      label: 'Therefore, it is essential to establish guidelines and regulations for AI development.',
-      isAnswer: true
-    },
+    { id: 'A', label: 'A. The benefits aren\'t just psychological either.' },
+    { id: 'B', label: 'B. Regular arts engagement goes beyond boosting physical health.' },
+    { id: 'C', label: 'C. But there is one piece of advice I bet you have never been given.' },
+    { id: 'D', label: 'D. Many of these studies contain buried questions on arts engagement.' },
+    { id: 'E', label: 'E. Arts can be inaccessible to people because of cost and other reasons.' },
+    { id: 'F', label: 'F. Crafts, singing, theatre and writing are good for us as part of our daily lives.' },
+    { id: 'G', label: 'G. Programs being developed around the world are starting to integrate the arts into healthcare.' },
   ];
 
-  // 创建七选五的题目（1个题目包含所有选项）
-  const sevenChooseFiveQuestion = await prisma.question.create({
-    data: {
-      content: "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项。选项中有两项为多余选项。",
-      questionType: 'choice',
-      options: sevenChooseFiveOptions.map(opt => ({ id: opt.id, label: opt.label })),
-      answer: sevenChooseFiveOptions.filter(opt => opt.isAnswer).map(opt => opt.id).join(','), // 正确答案的ID用逗号分隔
-      analysis: '七选五解析: 根据上下文逻辑关系选择最合适的句子填入空白处。',
-      score: 25,
-      correctRate: 0.55,
-      subject: "英语",
-      source: "练习题",
-      category: "七选五",
-      grade: "高三",
-      tags: ["七选五", "阅读理解", "英语"],
-    },
-  });
+  // 每个空对应的正确答案
+  const sevenChooseFiveAnswers = ['C', 'G', 'D', 'A', 'E'];
 
-  // 将题目关联到题目组
-  await prisma.groupItem.create({
-    data: {
-      groupId: sevenChooseFiveGroup.id,
-      questionId: sevenChooseFiveQuestion.id,
-      orderIndex: 0,
-    },
-  });
+  // 为每个空创建独立的题目
+  const sevenChooseFiveQuestions = [];
+  for (let i = 0; i < 5; i++) {
+    const question = await prisma.question.create({
+      data: {
+        content: "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项。选项中有两项为多余选项。",
+        questionType: 'choice',
+        options: sevenChooseFiveOptions,
+        answer: sevenChooseFiveAnswers[i],
+        analysis: `七选五解析: 第${i + 1}空根据上下文逻辑关系选择最合适的句子填入空白处。`,
+        score: 5,
+        correctRate: 0.55,
+        subject: "英语",
+        source: "练习题",
+        category: "七选五",
+        grade: "高三",
+        tags: ["七选五", "阅读理解", "英语"],
+      },
+    });
+
+    await prisma.groupItem.create({
+      data: {
+        groupId: sevenChooseFiveGroup.id,
+        questionId: question.id,
+        orderIndex: i,
+      },
+    });
+
+    sevenChooseFiveQuestions.push(question);
+    console.log(`创建了七选五第${i + 1}题`);
+  }
 
   console.log("七选五题目数据创建完成！");
 

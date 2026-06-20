@@ -13,7 +13,11 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
 
     const { blanks, options, onBlankClick, onRemove, getNextBlankId } = context
 
-    const blankId = React.useMemo(() => getNextBlankId(), [getNextBlankId])
+    const blankIdRef = React.useRef<string | null>(null)
+    if (blankIdRef.current === null) {
+        blankIdRef.current = getNextBlankId()
+    }
+    const blankId = blankIdRef.current
 
     const filledOptionId = blanks[blankId]
     const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
