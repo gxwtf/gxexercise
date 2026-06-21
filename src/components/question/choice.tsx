@@ -103,7 +103,7 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
             <Field orientation="horizontal">
               <RadioGroupItem value={option.id} id={option.id} />
               <FieldContent>
-                <FieldTitle className="whitespace-nowrap">{option.label}</FieldTitle>
+                <FieldTitle className="text-base whitespace-nowrap">{option.label}</FieldTitle>
               </FieldContent>
             </Field>
           </FieldLabel>
@@ -125,7 +125,7 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
                 onCheckedChange={(checked) => handleMultipleChange(option.id, checked as boolean)}
               />
               <FieldContent>
-                <FieldTitle className="whitespace-nowrap">{option.label}</FieldTitle>
+                <FieldTitle className="text-base whitespace-nowrap">{option.label}</FieldTitle>
               </FieldContent>
             </Field>
           </FieldLabel>

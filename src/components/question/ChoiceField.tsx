@@ -1,6 +1,8 @@
 "use client"
 
 import { ChoiceQuestion } from "./choice"
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMDXComponents } from '@/mdx-components'
 
 type Option = {
   id: string
@@ -12,6 +14,7 @@ type ChoiceType = 'single' | 'multiple' | 'indeterminate'
 interface Question {
   id: string
   stem: string
+  stemMdx?: MDXRemoteSerializeResult | null
   type: ChoiceType
   options: Option[]
 }
@@ -22,15 +25,24 @@ interface ChoiceFieldProps {
 }
 
 export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
+  const components = useMDXComponents()
+
   return (
     <div className="space-y-6">
       {questions.map((question, index) => (
         <div key={question.id} className="space-y-4">
           {question.stem ? (
             <>
-              <h3 className="text-lg font-medium">
-                {index + 1}. {question.stem}
-              </h3>
+              <div className="flex items-baseline gap-1">
+                <span className="text-lg font-medium">{index + 1}.</span>
+                <div className="text-lg font-medium">
+                  {question.stemMdx ? (
+                    <MDXRemote {...question.stemMdx} components={components} />
+                  ) : (
+                    question.stem
+                  )}
+                </div>
+              </div>
               <ChoiceQuestion
                 type={question.type}
                 options={question.options}

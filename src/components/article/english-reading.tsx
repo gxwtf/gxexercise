@@ -201,7 +201,7 @@ export function EnglishReading({
               </header>
             ) : null}
 
-            <div className="prose prose-lg max-w-none dark:prose-invert">
+            <div className="prose max-w-none dark:prose-invert">
               {renderedContent()}
             </div>
           </article>

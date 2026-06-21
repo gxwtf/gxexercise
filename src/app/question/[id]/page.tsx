@@ -33,11 +33,14 @@ async function QuestionPageContent({ id }: { id: string }) {
     notFound();
   }
 
-  const questions = questionGroup.groupItems.map((item: any) => {
+  const questions = await Promise.all(questionGroup.groupItems.map(async (item: any) => {
+    const stemMdx = item.question.content ? await serialize(item.question.content) : null;
+    
     if (item.question.questionType === 'input') {
       return {
         id: item.question.id,
         stem: item.question.content,
+        stemMdx,
         type: 'input' as const,
         answer: item.question.answer || '',
         subStem: item.question.subContent || ''
@@ -46,11 +49,12 @@ async function QuestionPageContent({ id }: { id: string }) {
       return {
         id: item.question.id,
         stem: item.question.content,
+        stemMdx,
         type: 'single' as const,
         options: item.question.options || []
       };
     }
-  });
+  }));
 
   if (questionGroup.questionType === 'cloze') {
     const mdxSource = await serialize(questionGroup.content || '');

@@ -522,13 +522,13 @@ I want to be clear: I am not suggesting the arts can solve all problems. <Blank 
 
   // 创建7个选项（七选五，所有题目共用）
   const sevenChooseFiveOptions = [
-    { id: 'A', label: 'A. The benefits aren\'t just psychological either.' },
-    { id: 'B', label: 'B. Regular arts engagement goes beyond boosting physical health.' },
-    { id: 'C', label: 'C. But there is one piece of advice I bet you have never been given.' },
-    { id: 'D', label: 'D. Many of these studies contain buried questions on arts engagement.' },
-    { id: 'E', label: 'E. Arts can be inaccessible to people because of cost and other reasons.' },
-    { id: 'F', label: 'F. Crafts, singing, theatre and writing are good for us as part of our daily lives.' },
-    { id: 'G', label: 'G. Programs being developed around the world are starting to integrate the arts into healthcare.' },
+    { id: 'A', label: 'The benefits aren\'t just psychological either.' },
+    { id: 'B', label: 'Regular arts engagement goes beyond boosting physical health.' },
+    { id: 'C', label: 'But there is one piece of advice I bet you have never been given.' },
+    { id: 'D', label: 'Many of these studies contain buried questions on arts engagement.' },
+    { id: 'E', label: 'Arts can be inaccessible to people because of cost and other reasons.' },
+    { id: 'F', label: 'Crafts, singing, theatre and writing are good for us as part of our daily lives.' },
+    { id: 'G', label: 'Programs being developed around the world are starting to integrate the arts into healthcare.' },
   ];
 
   // 每个空对应的正确答案
@@ -620,7 +620,9 @@ I've completed my doctorate and am now an independent academic researcher. I hav
     {
       id: '55',
       questionType: 'input',
-      content: 'Please decide which part is false in the following statement, then underline it and explain why.',
+      content: `Please decide which part is false in the following statement, then underline it and explain why.
+
+➢ The author decided to pursue a Ph. D. because he failed in the job interview.`,
       // subContent: '➢ The author decided to pursue a Ph. D. because he failed in the job interview.',
       answer: 'The false part is "because he failed in the job interview". According to the passage, the author backed out of the interview one week before it was scheduled, not because he failed.',
       analysis: '根据文章第四段："One week before my scheduled interview with my top-choice company, I backed out." 作者是在面试前一周主动退出的，并非面试失败。',

@@ -32,7 +32,7 @@ export function BlankFillingQuestion({ availableOptions, selectedOption, onOptio
               <Field orientation="horizontal">
                 <RadioGroupItem value={option.id} id={option.id} />
                 <FieldContent>
-                  <FieldTitle>{option.label}</FieldTitle>
+                  <FieldTitle className="text-base">{option.id}. {option.label}</FieldTitle>
                 </FieldContent>
               </Field>
             </FieldLabel>

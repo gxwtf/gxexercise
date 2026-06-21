@@ -26,13 +26,13 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
         <span
             onClick={() => filledOption ? onRemove?.(blankId) : onBlankClick?.(blankId)}
             className={cn(
-                'inline rounded px-1 py-0.5 text-base font-normal transition cursor-pointer',
+                'inline rounded px-1 py-0.5 text-lg font-normal transition cursor-pointer',
                 'align-baseline leading-normal',
                 filledOption ? 'text-[#A31F24] font-medium' : 'text-black'
             )}
             {...props}
         >
-            {filledOption ? `[${filledOption.label}]` : '[■]'}
+            {filledOption ? `[${filledOption.id}. ${filledOption.label}]` : '[■]'}
         </span>
     )
 }
@@ -73,10 +73,10 @@ function Input({
         if (!clozeContext) {
             return (
                 <span className="inline-flex items-center h-8" {...props}>
-                    <span className="text-sm font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">?</span>
+                    <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">?</span>
                     <ShadcnInput
                         type="text"
-                        className="w-30 rounded-l-none h-8"
+                        className="w-30 rounded-l-none h-8 text-base"
                         onChange={(e) => onChange?.(e.target.value)}
                     />
                 </span>
@@ -95,12 +95,12 @@ function Input({
 
     return (
         <span className="inline-flex items-center h-7" {...props}>
-            <span className="text-sm font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">
+            <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">
                 {questionNumberRef.current}
             </span>
             <ShadcnInput
                 type="text"
-                className="w-30 rounded-l-none h-7"
+                className="w-30 rounded-l-none h-7 text-base"
                 onChange={handleChange}
             />
         </span>
@@ -160,7 +160,7 @@ const Typography = {
         ({ className, ...props }, ref) => (
             <p
                 ref={ref}
-                className={cn('leading-7 [&:not(:first-child)]:mt-4', className)}
+                className={cn('text-lg leading-7 [&:not(:first-child)]:mt-4', className)}
                 {...props}
             />
         )
@@ -201,7 +201,7 @@ const Typography = {
 
     LI: React.forwardRef<HTMLLIElement, React.HTMLAttributes<HTMLLIElement>>(
         ({ className, ...props }, ref) => (
-            <li ref={ref} className={cn('mt-2', className)} {...props} />
+            <li ref={ref} className={cn('text-lg mt-2', className)} {...props} />
         )
     ),
 

@@ -12,6 +12,7 @@ import { useAnswer } from './AnswerContext'
 interface ReadingExpressionQuestion {
   id: string
   stem: string
+  stemMdx?: MDXRemoteSerializeResult | null
   type: 'text' | 'input'
   subStem?: string
 }
@@ -38,7 +39,7 @@ export default function ReadingExpression({ questions, mdxSource }: ReadingExpre
   const components = useMDXComponents()
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
+    <div className="h-screen overflow-hidden bg-background font-question">
       <div className="flex h-screen">
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
@@ -59,9 +60,15 @@ export default function ReadingExpression({ questions, mdxSource }: ReadingExpre
                   <div className="flex items-start space-x-2">
                     <span className="text-lg font-medium text-gray-700">{index + 1}.</span>
                     <div className="flex-1">
-                      <p className="text-lg font-medium text-gray-900">{question.stem}</p>
+                      {question.stemMdx ? (
+                        <div className="text-lg font-medium text-gray-900">
+                          <MDXRemote {...question.stemMdx} components={components} />
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium text-gray-900">{question.stem}</p>
+                      )}
                       {question.subStem && (
-                        <p className="mt-2 text-base text-gray-700 italic">{question.subStem}</p>
+                        <p className="mt-2 text-lg text-gray-700 italic">{question.subStem}</p>
                       )}
                     </div>
                   </div>
