@@ -110,12 +110,12 @@ export function QuestionCard({
       <CardFooter>
         {/* 按钮区域 */}
         <div className="flex gap-2 w-full">
-          <Link href={`/question/${id}`} className="w-full">
+          <Link href={`/question/${id}`} className="w-full" target="_blank">
             <Button className="w-full">
               开始练习
             </Button>
           </Link>
-          <Link href={`/question/${id}/review`} className="w-full">
+          <Link href={`/question/${id}/review`} className="w-full" target="_blank">
             <Button variant="outline" className="w-full">
               回顾/学习
             </Button>

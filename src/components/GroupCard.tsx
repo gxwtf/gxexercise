@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Users } from 'lucide-react';
+import Link from "next/link";
 
 interface GroupCardProps {
   id: string;
@@ -14,6 +15,7 @@ interface GroupCardProps {
 }
 
 export function GroupCard({
+  id,
   title,
   content,
   questionCount,
@@ -65,12 +67,16 @@ export function GroupCard({
       </CardContent>
 
       <CardFooter>
-        <Button className="flex-1">
-          开始练习
-        </Button>
-        <Button variant="outline" className="flex-1">
-          回顾/学习
-        </Button>
+        <Link href={`/question/${id}`} className="flex-1" target="_blank">
+          <Button className="w-full">
+            开始练习
+          </Button>
+        </Link>
+        <Link href={`/question/${id}/review`} className="flex-1" target="_blank">
+          <Button variant="outline" className="w-full">
+            回顾/学习
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

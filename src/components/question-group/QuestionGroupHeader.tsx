@@ -61,8 +61,8 @@ export default function QuestionGroupHeader({ title, questionGroupId }: Question
       });
 
       if (response.ok) {
-        const result = await response.json();
-        router.push(`/practice-review/${result.submissionId}`);
+        await response.json();
+        router.push(`/question/${questionGroupId}/review`);
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to submit');
