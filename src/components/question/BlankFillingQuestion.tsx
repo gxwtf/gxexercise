@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from "react"
-import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Field,
@@ -29,7 +27,7 @@ export function BlankFillingQuestion({ availableOptions, selectedOption, onOptio
         <RadioGroup value={selectedOption || ''} onValueChange={(value) => onOptionSelect(value || null)}>
           {availableOptions.map(option => (
             <FieldLabel key={option.id}>
-              <Field orientation="horizontal">
+              <Field orientation="horizontal" className="!items-center">
                 <RadioGroupItem value={option.id} id={option.id} />
                 <FieldContent>
                   <FieldTitle className="text-base">{option.id}. {option.label}</FieldTitle>

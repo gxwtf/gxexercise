@@ -100,7 +100,7 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
       <RadioGroup value={selected[0] || ''} onValueChange={handleSingleChange}>
         {renderOptions((option) => (
           <FieldLabel key={option.id} className={layoutType === 'four-columns' ? 'flex-1 min-w-0' : ''}>
-            <Field orientation="horizontal">
+            <Field orientation="horizontal" className="!items-center">
               <RadioGroupItem value={option.id} id={option.id} />
               <FieldContent>
                 <FieldTitle className="text-base whitespace-nowrap">{option.label}</FieldTitle>
@@ -118,14 +118,14 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
       <div>
         {renderOptions((option) => (
           <FieldLabel key={option.id} className={layoutType === 'four-columns' ? 'flex-1 min-w-0' : ''}>
-            <Field orientation="horizontal">
+            <Field orientation="horizontal" className="items-center">
               <Checkbox
                 id={option.id}
                 checked={selected.includes(option.id)}
                 onCheckedChange={(checked) => handleMultipleChange(option.id, checked as boolean)}
               />
               <FieldContent>
-                <FieldTitle className="text-base whitespace-nowrap">{option.label}</FieldTitle>
+                <FieldTitle className="whitespace-nowrap">{option.label}</FieldTitle>
               </FieldContent>
             </Field>
           </FieldLabel>
