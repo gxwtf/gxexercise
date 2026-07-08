@@ -82,6 +82,14 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     ? await serialize(currentQuestion.analysis)
     : null
 
+  const correctAnswerMdx = currentQuestion.answer
+    ? await serialize(currentQuestion.answer)
+    : null
+
+  const userAnswerMdx = userAnswer
+    ? await serialize(userAnswer)
+    : null
+
   const questionSwitcherItems: QuestionSwitcherItem[] = questions.map((item, idx) => {
     const sub = questionSubmissions.find((s) => s.questionId === item.question.id)
     let status: "correct" | "wrong" | "unanswered" = "unanswered"
@@ -119,6 +127,7 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     questionGroup: {
       id: questionGroup.id,
       title: questionGroup.title,
+      questionType: questionGroup.questionType,
     },
     articleMdx,
     stemMdx,
@@ -127,7 +136,9 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     currentQuestion,
     options,
     correctAnswer: currentQuestion.answer || "",
+    correctAnswerMdx,
     userAnswer,
+    userAnswerMdx,
     isCorrect,
     currentIndex: questionIndex,
     historyItems,

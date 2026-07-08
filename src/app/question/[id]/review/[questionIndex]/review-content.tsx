@@ -8,11 +8,14 @@ import { QuestionSwitcher, type QuestionSwitcherItem } from "@/components/review
 import { ChoiceReview } from "@/components/review/ChoiceReview"
 import { SubmissionHistoryTable, type SubmissionHistoryItem } from "@/components/review/SubmissionHistoryTable"
 import { QuestionSection } from "@/components/QuestionSection"
+import { EnglishReading } from "@/components/article/english-reading"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface ReviewContentData {
     questionGroup: {
         id: string
         title: string
+        questionType: string
     }
     articleMdx: MDXRemoteSerializeResult | null
     stemMdx: MDXRemoteSerializeResult | null
@@ -24,7 +27,9 @@ interface ReviewContentData {
     }
     options: Array<{ id: string; label: string }>
     correctAnswer: string
+    correctAnswerMdx: MDXRemoteSerializeResult | null
     userAnswer: string | null
+    userAnswerMdx: MDXRemoteSerializeResult | null
     isCorrect: boolean | null
     currentIndex: number
     historyItems: SubmissionHistoryItem[]
@@ -34,6 +39,14 @@ interface ReviewContentData {
 interface ReviewContentProps {
     data: ReviewContentData
     basePath: string
+}
+
+function getQuestionCategory(questionType: string, groupType: string): "choice" | "fill" | "essay" {
+    const combined = `${questionType} ${groupType}`
+    if (combined.includes("选择") || combined.includes("七选五")) return "choice"
+    if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar")) return "fill"
+    if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
+    return "choice"
 }
 
 export function ReviewContent({ data, basePath }: ReviewContentProps) {
@@ -47,16 +60,24 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         currentQuestion,
         options,
         correctAnswer,
+        correctAnswerMdx,
         userAnswer,
+        userAnswerMdx,
         isCorrect,
         currentIndex,
         historyItems,
         correctRate,
     } = data
 
+    const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
+    const isChoiceType = category === "choice"
+    const isEnWriting = questionGroup.questionType === "en-writing"
+    const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
-    const displayUserAnswer = userAnswer ? userAnswer.toUpperCase() : null
-    const displayCorrectAnswer = correctAnswer.toUpperCase()
+    const displayUserAnswer = userAnswer
+        ? (isChoiceType ? userAnswer.toUpperCase() : userAnswer)
+        : null
+    const displayCorrectAnswer = isChoiceType ? correctAnswer.toUpperCase() : correctAnswer
 
     return (
         <div className="h-screen overflow-hidden bg-background">
@@ -68,32 +89,35 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                 </div>
             </header>
             <div className="flex" style={{ height: "calc(100vh - 56px)" }}>
-                <div className="flex-1 overflow-y-auto p-6">
-                    <article
-                        className="max-w-4xl mx-auto"
-                        style={{ fontFamily: '"Times New Roman", serif' }}
-                    >
-                        {articleMdx ? (
-                            <MDXRemote {...articleMdx} components={components} />
-                        ) : (
-                            <p className="text-muted-foreground">暂无文章内容</p>
-                        )}
-                    </article>
-                </div>
+                {!isEnWriting && (
+                    <>
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <EnglishReading startQuestionNumber={1}>
+                                {articleMdx ? (
+                                    <MDXRemote {...articleMdx} components={components} />
+                                ) : (
+                                    <p className="text-muted-foreground">暂无文章内容</p>
+                                )}
+                            </EnglishReading>
+                        </div>
 
-                <Separator orientation="vertical" />
+                        <Separator orientation="vertical" />
+                    </>
+                )}
 
                 <div className="flex-1 p-6 overflow-y-auto">
-                    <QuestionSwitcher
-                        questions={questionSwitcherItems}
-                        currentIndex={currentIndex}
-                        basePath={basePath}
-                    />
+                    {hasMultipleQuestions && (
+                        <QuestionSwitcher
+                            questions={questionSwitcherItems}
+                            currentIndex={currentIndex}
+                            basePath={basePath}
+                        />
+                    )}
 
                     <QuestionSection>
                         {stemMdx ? (
                             <div className="flex items-baseline gap-1">
-                                <span className="text-lg font-medium">{currentIndex}.</span>
+                                {hasMultipleQuestions && <span className="text-lg font-medium">{currentIndex}.</span>}
                                 <div className="text-lg font-medium">
                                     <MDXRemote {...stemMdx} components={components} />
                                 </div>
@@ -109,18 +133,51 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         ) : null}
                     </QuestionSection>
 
-                    <div className="mt-6 mb-6 p-4 rounded-lg bg-muted/50">
-                        <p className="text-base">
-                            我的作答：
-                            <span className={isCorrect ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-                                {displayUserAnswer ?? "未作答"}
-                            </span>
-                            {"  "}正确答案：
-                            <span className="text-green-600 font-medium">{displayCorrectAnswer}</span>
-                            {"  "}正确率：
-                            <span className="font-medium">{correctRateDisplay}</span>
-                        </p>
-                    </div>
+                    {category === "essay" ? (
+                        <div className="mt-6 mb-6">
+                            <Tabs defaultValue={userAnswerMdx ? "my-answer" : "reference-answer"}>
+                                <TabsList>
+                                    {userAnswerMdx && (
+                                        <TabsTrigger value="my-answer">我的作答</TabsTrigger>
+                                    )}
+                                    <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
+                                </TabsList>
+                                {userAnswerMdx && (
+                                    <TabsContent value="my-answer">
+                                        <QuestionSection>
+                                            <div className="prose dark:prose-invert max-w-none">
+                                                <MDXRemote {...userAnswerMdx} components={components} />
+                                            </div>
+                                        </QuestionSection>
+                                    </TabsContent>
+                                )}
+                                <TabsContent value="reference-answer">
+                                    <QuestionSection>
+                                        <div className="prose dark:prose-invert max-w-none">
+                                            {correctAnswerMdx ? (
+                                                <MDXRemote {...correctAnswerMdx} components={components} />
+                                            ) : (
+                                                <span className="text-muted-foreground">暂无参考答案</span>
+                                            )}
+                                        </div>
+                                    </QuestionSection>
+                                </TabsContent>
+                            </Tabs>
+                        </div>
+                    ) : (
+                        <div className="mt-6 mb-6 p-4 rounded-lg bg-muted/50">
+                            <p className="text-base">
+                                我的作答：
+                                <span className={isCorrect === null ? "text-muted-foreground font-medium" : isCorrect ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                                    {displayUserAnswer ?? "未作答"}
+                                </span>
+                                {"  "}正确答案：
+                                <span className="text-green-600 font-medium">{displayCorrectAnswer}</span>
+                                {"  "}正确率：
+                                <span className="font-medium">{correctRateDisplay}</span>
+                            </p>
+                        </div>
+                    )}
 
                     {analysisMdx ? (
                         <>
@@ -140,6 +197,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         <SubmissionHistoryTable
                             submissions={historyItems}
                             questionIndex={currentIndex}
+                            questionType={currentQuestion.questionType}
                         />
                     </div>
                 </div>

@@ -21,9 +21,10 @@ export interface SubmissionHistoryItem {
 interface SubmissionHistoryTableProps {
   submissions: SubmissionHistoryItem[]
   questionIndex: number
+  questionType: string
 }
 
-export function SubmissionHistoryTable({ submissions, questionIndex: _questionIndex }: SubmissionHistoryTableProps) {
+export function SubmissionHistoryTable({ submissions, questionIndex: _questionIndex, questionType }: SubmissionHistoryTableProps) {
   if (submissions.length === 0) {
     return (
       <div className="text-sm text-muted-foreground py-4">
@@ -31,6 +32,8 @@ export function SubmissionHistoryTable({ submissions, questionIndex: _questionIn
       </div>
     )
   }
+
+  const isChoiceType = questionType.includes("选择") || questionType.includes("七选五")
 
   const formatDate = (date: Date) => {
     const d = new Date(date)
@@ -57,7 +60,7 @@ export function SubmissionHistoryTable({ submissions, questionIndex: _questionIn
         {submissions.map((submission, index) => (
           <TableRow key={submission.id}>
             <TableCell className="font-medium">{index + 1}</TableCell>
-            <TableCell>{submission.answer.toUpperCase()}</TableCell>
+            <TableCell>{isChoiceType ? submission.answer.toUpperCase() : submission.answer}</TableCell>
             <TableCell>
               <span
                 className={cn(
