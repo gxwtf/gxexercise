@@ -7,21 +7,32 @@ import { useMDXComponents } from '@/mdx-components'
 import { QuestionSection } from '@/components/QuestionSection'
 import { useAnswer } from './AnswerContext'
 
+interface EnWritingQuestion {
+  id: string
+  stem: string
+  stemMdx?: MDXRemoteSerializeResult | null
+  type: 'text' | 'input'
+  subStem?: string
+}
+
 interface EnWritingProps {
+  questions: EnWritingQuestion[]
   mdxSource: MDXRemoteSerializeResult
 }
 
-export default function EnWriting({ mdxSource }: EnWritingProps) {
+export default function EnWriting({ questions, mdxSource }: EnWritingProps) {
   const { setAnswer } = useAnswer()
   const [text, setText] = React.useState('')
   const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length
 
+  const questionId = questions[0]?.id ?? 'writing'
+
   React.useEffect(() => {
-    setAnswer('writing', {
+    setAnswer(questionId, {
       answer: text,
       wordCount
     })
-  }, [text, wordCount, setAnswer])
+  }, [text, wordCount, setAnswer, questionId])
 
   const components = useMDXComponents()
 

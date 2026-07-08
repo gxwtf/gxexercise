@@ -127,6 +127,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <EnWriting 
+          questions={questions as any}
           mdxSource={mdxSource}
         />
       </>
