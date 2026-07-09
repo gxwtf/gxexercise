@@ -168,6 +168,18 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     })
   )
 
+  const allUserBlanks: Record<string, string> = {}
+  const allCorrectBlanks: Record<string, string> = {}
+  questions.forEach((item, idx) => {
+    const sub = questionSubmissions.find((s) => s.questionId === item.question.id)
+    const blankId = String(idx + 1)
+    if (sub?.content) {
+      const answer = (sub.content as { answer?: string }).answer
+      if (answer) allUserBlanks[blankId] = answer
+    }
+    allCorrectBlanks[blankId] = item.question.answer || ''
+  })
+
   return {
     questionGroup: {
       id: questionGroup.id,
@@ -188,6 +200,8 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     currentIndex: questionIndex,
     historyItems,
     correctRate: currentQuestion.correctRate,
+    allUserBlanks,
+    allCorrectBlanks,
   }
 }
 

@@ -68,7 +68,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
         return <span {...props}>{children}</span>
     }
 
-    const { blanks, options, onBlankClick, onRemove, getNextBlankId } = context
+    const { blanks, options, onBlankClick, onRemove, getNextBlankId, reviewMode, correctBlanks } = context
 
     const blankIdRef = React.useRef<string | null>(null)
     if (blankIdRef.current === null) {
@@ -78,6 +78,38 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
 
     const filledOptionId = blanks[blankId]
     const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
+
+    if (reviewMode) {
+      if (filledOption) {
+        const isCorrect = correctBlanks && filledOptionId === correctBlanks[blankId]
+        return (
+          <span
+            className={cn(
+              'inline rounded px-1 py-0.5 text-lg font-normal',
+              'align-baseline leading-normal',
+              isCorrect
+                ? 'text-green-700 bg-green-50 dark:bg-green-950 dark:text-green-300 font-medium'
+                : 'text-red-700 bg-red-50 dark:bg-red-950 dark:text-red-300 font-medium'
+            )}
+            {...props}
+          >
+            [{filledOption.id}. {filledOption.label}]
+          </span>
+        )
+      }
+      return (
+        <span
+          className={cn(
+            'inline rounded px-1 py-0.5 text-lg font-normal',
+            'align-baseline leading-normal',
+            'text-slate-600'
+          )}
+          {...props}
+        >
+          [■]
+        </span>
+      )
+    }
 
     return (
         <span

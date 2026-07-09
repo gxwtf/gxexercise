@@ -15,6 +15,8 @@ export interface BlankContextValue {
   onBlankClick?: (blankId: string) => void;
   onRemove?: (blankId: string) => void;
   getNextBlankId: () => string;
+  reviewMode?: boolean;
+  correctBlanks?: Record<string, string>;
 }
 
 export const BlankContext = React.createContext<BlankContextValue | null>(null);
@@ -59,6 +61,8 @@ export interface EnglishReadingProps {
   onRemove?: (blankId: string) => void;
   onInputChange?: (questionId: string, value: string) => void;
   startQuestionNumber?: number;
+  reviewMode?: boolean;
+  correctBlanks?: Record<string, string>;
 }
 
 function replaceBlankTokens(
@@ -67,7 +71,9 @@ function replaceBlankTokens(
   blanks: Record<string, string>,
   options: BlankOption[],
   onBlankClick?: (blankId: string) => void,
-  onRemove?: (blankId: string) => void
+  onRemove?: (blankId: string) => void,
+  reviewMode?: boolean,
+  correctBlanks?: Record<string, string>,
 ): React.ReactNode {
   if (typeof node === 'string') {
     return node
@@ -77,6 +83,33 @@ function replaceBlankTokens(
           const blankId = getNextBlankId();
           const filledOptionId = blanks[blankId];
           const filledOption = filledOptionId ? options.find((o) => o.id === filledOptionId) : null;
+
+          if (reviewMode) {
+            if (filledOption) {
+              const isCorrect = correctBlanks && filledOptionId === correctBlanks[blankId];
+              return (
+                <span
+                  key={`blank-${blankId}-${index}`}
+                  className={cn(
+                    'inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium',
+                    isCorrect
+                      ? 'text-green-700 bg-green-50 dark:bg-green-950 dark:text-green-300'
+                      : 'text-red-700 bg-red-50 dark:bg-red-950 dark:text-red-300'
+                  )}
+                >
+                  [{filledOption.label}]
+                </span>
+              );
+            }
+            return (
+              <span
+                key={`blank-${blankId}-${index}`}
+                className="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium text-slate-600"
+              >
+                [■]
+              </span>
+            );
+          }
 
           return (
             <button
@@ -102,7 +135,7 @@ function replaceBlankTokens(
   if (Array.isArray(node)) {
     return node.map((child, index) => (
       <React.Fragment key={index}>
-        {replaceBlankTokens(child, getNextBlankId, blanks, options, onBlankClick, onRemove)}
+        {replaceBlankTokens(child, getNextBlankId, blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks)}
       </React.Fragment>
     ));
   }
@@ -113,7 +146,7 @@ function replaceBlankTokens(
     return React.cloneElement(
       node,
       node.props,
-      children ? replaceBlankTokens(children, getNextBlankId, blanks, options, onBlankClick, onRemove) : children
+      children ? replaceBlankTokens(children, getNextBlankId, blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks) : children
     );
   }
 
@@ -131,6 +164,8 @@ export function EnglishReading({
   onRemove,
   onInputChange,
   startQuestionNumber = 1,
+  reviewMode = false,
+  correctBlanks,
 }: EnglishReadingProps) {
   const blankIndexRef = React.useRef(0);
   blankIndexRef.current = 0;
@@ -156,8 +191,10 @@ export function EnglishReading({
       onBlankClick,
       onRemove,
       getNextBlankId,
+      reviewMode,
+      correctBlanks,
     }),
-    [blanks, options, onBlankClick, onRemove, getNextBlankId]
+    [blanks, options, onBlankClick, onRemove, getNextBlankId, reviewMode, correctBlanks]
   );
 
   const clozeContextValue = React.useMemo(
@@ -182,7 +219,9 @@ export function EnglishReading({
       blanks,
       options,
       onBlankClick,
-      onRemove
+      onRemove,
+      reviewMode,
+      correctBlanks,
     );
   };
 

@@ -34,6 +34,8 @@ interface ReviewContentData {
     currentIndex: number
     historyItems: SubmissionHistoryItem[]
     correctRate: number | null
+    allUserBlanks: Record<string, string>
+    allCorrectBlanks: Record<string, string>
 }
 
 interface ReviewContentProps {
@@ -68,6 +70,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         currentIndex,
         historyItems,
         correctRate,
+        allUserBlanks,
+        allCorrectBlanks,
     } = data
 
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
@@ -80,6 +84,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         ? (isChoiceType ? userAnswer.toUpperCase() : userAnswer)
         : null
     const displayCorrectAnswer = isChoiceType ? correctAnswer.toUpperCase() : correctAnswer
+
+    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression"].includes(questionGroup.questionType)
 
     return (
         <div className="h-screen overflow-hidden bg-background">
@@ -94,7 +100,13 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                 {!isEnWriting && !isMathType && (
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
-                            <EnglishReading startQuestionNumber={1}>
+                            <EnglishReading
+                                startQuestionNumber={1}
+                                blanks={allUserBlanks}
+                                options={options}
+                                correctBlanks={allCorrectBlanks}
+                                reviewMode={usesBlanks}
+                            >
                                 {articleMdx ? (
                                     <MDXRemote {...articleMdx} components={components} />
                                 ) : (

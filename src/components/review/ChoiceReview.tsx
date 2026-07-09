@@ -82,9 +82,19 @@ export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceRevie
               style
             )}
           >
-            <span className="font-medium">{option.id.toUpperCase()}.</span>{" "}
+            {/^[A-Za-z]$/.test(option.id) ? (
+              <span className="font-medium">{option.id.toUpperCase()}.</span>
+            ) : (
+              <span className="font-medium">{option.id.toUpperCase()}</span>
+            )}{" "}
             {option.labelMdx ? (
-              <MDXRemote {...option.labelMdx} components={components} />
+              <MDXRemote
+                {...option.labelMdx}
+                components={{
+                  ...components,
+                  p: (props) => <span>{props.children}</span>,
+                }}
+              />
             ) : (
               option.label
             )}
