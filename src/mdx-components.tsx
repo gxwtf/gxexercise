@@ -4,6 +4,63 @@ import { cn } from '@/lib/utils'
 import { useBlankContext, ClozeContext, useInputChangeContext } from '@/components/article/english-reading'
 import { Input as ShadcnInput } from "@/components/ui/input"
 
+// ---- MathInput2 context ----
+interface MathInput2ContextType {
+  onInputChange: (index: number, value: string) => void
+  getNextIndex: () => number
+}
+
+const MathInput2Context = React.createContext<MathInput2ContextType | undefined>(undefined)
+
+export function useMathInput2Context() {
+  return React.useContext(MathInput2Context)
+}
+
+export function MathInput2Provider({ children, onInputChange }: { children: React.ReactNode; onInputChange: (index: number, value: string) => void }) {
+  const indexRef = React.useRef(0)
+  const getNextIndex = React.useCallback(() => {
+    const idx = indexRef.current
+    indexRef.current++
+    return idx
+  }, [])
+
+  return (
+    <MathInput2Context.Provider value={{ onInputChange, getNextIndex }}>
+      {children}
+    </MathInput2Context.Provider>
+  )
+}
+
+// Input2 - 无序号短输入框，用于数学填空
+function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
+  const ctx = React.useContext(MathInput2Context)
+  const indexRef = React.useRef<number | undefined>(undefined)
+
+  if (indexRef.current === undefined) {
+    if (ctx) {
+      indexRef.current = ctx.getNextIndex()
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (ctx && indexRef.current !== undefined) {
+      ctx.onInputChange(indexRef.current, e.target.value)
+    }
+  }
+
+  return (
+    <span className="inline-flex items-center h-8" {...props}>
+      <ShadcnInput
+        type="text"
+        className="w-32 h-8 text-base inline-block"
+        onChange={handleChange}
+      />
+    </span>
+  )
+}
+
+Input2.displayName = 'Input2'
+
 function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
     const context = useBlankContext()
 
@@ -289,6 +346,7 @@ const components: MDXComponents = {
     Blank,
     ClozeBlank,
     Input,
+    Input2,
 }
 
 export function useMDXComponents(): MDXComponents {

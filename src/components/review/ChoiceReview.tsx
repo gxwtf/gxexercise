@@ -1,10 +1,13 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMDXComponents } from '@/mdx-components'
 
 type Option = {
   id: string
   label: string
+  labelMdx?: MDXRemoteSerializeResult | null
 }
 
 type LayoutType = "vertical" | "two-columns" | "four-columns"
@@ -31,7 +34,12 @@ function getLayoutType(options: Option[]): LayoutType {
 }
 
 export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceReviewProps) {
-  const isCorrect = userAnswer === correctAnswer
+  const components = useMDXComponents()
+  const userAnswers = userAnswer ? userAnswer.split(',').map(s => s.trim()) : []
+  const correctAnswers = correctAnswer.split(',').map(s => s.trim())
+  const sortedUser = [...userAnswers].sort().join(',')
+  const sortedCorrect = [...correctAnswers].sort().join(',')
+  const isCorrect = userAnswer !== null && sortedUser === sortedCorrect
   const layoutType = getLayoutType(options)
 
   const gridClass =
@@ -44,8 +52,8 @@ export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceRevie
   return (
     <div className={gridClass}>
       {options.map((option) => {
-        const isSelected = userAnswer === option.id
-        const isCorrectOption = correctAnswer === option.id
+        const isSelected = userAnswers.includes(option.id)
+        const isCorrectOption = correctAnswers.includes(option.id)
 
         let style: string
 
@@ -74,7 +82,12 @@ export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceRevie
               style
             )}
           >
-            <span className="font-medium">{option.id.toUpperCase()}.</span> {option.label}
+            <span className="font-medium">{option.id.toUpperCase()}.</span>{" "}
+            {option.labelMdx ? (
+              <MDXRemote {...option.labelMdx} components={components} />
+            ) : (
+              option.label
+            )}
           </div>
         )
       })}

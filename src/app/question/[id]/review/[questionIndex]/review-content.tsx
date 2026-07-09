@@ -25,7 +25,7 @@ interface ReviewContentData {
         id: string
         questionType: string
     }
-    options: Array<{ id: string; label: string }>
+    options: Array<{ id: string; label: string; labelMdx?: MDXRemoteSerializeResult | null }>
     correctAnswer: string
     correctAnswerMdx: MDXRemoteSerializeResult | null
     userAnswer: string | null
@@ -42,9 +42,10 @@ interface ReviewContentProps {
 }
 
 function getQuestionCategory(questionType: string, groupType: string): "choice" | "fill" | "essay" {
+    if (questionType === "single" || questionType === "multiple" || questionType === "choice") return "choice"
     const combined = `${questionType} ${groupType}`
-    if (combined.includes("选择") || combined.includes("七选五")) return "choice"
-    if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar")) return "fill"
+    if (combined.includes("选择") || combined.includes("七选五") || groupType === "math-choice") return "choice"
+    if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || groupType === "math-fill") return "fill"
     if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
     return "choice"
 }
@@ -72,6 +73,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
     const isChoiceType = category === "choice"
     const isEnWriting = questionGroup.questionType === "en-writing"
+    const isMathType = questionGroup.questionType === "math-fill" || questionGroup.questionType === "math-choice"
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
     const displayUserAnswer = userAnswer
@@ -89,7 +91,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                 </div>
             </header>
             <div className="flex" style={{ height: "calc(100vh - 56px)" }}>
-                {!isEnWriting && (
+                {!isEnWriting && !isMathType && (
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
                             <EnglishReading startQuestionNumber={1}>

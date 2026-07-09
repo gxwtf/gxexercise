@@ -49,7 +49,7 @@ export default function EnWriting({ questions, mdxSource }: EnWritingProps) {
               placeholder="Please write your answer here..."
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="min-h-64"
+              className="min-h-64 text-lg md:text-lg"
             />
 
             {/* 字数统计 */}

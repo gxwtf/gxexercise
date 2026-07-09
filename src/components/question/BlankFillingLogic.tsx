@@ -5,6 +5,7 @@ import * as React from 'react'
 type Option = {
   id: string
   label: string
+  labelMdx?: any
 }
 
 interface BlankFillingLogicProps {

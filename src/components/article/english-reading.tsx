@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 export type BlankOption = {
   id: string;
   label: string;
+  labelMdx?: any;
 };
 
 export interface BlankContextValue {

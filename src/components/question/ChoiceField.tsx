@@ -7,6 +7,7 @@ import { useMDXComponents } from '@/mdx-components'
 type Option = {
   id: string
   label: string
+  labelMdx?: MDXRemoteSerializeResult | null
 }
 
 type ChoiceType = 'single' | 'multiple' | 'indeterminate'

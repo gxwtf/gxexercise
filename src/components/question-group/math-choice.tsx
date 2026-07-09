@@ -1,27 +1,25 @@
 'use client'
 
 import * as React from 'react'
-import EnglishReading from '@/components/article/english-reading'
 import { ChoiceField } from '@/components/question/ChoiceField'
 import { QuestionSection } from '@/components/QuestionSection'
-import { Separator } from '@/components/ui/separator'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
 import { useAnswer } from './AnswerContext'
 
-interface ClozeQuestion {
+interface MathChoiceQuestion {
   id: string
   stem: string
+  stemMdx?: MDXRemoteSerializeResult | null
   type: 'single'
   options: Array<{ id: string; label: string; labelMdx?: MDXRemoteSerializeResult | null }>
 }
 
-interface ClozeProps {
-  questions: ClozeQuestion[]
-  mdxSource: MDXRemoteSerializeResult
+interface MathChoiceProps {
+  questions: MathChoiceQuestion[]
 }
 
-export default function Cloze({ questions, mdxSource }: ClozeProps) {
+export default function MathChoice({ questions }: MathChoiceProps) {
   const { setAnswer } = useAnswer()
 
   const onAnswerChange = (questionId: string, selected: string[]) => {
@@ -34,14 +32,6 @@ export default function Cloze({ questions, mdxSource }: ClozeProps) {
   return (
     <div className="h-screen overflow-hidden bg-background">
       <div className="flex h-screen">
-        <div className="flex-1 overflow-y-auto p-6">
-          <EnglishReading startQuestionNumber={1}>
-            <MDXRemote {...mdxSource} components={components} />
-          </EnglishReading>
-        </div>
-
-        <Separator orientation="vertical" />
-
         <div className="flex-1 p-6 overflow-y-auto">
           <QuestionSection>
             <ChoiceField

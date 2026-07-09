@@ -9,10 +9,13 @@ import {
   FieldLabel,
   FieldTitle,
 } from "@/components/ui/field"
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { useMDXComponents } from '@/mdx-components'
 
 type Option = {
   id: string
   label: string
+  labelMdx?: MDXRemoteSerializeResult | null
 }
 
 type ChoiceType = 'single' | 'multiple' | 'indeterminate'
@@ -46,6 +49,7 @@ function getLayoutType(options: Option[]): LayoutType {
 export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps) {
   const [selected, setSelected] = useState<string[]>([])
   const layoutType = getLayoutType(options)
+  const components = useMDXComponents()
 
   const handleMultipleChange = (id: string, checked: boolean) => {
     const newSelected = checked ? [...selected, id] : selected.filter(s => s !== id)
@@ -56,6 +60,18 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
   const handleSingleChange = (value: string) => {
     setSelected([value])
     onChange([value])
+  }
+
+  // 渲染选项标签
+  const renderOptionLabel = (option: Option) => {
+    if (option.labelMdx) {
+      return (
+        <FieldTitle className="text-base">
+          <MDXRemote {...option.labelMdx} components={components} />
+        </FieldTitle>
+      )
+    }
+    return <FieldTitle className="text-base whitespace-nowrap">{option.label}</FieldTitle>
   }
 
   // 渲染选项的通用函数
@@ -103,7 +119,7 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
             <Field orientation="horizontal" className="!items-center">
               <RadioGroupItem value={option.id} id={option.id} />
               <FieldContent>
-                <FieldTitle className="text-base whitespace-nowrap">{option.label}</FieldTitle>
+                {renderOptionLabel(option)}
               </FieldContent>
             </Field>
           </FieldLabel>
@@ -118,14 +134,14 @@ export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps)
       <div>
         {renderOptions((option) => (
           <FieldLabel key={option.id} className={layoutType === 'four-columns' ? 'flex-1 min-w-0' : ''}>
-            <Field orientation="horizontal" className="items-center">
+            <Field orientation="horizontal" className="!items-center">
               <Checkbox
                 id={option.id}
                 checked={selected.includes(option.id)}
                 onCheckedChange={(checked) => handleMultipleChange(option.id, checked as boolean)}
               />
               <FieldContent>
-                <FieldTitle className="whitespace-nowrap">{option.label}</FieldTitle>
+                {renderOptionLabel(option)}
               </FieldContent>
             </Field>
           </FieldLabel>

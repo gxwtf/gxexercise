@@ -14,7 +14,7 @@ interface SevenChooseFiveQuestion {
   id: string
   stem: string
   type: 'single' | 'multiple'
-  options: Array<{ id: string; label: string }>
+  options: Array<{ id: string; label: string; labelMdx?: MDXRemoteSerializeResult | null }>
 }
 
 interface SevenChooseFiveProps {

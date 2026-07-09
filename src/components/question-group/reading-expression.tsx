@@ -77,7 +77,7 @@ export default function ReadingExpression({ questions, mdxSource }: ReadingExpre
                     placeholder="Please write your answer here..."
                     value={textAnswers[question.id] || ''}
                     onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                    className="min-h-20 resize-y"
+                    className="min-h-20 resize-y text-lg md:text-lg"
                   />
                 </div>
               ))}

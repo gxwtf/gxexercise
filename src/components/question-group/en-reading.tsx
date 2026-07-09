@@ -16,7 +16,7 @@ interface EnReadingQuestion {
   id: string
   stem: string
   type: 'single'
-  options: Array<{ id: string; label: string }>
+  options: Array<{ id: string; label: string; labelMdx?: MDXRemoteSerializeResult | null }>
 }
 
 /**
