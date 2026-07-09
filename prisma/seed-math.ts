@@ -13,6 +13,40 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  console.log("清理旧数学数据...");
+
+  // 1. 找到所有数学题组
+  const mathGroups = await prisma.questionGroup.findMany({
+    where: {
+      questionType: { in: ["math-fill", "math-choice"] },
+    },
+    select: { id: true },
+  });
+  const mathGroupIds = mathGroups.map((g) => g.id);
+
+  // 2. 找到所有数学题
+  const mathQuestions = await prisma.question.findMany({
+    where: {
+      category: { in: ["数学填空", "数学选择"] },
+    },
+    select: { id: true },
+  });
+  const mathQuestionIds = mathQuestions.map((q) => q.id);
+
+  // 3. 删除关联数据（按外键依赖顺序）
+  if (mathGroupIds.length > 0) {
+    await prisma.groupItem.deleteMany({ where: { groupId: { in: mathGroupIds } } });
+    await prisma.questionGroupSubmission.deleteMany({ where: { questionGroupId: { in: mathGroupIds } } });
+    await prisma.questionGroup.deleteMany({ where: { id: { in: mathGroupIds } } });
+    console.log(`删除了 ${mathGroupIds.length} 个数学题组`);
+  }
+
+  if (mathQuestionIds.length > 0) {
+    await prisma.questionSubmission.deleteMany({ where: { questionId: { in: mathQuestionIds } } });
+    await prisma.question.deleteMany({ where: { id: { in: mathQuestionIds } } });
+    console.log(`删除了 ${mathQuestionIds.length} 个数学题`);
+  }
+
   console.log("开始创建数学填空题和选择题数据...");
 
   // ==========================================
@@ -125,10 +159,10 @@ async function main() {
       correctRate: 0.55,
     },
     {
-      content: "若函数 $f(x)=\\left\\{\\begin{array}{l}a x^2+2 x, \\quad x\\lt 0, \\\\ \\mathrm{e}^x+(a-1) x, x \\geqslant 0\\end{array}\\right.$ 的值域为 $\\mathbf{R}$ ，则实数 $a$ 的取值范围是",
+      content: "若函数 $f(x)=\\left\\{\\begin{array}{l}a x^2+2 x, \\quad x\\lt 0, \\\\ e^x+(a-1) x, x \\geqslant 0\\end{array}\\right.$ 的值域为 $\\mathbf{R}$ ，则实数 $a$ 的取值范围是",
       options: [
-        { id: "A", label: "$\\left(-\\infty, 1-\\mathrm{e}^2\\right]$" },
-        { id: "B", label: "$\\left[1-\\mathrm{e}^2, 0\\right)$" },
+        { id: "A", label: "$\\left(-\\infty, 1-e^2\\right]$" },
+        { id: "B", label: "$\\left[1-e^2, 0\\right)$" },
         { id: "C", label: "$(-\\infty, 1-e]$" },
         { id: "D", label: "$[1-e, 0)$" },
       ],
