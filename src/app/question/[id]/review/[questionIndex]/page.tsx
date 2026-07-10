@@ -6,6 +6,7 @@ import { sessionOptions, type SessionData } from "@/lib/iron"
 import { serialize } from "next-mdx-remote/serialize"
 import type { MDXRemoteSerializeResult } from "next-mdx-remote"
 import remarkMath from 'remark-math'
+import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import type { QuestionSwitcherItem } from "@/components/review/QuestionSwitcher"
 import type { SubmissionHistoryItem } from "@/components/review/SubmissionHistoryTable"
@@ -51,7 +52,7 @@ async function buildReviewData(
   selectedSubmissionId?: string
 ) {
   const mdxOptions = {
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [remarkGfm, remarkMath],
     rehypePlugins: [rehypeKatex],
   }
 

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import Cloze from "@/components/question-group/cloze";
 import Grammar from "@/components/question-group/grammar";
@@ -49,7 +50,7 @@ interface PageProps {
 
 async function QuestionPageContent({ id }: { id: string }) {
   const mdxOptions = {
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [remarkGfm, remarkMath],
     rehypePlugins: [rehypeKatex],
   };
 

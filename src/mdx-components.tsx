@@ -383,6 +383,37 @@ function RightAlign({ children, className, ...props }: React.HTMLAttributes<HTML
 
 RightAlign.displayName = 'RightAlign';
 
+// Center - 居中组件，用于诗词等需要居中展示的内容
+function Center({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <div
+            className={cn('text-lg leading-7 text-center [&>p]:!indent-0', className)}
+            {...props}
+        >
+            {children}
+        </div>
+    )
+}
+
+Center.displayName = 'Center';
+
+// Superscript - 上角标组件，用于语文题文中的注释标记
+function Superscript({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+    return (
+        <span
+            className={cn(
+                'inline align-[0.25em] text-[0.62em] font-normal text-slate-600 ml-0.5',
+                className
+            )}
+            {...props}
+        >
+            {children}
+        </span>
+    )
+}
+
+Superscript.displayName = 'Superscript';
+
 const components: MDXComponents = {
     ...Typography,
     p: Typography.P,
@@ -395,11 +426,18 @@ const components: MDXComponents = {
     ol: Typography.OL,
     li: Typography.LI,
     code: Typography.InlineCode,
+    sup: ({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+        <sup className={cn('inline align-[0.25em] text-[0.7em] font-normal text-slate-600 ml-0.5 leading-none', className)} {...props}>
+            {children}
+        </sup>
+    ),
     Blank,
     ClozeBlank,
     Input,
     Input2,
     RightAlign,
+    Center,
+    Superscript,
 }
 
 export function useMDXComponents(): MDXComponents {
