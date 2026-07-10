@@ -6,8 +6,9 @@ import { Input as ShadcnInput } from "@/components/ui/input"
 
 // ---- MathInput2 context ----
 interface MathInput2ContextType {
-  onInputChange: (index: number, value: string) => void
+  onInputChange?: (index: number, value: string) => void
   getNextIndex: () => number
+  disabled?: boolean
 }
 
 const MathInput2Context = React.createContext<MathInput2ContextType | undefined>(undefined)
@@ -16,7 +17,7 @@ export function useMathInput2Context() {
   return React.useContext(MathInput2Context)
 }
 
-export function MathInput2Provider({ children, onInputChange }: { children: React.ReactNode; onInputChange: (index: number, value: string) => void }) {
+export function MathInput2Provider({ children, onInputChange, disabled = false }: { children: React.ReactNode; onInputChange?: (index: number, value: string) => void; disabled?: boolean }) {
   const indexRef = React.useRef(0)
   const getNextIndex = React.useCallback(() => {
     const idx = indexRef.current
@@ -25,7 +26,7 @@ export function MathInput2Provider({ children, onInputChange }: { children: Reac
   }, [])
 
   return (
-    <MathInput2Context.Provider value={{ onInputChange, getNextIndex }}>
+    <MathInput2Context.Provider value={{ onInputChange, getNextIndex, disabled }}>
       {children}
     </MathInput2Context.Provider>
   )
@@ -35,6 +36,7 @@ export function MathInput2Provider({ children, onInputChange }: { children: Reac
 function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
   const ctx = React.useContext(MathInput2Context)
   const indexRef = React.useRef<number | undefined>(undefined)
+  const isDisabled = ctx?.disabled ?? false
 
   if (indexRef.current === undefined) {
     if (ctx) {
@@ -43,16 +45,17 @@ function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (ctx && indexRef.current !== undefined) {
+    if (ctx && indexRef.current !== undefined && ctx.onInputChange) {
       ctx.onInputChange(indexRef.current, e.target.value)
     }
   }
 
   return (
-    <span className="inline-flex items-center h-8" {...props}>
+    <span className="inline-flex items-center h-8 align-baseline !text-indent-0" {...props}>
       <ShadcnInput
         type="text"
         className="w-32 h-8 text-base inline-block"
+        disabled={isDisabled}
         onChange={handleChange}
       />
     </span>
@@ -157,15 +160,17 @@ function Input({
     const clozeContext = React.useContext(ClozeContext);
     const inputChangeContext = useInputChangeContext();
     const questionNumberRef = React.useRef<number | undefined>(undefined);
+    const isReviewMode = clozeContext?.reviewMode ?? false;
 
     if (questionNumberRef.current === undefined) {
         if (!clozeContext) {
             return (
-                <span className="inline-flex items-center h-8" {...props}>
-                    <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">?</span>
+                <span className="inline-flex items-center h-8" style={{textIndent: 0}} {...props}>
+                    <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>?</span>
                     <ShadcnInput
                         type="text"
                         className="w-30 rounded-l-none h-8 text-base"
+                        disabled={isReviewMode}
                         onChange={(e) => onChange?.(e.target.value)}
                     />
                 </span>
@@ -183,13 +188,14 @@ function Input({
     };
 
     return (
-        <span className="inline-flex items-center h-7" {...props}>
-            <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center">
+        <span className="inline-flex items-center h-7" style={{textIndent: 0}} {...props}>
+            <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>
                 {questionNumberRef.current}
             </span>
             <ShadcnInput
                 type="text"
                 className="w-30 rounded-l-none h-7 text-base"
+                disabled={isReviewMode}
                 onChange={handleChange}
             />
         </span>
@@ -204,7 +210,7 @@ const Typography = {
             <h1
                 ref={ref}
                 className={cn(
-                    'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mt-12 mb-6',
+                    'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mt-12 mb-6 text-center',
                     className
                 )}
                 {...props}
@@ -217,7 +223,7 @@ const Typography = {
             <h2
                 ref={ref}
                 className={cn(
-                    'scroll-m-20 text-3xl font-semibold tracking-tight transition-colors mt-10 mb-4',
+                    'scroll-m-20 text-3xl font-semibold tracking-tight transition-colors mt-10 mb-4 text-center',
                     className
                 )}
                 {...props}
@@ -229,7 +235,7 @@ const Typography = {
         ({ className, ...props }, ref) => (
             <h3
                 ref={ref}
-                className={cn('scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4', className)}
+                className={cn('scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4 text-center', className)}
                 {...props}
             />
         )
@@ -239,7 +245,7 @@ const Typography = {
         ({ className, ...props }, ref) => (
             <h4
                 ref={ref}
-                className={cn('scroll-m-20 text-xl font-semibold tracking-tight mt-6 mb-3', className)}
+                className={cn('scroll-m-20 text-xl font-semibold tracking-tight mt-6 mb-3 text-center', className)}
                 {...props}
             />
         )
@@ -363,6 +369,20 @@ Typography.Large.displayName = 'Large';
 Typography.Small.displayName = 'Small';
 Typography.Muted.displayName = 'Muted';
 
+// RightAlign - 右对齐文本，用于"（取材于...）"这类内容
+function RightAlign({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <div
+            className={cn('text-right text-base text-muted-foreground my-2', className)}
+            {...props}
+        >
+            {children}
+        </div>
+    )
+}
+
+RightAlign.displayName = 'RightAlign';
+
 const components: MDXComponents = {
     ...Typography,
     p: Typography.P,
@@ -379,6 +399,7 @@ const components: MDXComponents = {
     ClozeBlank,
     Input,
     Input2,
+    RightAlign,
 }
 
 export function useMDXComponents(): MDXComponents {

@@ -2,13 +2,13 @@
 
 import * as React from "react"
 import { MDXRemote, type MDXRemoteSerializeResult } from "next-mdx-remote"
-import { useMDXComponents } from "@/mdx-components"
+import { useMDXComponents, MathInput2Provider } from "@/mdx-components"
 import { Separator } from "@/components/ui/separator"
 import { QuestionSwitcher, type QuestionSwitcherItem } from "@/components/review/QuestionSwitcher"
 import { ChoiceReview } from "@/components/review/ChoiceReview"
 import { SubmissionHistoryTable, type SubmissionHistoryItem } from "@/components/review/SubmissionHistoryTable"
 import { QuestionSection } from "@/components/QuestionSection"
-import { EnglishReading } from "@/components/article/english-reading"
+import { EnglishReading, ClozeContext } from "@/components/article/english-reading"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface ReviewContentData {
@@ -36,6 +36,7 @@ interface ReviewContentData {
     correctRate: number | null
     allUserBlanks: Record<string, string>
     allCorrectBlanks: Record<string, string>
+    currentSubmissionId: string | null
 }
 
 interface ReviewContentProps {
@@ -49,6 +50,10 @@ function getQuestionCategory(questionType: string, groupType: string): "choice" 
     if (combined.includes("选择") || combined.includes("七选五") || groupType === "math-choice") return "choice"
     if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || groupType === "math-fill") return "fill"
     if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
+    if (groupType === "chinese-reading") {
+        if (questionType === "input") return "fill"
+        if (questionType === "text") return "essay"
+    }
     return "choice"
 }
 
@@ -101,6 +106,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
                             <EnglishReading
+                                indentParagraphs
                                 startQuestionNumber={1}
                                 blanks={allUserBlanks}
                                 options={options}
@@ -133,7 +139,11 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             <div className="flex items-baseline gap-1">
                                 {hasMultipleQuestions && <span className="text-lg font-medium">{currentIndex}.</span>}
                                 <div className="text-lg font-medium">
-                                    <MDXRemote {...stemMdx} components={components} />
+                                    <ClozeContext.Provider value={{ getNextQuestionNumber: () => 1, reviewMode: true }}>
+                                        <MathInput2Provider disabled>
+                                            <MDXRemote {...stemMdx} components={components} />
+                                        </MathInput2Provider>
+                                    </ClozeContext.Provider>
                                 </div>
                             </div>
                         ) : null}
@@ -152,19 +162,19 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             <Tabs defaultValue={userAnswerMdx ? "my-answer" : "reference-answer"}>
                                 <TabsList>
                                     {userAnswerMdx && (
-                                        <TabsTrigger value="my-answer">我的作答</TabsTrigger>
-                                    )}
-                                    <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
-                                </TabsList>
-                                {userAnswerMdx && (
-                                    <TabsContent value="my-answer">
-                                        <QuestionSection>
-                                            <div className="prose dark:prose-invert max-w-none">
-                                                <MDXRemote {...userAnswerMdx} components={components} />
-                                            </div>
-                                        </QuestionSection>
-                                    </TabsContent>
+                                    <TabsTrigger value="my-answer">我的作答</TabsTrigger>
                                 )}
+                                <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
+                            </TabsList>
+                            {userAnswerMdx && (
+                                <TabsContent value="my-answer">
+                                    <QuestionSection>
+                                        <div className="prose dark:prose-invert max-w-none">
+                                            <MDXRemote {...userAnswerMdx} components={components} />
+                                        </div>
+                                    </QuestionSection>
+                                </TabsContent>
+                            )}
                                 <TabsContent value="reference-answer">
                                     <QuestionSection>
                                         <div className="prose dark:prose-invert max-w-none">
@@ -212,6 +222,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             submissions={historyItems}
                             questionIndex={currentIndex}
                             questionType={currentQuestion.questionType}
+                            currentSubmissionId={data.currentSubmissionId ?? undefined}
                         />
                     </div>
                 </div>

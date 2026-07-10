@@ -43,7 +43,7 @@ export default function ReadingExpression({ questions, mdxSource }: ReadingExpre
       <div className="flex h-screen">
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
-          <EnglishReading>
+          <EnglishReading indentParagraphs>
             <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>
         </div>

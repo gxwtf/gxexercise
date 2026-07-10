@@ -53,6 +53,7 @@ export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiv
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
           <EnglishReading
+            indentParagraphs
             blanks={filledBlanks}
             options={options}
             onBlankClick={handleBlankClick}

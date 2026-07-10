@@ -11,6 +11,7 @@ import ReadingExpression from "@/components/question-group/reading-expression";
 import EnWriting from "@/components/question-group/en-writing";
 import MathFill from "@/components/question-group/math-fill";
 import MathChoice from "@/components/question-group/math-choice";
+import ChineseReading from "@/components/question-group/chinese-reading";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
 
 function escapeLatexBraces(content: string): string {
@@ -98,6 +99,15 @@ async function QuestionPageContent({ id }: { id: string }) {
         stem: item.question.content,
         stemMdx,
         type: 'input' as const,
+        answer: item.question.answer || '',
+        subStem: item.question.subContent || ''
+      };
+    } else if (item.question.questionType === 'text') {
+      return {
+        id: item.question.id,
+        stem: item.question.content,
+        stemMdx,
+        type: 'text' as const,
         answer: item.question.answer || '',
         subStem: item.question.subContent || ''
       };
@@ -215,6 +225,19 @@ async function QuestionPageContent({ id }: { id: string }) {
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <MathChoice 
           questions={questions as any}
+        />
+      </>
+    );
+  }
+
+  if (questionGroup.questionType === 'chinese-reading') {
+    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <ChineseReading 
+          questions={questions as any} 
+          mdxSource={mdxSource}
         />
       </>
     );

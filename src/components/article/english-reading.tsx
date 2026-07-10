@@ -23,6 +23,7 @@ export const BlankContext = React.createContext<BlankContextValue | null>(null);
 
 export interface ClozeContextValue {
   getNextQuestionNumber: () => number;
+  reviewMode?: boolean;
 }
 
 export const ClozeContext = React.createContext<ClozeContextValue | null>(null);
@@ -63,6 +64,7 @@ export interface EnglishReadingProps {
   startQuestionNumber?: number;
   reviewMode?: boolean;
   correctBlanks?: Record<string, string>;
+  indentParagraphs?: boolean;
 }
 
 function replaceBlankTokens(
@@ -166,6 +168,7 @@ export function EnglishReading({
   startQuestionNumber = 1,
   reviewMode = false,
   correctBlanks,
+  indentParagraphs = false,
 }: EnglishReadingProps) {
   const blankIndexRef = React.useRef(0);
   blankIndexRef.current = 0;
@@ -200,8 +203,9 @@ export function EnglishReading({
   const clozeContextValue = React.useMemo(
     () => ({
       getNextQuestionNumber,
+      reviewMode,
     }),
-    [getNextQuestionNumber]
+    [getNextQuestionNumber, reviewMode]
   );
 
   const inputChangeContextValue = React.useMemo(
@@ -235,13 +239,19 @@ export function EnglishReading({
           >
             {title ? (
               <header className="mb-8">
-                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
+                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 text-center">
                   {title}
                 </h1>
               </header>
             ) : null}
 
-            <div className="prose max-w-none dark:prose-invert">
+            {indentParagraphs && (
+              <style>{`
+                .article-indent p { text-indent: 2em; }
+              `}</style>
+            )}
+
+            <div className={cn('prose max-w-none dark:prose-invert', indentParagraphs && 'article-indent')}>
               {renderedContent()}
             </div>
           </article>

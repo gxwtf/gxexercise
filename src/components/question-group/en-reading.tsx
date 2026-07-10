@@ -64,7 +64,7 @@ export default function EnReading({ questions, mdxSource }: EnReadingProps) {
       <div className="flex h-screen">
         {/* 左侧文章阅读区域 */}
         <div className="flex-1 overflow-y-auto p-6">
-          <EnglishReading>
+          <EnglishReading indentParagraphs>
             {/* 使用 MDXRemote 渲染文章内容 */}
             <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>

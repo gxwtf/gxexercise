@@ -4,6 +4,7 @@ import { cookies } from "next/headers"
 import { getIronSession } from "iron-session"
 import { sessionOptions, type SessionData } from "@/lib/iron"
 import { serialize } from "next-mdx-remote/serialize"
+import type { MDXRemoteSerializeResult } from "next-mdx-remote"
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import type { QuestionSwitcherItem } from "@/components/review/QuestionSwitcher"
@@ -17,42 +18,41 @@ interface PageProps {
   }>
 }
 
-async function getReviewData(questionGroupId: string, questionIndex: number) {
+function escapeLatexBraces(content: string): string {
+  let result = ''
+  let inTag = 0
+  let inMath = false
+  for (let i = 0; i < content.length; i++) {
+    const ch = content[i]
+    if (ch === '$' && inTag === 0) {
+      inMath = !inMath
+      result += ch
+    } else if (ch === '<') {
+      inTag++
+      result += ch
+    } else if (ch === '>') {
+      inTag = Math.max(0, inTag - 1)
+      result += ch
+    } else if (ch === '{' && inTag === 0 && !inMath) {
+      result += '\\{'
+    } else if (ch === '}' && inTag === 0 && !inMath) {
+      result += '\\}'
+    } else {
+      result += ch
+    }
+  }
+  return result
+}
+
+async function buildReviewData(
+  questionGroupId: string,
+  questionIndex: number,
+  userId: number,
+  selectedSubmissionId?: string
+) {
   const mdxOptions = {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex],
-  };
-
-  function escapeLatexBraces(content: string): string {
-    let result = ''
-    let inTag = 0
-    let inMath = false
-    for (let i = 0; i < content.length; i++) {
-      const ch = content[i]
-      if (ch === '$' && inTag === 0) {
-        inMath = !inMath
-        result += ch
-      } else if (ch === '<') {
-        inTag++
-        result += ch
-      } else if (ch === '>') {
-        inTag = Math.max(0, inTag - 1)
-        result += ch
-      } else if (ch === '{' && inTag === 0 && !inMath) {
-        result += '\\{'
-      } else if (ch === '}' && inTag === 0 && !inMath) {
-        result += '\\}'
-      } else {
-        result += ch
-      }
-    }
-    return result
-  }
-
-  const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
-
-  if (!session.isLoggedIn || !session.userid) {
-    redirect("/login")
   }
 
   const questionGroup = await prisma.questionGroup.findUnique({
@@ -79,7 +79,7 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
 
   const latestGroupSubmission = await prisma.questionGroupSubmission.findFirst({
     where: {
-      userId: session.userid,
+      userId,
       questionGroupId,
     },
     orderBy: { createdAt: "desc" },
@@ -97,11 +97,26 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     (s) => s.questionId === currentQuestion.id
   )
 
-  const userAnswer = currentSubmission?.content
-    ? (currentSubmission.content as { answer?: string }).answer ?? null
+  const allQuestionSubmissions = await prisma.questionSubmission.findMany({
+    where: {
+      userId,
+      questionId: currentQuestion.id,
+    },
+    orderBy: { createdAt: "desc" },
+  })
+
+  let selectedSubmission = currentSubmission
+  if (selectedSubmissionId) {
+    selectedSubmission = allQuestionSubmissions.find(
+      (s) => s.id === selectedSubmissionId
+    ) ?? currentSubmission
+  }
+
+  const userAnswer = selectedSubmission?.content
+    ? (selectedSubmission.content as { answer?: string }).answer ?? null
     : null
 
-  const isCorrect = currentSubmission?.isCorrect ?? null
+  const isCorrect = selectedSubmission?.isCorrect ?? null
 
   const articleMdx = questionGroup.content
     ? await serialize(escapeLatexBraces(questionGroup.content), { mdxOptions })
@@ -116,11 +131,11 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     : null
 
   const correctAnswerMdx = currentQuestion.answer
-    ? await serialize(escapeLatexBraces(currentQuestion.answer), { mdxOptions })
+    ? await serialize(escapeLatexBraces(currentQuestion.answer).replace(/\n/g, '\n\n'), { mdxOptions })
     : null
 
   const userAnswerMdx = userAnswer
-    ? await serialize(escapeLatexBraces(userAnswer), { mdxOptions })
+    ? await serialize(escapeLatexBraces(userAnswer).replace(/\n/g, '\n\n'), { mdxOptions })
     : null
 
   const questionSwitcherItems: QuestionSwitcherItem[] = questions.map((item, idx) => {
@@ -136,23 +151,22 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     }
   })
 
-  const allQuestionSubmissions = await prisma.questionSubmission.findMany({
-    where: {
-      userId: session.userid,
-      questionId: currentQuestion.id,
-    },
-    orderBy: { createdAt: "desc" },
-  })
-
-  const historyItems: SubmissionHistoryItem[] = allQuestionSubmissions.map((sub) => {
+  const historyItems: SubmissionHistoryItem[] = await Promise.all(allQuestionSubmissions.map(async (sub) => {
     const answer = sub.content ? (sub.content as { answer?: string }).answer ?? "-" : "-"
+    let answerMdx: MDXRemoteSerializeResult | null = null
+    try {
+      if (answer) {
+        answerMdx = await serialize(escapeLatexBraces(answer).replace(/\n/g, '\n\n'), { mdxOptions })
+      }
+    } catch {}
     return {
       id: sub.id,
       answer,
+      answerMdx,
       isCorrect: sub.isCorrect ?? false,
       createdAt: sub.createdAt,
     }
-  })
+  }))
 
   const rawOptions = (currentQuestion.options as Array<{ id: string; label: string }>) || []
 
@@ -202,6 +216,7 @@ async function getReviewData(questionGroupId: string, questionIndex: number) {
     correctRate: currentQuestion.correctRate,
     allUserBlanks,
     allCorrectBlanks,
+    currentSubmissionId: selectedSubmission?.id ?? null,
   }
 }
 
@@ -213,9 +228,62 @@ export default async function ReviewQuestionPage({ params }: PageProps) {
     redirect(`/question/${id}/review/1`)
   }
 
-  const data = await getReviewData(id, index)
+  const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
 
-  const basePath = `/question/${id}/review`
+  if (!session.isLoggedIn || !session.userid) {
+    redirect("/login")
+  }
+
+  const userId = session.userid
+
+  // 检测 id 是 questionGroupId 还是 questionSubmissionId
+  // 先尝试作为 questionSubmissionId 查找
+  const questionSubmission = await prisma.questionSubmission.findUnique({
+    where: { id },
+  })
+
+  let data
+  let basePath: string
+
+  if (questionSubmission) {
+    // id 是 questionSubmissionId
+    // 通过 questionId 找到 GroupItem，再找到 QuestionGroup
+    const groupItem = await prisma.groupItem.findFirst({
+      where: { questionId: questionSubmission.questionId },
+      include: {
+        group: true,
+      },
+      orderBy: { orderIndex: "asc" },
+    })
+
+    if (!groupItem) {
+      notFound()
+    }
+
+    const questionGroup = groupItem.group
+
+    // 找到这个 question 在 group 中的 index
+    const allGroupItems = await prisma.groupItem.findMany({
+      where: { groupId: questionGroup.id },
+      orderBy: { orderIndex: "asc" },
+    })
+
+    const resolvedIndex = allGroupItems.findIndex(item => item.questionId === questionSubmission.questionId) + 1
+
+    data = await buildReviewData(
+      questionGroup.id,
+      resolvedIndex > 0 ? resolvedIndex : index,
+      userId,
+      questionSubmission.id
+    )
+
+    // basePath 指向 questionGroupId，以便 QuestionSwitcher 正常切换
+    basePath = `/question/${questionGroup.id}/review`
+  } else {
+    // id 是 questionGroupId（原逻辑）
+    data = await buildReviewData(id, index, userId)
+    basePath = `/question/${id}/review`
+  }
 
   return (
     <ReviewContent

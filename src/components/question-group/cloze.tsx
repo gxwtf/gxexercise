@@ -35,7 +35,7 @@ export default function Cloze({ questions, mdxSource }: ClozeProps) {
     <div className="h-screen overflow-hidden bg-background">
       <div className="flex h-screen">
         <div className="flex-1 overflow-y-auto p-6">
-          <EnglishReading startQuestionNumber={1}>
+          <EnglishReading startQuestionNumber={1} indentParagraphs>
             <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>
         </div>

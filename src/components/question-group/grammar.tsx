@@ -41,6 +41,7 @@ export default function Grammar({ questions, mdxSource }: GrammarProps) {
         <EnglishReading 
           startQuestionNumber={1}
           onInputChange={handleInputChange}
+          indentParagraphs
         >
           <MDXRemote {...mdxSource} components={components} />
         </EnglishReading>
