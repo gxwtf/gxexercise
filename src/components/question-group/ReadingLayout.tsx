@@ -5,13 +5,14 @@ import EnglishReading from '@/components/article/english-reading'
 import { QuestionSection } from '@/components/QuestionSection'
 import { Separator } from '@/components/ui/separator'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { useMDXComponents } from '@/mdx-components'
+import { MathInput2Provider, useMDXComponents } from '@/mdx-components'
 
 export interface ReadingLayoutProps {
   mdxSource: MDXRemoteSerializeResult
   children: React.ReactNode
   indentParagraphs?: boolean
   startQuestionNumber?: number
+  onInlineInputChange?: (index: number, value: string) => void
 }
 
 export function ReadingLayout({
@@ -19,6 +20,7 @@ export function ReadingLayout({
   children,
   indentParagraphs = true,
   startQuestionNumber,
+  onInlineInputChange,
 }: ReadingLayoutProps) {
   const components = useMDXComponents()
 
@@ -30,7 +32,9 @@ export function ReadingLayout({
             indentParagraphs={indentParagraphs}
             startQuestionNumber={startQuestionNumber}
           >
-            <MDXRemote {...mdxSource} components={components} />
+            <MathInput2Provider onInputChange={onInlineInputChange}>
+              <MDXRemote {...mdxSource} components={components} />
+            </MathInput2Provider>
           </EnglishReading>
         </div>
 

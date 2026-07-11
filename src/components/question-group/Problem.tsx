@@ -53,9 +53,24 @@ export default function Problem({
       inputValuesRef.current[questionId] = {}
     }
     inputValuesRef.current[questionId][index] = value
-    const values = Object.values(inputValuesRef.current[questionId]).sort()
+    const values = Object.entries(inputValuesRef.current[questionId])
+      .sort(([left], [right]) => Number(left) - Number(right))
+      .map(([, inputValue]) => inputValue)
     setAnswer(questionId, { answer: values.join(',') })
   }, [setAnswer])
+
+  const inputQuestions = questions.filter(q => q.type === 'input')
+  const onInlineInputChange = useCallback((index: number, value: string) => {
+    if (inputQuestions.length === 1) {
+      onInputChange(inputQuestions[0].id, index, value)
+      return
+    }
+
+    const question = inputQuestions[index]
+    if (question) {
+      setAnswer(question.id, { answer: value })
+    }
+  }, [inputQuestions, onInputChange, setAnswer])
 
   const hasArticle = !!mdxSource
   const isSingleTextQuestion = !hasArticle && questions.length === 1 && textQuestions.length === 1
@@ -97,6 +112,9 @@ export default function Problem({
         }
         if (seg.type === 'input') {
           const question = seg.question
+          if (hasArticle && !question.stem.trim()) {
+            return null
+          }
           return (
             <div key={question.id} className="space-y-3">
               <div className="flex items-start space-x-2">
@@ -140,6 +158,7 @@ export default function Problem({
         mdxSource={mdxSource!}
         indentParagraphs={indentParagraphs}
         startQuestionNumber={startQuestionNumber}
+        onInlineInputChange={onInlineInputChange}
       >
         {body}
       </ReadingLayout>

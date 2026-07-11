@@ -8,6 +8,7 @@ import Grammar, { type GrammarQuestion } from "@/components/question-group/gramm
 import SevenChooseFive, { type SevenChooseFiveQuestion } from "@/components/question-group/seven-choose-five";
 import Problem from "@/components/question-group/Problem";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
+import { normalizeLegacyBlankMarkup } from "@/lib/legacy-blank-markup";
 
 type QuestionOption = {
   id: string;
@@ -78,6 +79,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       title: true,
       content: true,
       options: true,
+      subject: true,
       questionType: true,
       groupItems: {
         select: {
@@ -162,8 +164,17 @@ async function QuestionPageContent({ id }: { id: string }) {
     }
   }));
 
+  const hasInputQuestions = questions.some(question => question.type === 'input');
+  const groupContent = hasInputQuestions
+    ? normalizeLegacyBlankMarkup(questionGroup.content || '', {
+        appendInputWhenMissing: questionGroup.subject === '数学',
+        replaceBareGrammarNumbers: questionGroup.questionType === 'grammar',
+        replaceChinesePunctuationBlanks: questionGroup.subject === '语文',
+      })
+    : questionGroup.content || '';
+
   if (questionGroup.questionType === 'cloze') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
@@ -179,7 +190,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'grammar') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
@@ -192,7 +203,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'chinese-dictation') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
@@ -205,7 +216,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'en-reading') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
@@ -219,7 +230,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'seven-choose-five') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
@@ -233,7 +244,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'reading-expression') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
@@ -289,11 +300,13 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'math-fill') {
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
           questions={questions}
+          mdxSource={mdxSource}
           language="zh"
         />
       </>
@@ -313,7 +326,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'chinese-reading') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = await serialize(groupContent, { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />

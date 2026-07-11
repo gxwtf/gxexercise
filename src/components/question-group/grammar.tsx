@@ -19,6 +19,7 @@ interface GrammarProps {
 
 export default function Grammar({ questions, mdxSource }: GrammarProps) {
   const { setAnswer } = useAnswer()
+  const inputValuesRef = React.useRef<Record<number, string>>({})
 
   const handleInputChange = (questionNumber: string, value: string) => {
     const questionIndex = parseInt(questionNumber) - 1
@@ -32,6 +33,17 @@ export default function Grammar({ questions, mdxSource }: GrammarProps) {
   }
 
   const handleInput2Change = React.useCallback((index: number, value: string) => {
+    if (questions.length === 1) {
+      inputValuesRef.current[index] = value
+      const answer = Object.keys(inputValuesRef.current)
+        .map(Number)
+        .sort((left, right) => left - right)
+        .map(key => inputValuesRef.current[key])
+        .join(',')
+      setAnswer(questions[0].id, { answer })
+      return
+    }
+
     const question = questions[index]
     if (question) {
       setAnswer(question.id, {
