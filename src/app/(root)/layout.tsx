@@ -1,6 +1,7 @@
 // 第一层布局
 
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -9,6 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1">
                 {children}
             </main>
+            <Footer />
         </>
     );
 }
