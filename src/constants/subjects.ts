@@ -17,7 +17,7 @@ export const routeToSubject: Record<string, string> = {
 };
 
 export const categoriesBySubject: Record<string, string[]> = {
-  '数学': ['填空', '选择','三角', '概统', '立几', '解几', '导数', '新定义', '套卷'],
+  '数学': ['选择','填空', '三角', '概统', '立几', '解几', '导数', '新定义', '套卷'],
   '语文': ['多文本', '文言文', '古诗', '默写', '名著', '文学类', '语用', '微写作', '作文', '套卷'],
   '英语': ['完形填空', '语法填空', '阅读', '七选五', '阅读表达', '作文', '套卷'],
   '物理': ['力学', '电磁学', '热学', '光学', '实验题', '套卷'],
@@ -26,8 +26,8 @@ export const categoriesBySubject: Record<string, string[]> = {
 
 export const categoryToRoute: Record<string, Record<string, string>> = {
   '数学': {
-    '填空': 'math-fill',
     '选择': 'math-choice',
+    '填空': 'math-fill',
     '三角': 'trigonometry',
     '概统': 'probability',
     '立几': 'solid-geometry',
