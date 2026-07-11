@@ -16,11 +16,10 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
 
   const isTestPaperCategory = categoryName === '套卷';
 
-  // 查询 QuestionGroup
+  // 普通科目入口展示该科目的全部题组；套卷入口只展示试卷。
   const groups = isTestPaperCategory ? [] : await prisma.questionGroup.findMany({
     where: {
       subject: subjectName,
-      category: categoryName,
     },
     orderBy: { createdAt: "desc" },
     select: {
