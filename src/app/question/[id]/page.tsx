@@ -13,6 +13,8 @@ import EnWriting from "@/components/question-group/en-writing";
 import MathFill from "@/components/question-group/math-fill";
 import MathChoice from "@/components/question-group/math-choice";
 import ChineseReading from "@/components/question-group/chinese-reading";
+import MicroWriting from "@/components/question-group/chinese-micro-writing";
+import Essay from "@/components/question-group/chinese-essay";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
 
 function escapeLatexBraces(content: string): string {
@@ -157,6 +159,19 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
+  if (questionGroup.questionType === 'chinese-dictation') {
+    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <Grammar 
+          questions={questions as any} 
+          mdxSource={mdxSource}
+        />
+      </>
+    );
+  }
+
   if (questionGroup.questionType === 'en-reading') {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
@@ -202,6 +217,32 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <EnWriting 
+          questions={questions as any}
+          mdxSource={mdxSource}
+        />
+      </>
+    );
+  }
+
+  if (questionGroup.questionType === 'chinese-micro-writing') {
+    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <MicroWriting 
+          questions={questions as any}
+          mdxSource={mdxSource}
+        />
+      </>
+    );
+  }
+
+  if (questionGroup.questionType === 'chinese-essay') {
+    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <Essay 
           questions={questions as any}
           mdxSource={mdxSource}
         />
