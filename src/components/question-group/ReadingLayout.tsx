@@ -2,40 +2,34 @@
 
 import * as React from 'react'
 import EnglishReading from '@/components/article/english-reading'
-import { ChoiceField } from '@/components/question/ChoiceField'
 import { QuestionSection } from '@/components/QuestionSection'
 import { Separator } from '@/components/ui/separator'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
-import { useAnswer } from './AnswerContext'
 
-interface ClozeQuestion {
-  id: string
-  stem: string
-  type: 'single'
-  options: Array<{ id: string; label: string; labelMdx?: MDXRemoteSerializeResult | null }>
-}
-
-interface ClozeProps {
-  questions: ClozeQuestion[]
+export interface ReadingLayoutProps {
   mdxSource: MDXRemoteSerializeResult
+  children: React.ReactNode
+  indentParagraphs?: boolean
+  startQuestionNumber?: number
 }
 
-export default function Cloze({ questions, mdxSource }: ClozeProps) {
-  const { setAnswer } = useAnswer()
-
-  const onAnswerChange = (questionId: string, selected: string[]) => {
-    const answer = selected.length === 1 ? selected[0] : selected.join(',')
-    setAnswer(questionId, { answer })
-  }
-
+export function ReadingLayout({
+  mdxSource,
+  children,
+  indentParagraphs = true,
+  startQuestionNumber,
+}: ReadingLayoutProps) {
   const components = useMDXComponents()
 
   return (
     <div className="h-screen overflow-hidden bg-background">
       <div className="flex h-screen">
         <div className="flex-1 overflow-y-auto p-6">
-          <EnglishReading startQuestionNumber={1} indentParagraphs>
+          <EnglishReading
+            indentParagraphs={indentParagraphs}
+            startQuestionNumber={startQuestionNumber}
+          >
             <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>
         </div>
@@ -44,10 +38,7 @@ export default function Cloze({ questions, mdxSource }: ClozeProps) {
 
         <div className="flex-1 p-6 overflow-y-auto">
           <QuestionSection>
-            <ChoiceField
-              questions={questions}
-              onChange={onAnswerChange}
-            />
+            {children}
           </QuestionSection>
         </div>
       </div>

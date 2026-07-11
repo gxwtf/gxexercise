@@ -4,17 +4,9 @@ import { serialize } from 'next-mdx-remote/serialize';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
-import Cloze from "@/components/question-group/cloze";
 import Grammar from "@/components/question-group/grammar";
-import EnReading from "@/components/question-group/en-reading";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
-import ReadingExpression from "@/components/question-group/reading-expression";
-import EnWriting from "@/components/question-group/en-writing";
-import MathFill from "@/components/question-group/math-fill";
-import MathChoice from "@/components/question-group/math-choice";
-import ChineseReading from "@/components/question-group/chinese-reading";
-import MicroWriting from "@/components/question-group/chinese-micro-writing";
-import Essay from "@/components/question-group/chinese-essay";
+import Problem from "@/components/question-group/Problem";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
 
 function escapeLatexBraces(content: string): string {
@@ -138,9 +130,12 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <Cloze 
+        <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
+          language="en"
+          indentParagraphs={false}
+          startQuestionNumber={1}
         />
       </>
     );
@@ -177,9 +172,10 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <EnReading 
+        <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
+          language="en"
         />
       </>
     );
@@ -203,48 +199,52 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <ReadingExpression 
+        <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
+          language="en"
+          minHeight="min-h-20"
         />
       </>
     );
   }
 
   if (questionGroup.questionType === 'en-writing') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <EnWriting 
+        <Problem
           questions={questions as any}
-          mdxSource={mdxSource}
+          language="en"
+          minHeight="min-h-64"
+          showWordCount
         />
       </>
     );
   }
 
   if (questionGroup.questionType === 'chinese-micro-writing') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <MicroWriting 
+        <Problem
           questions={questions as any}
-          mdxSource={mdxSource}
+          language="zh"
+          showWordCount
         />
       </>
     );
   }
 
   if (questionGroup.questionType === 'chinese-essay') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <Essay 
+        <Problem
           questions={questions as any}
-          mdxSource={mdxSource}
+          language="zh"
+          minHeight="min-h-64"
+          showWordCount
         />
       </>
     );
@@ -254,8 +254,9 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <MathFill 
+        <Problem
           questions={questions as any}
+          language="zh"
         />
       </>
     );
@@ -265,8 +266,9 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <MathChoice 
+        <Problem
           questions={questions as any}
+          language="zh"
         />
       </>
     );
@@ -277,9 +279,10 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <ChineseReading 
+        <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
+          language="zh"
         />
       </>
     );

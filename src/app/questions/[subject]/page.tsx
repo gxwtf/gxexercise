@@ -17,7 +17,7 @@ export default async function SubjectPage({ params }: PageProps) {
     // 排除"套卷"分类，优先显示其他分类
     const nonTestPaperCategories = categories.filter(cat => cat !== '套卷');
     const firstCategory = nonTestPaperCategories.length > 0 ? nonTestPaperCategories[0] : categories[0];
-    const categoryRoute = categoryToRoute[firstCategory] || firstCategory.toLowerCase();
+    const categoryRoute = categoryToRoute[subjectName]?.[firstCategory] || firstCategory.toLowerCase();
     
     // 重定向到第一个分类页面
     redirect(`/questions/${subject}/${categoryRoute}`);

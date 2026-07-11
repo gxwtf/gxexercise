@@ -23,9 +23,10 @@ interface Question {
 interface ChoiceFieldProps {
   questions: Question[]
   onChange: (questionId: string, selected: string[]) => void
+  startIndex?: number
 }
 
-export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
+export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceFieldProps) {
   const components = useMDXComponents()
 
   return (
@@ -35,7 +36,7 @@ export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
           {question.stem ? (
             <>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-medium">{index + 1}.</span>
+                <span className="text-lg font-medium">{startIndex + index + 1}.</span>
                 <div className="text-lg font-medium">
                   {question.stemMdx ? (
                     <MDXRemote {...question.stemMdx} components={components} />
@@ -53,7 +54,7 @@ export function ChoiceField({ questions, onChange }: ChoiceFieldProps) {
           ) : (
             <div className="flex items-center gap-4">
               <span className="text-lg font-medium min-w-[30px]">
-                {index + 1}.
+                {startIndex + index + 1}.
               </span>
               <ChoiceQuestion
                 type={question.type}

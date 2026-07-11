@@ -43,7 +43,7 @@ export default async function RootPage() {
                   return (
                     <li key={category}>
                       <Link
-                        href={`/questions/${subjectRoute}/${categoryToRoute[category]}`}
+                        href={`/questions/${subjectRoute}/${categoryToRoute[subject]?.[category]}`}
                         className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                       >
                         <span>{category}</span>

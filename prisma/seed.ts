@@ -601,7 +601,7 @@ I've completed my doctorate and am now an independent academic researcher. I hav
   const readingExpressionQuestions = [
     {
       id: '53',
-      questionType: 'input',
+      questionType: 'text',
       content: 'Why did the author choose chemistry as his college major?',
       answer: 'Because it seemed to provide different career options.',
       analysis: '根据文章第一段第二句："I chose chemistry as my college major because it seemed to provide different career options."',
@@ -610,7 +610,7 @@ I've completed my doctorate and am now an independent academic researcher. I hav
     },
     {
       id: '54',
-      questionType: 'input',
+      questionType: 'text',
       content: 'When did the author begin to question his belief about not being suited for a Ph. D.?',
       answer: 'When he started the laboratory research project.',
       analysis: '根据文章第三段第一句："However, I began to question my belief that I was not suited for a Ph. D. when I started the laboratory research project."',
@@ -619,7 +619,7 @@ I've completed my doctorate and am now an independent academic researcher. I hav
     },
     {
       id: '55',
-      questionType: 'input',
+      questionType: 'text',
       content: `Please decide which part is false in the following statement, then underline it and explain why.
 
 ➢ The author decided to pursue a Ph. D. because he failed in the job interview.`,
@@ -631,7 +631,7 @@ I've completed my doctorate and am now an independent academic researcher. I hav
     },
     {
       id: '56',
-      questionType: 'input',
+      questionType: 'text',
       content: 'Do you think it\'s necessary for people to love what they do? Why or why not? (In about 40 words)',
       answer: 'Answers may vary. A possible answer: It\'s not absolutely necessary at first, but developing love for what you do can bring more satisfaction and motivation in the long run.',
       analysis: '这是开放性问题，答案因人而异。合理即可。',
@@ -707,7 +707,7 @@ I've completed my doctorate and am now an independent academic researcher. I hav
   const enWritingQuestion = await prisma.question.create({
     data: {
       content: enWritingArticle,
-      questionType: 'input',
+      questionType: 'text',
       options: [],
       answer: '', // 写作题没有固定答案
       analysis: '写作题评分标准：内容要点完整（接待建议和理由），语言表达准确流畅，结构清晰，词数符合要求。',

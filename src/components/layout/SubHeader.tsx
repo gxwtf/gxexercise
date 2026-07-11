@@ -35,7 +35,7 @@ export default function SubHeader({
     
     // 从当前路径中提取题型
     for (const item of currentNavItems.navButtons) {
-      const categoryRoute = categoryToRoute[item.label];
+      const categoryRoute = categoryToRoute[subject]?.[item.label];
       if (pathname.includes(categoryRoute)) {
         return item.label;
       }
