@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,15 +11,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Monitor, Moon, Sun } from 'lucide-react';
 
+const subscribeToHydration = () => () => undefined;
+const getClientMounted = () => true;
+const getServerMounted = () => false;
+
 export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeToHydration,
+    getClientMounted,
+    getServerMounted
+  );
   const { theme, setTheme } = useTheme();
 
   // 避免水合不匹配
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" disabled>

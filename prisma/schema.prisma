@@ -10,26 +10,64 @@ datasource db {
   provider = "postgresql"
 }
 
-model Question {
-  id             String     @id @default(cuid())
-  questionType   String     @db.VarChar(100)
-  content        String     @db.Text @default("")
-  options        Json?
-  answer         String     @default("")
-  analysis       String?    @db.Text
-  score          Int        @default(5)
-  correctRate    Float?     @db.Real
-  subject        String     @db.VarChar(100)
-  source         String     @db.VarChar(200)
-  grade          String?    @db.VarChar(50)
-  category       String     @db.VarChar(100) @default("")
-  year           Int?
-  tags           String[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+enum BankRightsStatus {
+  APPROVED
+  REVIEW_REQUIRED
+  RESTRICTED
+}
 
-  groupItems     GroupItem[]
-  submissions    QuestionSubmission[]
+enum BankReviewStatus {
+  APPROVED
+  REVIEW_REQUIRED
+  INVALID
+}
+
+enum BankSourceRole {
+  QUESTION
+  ANSWER
+  ANALYSIS
+  CROSS_CHECK
+}
+
+enum BankIngestStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum BankIngestAction {
+  INSERTED
+  SKIPPED_IDENTICAL
+  LINKED_EXISTING
+  CONFLICT
+  REJECTED
+}
+
+model Question {
+  id           String   @id @default(cuid())
+  questionType String   @db.VarChar(100)
+  content      String   @default("") @db.Text
+  options      Json?
+  answer       String   @default("")
+  analysis     String?  @db.Text
+  subContent   String?  @db.Text
+  score        Float    @default(5)
+  correctRate  Float?   @db.Real
+  subject      String   @db.VarChar(100)
+  source       String   @db.VarChar(200)
+  grade        String?  @db.VarChar(50)
+  category     String   @default("") @db.VarChar(100)
+  year         Int?
+  tags         String[]
+  sourceKey    String?  @unique @db.VarChar(512)
+  payloadHash  String?  @db.Char(64)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  groupItems       GroupItem[]
+  submissions      QuestionSubmission[]
+  bankPublications BankQuestionPublication[]
 
   @@index([subject])
   @@index([questionType])
@@ -38,88 +76,426 @@ model Question {
 }
 
 model QuestionGroup {
-  id           String      @id @default(cuid())
-  title        String      @db.VarChar(255)
-  content      String      @db.Text
-  questionType String      @db.VarChar(100)
-  score        Int         @default(0)
-  subject      String      @db.VarChar(100)
-  source       String      @db.VarChar(200)
-  grade        String?     @db.VarChar(50)
-  category     String      @db.VarChar(100)
+  id           String   @id @default(cuid())
+  title        String   @db.VarChar(255)
+  content      String   @db.Text
+  instructions String?  @db.Text
+  options      Json?
+  analysis     String?  @db.Text
+  questionType String   @db.VarChar(100)
+  score        Float    @default(0)
+  subject      String   @db.VarChar(100)
+  source       String   @db.VarChar(200)
+  grade        String?  @db.VarChar(50)
+  category     String   @db.VarChar(100)
   tags         String[]
-  imageUrl     String?     @db.VarChar(500)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  year         Int?
+  sourceKey    String?  @unique @db.VarChar(512)
+  payloadHash  String?  @db.Char(64)
+  metadata     Json?
+  imageUrl     String?  @db.VarChar(500)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  groupItems   GroupItem[]
-  submissions  QuestionGroupSubmission[]
+  groupItems       GroupItem[]
+  submissions      QuestionGroupSubmission[]
+  bankPublications BankSectionPublication[]
 
   @@index([subject])
   @@index([category])
+  @@index([year])
 }
 
 model GroupItem {
-  id         String        @id @default(cuid())
+  id         String @id @default(cuid())
   groupId    String
   questionId String
   orderIndex Int
+  blankIndex Int?
 
-  group      QuestionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  question   Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  group    QuestionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  question Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, questionId])
+  @@unique([groupId, orderIndex])
+  @@unique([groupId, blankIndex])
   @@index([groupId])
 }
 
 model TestPaper {
-  id          String      @id @default(cuid())
-  title       String      @db.VarChar(255)
-  description String?     @db.Text
-  subject     String      @db.VarChar(100)
-  source      String      @db.VarChar(200)
-  grade       String?     @db.VarChar(50)
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  subject     String   @db.VarChar(100)
+  source      String   @db.VarChar(200)
+  grade       String?  @db.VarChar(50)
   year        Int?
-  totalScore  Int?
+  totalScore  Float?
   duration    Int?
   tags        String[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  sourceKey   String?  @unique @db.VarChar(512)
+  payloadHash String?  @db.Char(64)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  paperItems  PaperItem[]
-  submissions TestPaperSubmission[]
+  paperItems       PaperItem[]
+  submissions      TestPaperSubmission[]
+  bankPublications BankPaperPublication[]
 
   @@index([subject])
   @@index([year])
 }
 
 model PaperItem {
-  id         String     @id @default(cuid())
+  id         String @id @default(cuid())
   paperId    String
   itemId     String
-  itemType   String     @db.VarChar(20)
+  itemType   String @db.VarChar(20)
   orderIndex Int
 
-  paper      TestPaper  @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  paper TestPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
 
   @@unique([paperId, itemId])
+  @@unique([paperId, orderIndex])
   @@index([paperId])
 }
 
-model QuestionSubmission {
-  id              String    @id @default(cuid())
-  userId          Int
-  questionId      String
-  groupSubmissionId String?
-  content         Json?
-  score           Float?    @db.Real
-  isCorrect       Boolean?
-  createdAt       DateTime  @default(now())
+model BankSourceSnapshot {
+  id             String           @id @default(cuid())
+  sourceKey      String           @unique @db.VarChar(255)
+  providerKey    String           @db.VarChar(100)
+  name           String           @db.VarChar(200)
+  sourceUrl      String           @db.VarChar(2048)
+  revision       String           @db.VarChar(128)
+  snapshotSha256 String           @db.Char(64)
+  licenseSpdx    String?          @db.VarChar(64)
+  rightsStatus   BankRightsStatus @default(REVIEW_REQUIRED)
+  retrievedAt    DateTime?
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  user            User      @relation(fields: [userId], references: [id])
-  question        Question  @relation(fields: [questionId], references: [id])
+  papers          BankPaperSource[]
+  paperRegions    BankPaperRegion[]
+  sections        BankSection[]
+  sectionSources  BankSectionSource[]
+  questions       BankQuestion[]
+  questionSources BankQuestionSource[]
+
+  @@unique([providerKey, revision])
+  @@index([rightsStatus])
+}
+
+model BankPaper {
+  id           String   @id @default(cuid())
+  paperKey     String   @unique @db.VarChar(255)
+  examKind     String   @default("gaokao") @db.VarChar(32)
+  examYear     Int
+  subjectCode  String   @db.VarChar(64)
+  subjectName  String   @db.VarChar(64)
+  variantCode  String   @db.VarChar(100)
+  paperVariant String   @db.VarChar(160)
+  regionScope  String   @db.VarChar(160)
+  track        String?  @db.VarChar(64)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sources     BankPaperSource[]
+  regions     BankPaperRegion[]
+  sections    BankSection[]
+  questions   BankQuestion[]
+  ingestItems BankIngestItem[]
+  publication BankPaperPublication?
+
+  @@index([examYear, subjectCode, variantCode])
+}
+
+model BankPaperSource {
+  paperId  String
+  sourceId String
+  role     BankSourceRole @default(QUESTION)
+
+  paper  BankPaper          @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  source BankSourceSnapshot @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@id([paperId, sourceId, role])
+  @@index([sourceId])
+}
+
+model BankPaperRegion {
+  paperId    String
+  regionCode String  @db.VarChar(32)
+  regionName String  @db.VarChar(64)
+  sourceId   String?
+  evidence   Json?
+
+  paper  BankPaper           @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  source BankSourceSnapshot? @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@id([paperId, regionCode])
+  @@index([regionCode, paperId])
+  @@index([sourceId])
+}
+
+model BankSection {
+  id           String           @id @default(cuid())
+  paperId      String
+  sourceId     String
+  sourceKey    String           @unique @db.VarChar(512)
+  sortOrder    Int
+  sectionType  String?          @db.VarChar(100)
+  questionType String           @db.VarChar(100)
+  title        String?          @db.VarChar(512)
+  category     String?          @db.VarChar(160)
+  grade        String?          @db.VarChar(50)
+  score        Decimal?         @db.Decimal(8, 2)
+  article      String?          @db.Text
+  instructions String?          @db.Text
+  analysis     String?          @db.Text
+  options      Json?
+  tags         String[]
+  metadata     Json?
+  contentHash  String           @db.Char(64)
+  payloadHash  String           @db.Char(64)
+  reviewStatus BankReviewStatus @default(REVIEW_REQUIRED)
+  rawSource    Json?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  paper       BankPaper               @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  source      BankSourceSnapshot      @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  sources     BankSectionSource[]
+  questions   BankQuestion[]
+  assets      BankSectionAsset[]
+  ingestItems BankIngestItem[]
+  publication BankSectionPublication?
+
+  @@unique([id, paperId])
+  @@unique([paperId, sortOrder])
+  @@index([sourceId])
+  @@index([contentHash])
+  @@index([reviewStatus])
+}
+
+model BankSectionSource {
+  sectionId          String
+  sourceId           String
+  sourceItemKey      String         @db.VarChar(512)
+  role               BankSourceRole @default(QUESTION)
+  payloadHash        String         @db.Char(64)
+  sourcePayload      Json
+  rawSource          Json?
+  resolutionEvidence Json?
+  createdAt          DateTime       @default(now())
+
+  section BankSection        @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  source  BankSourceSnapshot @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@id([sectionId, sourceId, sourceItemKey, role])
+  @@unique([sourceId, sourceItemKey, role])
+  @@index([sourceItemKey])
+}
+
+model BankQuestion {
+  id               String           @id @default(cuid())
+  paperId          String
+  sectionId        String?
+  sourceId         String
+  sourceKey        String           @unique @db.VarChar(512)
+  sourceQuestionNo String?          @db.VarChar(100)
+  sortOrder        Int
+  questionType     String           @db.VarChar(100)
+  score            Decimal?         @db.Decimal(8, 2)
+  correctRate      Decimal?         @db.Decimal(7, 6)
+  content          String           @default("") @db.Text
+  subContent       String?          @db.Text
+  options          Json?
+  answer           Json?
+  analysis         String?          @db.Text
+  metadata         Json?
+  contentHash      String           @db.Char(64)
+  canonicalHash    String           @db.Char(64)
+  payloadHash      String           @db.Char(64)
+  reviewStatus     BankReviewStatus @default(REVIEW_REQUIRED)
+  rawSource        Json?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  paper       BankPaper                @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  section     BankSection?             @relation(fields: [sectionId, paperId], references: [id, paperId], onDelete: Restrict)
+  source      BankSourceSnapshot       @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  sources     BankQuestionSource[]
+  assets      BankQuestionAsset[]
+  ingestItems BankIngestItem[]
+  publication BankQuestionPublication?
+
+  @@unique([sectionId, sortOrder])
+  @@index([paperId, sortOrder])
+  @@index([sourceId])
+  @@index([contentHash])
+  @@index([canonicalHash])
+  @@index([reviewStatus])
+}
+
+model BankQuestionSource {
+  questionId         String
+  sourceId           String
+  sourceItemKey      String         @db.VarChar(512)
+  role               BankSourceRole @default(QUESTION)
+  payloadHash        String         @db.Char(64)
+  sourcePayload      Json
+  rawSource          Json?
+  resolutionEvidence Json?
+  createdAt          DateTime       @default(now())
+
+  question BankQuestion       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  source   BankSourceSnapshot @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@id([questionId, sourceId, sourceItemKey, role])
+  @@unique([sourceId, sourceItemKey, role])
+  @@index([sourceItemKey])
+}
+
+model BankQuestionAsset {
+  id            String   @id @default(cuid())
+  questionId    String
+  assetRole     String   @default("question") @db.VarChar(32)
+  sourceUrl     String   @db.VarChar(2048)
+  storageUrl    String?  @db.VarChar(2048)
+  contentSha256 String?  @db.Char(64)
+  mimeType      String?  @db.VarChar(100)
+  byteSize      BigInt?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  question BankQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@index([contentSha256])
+}
+
+model BankSectionAsset {
+  id            String   @id @default(cuid())
+  sectionId     String
+  assetRole     String   @default("section") @db.VarChar(32)
+  sourceUrl     String   @db.VarChar(2048)
+  storageUrl    String?  @db.VarChar(2048)
+  contentSha256 String?  @db.Char(64)
+  mimeType      String?  @db.VarChar(100)
+  byteSize      BigInt?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  section BankSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([contentSha256])
+}
+
+model BankPaperPublication {
+  bankPaperId String   @id
+  testPaperId String
+  reviewedBy  String   @db.VarChar(191)
+  reviewedAt  DateTime
+  evidence    Json
+  createdAt   DateTime @default(now())
+
+  bankPaper BankPaper @relation(fields: [bankPaperId], references: [id], onDelete: Cascade)
+  testPaper TestPaper @relation(fields: [testPaperId], references: [id], onDelete: Restrict)
+
+  @@index([testPaperId])
+}
+
+model BankSectionPublication {
+  bankSectionId   String   @id
+  questionGroupId String
+  reviewedBy      String   @db.VarChar(191)
+  reviewedAt      DateTime
+  evidence        Json
+  createdAt       DateTime @default(now())
+
+  bankSection   BankSection   @relation(fields: [bankSectionId], references: [id], onDelete: Cascade)
+  questionGroup QuestionGroup @relation(fields: [questionGroupId], references: [id], onDelete: Restrict)
+
+  @@index([questionGroupId])
+}
+
+model BankQuestionPublication {
+  bankQuestionId String   @id
+  questionId     String
+  reviewedBy     String   @db.VarChar(191)
+  reviewedAt     DateTime
+  evidence       Json
+  createdAt      DateTime @default(now())
+
+  bankQuestion BankQuestion @relation(fields: [bankQuestionId], references: [id], onDelete: Cascade)
+  question     Question     @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@index([questionId])
+}
+
+model BankIngestRun {
+  id                   String           @id @default(uuid()) @db.Uuid
+  manifestSha256       String           @db.Char(64)
+  planSha256           String           @db.Char(64)
+  databaseIdentityHash String           @db.Char(64)
+  remoteInventoryHash  String?          @db.Char(64)
+  sourceRevision       String?          @db.VarChar(512)
+  importerVersion      String           @db.VarChar(64)
+  status               BankIngestStatus
+  startedAt            DateTime         @default(now())
+  completedAt          DateTime?
+  stats                Json?
+  errorMessage         String?          @db.Text
+
+  items BankIngestItem[]
+
+  @@index([manifestSha256, status])
+}
+
+model BankIngestItem {
+  id           String           @id @default(cuid())
+  runId        String           @db.Uuid
+  sourceKey    String           @db.VarChar(512)
+  itemKind     String           @db.VarChar(32)
+  action       BankIngestAction
+  paperId      String?
+  sectionId    String?
+  questionId   String?
+  beforeHash   String?          @db.Char(64)
+  afterHash    String?          @db.Char(64)
+  details      Json?
+  errorMessage String?          @db.Text
+  createdAt    DateTime         @default(now())
+
+  run      BankIngestRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  paper    BankPaper?    @relation(fields: [paperId], references: [id], onDelete: SetNull)
+  section  BankSection?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  question BankQuestion? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+
+  @@unique([runId, itemKind, sourceKey])
+  @@index([paperId])
+  @@index([sectionId])
+  @@index([questionId])
+}
+
+model QuestionSubmission {
+  id                String   @id @default(cuid())
+  userId            Int
+  questionId        String
+  groupSubmissionId String?
+  content           Json?
+  score             Float?   @db.Real
+  isCorrect         Boolean?
+  createdAt         DateTime @default(now())
+
+  user            User                     @relation(fields: [userId], references: [id])
+  question        Question                 @relation(fields: [questionId], references: [id])
   groupSubmission QuestionGroupSubmission? @relation(fields: [groupSubmissionId], references: [id])
 
+  @@unique([groupSubmissionId, questionId])
   @@index([userId])
   @@index([questionId])
   @@index([userId, questionId])
@@ -127,21 +503,21 @@ model QuestionSubmission {
 }
 
 model QuestionGroupSubmission {
-  id              String    @id @default(cuid())
-  userId          Int
-  questionGroupId String
+  id               String   @id @default(cuid())
+  userId           Int
+  questionGroupId  String
   testSubmissionId String?
-  score           Float?    @db.Real
-  isCorrect       Boolean?
-  correctNum      Int?
-  totalNum        Int?
-  duration        Int?
-  createdAt       DateTime  @default(now())
+  score            Float?   @db.Real
+  isCorrect        Boolean?
+  correctNum       Int?
+  totalNum         Int?
+  duration         Int?
+  createdAt        DateTime @default(now())
 
-  user            User         @relation(fields: [userId], references: [id])
-  questionGroup   QuestionGroup @relation(fields: [questionGroupId], references: [id])
-  submissions     QuestionSubmission[]
-  testSubmission  TestPaperSubmission? @relation(fields: [testSubmissionId], references: [id])
+  user           User                 @relation(fields: [userId], references: [id])
+  questionGroup  QuestionGroup        @relation(fields: [questionGroupId], references: [id])
+  submissions    QuestionSubmission[]
+  testSubmission TestPaperSubmission? @relation(fields: [testSubmissionId], references: [id])
 
   @@index([userId])
   @@index([questionGroupId])
@@ -150,19 +526,19 @@ model QuestionGroupSubmission {
 }
 
 model TestPaperSubmission {
-  id              String    @id @default(cuid())
-  userId          Int
-  testPaperId     String
-  content         Json?
-  score           Float?    @db.Real
-  duration        Int?
-  startedAt       DateTime?
-  submittedAt     DateTime?
-  createdAt       DateTime  @default(now())
+  id          String    @id @default(cuid())
+  userId      Int
+  testPaperId String
+  content     Json?
+  score       Float?    @db.Real
+  duration    Int?
+  startedAt   DateTime?
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
 
-  user            User         @relation(fields: [userId], references: [id])
-  testPaper       TestPaper    @relation(fields: [testPaperId], references: [id])
-  groupSubmissions     QuestionGroupSubmission[]
+  user             User                      @relation(fields: [userId], references: [id])
+  testPaper        TestPaper                 @relation(fields: [testPaperId], references: [id])
+  groupSubmissions QuestionGroupSubmission[]
 
   @@index([userId])
   @@index([testPaperId])
@@ -170,11 +546,11 @@ model TestPaperSubmission {
 }
 
 model User {
-  id       Int       @id
+  id Int @id
 
-  questionSubmissions      QuestionSubmission[]
-  groupSubmissions         QuestionGroupSubmission[]
-  testPaperSubmissions     TestPaperSubmission[]
+  questionSubmissions  QuestionSubmission[]
+  groupSubmissions     QuestionGroupSubmission[]
+  testPaperSubmissions TestPaperSubmission[]
 
   @@unique([id])
   @@index([id])

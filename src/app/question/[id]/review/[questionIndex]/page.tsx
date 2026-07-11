@@ -141,9 +141,13 @@ async function buildReviewData(
 
   const questionSwitcherItems: QuestionSwitcherItem[] = questions.map((item, idx) => {
     const sub = questionSubmissions.find((s) => s.questionId === item.question.id)
-    let status: "correct" | "wrong" | "unanswered" = "unanswered"
+    let status: QuestionSwitcherItem["status"] = "unanswered"
     if (sub) {
-      status = sub.isCorrect ? "correct" : "wrong"
+      status = sub.isCorrect === null
+        ? "pending"
+        : sub.isCorrect
+          ? "correct"
+          : "wrong"
     }
     return {
       index: idx + 1,
@@ -164,7 +168,7 @@ async function buildReviewData(
       id: sub.id,
       answer,
       answerMdx,
-      isCorrect: sub.isCorrect ?? false,
+      isCorrect: sub.isCorrect,
       createdAt: sub.createdAt,
     }
   }))

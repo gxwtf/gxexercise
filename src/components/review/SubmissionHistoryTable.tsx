@@ -17,7 +17,7 @@ export interface SubmissionHistoryItem {
   id: string
   answer: string
   answerMdx: MDXRemoteSerializeResult | null
-  isCorrect: boolean
+  isCorrect: boolean | null
   createdAt: Date
 }
 
@@ -86,12 +86,18 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
                 <span
                   className={cn(
                     "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                    submission.isCorrect
-                      ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                      : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                    submission.isCorrect === null
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                      : submission.isCorrect
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                        : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
                   )}
                 >
-                  {submission.isCorrect ? "正确" : "错误"}
+                  {submission.isCorrect === null
+                    ? "待人工评阅"
+                    : submission.isCorrect
+                      ? "正确"
+                      : "错误"}
                 </span>
               </TableCell>
               <TableCell className="text-right">

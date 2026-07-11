@@ -1,104 +1,120 @@
 import { prisma } from "@/lib/prisma";
+import { getAuthenticatedUserId } from "@/lib/server-session";
 import { NextResponse } from "next/server";
 
+import {
+  parseGroupSubmissionInput,
+  prepareGroupSubmission,
+} from "./submission-logic";
+
+function errorResponse(error: string, status: number) {
+  return NextResponse.json({ success: false, error }, { status });
+}
+
 export async function POST(request: Request) {
+  const userId = await getAuthenticatedUserId();
+  if (userId === null) {
+    return errorResponse("Authentication required", 401);
+  }
+
+  let rawBody: unknown;
   try {
-    const { userId, questionGroupId, questionSubmissions, duration } = await request.json();
+    rawBody = await request.json();
+  } catch {
+    return errorResponse("Invalid JSON body", 400);
+  }
 
-    const questionGroup = await prisma.questionGroup.findUnique({
-      where: { id: questionGroupId },
-      include: {
-        groupItems: {
-          include: {
-            question: true
+  const parsedInput = parseGroupSubmissionInput(rawBody);
+  if (!parsedInput.ok) {
+    return errorResponse(parsedInput.error, 400);
+  }
+
+  const { questionGroupId, questionSubmissions, duration } = parsedInput.value;
+
+  try {
+    const result = await prisma.$transaction(async (transaction) => {
+      const questionGroup = await transaction.questionGroup.findUnique({
+        where: { id: questionGroupId },
+        select: {
+          groupItems: {
+            select: {
+              question: {
+                select: {
+                  id: true,
+                  questionType: true,
+                  answer: true,
+                  score: true,
+                },
+              },
+            },
+            orderBy: { orderIndex: "asc" },
           },
-          orderBy: { orderIndex: 'asc' }
-        }
-      }
-    });
-
-    if (!questionGroup) {
-      return NextResponse.json(
-        { success: false, error: "QuestionGroup not found" },
-        { status: 404 }
-      );
-    }
-
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {},
-      create: { id: userId }
-    });
-
-    let totalScore = 0;
-    let correctNum = 0;
-    const totalNum = questionGroup.groupItems.length;
-
-    const processedSubmissions = await Promise.all(
-      questionSubmissions.map(async (sub: any) => {
-        const question = questionGroup.groupItems.find(
-          (item) => item.question.id === sub.questionId
-        );
-
-        if (!question) {
-          return null;
-        }
-
-        const userAnswer = sub.content?.answer ?? '';
-        const correctAnswer = question.question.answer ?? '';
-        const questionScore = question.question.score ?? 0;
-
-        const isCorrect = userAnswer === correctAnswer;
-        const score = isCorrect ? questionScore : 0;
-
-        if (isCorrect) {
-          correctNum++;
-        }
-        totalScore += score;
-
-        return {
-          userId,
-          questionId: sub.questionId,
-          content: { answer: userAnswer },
-          score,
-          isCorrect
-        };
-      })
-    );
-
-    const validSubmissions = processedSubmissions.filter((s) => s !== null);
-    const isAllCorrect = correctNum === totalNum && totalNum > 0;
-
-    const groupSubmission = await prisma.questionGroupSubmission.create({
-      data: {
-        userId,
-        questionGroupId,
-        score: totalScore,
-        isCorrect: isAllCorrect,
-        correctNum,
-        totalNum,
-        duration
-      }
-    });
-
-    if (validSubmissions.length > 0) {
-      await prisma.questionSubmission.createMany({
-        data: validSubmissions.map((sub: any) => ({
-          ...sub,
-          groupSubmissionId: groupSubmission.id
-        }))
+        },
       });
+
+      if (!questionGroup) {
+        return { kind: "not-found" as const };
+      }
+
+      const prepared = prepareGroupSubmission(
+        questionGroup.groupItems.map((item) => item.question),
+        questionSubmissions,
+      );
+      if (!prepared.ok) {
+        return {
+          kind: "invalid" as const,
+          error: prepared.error,
+        };
+      }
+
+      await transaction.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: { id: userId },
+      });
+
+      const groupSubmission = await transaction.questionGroupSubmission.create({
+        data: {
+          userId,
+          questionGroupId,
+          score: prepared.value.score,
+          isCorrect: prepared.value.isCorrect,
+          correctNum: prepared.value.correctNum,
+          totalNum: prepared.value.totalNum,
+          duration,
+        },
+        select: { id: true },
+      });
+
+      if (prepared.value.submissions.length > 0) {
+        await transaction.questionSubmission.createMany({
+          data: prepared.value.submissions.map((submission) => ({
+            userId,
+            questionId: submission.questionId,
+            groupSubmissionId: groupSubmission.id,
+            content: submission.content,
+            score: submission.score,
+            isCorrect: submission.isCorrect,
+          })),
+        });
+      }
+
+      return {
+        kind: "created" as const,
+        submissionId: groupSubmission.id,
+      };
+    });
+
+    if (result.kind === "not-found") {
+      return errorResponse("QuestionGroup not found", 404);
+    }
+    if (result.kind === "invalid") {
+      return errorResponse(result.error, 400);
     }
 
-    return NextResponse.json({
-      success: true,
-      submissionId: groupSubmission.id
-    });
+    return NextResponse.json({ success: true, submissionId: result.submissionId });
   } catch (error) {
     console.error("Error creating submission:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to create submission" },
-      { status: 500 }
-    );
+    return errorResponse("Failed to create submission", 500);
   }
 }

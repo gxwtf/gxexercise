@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "year_range": { "from": 2016, "to": 2025 },
+  "manifest_sha256": "56a98db9b25fa51103776fe9e61ee37e052ad7759bd7ea9df5a9a86a3bb83865",
+  "record_count": 2244,
+  "child_question_count": 3247,
+  "paper_count": 248,
+  "quarantine_count": 4,
+  "metadata_override_count": 11,
+  "coverage_year_totals": {
+    "2016": 285,
+    "2017": 288,
+    "2018": 278,
+    "2019": 289,
+    "2020": 295,
+    "2021": 214,
+    "2022": 210,
+    "2023": 201,
+    "2024": 158,
+    "2025": 26
+  },
+  "sources": [
+    {
+      "key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "snapshotSha256": "bcdffb0d61e959394713bbd84979518b3950ce2b2a08454fbfbf6de3a92dc901",
+      "rightsStatus": "review_required"
+    },
+    {
+      "key": "openlmlab-gaokao-bench-updates",
+      "revision": "a606c88ab6039f9282d5135c767e13bc0ec99079",
+      "snapshotSha256": "bcd54d3e24c7636e2e1a57fd5e430b63412f19c2e152b77c8890aa11e7b6059d",
+      "rightsStatus": "review_required"
+    },
+    {
+      "key": "frankieyao-gaokao-math",
+      "revision": "4b994833f5fa730d9967f450b5a4454173afdc52",
+      "snapshotSha256": "1433e55f4b1181ce2b290fc2e973bfce08053d639b2431af4e48d1f7f407d2a5",
+      "rightsStatus": "review_required"
+    }
+  ]
+}

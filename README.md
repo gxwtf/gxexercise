@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+[中文说明](README.zh-CN.md) · [高考导入手册（中文）](scripts/gaokao/README.zh-CN.md) · [覆盖范围（中文）](docs/gaokao-coverage.zh-CN.md)
+
+## Gaokao question ingestion
+
+The repository includes a provenance-preserving, review-gated pipeline for the
+2016–2025 Gaokao source snapshot. It validates the English and Chinese seed
+formats, produces a deterministic manifest, plans idempotent remote changes, and
+writes only to independent staging tables until rights and content review pass.
+
+See [the ingestion runbook](scripts/gaokao/README.md) and [the current coverage
+and known gaps](docs/gaokao-coverage.md). Do not use the legacy demo seed scripts
+for a production refresh.
+
 ## Getting Started
 
 First, run the development server:

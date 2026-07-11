@@ -11,30 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 type Question = {
-  id: string;
-  questionType: string;
-  content: string;
-  options?: any | null;
-  answer: string;
-  analysis?: string | null;
-  score: number;
-  correctRate: number | null;
-  subject: string;
-  source: string;
   grade?: string | null;
-  category: string;
   year?: number | null;
-  tags: string[];
-  imageUrl?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 type GroupItem = {
-  id: string;
-  groupId: string;
-  questionId: string;
-  orderIndex: number;
   question: Question;
 };
 
@@ -43,15 +24,12 @@ type QuestionGroup = {
   title: string;
   content: string;
   questionType: string;
-  score: number;
   subject: string;
   source: string;
   grade?: string | null;
   category: string;
   tags: string[];
   imageUrl?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
   groupItems: GroupItem[];
 };
 
@@ -63,11 +41,7 @@ type TestPaper = {
   source: string;
   year?: number | null;
   grade?: string | null;
-  totalScore?: number | null;
-  duration?: number | null;
   tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 interface QuestionOverviewProps {

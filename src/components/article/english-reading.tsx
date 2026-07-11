@@ -2,12 +2,23 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 export type BlankOption = {
   id: string;
   label: string;
-  labelMdx?: any;
+  labelMdx?: MDXRemoteSerializeResult | null;
 };
+
+function createStringCounter(start: number) {
+  let next = start;
+  return () => String(next++);
+}
+
+function createNumberCounter(start: number) {
+  let next = start;
+  return () => next++;
+}
 
 export interface BlankContextValue {
   blanks: Record<string, string>;
@@ -158,7 +169,6 @@ function replaceBlankTokens(
 export function EnglishReading({
   title,
   children,
-  customComponents = {},
   className,
   blanks = {},
   options = [],
@@ -170,22 +180,8 @@ export function EnglishReading({
   correctBlanks,
   indentParagraphs = false,
 }: EnglishReadingProps) {
-  const blankIndexRef = React.useRef(0);
-  blankIndexRef.current = 0;
-
-  const getNextBlankId = React.useCallback(() => {
-    blankIndexRef.current += 1;
-    return String(blankIndexRef.current);
-  }, []);
-
-  const clozeNumberRef = React.useRef(startQuestionNumber ?? 1);
-  clozeNumberRef.current = startQuestionNumber ?? 1;
-
-  const getNextQuestionNumber = React.useCallback(() => {
-    const next = clozeNumberRef.current;
-    clozeNumberRef.current += 1;
-    return next;
-  }, []);
+  const getNextBlankId = createStringCounter(1);
+  const getNextQuestionNumber = createNumberCounter(startQuestionNumber);
 
   const blankContextValue = React.useMemo(
     () => ({
@@ -215,9 +211,8 @@ export function EnglishReading({
     [onInputChange]
   );
 
-  const renderedContent = () => {
-    if (!children) return null;
-    return replaceBlankTokens(
+  const renderedContent = children
+    ? replaceBlankTokens(
       children,
       getNextBlankId,
       blanks,
@@ -226,8 +221,8 @@ export function EnglishReading({
       onRemove,
       reviewMode,
       correctBlanks,
-    );
-  };
+    )
+    : null;
 
   return (
     <BlankContext.Provider value={blankContextValue}>
@@ -252,7 +247,7 @@ export function EnglishReading({
             )}
 
             <div className={cn('prose max-w-none dark:prose-invert', indentParagraphs && 'article-indent')}>
-              {renderedContent()}
+              {renderedContent}
             </div>
           </article>
         </InputChangeContext.Provider>

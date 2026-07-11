@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "overrides": [
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_Chemistry_MCQs.json",
+      "source_index": 113,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "7202ae8fb8bf4e4507e57bd4e8adc58246bd242fd99da9346928872e7557aa05",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["Same-file 2021 paper boundary and the corresponding 全国甲卷 paper were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_Chemistry_MCQs.json",
+      "source_index": 114,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "4bde29b60e0856b1de4c5051e3a944ac0a4368f87c03700a1d90b23614a9ef35",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["Same-file 2021 paper boundary and the corresponding 全国甲卷 paper were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_Chemistry_MCQs.json",
+      "source_index": 115,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "493d3b08d7bfba31ff6463aa846ab543d7e4e03187867434d1244a1b4f4c6eb9",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["Same-file 2021 paper boundary and the corresponding 全国甲卷 paper were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_English_Fill_in_Blanks.json",
+      "source_index": 27,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "fff8ffd87fee5acd27a937fc600d07b535bdaefe618f813e144ce76446aab92f",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 cloze passage and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_English_Reading_Comp.json",
+      "source_index": 112,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "03143b61b18b016eaf89bc925c91d659cbab73e7b56c451f93296476f84860b1",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 reading set and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_English_Reading_Comp.json",
+      "source_index": 113,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "989b1b15e26d35c3fc9d8c72ede258e19c7c3f3b38d1a601c67e5e290c2017fb",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 reading set and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_English_Reading_Comp.json",
+      "source_index": 114,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "4764d21457c3d4df6be8b40260c7afbbcccc3cf7345925d14cbec1068f76c33f",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 reading set and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2010-2022_English_Reading_Comp.json",
+      "source_index": 115,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "e0dc83a141cafb652eab6fa679a5039808e6f03be615c7934b4bef6654a26a1a",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 reading set and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Objective_Questions/2012-2022_English_Cloze_Test.json",
+      "source_index": 23,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "881610e248dcb9bd7697ed611a6278b5101f3f169c6dfd45d93968b419a19cbb",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 seven-choice-five passage and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Subjective_Questions/2012-2022_English_Language_Error_Correction.json",
+      "source_index": 23,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "b253f775d262df34fa8a0cb97e4f1062e0fde8ff43b353805c208b00bb2814ac",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 error-correction passage and source batch boundary were manually cross-checked."]
+    },
+    {
+      "provider_key": "openlmlab-gaokao-bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "source_file": "Subjective_Questions/2014-2022_English_Language_Cloze_Passage.json",
+      "source_index": 20,
+      "year": 2021,
+      "raw_category": "（解析版）",
+      "raw_sha256": "6bc52ff898b387b45f82fdf699e85285c0a359b29808f91d08ec326679f0e295",
+      "category": "全国甲卷",
+      "reason": "The upstream category contains an edition label instead of the paper identity.",
+      "evidence": ["The 2021 全国甲卷 grammar passage and source batch boundary were manually cross-checked."]
+    }
+  ]
+}

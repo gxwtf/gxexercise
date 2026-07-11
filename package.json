@@ -7,11 +7,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test test/**/*.test.ts",
+    "typecheck": "tsc --noEmit",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:seed-math": "npx tsx prisma/seed-math.ts",
     "db:seed-chinese": "npx tsx prisma/seed-chinese.ts",
     "db:generate": "npx prisma generate",
-    "db:push": "npx prisma db push"
+    "db:push": "npx prisma db push",
+    "db:migrate:deploy": "npx prisma migrate deploy",
+    "gaokao:manifest": "tsx scripts/gaokao/build-manifest.ts",
+    "gaokao:validate-manifest": "tsx scripts/gaokao/validate-manifest-cli.ts",
+    "gaokao:verify-snapshot": "tsx scripts/gaokao/verify-snapshot.ts",
+    "gaokao:validate-seeds": "tsx scripts/gaokao/validate-seeds.ts",
+    "gaokao:plan": "tsx scripts/gaokao/apply-manifest.ts",
+    "gaokao:apply": "tsx scripts/gaokao/apply-manifest.ts --apply"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -57,7 +66,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^10",
+    "eslint": "^9.39.1",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

@@ -6,11 +6,10 @@ import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents, MathInput2Provider } from '@/mdx-components'
 import { useAnswer } from './AnswerContext'
 
-interface GrammarQuestion {
+export interface GrammarQuestion {
   id: string
   stem: string
   type: 'input'
-  answer: string
 }
 
 interface GrammarProps {

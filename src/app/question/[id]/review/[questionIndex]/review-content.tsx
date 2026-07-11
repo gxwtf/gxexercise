@@ -77,6 +77,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         correctRate,
         allUserBlanks,
         allCorrectBlanks,
+        currentSubmissionId,
     } = data
 
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
@@ -157,6 +158,12 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         ) : null}
                     </QuestionSection>
 
+                    {isCorrect === null && (
+                        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                            {currentSubmissionId ? "待人工评阅" : "未判定"}
+                        </div>
+                    )}
+
                     {category === "essay" ? (
                         <div className="mt-6 mb-6">
                             <Tabs defaultValue={userAnswerMdx ? "my-answer" : "reference-answer"}>
@@ -222,7 +229,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             submissions={historyItems}
                             questionIndex={currentIndex}
                             questionType={currentQuestion.questionType}
-                            currentSubmissionId={data.currentSubmissionId ?? undefined}
+                            currentSubmissionId={currentSubmissionId ?? undefined}
                         />
                     </div>
                 </div>

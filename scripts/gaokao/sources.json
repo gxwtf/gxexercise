@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "arg": "bench-root",
+      "adapter": "gaokao-bench-json",
+      "provider_key": "openlmlab-gaokao-bench",
+      "name": "OpenLMLab/GAOKAO-Bench",
+      "url": "https://github.com/OpenLMLab/GAOKAO-Bench",
+      "revision": "6dbb24f8d8439041e5431c4c184a582182a6ce9c",
+      "repo_license_spdx": "Apache-2.0",
+      "content_rights_status": "review_required"
+    },
+    {
+      "arg": "updates-root",
+      "adapter": "gaokao-bench-json",
+      "provider_key": "openlmlab-gaokao-bench-updates",
+      "name": "OpenLMLab/GAOKAO-Bench-Updates",
+      "url": "https://github.com/OpenLMLab/GAOKAO-Bench-Updates",
+      "revision": "a606c88ab6039f9282d5135c767e13bc0ec99079",
+      "repo_license_spdx": null,
+      "content_rights_status": "review_required"
+    },
+    {
+      "arg": "gaokao-math-root",
+      "adapter": "gaokao-math-jsonl",
+      "data_file": "test.jsonl",
+      "provider_key": "frankieyao-gaokao-math",
+      "name": "FrankieYao/GaoKaoMath",
+      "url": "https://huggingface.co/datasets/FrankieYao/GaoKaoMath",
+      "revision": "4b994833f5fa730d9967f450b5a4454173afdc52",
+      "repo_license_spdx": "MIT",
+      "content_rights_status": "review_required"
+    }
+  ]
+}

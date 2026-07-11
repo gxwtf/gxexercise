@@ -85,7 +85,11 @@ export default function Problem({
           return (
             <ChoiceField
               key={seg.questions[0].id}
-              questions={seg.questions as any}
+              questions={seg.questions.map((question) => ({
+                ...question,
+                type: question.type as 'single' | 'multiple',
+                options: question.options ?? [],
+              }))}
               startIndex={seg.startIndex}
               onChange={onChoiceChange}
             />

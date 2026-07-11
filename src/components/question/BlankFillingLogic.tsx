@@ -1,11 +1,12 @@
 'use client'
 
 import * as React from 'react'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 
 type Option = {
   id: string
   label: string
-  labelMdx?: any
+  labelMdx?: MDXRemoteSerializeResult | null
 }
 
 interface BlankFillingLogicProps {
@@ -114,7 +115,9 @@ export function BlankFillingLogic({ options, onStateChange, children }: BlankFil
   return (
     <div>
       {children && React.Children.map(children, child => 
-        React.isValidElement(child) ? React.cloneElement(child, { logic } as any) : child
+        React.isValidElement<{ logic?: ReturnType<typeof useBlankFillingLogic> }>(child)
+          ? React.cloneElement(child, { logic })
+          : child
       )}
     </div>
   )

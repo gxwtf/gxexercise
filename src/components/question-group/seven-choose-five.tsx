@@ -10,7 +10,7 @@ import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
 import { useAnswer } from './AnswerContext'
 
-interface SevenChooseFiveQuestion {
+export interface SevenChooseFiveQuestion {
   id: string
   stem: string
   type: 'single' | 'multiple'
@@ -20,11 +20,16 @@ interface SevenChooseFiveQuestion {
 interface SevenChooseFiveProps {
   questions: SevenChooseFiveQuestion[]
   mdxSource: MDXRemoteSerializeResult
+  groupOptions?: SevenChooseFiveQuestion['options']
 }
 
-export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiveProps) {
+export default function SevenChooseFive({ questions, mdxSource, groupOptions = [] }: SevenChooseFiveProps) {
   const { setAnswer } = useAnswer()
-  const options = questions.length > 0 ? questions[0].options : []
+  const options = groupOptions.length > 0
+    ? groupOptions
+    : questions.length > 0
+      ? questions[0].options
+      : []
 
   const {
     filledBlanks,

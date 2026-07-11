@@ -16,13 +16,16 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import Image from "next/image"
 import useSession from "@/lib/use-session"
 import {useRouter, useSearchParams} from "next/navigation"
 import { useAlertContext } from "@/components/alert-provider"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
+
+const subscribeToHost = () => () => undefined
+const getClientHost = () => window.location.host
+const getServerHost = () => 'localhost:3000'
 
 export function LoginForm({
   className,
@@ -33,12 +36,7 @@ export function LoginForm({
   const { showAlert } = useAlertContext()
   const searchParams = useSearchParams()
   const back = searchParams.get("back") || "/"
-  const [host,setHost] = useState<string>('localhost:3000')
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setHost(window.location.host);
-    }
-  }, [])
+  const host = useSyncExternalStore(subscribeToHost, getClientHost, getServerHost)
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

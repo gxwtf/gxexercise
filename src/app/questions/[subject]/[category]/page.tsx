@@ -23,12 +23,27 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
       category: categoryName,
     },
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      questionType: true,
+      subject: true,
+      source: true,
+      grade: true,
+      category: true,
+      tags: true,
+      imageUrl: true,
       groupItems: {
         orderBy: { orderIndex: "asc" },
-        include: {
-          question: true
-        }
+        select: {
+          question: {
+            select: {
+              year: true,
+              grade: true,
+            },
+          },
+        },
       },
     },
   });
@@ -38,10 +53,15 @@ export default async function SubjectCategoryPage({ params }: PageProps) {
       subject: subjectName,
     },
     orderBy: { createdAt: "desc" },
-    include: {
-      paperItems: {
-        orderBy: { orderIndex: "asc" },
-      },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      subject: true,
+      source: true,
+      year: true,
+      grade: true,
+      tags: true,
     },
   });
 

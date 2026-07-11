@@ -4,10 +4,34 @@ import { serialize } from 'next-mdx-remote/serialize';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
-import Grammar from "@/components/question-group/grammar";
-import SevenChooseFive from "@/components/question-group/seven-choose-five";
+import Grammar, { type GrammarQuestion } from "@/components/question-group/grammar";
+import SevenChooseFive, { type SevenChooseFiveQuestion } from "@/components/question-group/seven-choose-five";
 import Problem from "@/components/question-group/Problem";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
+
+type QuestionOption = {
+  id: string;
+  label: string;
+};
+
+function parseQuestionOptions(value: unknown): QuestionOption[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((option) => {
+    if (!option || typeof option !== "object" || Array.isArray(option)) {
+      return [];
+    }
+
+    const { id, label } = option as Record<string, unknown>;
+    if ((typeof id !== "string" && typeof id !== "number") || typeof label !== "string") {
+      return [];
+    }
+
+    return [{ id: String(id), label }];
+  });
+}
 
 function escapeLatexBraces(content: string): string {
   let result = ''
@@ -50,10 +74,22 @@ async function QuestionPageContent({ id }: { id: string }) {
 
   const questionGroup = await prisma.questionGroup.findUnique({
     where: { id },
-    include: {
+    select: {
+      title: true,
+      content: true,
+      options: true,
+      questionType: true,
       groupItems: {
-        include: {
-          question: true
+        select: {
+          question: {
+            select: {
+              id: true,
+              content: true,
+              subContent: true,
+              questionType: true,
+              options: true,
+            },
+          },
         },
         orderBy: { orderIndex: 'asc' }
       }
@@ -64,7 +100,21 @@ async function QuestionPageContent({ id }: { id: string }) {
     notFound();
   }
 
-  const questions = await Promise.all(questionGroup.groupItems.map(async (item: any) => {
+  const serializeOptions = async (options: QuestionOption[]) => Promise.all(
+    options.map(async (opt) => {
+      try {
+        const escaped = escapeLatexBraces(opt.label);
+        const labelMdx = await serialize(escaped, { mdxOptions });
+        return { ...opt, labelMdx };
+      } catch {
+        return { ...opt, labelMdx: null };
+      }
+    })
+  );
+
+  const groupOptions = await serializeOptions(parseQuestionOptions(questionGroup.options));
+
+  const questions = await Promise.all(questionGroup.groupItems.map(async (item) => {
     let stemMdx = null;
     if (item.question.content) {
       try {
@@ -75,18 +125,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       }
     }
 
-    const options = (item.question.options || []) as Array<{ id: string; label: string }>;
-    const optionsWithMdx = await Promise.all(
-      options.map(async (opt: { id: string; label: string }) => {
-        try {
-          const escaped = escapeLatexBraces(opt.label);
-          const labelMdx = await serialize(escaped, { mdxOptions });
-          return { ...opt, labelMdx };
-        } catch {
-          return { ...opt, labelMdx: null };
-        }
-      })
-    );
+    const optionsWithMdx = await serializeOptions(parseQuestionOptions(item.question.options));
     
     if (item.question.questionType === 'input') {
       return {
@@ -94,7 +133,6 @@ async function QuestionPageContent({ id }: { id: string }) {
         stem: item.question.content,
         stemMdx,
         type: 'input' as const,
-        answer: item.question.answer || '',
         subStem: item.question.subContent || ''
       };
     } else if (item.question.questionType === 'text') {
@@ -103,7 +141,6 @@ async function QuestionPageContent({ id }: { id: string }) {
         stem: item.question.content,
         stemMdx,
         type: 'text' as const,
-        answer: item.question.answer || '',
         subStem: item.question.subContent || ''
       };
     } else if (item.question.questionType === 'multiple') {
@@ -131,7 +168,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any} 
+          questions={questions}
           mdxSource={mdxSource}
           language="en"
           indentParagraphs={false}
@@ -146,8 +183,8 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <Grammar 
-          questions={questions as any} 
+        <Grammar
+          questions={questions as GrammarQuestion[]}
           mdxSource={mdxSource}
         />
       </>
@@ -159,8 +196,8 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <Grammar 
-          questions={questions as any} 
+        <Grammar
+          questions={questions as GrammarQuestion[]}
           mdxSource={mdxSource}
         />
       </>
@@ -173,7 +210,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any} 
+          questions={questions}
           mdxSource={mdxSource}
           language="en"
         />
@@ -186,9 +223,10 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
-        <SevenChooseFive 
-          questions={questions as any} 
+        <SevenChooseFive
+          questions={questions as SevenChooseFiveQuestion[]}
           mdxSource={mdxSource}
+          groupOptions={groupOptions}
         />
       </>
     );
@@ -200,7 +238,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any} 
+          questions={questions}
           mdxSource={mdxSource}
           language="en"
           minHeight="min-h-20"
@@ -214,7 +252,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any}
+          questions={questions}
           language="en"
           minHeight="min-h-64"
           showWordCount
@@ -228,7 +266,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any}
+          questions={questions}
           language="zh"
           showWordCount
         />
@@ -241,7 +279,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any}
+          questions={questions}
           language="zh"
           minHeight="min-h-64"
           showWordCount
@@ -255,7 +293,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any}
+          questions={questions}
           language="zh"
         />
       </>
@@ -267,7 +305,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any}
+          questions={questions}
           language="zh"
         />
       </>
@@ -280,7 +318,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
         <Problem
-          questions={questions as any} 
+          questions={questions}
           mdxSource={mdxSource}
           language="zh"
         />

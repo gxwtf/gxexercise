@@ -13,17 +13,17 @@ interface MathInput2ContextType {
 
 const MathInput2Context = React.createContext<MathInput2ContextType | undefined>(undefined)
 
+function createIndexCounter() {
+  let next = 0
+  return () => next++
+}
+
 export function useMathInput2Context() {
   return React.useContext(MathInput2Context)
 }
 
 export function MathInput2Provider({ children, onInputChange, disabled = false }: { children: React.ReactNode; onInputChange?: (index: number, value: string) => void; disabled?: boolean }) {
-  const indexRef = React.useRef(0)
-  const getNextIndex = React.useCallback(() => {
-    const idx = indexRef.current
-    indexRef.current++
-    return idx
-  }, [])
+  const [getNextIndex] = React.useState(createIndexCounter)
 
   return (
     <MathInput2Context.Provider value={{ onInputChange, getNextIndex, disabled }}>
@@ -35,18 +35,12 @@ export function MathInput2Provider({ children, onInputChange, disabled = false }
 // Input2 - 无序号短输入框，用于数学填空
 function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
   const ctx = React.useContext(MathInput2Context)
-  const indexRef = React.useRef<number | undefined>(undefined)
+  const [index] = React.useState(() => ctx?.getNextIndex())
   const isDisabled = ctx?.disabled ?? false
 
-  if (indexRef.current === undefined) {
-    if (ctx) {
-      indexRef.current = ctx.getNextIndex()
-    }
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (ctx && indexRef.current !== undefined && ctx.onInputChange) {
-      ctx.onInputChange(indexRef.current, e.target.value)
+    if (ctx && index !== undefined && ctx.onInputChange) {
+      ctx.onInputChange(index, e.target.value)
     }
   }
 
@@ -66,18 +60,13 @@ Input2.displayName = 'Input2'
 
 function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
     const context = useBlankContext()
+    const [blankId] = React.useState(() => context?.getNextBlankId())
 
-    if (!context) {
+    if (!context || !blankId) {
         return <span {...props}>{children}</span>
     }
 
-    const { blanks, options, onBlankClick, onRemove, getNextBlankId, reviewMode, correctBlanks } = context
-
-    const blankIdRef = React.useRef<string | null>(null)
-    if (blankIdRef.current === null) {
-        blankIdRef.current = getNextBlankId()
-    }
-    const blankId = blankIdRef.current
+    const { blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks } = context
 
     const filledOptionId = blanks[blankId]
     const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
@@ -134,18 +123,18 @@ function ClozeBlank({
     ...props
 }: React.HTMLAttributes<HTMLSpanElement> & { questionNumber?: number }) {
     const context = React.useContext(ClozeContext);
-    const questionNumberRef = React.useRef<number | undefined>(questionNumber);
+    const [generatedQuestionNumber] = React.useState(
+        () => questionNumber ?? context?.getNextQuestionNumber()
+    );
+    const resolvedQuestionNumber = questionNumber ?? generatedQuestionNumber;
 
-    if (questionNumberRef.current === undefined) {
-        if (!context) {
-            return <span {...props}>____?____</span>;
-        }
-        questionNumberRef.current = context.getNextQuestionNumber();
+    if (resolvedQuestionNumber === undefined) {
+        return <span {...props}>____?____</span>;
     }
 
     return (
         <span {...props}>
-            ____{questionNumberRef.current}____
+            ____{resolvedQuestionNumber}____
         </span>
     )
 }
@@ -159,38 +148,35 @@ function Input({
 }: React.HTMLAttributes<HTMLSpanElement> & { onChange?: (value: string) => void }) {
     const clozeContext = React.useContext(ClozeContext);
     const inputChangeContext = useInputChangeContext();
-    const questionNumberRef = React.useRef<number | undefined>(undefined);
+    const [questionNumber] = React.useState(() => clozeContext?.getNextQuestionNumber());
     const isReviewMode = clozeContext?.reviewMode ?? false;
 
-    if (questionNumberRef.current === undefined) {
-        if (!clozeContext) {
-            return (
-                <span className="inline-flex items-center h-8" style={{textIndent: 0}} {...props}>
-                    <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>?</span>
-                    <ShadcnInput
-                        type="text"
-                        className="w-30 rounded-l-none h-8 text-base"
-                        disabled={isReviewMode}
-                        onChange={(e) => onChange?.(e.target.value)}
-                    />
-                </span>
-            );
-        }
-        questionNumberRef.current = clozeContext.getNextQuestionNumber();
+    if (questionNumber === undefined) {
+        return (
+            <span className="inline-flex items-center h-8" style={{textIndent: 0}} {...props}>
+                <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>?</span>
+                <ShadcnInput
+                    type="text"
+                    className="w-30 rounded-l-none h-8 text-base"
+                    disabled={isReviewMode}
+                    onChange={(e) => onChange?.(e.target.value)}
+                />
+            </span>
+        );
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange?.(e.target.value);
         // 通过 InputChangeContext 传递答案到父组件
-        if (inputChangeContext?.onInputChange && questionNumberRef.current) {
-            inputChangeContext.onInputChange(String(questionNumberRef.current), e.target.value);
+        if (inputChangeContext?.onInputChange) {
+            inputChangeContext.onInputChange(String(questionNumber), e.target.value);
         }
     };
 
     return (
         <span className="inline-flex items-center h-7" style={{textIndent: 0}} {...props}>
             <span className="text-base font-medium text-gray-700 px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>
-                {questionNumberRef.current}
+                {questionNumber}
             </span>
             <ShadcnInput
                 type="text"
