@@ -232,7 +232,39 @@ export function topicFromFilename(filePath: string): string {
     .replace(/_/g, " ");
 }
 
-export function publicCategoryFromSource(filePath: string, subjectName: string): string {
+function compactTopicText(content: string): string {
+  return content.replace(/\s+/g, "");
+}
+
+function mathOpenEndedCategory(content: string): string {
+  const text = compactTopicText(content);
+  if (/椭圆|双曲线|抛物线|圆锥曲线|轨迹|焦点|准线|坐标系|直角坐标系|参数方程|曲线/.test(text)) return "解几";
+  if (/棱柱|棱锥|多面体|球|体积|表面积|直线与平面|平面与平面|空间向量|正方体|长方体|几何体|四面体/.test(text)) return "立几";
+  if (/三角|正弦|余弦|正切|sin|cos|tan|弧度|解三角形/i.test(text)) return "三角";
+  if (/概率|统计|随机|样本|频率|方差|均值|回归|独立事件|排列|组合|二项|正态分布/.test(text)) return "概统";
+  if (/导数|极值|单调|切线|函数f\(|f\(x\)|零点/.test(text)) return "导数";
+  return "新定义";
+}
+
+function physicsCategory(content: string): string {
+  const text = compactTopicText(content);
+  if (/透镜|折射|反射|干涉|衍射|全反射|光电效应|光路|激光|望远镜|射线/.test(text)) return "光学";
+  if (/测量|仪器|验证|探究|误差|读数|电表|游标卡尺|打点计时器|油膜法/.test(text)) return "实验题";
+  if (/电场|电势|电压|电流|电阻|磁场|磁感应|洛伦兹|安培力|电容|电荷|电路|电磁|感应电动势/.test(text)) return "电磁学";
+  if (/温度|热力|热量|内能|理想气体|分子运动|压强|热机|比热容/.test(text)) return "热学";
+  return "力学";
+}
+
+function chemistryCategory(content: string): string {
+  const text = compactTopicText(content);
+  if (/离子方程式|化学方程式|电极反应式|反应方程式|配平/.test(text)) return "化学方程式";
+  if (/实验|装置|操作|试管|烧杯|量筒|滴定|过滤|蒸馏|萃取|制备|实验现象/.test(text)) return "实验操作";
+  if (/元素周期|周期表|同周期|同主族|原子序数|核外电子|电子层|原子半径|电负性/.test(text)) return "元素周期";
+  if (/有机|烃|酯|醇|醛|羧|苯|乙烯|烷|糖类|油脂|蛋白质|高分子|聚合|同分异构/.test(text)) return "有机化学";
+  return "无机化学";
+}
+
+export function publicCategoryFromSource(filePath: string, subjectName: string, content = ""): string {
   const normalized = filePath.replace(/\\/g, "/");
 
   if (/Chinese_Lang_and_Usage|Language_and_Writing_Skills/.test(normalized)) return "语用";
@@ -245,14 +277,17 @@ export function publicCategoryFromSource(filePath: string, subjectName: string):
   if (/English_Fill_in_Blanks/.test(normalized)) return "完形填空";
   if (/English_Cloze_Test/.test(normalized)) return "七选五";
   if (/Language_Cloze_Passage/.test(normalized)) return "语法填空";
-  if (/Error_Correction/.test(normalized)) return "短文改错";
+  if (/Error_Correction/.test(normalized)) return "阅读表达";
   if (/English_Reading_Comp/.test(normalized)) return "阅读";
 
   if (/Mathematics|Math/.test(normalized)) {
     if (/Fill-in-the-Blank/.test(normalized)) return "填空";
     if (/MCQs/.test(normalized)) return "选择";
-    if (/Open-ended/.test(normalized)) return "解答题";
+    if (/Open-ended/.test(normalized)) return mathOpenEndedCategory(content);
   }
+
+  if (/Physics/.test(normalized)) return physicsCategory(content);
+  if (/Chemistry/.test(normalized)) return chemistryCategory(content);
 
   if (/MCQs/.test(normalized)) return "选择";
   if (/Open-ended/.test(normalized)) return "解答题";
@@ -410,7 +445,7 @@ export function buildManifestRecord(input: {
   const sourceItemKey = `${source.key}:${normalizedPath}:${sourceIndex}`;
   const questionNumber = extractQuestionNumber(article);
   const topic = topicFromFilename(relativePath);
-  const publicCategory = publicCategoryFromSource(relativePath, subject.name);
+  const publicCategory = publicCategoryFromSource(relativePath, subject.name, article);
   const types = inferQuestionTypes(relativePath);
   const scores = allocateScore(score, answers.length);
   const sectionContentHash = sha256(canonicalText(article));

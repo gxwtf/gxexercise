@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { routeToSubject, routeToCategory } from "@/constants/subjects";
+import { categoryForSubjectRoute, routeToSubject } from "@/constants/subjects";
 import { QuestionOverview } from "@/components/QuestionOverview";
 
 interface PageProps {
@@ -12,7 +12,7 @@ interface PageProps {
 export default async function SubjectCategoryPage({ params }: PageProps) {
   const { subject, category } = await params;
   const subjectName = routeToSubject[subject] || subject;
-  const categoryName = routeToCategory[category] || category;
+  const categoryName = categoryForSubjectRoute(subjectName, category);
 
   const isTestPaperCategory = categoryName === '套卷';
 

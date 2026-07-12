@@ -25,11 +25,11 @@ export const routeToSubject: Record<string, string> = {
 };
 
 export const categoriesBySubject: Record<string, string[]> = {
-  '数学': ['选择', '填空', '解答题', '套卷'],
-  '语文': ['多文本', '文言文', '古诗', '默写', '文学类', '语用', '套卷'],
-  '英语': ['完形填空', '语法填空', '阅读', '七选五', '短文改错', '套卷'],
-  '物理': ['选择', '解答题', '套卷'],
-  '化学': ['选择', '解答题', '套卷'],
+  '数学': ['选择', '填空', '三角', '概统', '立几', '解几', '导数', '新定义', '套卷'],
+  '语文': ['多文本', '文言文', '古诗', '默写', '名著', '文学类', '语用', '微写作', '作文', '套卷'],
+  '英语': ['完形填空', '语法填空', '阅读', '七选五', '阅读表达', '作文', '套卷'],
+  '物理': ['力学', '电磁学', '热学', '光学', '实验题', '套卷'],
+  '化学': ['化学方程式', '有机化学', '无机化学', '实验操作', '元素周期', '套卷'],
   '生物': ['选择', '解答题', '套卷'],
   '历史': ['选择', '解答题', '套卷'],
   '地理': ['选择', '解答题', '套卷'],
@@ -46,6 +46,7 @@ export const categoryToRoute: Record<string, Record<string, string>> = {
     '立几': 'solid-geometry',
     '解几': 'analytic-geometry',
     '导数': 'derivatives',
+    '新定义': 'new-definition',
     '套卷': 'test-paper',
   },
   '语文': {
@@ -65,7 +66,7 @@ export const categoryToRoute: Record<string, Record<string, string>> = {
     '语法填空': 'grammar',
     '阅读': 'en-reading',
     '七选五': 'seven-choose-five',
-    '短文改错': 'error-correction',
+    '阅读表达': 'reading-expression',
     '作文': 'en-writing',
     '套卷': 'test-paper',
   },
@@ -114,6 +115,11 @@ export const categoryToRoute: Record<string, Record<string, string>> = {
 export const routeToCategory: Record<string, string> = Object.fromEntries(
   Object.values(categoryToRoute).flatMap(map => Object.entries(map).map(([k, v]) => [v, k]))
 );
+
+export function categoryForSubjectRoute(subject: string, route: string): string {
+  const match = Object.entries(categoryToRoute[subject] || {}).find(([, categoryRoute]) => categoryRoute === route);
+  return match?.[0] || routeToCategory[route] || route;
+}
 
 export const subjectNavItems: Record<string, {
   navButtons: { label: string; href: string }[];
