@@ -91,7 +91,7 @@ async function main() {
   if (sourceHash !== paper.sourcePdfSha256) throw new Error("Source PDF checksum does not match reviewed input");
 
   const prefix = `manual:beijing:${paper.year}:${paper.subject}:${paper.track ?? "general"}`;
-  const source = "北京卷（用户提供 PDF，逐页人工核对）";
+  const source = "北京卷";
   const plan = paper.questions.map(question => ({
     number: question.number,
     groupSourceKey: `${prefix}:group:${question.number}`,
@@ -121,7 +121,7 @@ async function main() {
           year: paper.year,
           totalScore: paper.totalScore,
           duration: paper.duration,
-          tags: [paper.subject, "高考真题", "北京卷", String(paper.year)],
+          tags: [],
           sourceKey: paperSourceKey,
           payloadHash: sha256(stableStringify(paper)),
           metadata: { source_pdf_sha256: sourceHash, track: paper.track, reviewed: true },
@@ -131,7 +131,7 @@ async function main() {
 
       for (const question of paper.questions) {
         const keys = plan.find(item => item.number === question.number)!;
-        const tags = [paper.subject, "高考真题", "北京卷", String(paper.year), question.category];
+        const tags: string[] = [];
         const group = await tx.questionGroup.upsert({
           where: { sourceKey: keys.groupSourceKey },
           create: {
