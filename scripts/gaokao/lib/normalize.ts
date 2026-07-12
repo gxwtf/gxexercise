@@ -232,6 +232,33 @@ export function topicFromFilename(filePath: string): string {
     .replace(/_/g, " ");
 }
 
+export function publicCategoryFromSource(filePath: string, subjectName: string): string {
+  const normalized = filePath.replace(/\\/g, "/");
+
+  if (/Chinese_Lang_and_Usage|Language_and_Writing_Skills/.test(normalized)) return "语用";
+  if (/Chinese_Modern_Lit|Practical_Text/.test(normalized)) return "多文本";
+  if (/Classical_Chinese/.test(normalized)) return "文言文";
+  if (/Ancient_Poetry/.test(normalized)) return "古诗";
+  if (/Famous_Passages|Dictation/.test(normalized)) return "默写";
+  if (/Literary_Text/.test(normalized)) return "文学类";
+
+  if (/English_Fill_in_Blanks/.test(normalized)) return "完形填空";
+  if (/English_Cloze_Test/.test(normalized)) return "七选五";
+  if (/Language_Cloze_Passage/.test(normalized)) return "语法填空";
+  if (/Error_Correction/.test(normalized)) return "阅读表达";
+  if (/English_Reading_Comp/.test(normalized)) return "阅读";
+
+  if (/Mathematics|Math/.test(normalized)) {
+    if (/Fill-in-the-Blank/.test(normalized)) return "填空";
+    if (/MCQs/.test(normalized)) return "选择";
+    if (/Open-ended/.test(normalized)) return "解答题";
+  }
+
+  if (/MCQs/.test(normalized)) return "选择";
+  if (/Open-ended/.test(normalized)) return "解答题";
+  return subjectName;
+}
+
 export function inferQuestionTypes(filePath: string): {
   sectionType: string;
   childType: string;
@@ -383,6 +410,7 @@ export function buildManifestRecord(input: {
   const sourceItemKey = `${source.key}:${normalizedPath}:${sourceIndex}`;
   const questionNumber = extractQuestionNumber(article);
   const topic = topicFromFilename(relativePath);
+  const publicCategory = publicCategoryFromSource(relativePath, subject.name);
   const types = inferQuestionTypes(relativePath);
   const scores = allocateScore(score, answers.length);
   const sectionContentHash = sha256(canonicalText(article));
@@ -442,14 +470,14 @@ export function buildManifestRecord(input: {
     section_type: topic,
     question_type: types.sectionType,
     title: `${year}年${category.variant}${subject.name} ${questionNumber ?? `#${sourceIndex}`}`,
-    category: topic,
+    category: publicCategory,
     grade: "高三",
     score,
     article,
     instructions: null,
     analysis,
     options: null,
-    tags: [subject.name, "高考真题", String(year), category.variant, topic],
+    tags: [subject.name, "高考真题", String(year), category.variant, publicCategory, topic],
     metadata: {
       source_file: normalizedPath,
       source_index: sourceIndex,

@@ -5,6 +5,7 @@ import {
   deriveSubject,
   normalizeCategory,
   normalizeText,
+  publicCategoryFromSource,
 } from "../scripts/gaokao/lib/normalize";
 
 test("normalizes national, new-Gaokao and province paper metadata", () => {
@@ -31,6 +32,14 @@ test("keeps ambiguous curriculum labels explicitly unverified", () => {
 test("maps Math I to science and Math II to humanities", () => {
   assert.equal(deriveSubject("2023_Math_I_MCQs.json")?.code, "mathematics_science");
   assert.equal(deriveSubject("2023_Math_II_MCQs.json")?.code, "mathematics_humanities");
+});
+
+test("maps imported source files to visible exercise categories", () => {
+  assert.equal(publicCategoryFromSource("Objective_Questions/2024_Chinese_Modern_Lit.json", "语文"), "多文本");
+  assert.equal(publicCategoryFromSource("Objective_Questions/2024_English_Fill_in_Blanks.json", "英语"), "完形填空");
+  assert.equal(publicCategoryFromSource("Objective_Questions/2024_Math_II_Fill-in-the-Blank.json", "数学"), "填空");
+  assert.equal(publicCategoryFromSource("Objective_Questions/2024_Physics_MCQs.json", "物理"), "选择");
+  assert.equal(publicCategoryFromSource("Subjective_Questions/2024_Physics_Open-ended_Questions.json", "物理"), "解答题");
 });
 
 test("builds a deterministic grouped record and preserves fractional total score", () => {
