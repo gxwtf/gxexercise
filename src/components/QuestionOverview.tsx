@@ -157,6 +157,13 @@ export function QuestionOverview({
   };
 
   const filteredGroups = useMemo(() => {
+    // 导入题库使用的分类名（如 “Math II MCQs”）与导航分类（如“选择”）
+    // 不一定相同。只有题组中实际存在该导航分类时才按它二次筛选，避免
+    // 已按学科查询到的题目在客户端被全部误过滤掉。
+    const hasMatchingRouteCategory = !!category && initialGroups.some(
+      (group) => group.category === category,
+    );
+
     return initialGroups.filter((group) => {
       const matchesSearch =
         group.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -165,7 +172,7 @@ export function QuestionOverview({
           tag.toLowerCase().includes(searchTerm.toLowerCase())
         );
       const matchesSubject = !subject || group.subject === subject;
-      const matchesCategory = !category || group.category === category;
+      const matchesCategory = !hasMatchingRouteCategory || group.category === category;
       const matchesType = !questionType || group.questionType === questionType;
 
       // 新增筛选条件
