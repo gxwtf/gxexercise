@@ -245,7 +245,7 @@ export function publicCategoryFromSource(filePath: string, subjectName: string):
   if (/English_Fill_in_Blanks/.test(normalized)) return "完形填空";
   if (/English_Cloze_Test/.test(normalized)) return "七选五";
   if (/Language_Cloze_Passage/.test(normalized)) return "语法填空";
-  if (/Error_Correction/.test(normalized)) return "阅读表达";
+  if (/Error_Correction/.test(normalized)) return "短文改错";
   if (/English_Reading_Comp/.test(normalized)) return "阅读";
 
   if (/Mathematics|Math/.test(normalized)) {
