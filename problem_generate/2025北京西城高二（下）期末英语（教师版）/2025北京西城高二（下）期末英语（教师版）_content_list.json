@@ -1,0 +1,2127 @@
+[
+    {
+        "type": "text",
+        "text": "2025北京西城高二（下）期末",
+        "text_level": 1,
+        "bbox": [
+            295,
+            54,
+            702,
+            78
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "英 语",
+        "text_level": 1,
+        "bbox": [
+            435,
+            96,
+            564,
+            120
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2025.7",
+        "bbox": [
+            850,
+            137,
+            912,
+            152
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "本试卷共14页，共140分。考试时长120分钟。考生务必将答案写在答题卡上，在试卷上作答无效。",
+        "bbox": [
+            84,
+            161,
+            909,
+            206
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "第I卷（共83分）",
+        "bbox": [
+            416,
+            217,
+            571,
+            234
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "I.听力理解（共三节，30分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            244,
+            342,
+            261
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "第一节：（共4小题；每小题2分，共8分）",
+        "bbox": [
+            85,
+            272,
+            473,
+            290
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "听下面四段对话，每段对话后有一道小题，从每题所给的A、B、C三个选项中选出最佳选项。每段对话你将听一遍。",
+        "bbox": [
+            84,
+            300,
+            894,
+            346
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. What will the man wear to the event? A. A suit. B. A jacket. C. A T-shirt.",
+        "bbox": [
+            85,
+            355,
+            374,
+            392
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. How will the woman go to the shopping center today? A. By car. B. On foot. C. By bus.",
+        "bbox": [
+            85,
+            398,
+            492,
+            435
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. What is the man looking for? A. His locker. B. His book. C. His bag. 4. What is the woman's favorite class now? A. Art. B. Math. C. Science.",
+        "bbox": [
+            85,
+            442,
+            398,
+            520
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "第二节：（共6小题；每小题2分，共12分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            527,
+            484,
+            545
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "听下面一段对话，回答第5至第6小题。",
+        "bbox": [
+            85,
+            611,
+            443,
+            627
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "5. What is the man? A. A cleaner. B. A secretary. C. A manager. 6. What will the woman probably do next? A. Go to work. B. Answer calls. C. Buy some coffee.",
+        "bbox": [
+            84,
+            638,
+            467,
+            718
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "听下面一段对话，回答第7至第8小题。",
+        "bbox": [
+            85,
+            725,
+            443,
+            741
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "7. How does Tom help Mary with her garden? A. He cuts the grass. B. He shapes the bushes. C. He plants new flowers.",
+        "bbox": [
+            85,
+            752,
+            605,
+            789
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "8. What is the most probable relationship between the two speakers? A. Husband and wife. B. Classmates. C. Neighbors.",
+        "bbox": [
+            85,
+            796,
+            574,
+            832
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "听下面一段独白，回答第9至第10小题。",
+        "bbox": [
+            85,
+            839,
+            453,
+            856
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "9. What will Jamie Cook's lecture focus on? A. The features of science.",
+        "bbox": [
+            85,
+            866,
+            405,
+            902
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "第1页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            998
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "B. The social impacts of AI.",
+        "bbox": [
+            85,
+            53,
+            290,
+            67
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "C. The possibility of life on other planets.",
+        "bbox": [
+            85,
+            76,
+            386,
+            90
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "10. What is the speaker's purpose in giving the talk?",
+        "bbox": [
+            85,
+            96,
+            462,
+            111
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "A. To welcome new students.",
+        "bbox": [
+            85,
+            118,
+            300,
+            131
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "B. To present various discoveries.",
+        "bbox": [
+            85,
+            139,
+            331,
+            153
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "C. To introduce upcoming events.",
+        "bbox": [
+            85,
+            161,
+            331,
+            175
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "第三节：（共5小题；每小题2分，共10分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            183,
+            485,
+            199
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "听下面一段独白，根据题目要求在相应的横线上写下第11题至第15题的关键信息。每小题仅填写一个词。这段独白你将听两遍。",
+        "bbox": [
+            84,
+            210,
+            884,
+            250
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "table",
+        "img_path": "images/faceabc0cdb035911e46be831aace376b4a889cb113eedc6c95d4c9cb7e451a4.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=2>How to Survive in the Wild</td></tr><tr><td rowspan=1 colspan=1>Find water</td><td rowspan=1 colspan=1>11a body of water.·Dig for water if you can&#x27;t find it around.</td></tr><tr><td rowspan=1 colspan=1>12a shelter</td><td rowspan=1 colspan=1>·Find a fallen tree or a big rock.·Search for _13_branches and lay them against the tree or rock.</td></tr><tr><td rowspan=1 colspan=1>14_yourself from theelements</td><td rowspan=1 colspan=1>·Eat late.·Cover yourself with dirt and_15when you go to sleep.</td></tr></table>",
+        "bbox": [
+            87,
+            258,
+            789,
+            456
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "I.完形填空（共10小题；每小题1.5分，共15分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            457,
+            541,
+            474
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，掌握其大意，从每题所给的A、B、C、D四个选项中，选出最佳选项，并在答题卡上将该选项涂黑。",
+        "text_level": 2,
+        "bbox": [
+            85,
+            485,
+            907,
+            530
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Firefighters should be quick thinkers. In an emergency, they should figure out the speediest and safest way to act, sometimes including improvising (临时拼凑) with the things1. Fire chief Fennessy knows this well. He is now making headlines for2two homes with milk and beer during a fire in Altadena, California.",
+        "bbox": [
+            84,
+            541,
+            904,
+            601
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/26a9a1d1571edd7ca3ec6ac285bc5c90fce6cbe64b1eaf9f2d087489def23ee6.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            136,
+            609,
+            221,
+            667
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Although Altadena was not in his charge, Fennessy grew up there and still had family and friends there. Hearing the news of the fire, he tried to contact his brother. When he couldn't3his brother, Fennessy decided to drive over to Altadena. On his way, he learned his brother's family had been taken to safety, but since he had already made the",
+        "bbox": [
+            243,
+            607,
+            904,
+            687
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4, Fennessy figured he might as well take a look.",
+        "bbox": [
+            85,
+            694,
+            509,
+            709
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "When reaching the spot, Fennessy couldn't believe his eyes at the sight of the ruins. “I haven't seen anything like this where you drive for miles, and there's massive 5\"Fennessy said. When he reached his brother's street, his home and a neighbor's house were still standing, but he6the flames were getting too close, as other nearby homes were already burning down.",
+        "bbox": [
+            84,
+            715,
+            905,
+            795
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Even more worrisome, a gas meter on the neighbor's house was melting (熔化), surrounded by fire. Thinking he had to7the gas meter, he looked for a hose (水龙带), but there was no water.",
+        "bbox": [
+            84,
+            802,
+            902,
+            843
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Exploring his options, Fennessy8his entry through the front door of one of the homes and went into the kitchen looking for whatever he could use. “I ended up finding some milk and beer,\" he explained. “To do nothing means the home's going to be 9, and in this case, a little milk and beer really saved the day.\"",
+        "bbox": [
+            84,
+            850,
+            909,
+            909
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "第2页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            998
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "The two homes he saved are now the only two houses standing on the block. But Fennessy said he only did what he could as a trained firefighter and was getting a lot of10for what was luck in terms of timing and resources. “We’re fixers. We’re going to put our lives on the line,\" Fennessy said.",
+        "bbox": [
+            84,
+            53,
+            912,
+            111
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. A. at hand B. on time C. in order D. in mind",
+        "bbox": [
+            85,
+            117,
+            784,
+            133
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. A. cleaning B. providing C. saving D. filling",
+        "bbox": [
+            85,
+            139,
+            774,
+            155
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. A. persuade B. reach C. meet D. remind",
+        "bbox": [
+            85,
+            160,
+            781,
+            177
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "4. A. day B. trip C. change D. appointment",
+        "bbox": [
+            85,
+            181,
+            818,
+            198
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "5. A. access B. progress C. disturbance D. destruction",
+        "bbox": [
+            85,
+            204,
+            810,
+            219
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "6. A. forgot B. wondered C. feared D. ignored",
+        "bbox": [
+            85,
+            224,
+            786,
+            241
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "7. A. cool B. break C. operate D. remove",
+        "bbox": [
+            85,
+            246,
+            784,
+            262
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "8. A. missed B. declared C. delayed D. forced",
+        "bbox": [
+            85,
+            267,
+            778,
+            284
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "9. A. lost B. emptied C. moved D. restored",
+        "bbox": [
+            85,
+            290,
+            788,
+            305
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "10. A. wisdom B. pride C. credit D. confidence",
+        "bbox": [
+            85,
+            311,
+            806,
+            326
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "ⅢI.阅读理解（共两节，38分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            334,
+            357,
+            350
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "第一节（共14小题；每小题2分，共28分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            361,
+            485,
+            379
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，从每题所给的A、B、C、D四个选项中，选出最佳选项，并在答题卡上将该项涂黑。",
+        "bbox": [
+            84,
+            388,
+            907,
+            435
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "A",
+        "text_level": 2,
+        "bbox": [
+            489,
+            445,
+            509,
+            460
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Odyssey of the Mind (OM) promotes creativity, problem solving, teamwork, and more. It is a creative problem-solving competition that gives kids the confidence to think for themselves and to create solutions to any challenge. Independent study, original ideas, and critical thinking skills are rewarded over getting the “one right answer\" thanks to our unique open-ended problems that are backed by educators and experts in STE(A)M fields. Performance, art & cultural studies are also incorporated, creating a well-rounded program that has impacted lives for over 40 years. OM benefits all types of students as they learn to think outside the box.",
+        "bbox": [
+            84,
+            469,
+            897,
+            593
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Participation",
+        "text_level": 2,
+        "bbox": [
+            85,
+            599,
+            193,
+            613
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Students work in teams of up to seven members and spend weeks or months working together and creating solutions to long-term problems. Every year, there are six long-term problems designed for them to choose from • Teams are formed by division and compete against teams in the same division and problem. Grade level determines the division for teams.",
+        "bbox": [
+            84,
+            620,
+            887,
+            700
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• In the competition, teams have eight minutes to present their long-term problem solution. They will be scored for how well they meet the requirements of the problem (Long-Term score) and for their creativity in categories specific to that problem (Style score).",
+        "bbox": [
+            84,
+            706,
+            905,
+            765
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Cost",
+        "bbox": [
+            85,
+            771,
+            129,
+            784
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Yearly memberships are required to participate in OM. Each membership supports one team per problem per division.",
+        "bbox": [
+            85,
+            793,
+            895,
+            828
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Standard Membership \\$290: Individual schools/ Multiple schools sharing a principal.",
+        "bbox": [
+            85,
+            835,
+            727,
+            851
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Additional Membership \\$190: Only for schools who enter two teams in the same problem and division in competition.",
+        "bbox": [
+            84,
+            857,
+            863,
+            894
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Awards",
+        "bbox": [
+            85,
+            901,
+            151,
+            914
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "第3页/共12页",
+        "bbox": [
+            447,
+            982,
+            551,
+            998
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Ranatra Fusca Creativity Award: It represents the essence of OM. It is presented to teams or individuals who exhibit exceptional creativity, either through some aspect of their problem solution, or an extraordinary idea beyond the problem solution.",
+        "bbox": [
+            84,
+            54,
+            910,
+            111
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "• OMER's Award: It recognizes individuals or teams who demonstrate outstanding sportsmanship, excellent behavior, or exceptional talent.",
+        "bbox": [
+            84,
+            117,
+            868,
+            154
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "• Odyssey of the Mind Creativity Award: It recognizes an individual and/ or organization for extraordinary creative achievement or exceptional effort.",
+        "bbox": [
+            85,
+            161,
+            867,
+            198
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "• Odyssey of the Mind Spirit Award: It recognizes an individual involved in the program who demonstrates the encouragement and development of cooperation, self-respect, and the appreciation and understanding of others.",
+        "bbox": [
+            85,
+            204,
+            894,
+            241
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "11. What does Odyssey of the Mind value most? A. Having innovative solutions. B. Getting the right answer. C. Impacting others' daily lives. D. Facing more challenges.",
+        "bbox": [
+            85,
+            247,
+            697,
+            306
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "12. In Odyssey of the Mind, students will A. work in groups of at least seven B. be scored from two different aspects C. address six problems at the same time D. prepare their solutions within eight minutes",
+        "bbox": [
+            84,
+            312,
+            463,
+            413
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "13. The participant with the strongest sense of teamwork is most likely to be awarded   \nA. OMER's Award   \nB. Ranatra Fusca Creativity Award   \nC. Odyssey of the Mind Spirit Award   \nD. Odyssey of the Mind Creativity Award",
+        "bbox": [
+            84,
+            419,
+            773,
+            520
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "B",
+        "text_level": 2,
+        "bbox": [
+            489,
+            529,
+            509,
+            542
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "I've always been a daring risk taker. But when I was 15, my luck ran out. A horseback riding accident resulted in severe injuries, the death of my beloved horse Spooks, and the horrible news that I'd never ride again. I was set on proving the doctors wrong. Just a few months later, with my mother's support, I rode sidesaddle and won my first jumping competition. The excitement was incredible.",
+        "bbox": [
+            84,
+            552,
+            904,
+            632
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "image",
+        "img_path": "images/0c0a83821de5ee0f9ea5ee3eeb4f8634509e31aaf58eac6b33debfa841d50835.jpg",
+        "image_caption": [],
+        "image_footnote": [
+            "sidesaddle"
+        ],
+        "bbox": [
+            129,
+            639,
+            230,
+            711
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "From then on, I committed my life to adventure, remembering my mother's lesson: never say, “I can't\". At 22, I read about an opening to be a motorcycle trick rider — I'd learned to ride a few years earlier. Still, it was 1976 and I knew they were unlikely to hire a woman. I thought about that as I signed my trick rider application, leaving off the honorific — Ms., hoping to hide the fact that I was a woman. But they never got back to me.",
+        "bbox": [
+            245,
+            638,
+            899,
+            739
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "I was heartbroken. Maybe the position had already been filled; maybe they'd discovered I was a woman. My friend Steve then proposed an idea that at first seemed crazy: learning to fly aeroplanes. “Flying is for men,\" I laughed at the idea. But gradually, I realized the suggestion had stuck with me.",
+        "bbox": [
+            84,
+            746,
+            895,
+            804
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Years ago, trial flights — brief introductory sessions with an instructor — cost just £5 for 15 minutes in the air Steve and I both signed up, and after my first session, I couldn't stop talking about flying. I got my license and headed for the US to work as a pilot. It wasn't easy. Initially, people were doubtful about a woman working in the role, but I ended up outperforming my male colleagues. Twenty years later, I returned to England and started my own flying company.",
+        "bbox": [
+            84,
+            810,
+            905,
+            913
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "第4页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            998
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Now, I live a quieter life. I’ve settled in a village in Lincolnshire, spending much of my time volunteering in care homes. Last October, after nearly fifty years and countless adventures, I received a letter from a post office in Staines. It was my trick rider application. The post office apologized for the delay and explained it had been found stuck behind a drawer in the office — the company never received it.",
+        "bbox": [
+            84,
+            53,
+            900,
+            133
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Looking back, I realized that even though I didn't get that job, it led me to a series of adventures that shaped my life in unexpected and fulfilling ways.",
+        "bbox": [
+            85,
+            140,
+            894,
+            177
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "14. What did winning the jumping competition bring to the writer? A. The faith in friendship.   \nB. The acquisition of a new skill.   \nC. The recognition of mother's love.   \nD. The determination to go adventuring.",
+        "bbox": [
+            84,
+            183,
+            564,
+            282
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "15. How did the writer feel at first when Steve suggested learning to fly? A. Curious. B. Inspired. C. Desperate. D. Doubtful.",
+        "bbox": [
+            85,
+            290,
+            794,
+            326
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "16. Why did the writer fail to receive any reply about the trick ride position? A. Because she forgot to sign the application.   \nB. Because her application was not delivered.   \nC. Because women were unfit for the position.   \nD. Because the position had already been filled. 17. What can we learn from this passage? A. Smart plans make big dreams.   \nB. The best journeys are not mapped.   \nC. Doubt kills more goals than failure.   \nD. Strong women create strong societies.",
+        "bbox": [
+            84,
+            334,
+            631,
+            435
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            85,
+            441,
+            384,
+            542
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "C",
+        "text_level": 2,
+        "bbox": [
+            489,
+            550,
+            509,
+            563
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Elephants and gorillas in the Republic of the Congo's rainforests spend a lot of time hiding in the shadows — or so we thought. Using drone (无人机) surveys and AI processing, scientists have discovered an extensive network of mysterious open clearings among the trees. Animals like elephants, gorillas visit these muddy areas, called bais, in the languages of the Indigenous Ba’Aka, to search for vital nutrition and maintain their complex social networks. The numerous playgrounds are visible in satellite images, and AI analysis is helping researchers find them more effectively.",
+        "bbox": [
+            84,
+            574,
+            910,
+            699
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The discovery began in 2021 when Sylvain Ngouma and Evan Hockridge came upon a massive clearing during fieldwork in Odzala-Kokoua National Park and found a trail (踪迹) of wet, pot-sized footprints leading through the woods to the open roundabout. Hockridge, who had thought bais were abnormal, says, “I had it backward. It kind of hit me when I was there. You can't understand animal interactions without first understanding bais.\"",
+        "bbox": [
+            84,
+            705,
+            902,
+            808
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "For the next three summers, the team investigated the clearings. They analyzed camera-trap images, confirming what local people had told them — that these natural clearings are crucial gathering grounds for some of the world's most endangered mammals. The bais, they realized, are big melting pots, big playgrounds, for a collection of forest animals.",
+        "bbox": [
+            84,
+            816,
+            894,
+            895
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "第5页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            998
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "During the initial surveys, the team followed elephant trails to move through the rainforest from bai to bai. This process led Hockridge to wonder about a network. Although previous studies documented animal behavior in selected bais, no one had counted them or had the means to map their distribution. The team partnered with African Parks, using drones to scan known sites. They trained an AI algorithm (算法) to identify bais in satellite imagery, revealing 2,176 clearings in one park — 10 times more than previously recorded.",
+        "bbox": [
+            84,
+            53,
+            907,
+            158
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Bais are always near rivers or streams. Most are smaller than a city block, but few, at more than 100 acres, are bigger than some college campuses. “Bais are ultimately islands of resources, and animals produce these networks of trails to essentially navigate to and from a network of bais,\" Hockridge says. The researchers' map of bais, the first of its kind, is also a map of conservation priorities. “We find that a huge portion of the animal community depends on this unique ecosystem. These species don't have alternative habitats other than bais,\" Hockridge says.",
+        "bbox": [
+            84,
+            164,
+            902,
+            266
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The study is also a step toward solving the ultimate mystery: How did bais form? Many ecologists have argued that a combination of hydrology (水文学) and animal landscaping is at play. But definitive proof remains elusive. Now, with a map in hand and camera traps still in place, the research team is tracking long-term changes, which have implications for the maintenance of these crucial animal habitats.",
+        "bbox": [
+            84,
+            272,
+            894,
+            354
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "“We have hypotheses (假说),\"Andrew Davies, an ecologist in Harvard, says, \"but the short answer is: we don't know.\"",
+        "bbox": [
+            85,
+            361,
+            875,
+            399
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "18. For rainforest animals, bais are places for A. fun and safety B. water and shelter C. food and connection D. shade and entertainment",
+        "bbox": [
+            85,
+            407,
+            695,
+            463
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "19. What can we learn about Ngouma and Hockridge's research? A. It discovered how bais formed.   \nB. It was the first to map the network of bais.   \nC. It analyzed images of bais provided by local people.   \nD. It concluded bais were spots intended for endangered species.",
+        "bbox": [
+            84,
+            472,
+            551,
+            571
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "20. What does the underlined word “elusive\" in Paragraph 6 probably mean? A. Difficult to find. B. Simple to clarify. C. Possible to overestimate. D. Unlikely to question.",
+        "bbox": [
+            84,
+            579,
+            670,
+            637
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "21. Which would be the best title for this passage? A. Conservation Priorities in Rainforests B. Hidden Playgrounds Revealed in Rainforests C. Secrets of Rainforest Animals' Social Networks D. Modern Tools Adopted for Rainforest Exploration",
+        "bbox": [
+            84,
+            644,
+            468,
+            744
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "D",
+        "text_level": 2,
+        "bbox": [
+            489,
+            752,
+            509,
+            765
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Monday was the first day of Dartmouth's spring term. So, as I often do at this time, I started teaching my course for non-science majors called “Understanding the Universe: From Atoms to the Big Bang\".",
+        "bbox": [
+            85,
+            776,
+            867,
+            813
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "This is what students like to call a “physics for poets\" class — a class that explores the history of how humanity has faced some of the deepest questions we can ask about the material world and our place in it, without the math. It is a class that tries to capture the true spirit of the liberal-arts education, mixing the sciences and the humanities as different and complementary ways of knowing the world and why we matter. In fancier words, as an intellectual history of physics and astronomy (天文学), the class requires that scientific thinking be contextualized culturally, so that students can situate the ways in which some of the most revolutionary ideas in the past 2,000 years emerged when they did.",
+        "bbox": [
+            84,
+            819,
+            902,
+            900
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "第6页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            998
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            84,
+            54,
+            900,
+            115
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Scientists, by training, have little exposure to the humanities. Given that a major in the sciences requires a lot of technical work, we spend precious little time dealing with what happened culturally and historically around the science we are trying to understand. This, I believe, is the reason why so many scientists in the public media condemn (遣责) the humanities as useless. As a consequence, many scientific ideas are presented as having addressed some of the deepest questions we have been asking, when they haven't.",
+        "bbox": [
+            84,
+            121,
+            897,
+            225
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Humanities students, on the other hand, are typically those who avoid the sciences or, at least, math. Their training is also technical, involving lots of reading and critical writing. You can often tell, when you teach this kind of class, who the scientists and the humanists are. All you have to do is write an equation (方程) on the blackboard and look at the class. Humanists will quickly look bored. The scientists will become lively. As you read from Aristotle's Metaphysics, the opposite will happen. To bridge this gap is the challenge.",
+        "bbox": [
+            84,
+            231,
+            904,
+            336
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The classroom is the ideal place for this conversation between the sciences and the humanities to unfold. By exposing students to the two sides of the cultural divide, we stand a chance of creating something that will actually close the gap. Scientists should recognize that some research topics — AI, biotechnology, climate change, life extension, nature, and many others — need to be investigated together with humanists as a joint effort.",
+        "bbox": [
+            84,
+            342,
+            902,
+            423
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "I finished the first class by reminding the students that not even the best teacher in the world can teach someone who doesn't want to learn. After all, as Tom Stoppard reminded us in his brilliant play Arcadia, it is wanting to know that makes us matter — scientists and humanists alike.",
+        "bbox": [
+            84,
+            429,
+            863,
+            486
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "22. What's special about the author's class? A. It guides students to explain revolutionary ideas.   \nB. It appeals to arts students to switch to scientific thinking.   \nC. It breaks the boundary between the sciences and the humanities.   \nD. It 挖 s into the secrets of human's position in the material world. 23. Which of the following would the author applaud? A. Mary, a history major, quit computer engineering for lack of interest.   \nB. Mia, an art student, drew pictures of famous scientists for a science fair.   \nC. Ben, teaching chemistry, guided his students to focus on technology work.   \nD. David, studying physics, worked with a philosophy student for his project. 24. What message does the author intend to deliver to his students? A. University courses present challenges.   \nB. The cultural divide deserves approval.   \nC. The eagerness to learn is of significance.   \nD. Prejudice towards the humanities is history.",
+        "bbox": [
+            84,
+            493,
+            568,
+            594
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            84,
+            604,
+            638,
+            703
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            84,
+            711,
+            568,
+            812
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "第二节（共5小题；每小题2分，共10分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            819,
+            473,
+            835
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项，并在答题卡上将该项涂黑。选项中共有两项为多余选项。",
+        "bbox": [
+            84,
+            846,
+            902,
+            891
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "第7页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            997
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Forgiveness is something that many of us strive for, but it can often feel difficult to achieve. Over the years, we've heard countless people express the intention to forgive, only to struggle with the emotional roadblocks that prevent them from truly letting go.",
+        "bbox": [
+            84,
+            53,
+            894,
+            112
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "First, let's define forgiveness.25It's not about forgetting what happened or excusing harmful behavior. In fact, our minds tell us that if we stay angry, bitter, or distant, we'll be safe from further hurt. 26While holding onto memories and creating distance may offer temporary emotional safeguards, it often deepens our sadness, isolates us, and prevents us from healing. Forgiveness, on the other hand, is about choosing not to let that pain continue to define your thoughts, emotions, and behaviors.",
+        "bbox": [
+            84,
+            118,
+            873,
+            219
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Forgiveness is essential because we're all human, and we all make mistakes. If we want to cultivate meaningful relationships, there will unavoidably be times when we hurt one another. Forgiveness becomes crucial in maintaining those connections and our own peace of mind.27Forgiving yourself is especially important. Raising walls of bitterness or anger toward yourself is deeply damaging. When you hold on to shame or guilt, you create emotional barriers that prevent you from living fully and authentically.",
+        "bbox": [
+            84,
+            225,
+            902,
+            328
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "So, how do we forgive? While the journey is deeply personal and can vary from person to person, there are key steps that can help guide us. Acknowledge the hurt and pain exactly as it is.28This perspective allows us to see others (and ourselves) as imperfect humans doing the best they can with what they have. Extend sympathy to yourself and others. Choose to release bitterness and move forward in line with your values.",
+        "bbox": [
+            84,
+            334,
+            887,
+            413
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "29It's an ongoing practice. But every time you choose forgiveness, you create space for love and healing to flow through your life. A. It is a continuous process. B. But we know that this isn't true. C. Recognize that everyone has faults. D. Remember that forgiveness isn't a one-time event. E. Forgiveness is the decision to release attachment to a painful past. F. You don't have to communicate with the person who wronged you. G. In fact, we may need to forgive not only others but ourselves as well.",
+        "bbox": [
+            84,
+            419,
+            885,
+            607
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "第Ⅱ卷（共57分）",
+        "text_level": 2,
+        "bbox": [
+            411,
+            613,
+            574,
+            630
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "I.选词填空（共5小题；每小题2分，共10分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            642,
+            507,
+            658
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "用方框中单词的适当形式完成下列句子，每个单词只能用一次。",
+        "bbox": [
+            85,
+            669,
+            576,
+            684
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "benefit, treat, logic, impress, motivate",
+        "bbox": [
+            89,
+            693,
+            484,
+            725
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "30. The performance of the athlete left everyone amazed.",
+        "bbox": [
+            85,
+            747,
+            569,
+            762
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "31. He is a bright student, but he just lacks the to learn new things.",
+        "bbox": [
+            85,
+            768,
+            636,
+            783
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "32. Many patients are not getting the medical they need.",
+        "bbox": [
+            85,
+            789,
+            563,
+            804
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "33. Cycling is highly to health and the environment.",
+        "bbox": [
+            85,
+            812,
+            534,
+            826
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "34. Programming requires thinking to gradually break big problems into smaller steps.",
+        "bbox": [
+            85,
+            833,
+            776,
+            848
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "II.语法填空（共10小题；每小题1.5分，共15分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            856,
+            541,
+            871
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "A",
+        "text_level": 2,
+        "bbox": [
+            489,
+            884,
+            509,
+            896
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "第8页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            997
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。",
+        "bbox": [
+            85,
+            53,
+            902,
+            93
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "The World Health Day, 35 (celebrate) every year on April 7, is a global initiative started by the World Health Organization (WHO). The aim of the day is36(spread) awareness around key health issues and run campaigns and discussions around it. This year's theme is “Healthy Beginning, Hopeful Futures\". The health of mothers and babies is the foundation of healthy37(family) and communities, helping ensure hopeful futures for us all.",
+        "bbox": [
+            84,
+            102,
+            909,
+            204
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "B",
+        "text_level": 2,
+        "bbox": [
+            489,
+            210,
+            509,
+            224
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。",
+        "bbox": [
+            84,
+            235,
+            902,
+            274
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "A tortoise at the Philadelphia Zoo has become the oldest first-time mother of her species after38(have) her first babies at 100 years old. The tortoise, named Mommy, is a critically endangered species in their native home. There are 39 (few) than 50 kept in US zoos. Mommy arrived at the Zoo in 1932, meaning anyone that 40(visit) the Zoo for the last 93 years has likely seen her. This is a significant milestone41the history of the Zoo.",
+        "bbox": [
+            84,
+            282,
+            912,
+            385
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "C",
+        "text_level": 2,
+        "bbox": [
+            487,
+            391,
+            509,
+            405
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。",
+        "bbox": [
+            85,
+            414,
+            904,
+            455
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "A Chinese automaker has created a battery42will enable electric vehicles (EVs) to charge almost as quickly as it takes to fill a regular car's gas tank. The new battery, named the e platform,43(develop) last year by BYD, a Chinese firm that is overtaking Tesla as the world's top seller of electric vehicles. BYD says it will install a network of 4,000 flash-charging stations across China. This technology is currently only available in China, and the company has yet to confirm44it will make it available internationally or not.",
+        "bbox": [
+            84,
+            463,
+            909,
+            565
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "ⅢI.书面表达（共两节，32分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            571,
+            357,
+            589
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "第一节（共4小题；第60、61题各2分，第62题3分，第63题5分，共12分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            599,
+            805,
+            617
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "阅读下面的短文，根据题目要求用英文回答问题。",
+        "bbox": [
+            85,
+            626,
+            472,
+            643
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We live in a world filled with distractions. Everywhere we look, we can find instant pleasures available for next-day delivery right to our homes. In a culture surrounded by messages saying that we can lose the discomfort right now, delayed gratification, which refers to the ability to wait for a long-term reward, is less attractive. But research shows it makes all the difference in achieving a more important and satisfying goal.",
+        "bbox": [
+            84,
+            651,
+            892,
+            732
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Delayed gratification and instant gratification involve the timing and approach to achieving satisfaction or rewards. The former requires self-discipline and the ability to manage impulses, while the latter often involves giving in to immediate desires. An example of this could be when a young man chooses to resist the urge to splurge (挥霍) on luxury items and instead save money regularly and patiently to buy a house. The delayed gratification is the goal and satisfaction he would achieve from owning a dream home, rather than the instant delight of impulsive shopping.",
+        "bbox": [
+            84,
+            738,
+            907,
+            864
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Delayed gratification has to do with one's natural ability and environment and what one is taught. Learning to delay the impulse for immediate pleasure in favor of long-term satisfaction is a skill required for progressive and long-term growth. We can start by making small changes every day and staying consistent with those changes. Over time, these habits can accumulate and lead to big changes and results. Consistent reminders of why we want to reach our goals can also help.",
+        "bbox": [
+            84,
+            870,
+            904,
+            907
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "第9页/共12页",
+        "bbox": [
+            447,
+            983,
+            551,
+            998
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            84,
+            53,
+            910,
+            112
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "If we were all masters at delayed gratification, our environment would not be filled with “quick\" solutions to everything under the sun. Our culture demands that successful humans rise above the constant distraction to selfmotivate and delay personal gratification in favor of distant goals. However, a balance between our thirst for instant rewards and our desire to create longevity in our career, relationships, and health is difficult to achieve. Our entire lives require that we weigh the choices of“okay right now\" vs. “bigger better later\". It takes a joint effort to override the environment to create our successful personal worlds.",
+        "bbox": [
+            84,
+            117,
+            907,
+            241
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "45. What is delayed gratification?",
+        "bbox": [
+            85,
+            247,
+            788,
+            285
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "46. What is the difference between delayed gratification and instant gratification?",
+        "bbox": [
+            85,
+            290,
+            788,
+            328
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "47. Please decide which part is false in the following statement, then underline it and explain why. Delayed gratification is merely related to one's environment, and it can contribute to one's long-term development.",
+        "bbox": [
+            85,
+            332,
+            821,
+            413
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "48. Please use an example to show how you would practice delayed gratification in your daily life. (In about 40 words)",
+        "bbox": [
+            85,
+            419,
+            882,
+            479
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "第二节（20分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            485,
+            228,
+            501
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "49.假设你是红星中学高二学生李华。你的外国好友Jim要给校报“AIandTeenLife”专栏投稿，他想重点介绍北京中学生的“智慧生活”，发来邮件询问你的建议。请你用英文给他回复，内容包括：",
+        "bbox": [
+            85,
+            512,
+            905,
+            552
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "1. 建议内容；",
+        "bbox": [
+            87,
+            561,
+            181,
+            575
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "2.说明理由。",
+        "bbox": [
+            85,
+            585,
+            183,
+            600
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "注意：1.词数100左右；",
+        "bbox": [
+            85,
+            609,
+            268,
+            624
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "2.开头和结尾已给出，不计入总词数。",
+        "bbox": [
+            85,
+            633,
+            376,
+            648
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Dear Jim,",
+        "bbox": [
+            87,
+            658,
+            159,
+            671
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            85,
+            680,
+            902,
+            782
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Yours, Li Hua",
+        "bbox": [
+            857,
+            788,
+            910,
+            822
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "第10页/共12页",
+        "bbox": [
+            442,
+            983,
+            554,
+            998
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "参考答案",
+        "text_level": 1,
+        "bbox": [
+            435,
+            54,
+            563,
+            79
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "第I卷（共83分）",
+        "text_level": 2,
+        "bbox": [
+            413,
+            93,
+            573,
+            112
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "ⅡI.完形填空（共10小题；每小题1.5分，共15分）",
+        "text_level": 2,
+        "bbox": [
+            84,
+            122,
+            541,
+            140
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，掌握其大意，从每题所给的A、B、C、D四个选项中，选出最佳选项，并在 答题卡上将该选项涂黑。   \n1.A 2.C 3.B 4.B 5.D 6.C 7.A 8.D 9.A 10.C",
+        "bbox": [
+            84,
+            151,
+            907,
+            221
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "III.阅读理解（共两节，38分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            228,
+            359,
+            244
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "第一节（共14小题；每小题2分，共28分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            255,
+            485,
+            273
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "阅读下面短文，从每题所给的A、B、C、D四个选项中，选出最佳选项，并在答题卡上将该 项涂黑。   \n11.A 12.B 13.C   \n14.D 15.D 16.B 17.B   \n18.C 19.B 20.A 21.B   \n22.C 23.D 24.C",
+        "bbox": [
+            84,
+            282,
+            907,
+            417
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "第二节（共5小题；每小题2分，共10分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            424,
+            475,
+            442
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项，并在答题卡上将该项 涂黑。选项中共有两项为多余选项。   \n25.E 26.B 27.G 28.C 29.D",
+        "bbox": [
+            84,
+            451,
+            900,
+            523
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "第Ⅱ卷（共57分）",
+        "text_level": 2,
+        "bbox": [
+            411,
+            530,
+            574,
+            546
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "I.选词填空（共5小题；每小题2分，共10分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            557,
+            509,
+            575
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "II.语法填空（共10小题；每小题1.5分，共15分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            693,
+            541,
+            709
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "35. celebrated 36. to spread 37. families   \n38. having 39. fewer 40. has visited 41. in   \n42. which## that 43. was developed 44. whether",
+        "bbox": [
+            85,
+            720,
+            460,
+            778
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "ⅢI.书面表达（共两节，32分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            785,
+            357,
+            802
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "第一节（共4小题；第60、61题各2分，第62题3分，第63题5分，共12分）",
+        "text_level": 2,
+        "bbox": [
+            84,
+            813,
+            805,
+            831
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "45. Delayed gratification refers to the ability to wait for a long-term reward.",
+        "bbox": [
+            84,
+            840,
+            630,
+            857
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "46. Delayed gratification requires self-discipline and the ability to manage impulses, while instant gratification often involves giving in to immediate desires.",
+        "bbox": [
+            84,
+            862,
+            912,
+            900
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "第11页/共12页",
+        "bbox": [
+            442,
+            982,
+            554,
+            998
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "47. Delayed gratification is merely related to one's environment, and it can contribute to one's long- term development.",
+        "text_level": 2,
+        "bbox": [
+            84,
+            53,
+            910,
+            91
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "According to the passage, delayed gratification has to do with one's natural ability and environment and what one is taught.",
+        "bbox": [
+            84,
+            96,
+            912,
+            134
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "48. I have been longing for a new gaming console. Instead of buying it immediately, I save a fixed amount weekly to get it in a few months.",
+        "bbox": [
+            84,
+            139,
+            912,
+            178
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "第二节（20分）",
+        "text_level": 2,
+        "bbox": [
+            85,
+            185,
+            228,
+            203
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Dear Jim,",
+        "bbox": [
+            85,
+            212,
+            161,
+            228
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "I’m thrilled to know you're going to introduce Beijing students' smart lifestyle! My suggestion is to focus on one key trend: AI-assisted learning.",
+        "bbox": [
+            84,
+            235,
+            895,
+            272
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Nowadays, AI tools are revolutionizing how high school students like me study. They provide instant homework help, generate practice questions, and even analyze our mistakes to create personalized study plans. Many classmates use voice assistants to practice English speaking, making learning more interactive. I believe your article will definitely be relevant if you highlight AI-assisted learning in Beijing and how it is transforming education here. Truly this is cutting-edge technology that is relatable to teens worldwide!",
+        "bbox": [
+            84,
+            278,
+            910,
+            381
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "I hope my advice is helpful.",
+        "bbox": [
+            119,
+            386,
+            324,
+            401
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Yours",
+        "bbox": [
+            863,
+            407,
+            912,
+            422
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Li Hua",
+        "bbox": [
+            855,
+            428,
+            912,
+            443
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "第12页/共12页",
+        "bbox": [
+            442,
+            982,
+            556,
+            998
+        ],
+        "page_idx": 11
+    }
+]

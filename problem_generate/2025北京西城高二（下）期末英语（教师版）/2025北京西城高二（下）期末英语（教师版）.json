@@ -1,0 +1,1022 @@
+{
+  "paper": {
+    "title": "2025北京西城高二（下）期末",
+    "subject": "英语",
+    "source": "2025北京西城高二（下）期末",
+    "grade": "高二",
+    "year": 2025,
+    "totalScore": 140,
+    "duration": 120,
+    "description": "",
+    "tags": [
+      "英语",
+      "高二",
+      "2025",
+      "期末",
+      "北京"
+    ]
+  },
+  "sections": [
+    {
+      "type": "完形填空",
+      "questionType": "cloze",
+      "title": "完形填空",
+      "category": "完形填空",
+      "score": 15,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "完形填空",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "Firefighters should be quick thinkers. In an emergency, they should figure out the speediest and safest way to act, sometimes including improvising (临时拼凑) with the things<ClozeBlank />. Fire chief Fennessy knows this well. He is now making headlines for<ClozeBlank />two homes with milk and beer during a fire in Altadena, California.\n\n![](https://gxwtf.cn/uploads/1785423761780-292058541.jpg)\n\nAlthough Altadena was not in his charge, Fennessy grew up there and still had family and friends there. Hearing the news of the fire, he tried to contact his brother. When he couldn't<ClozeBlank />his brother, Fennessy decided to drive over to Altadena. On his way, he learned his brother's family had been taken to safety, but since he had already made the\n\n<ClozeBlank />, Fennessy figured he might as well take a look.\n\nWhen reaching the spot, Fennessy couldn't believe his eyes at the sight of the ruins. “I haven't seen anything like this where you drive for miles, and there's massive <ClozeBlank />\"Fennessy said. When he reached his brother's street, his home and a neighbor's house were still standing, but he<ClozeBlank />the flames were getting too close, as other nearby homes were already burning down.\n\nEven more worrisome, a gas meter on the neighbor's house was melting (熔化), surrounded by fire. Thinking he had to<ClozeBlank />the gas meter, he looked for a hose (水龙带), but there was no water.\n\nExploring his options, Fennessy<ClozeBlank />his entry through the front door of one of the homes and went into the kitchen looking for whatever he could use. “I ended up finding some milk and beer,\" he explained. “To do nothing means the home's going to be <ClozeBlank />, and in this case, a little milk and beer really saved the day.\"\n\nThe two homes he saved are now the only two houses standing on the block. But Fennessy said he only did what he could as a trained firefighter and was getting a lot of<ClozeBlank />for what was luck in terms of timing and resources. “We’re fixers. We’re going to put our lives on the line,\" Fennessy said.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "at hand"
+            },
+            {
+              "id": "b",
+              "label": "on time"
+            },
+            {
+              "id": "c",
+              "label": "in order"
+            },
+            {
+              "id": "d",
+              "label": "in mind"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第1题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "cleaning"
+            },
+            {
+              "id": "b",
+              "label": "providing"
+            },
+            {
+              "id": "c",
+              "label": "saving"
+            },
+            {
+              "id": "d",
+              "label": "filling"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第2题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "persuade"
+            },
+            {
+              "id": "b",
+              "label": "reach"
+            },
+            {
+              "id": "c",
+              "label": "meet"
+            },
+            {
+              "id": "d",
+              "label": "remind"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第3题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "day"
+            },
+            {
+              "id": "b",
+              "label": "trip"
+            },
+            {
+              "id": "c",
+              "label": "change"
+            },
+            {
+              "id": "d",
+              "label": "appointment"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第4题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 5,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "access"
+            },
+            {
+              "id": "b",
+              "label": "progress"
+            },
+            {
+              "id": "c",
+              "label": "disturbance"
+            },
+            {
+              "id": "d",
+              "label": "destruction"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第5题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 6,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "forgot"
+            },
+            {
+              "id": "b",
+              "label": "wondered"
+            },
+            {
+              "id": "c",
+              "label": "feared"
+            },
+            {
+              "id": "d",
+              "label": "ignored"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第6题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 7,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "cool"
+            },
+            {
+              "id": "b",
+              "label": "break"
+            },
+            {
+              "id": "c",
+              "label": "operate"
+            },
+            {
+              "id": "d",
+              "label": "remove"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第7题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 8,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "missed"
+            },
+            {
+              "id": "b",
+              "label": "declared"
+            },
+            {
+              "id": "c",
+              "label": "delayed"
+            },
+            {
+              "id": "d",
+              "label": "forced"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第8题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 9,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "lost"
+            },
+            {
+              "id": "b",
+              "label": "emptied"
+            },
+            {
+              "id": "c",
+              "label": "moved"
+            },
+            {
+              "id": "d",
+              "label": "restored"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第9题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 10,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "wisdom"
+            },
+            {
+              "id": "b",
+              "label": "pride"
+            },
+            {
+              "id": "c",
+              "label": "credit"
+            },
+            {
+              "id": "d",
+              "label": "confidence"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第10题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解A",
+      "category": "阅读",
+      "score": 6,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "阅读",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "# A\n\nOdyssey of the Mind (OM) promotes creativity, problem solving, teamwork, and more. It is a creative problem-solving competition that gives kids the confidence to think for themselves and to create solutions to any challenge. Independent study, original ideas, and critical thinking skills are rewarded over getting the “one right answer\" thanks to our unique open-ended problems that are backed by educators and experts in STE(A)M fields. Performance, art & cultural studies are also incorporated, creating a well-rounded program that has impacted lives for over 40 years. OM benefits all types of students as they learn to think outside the box.\n\n## Participation\n\n• Students work in teams of up to seven members and spend weeks or months working together and creating solutions to long-term problems. Every year, there are six long-term problems designed for them to choose from • Teams are formed by division and compete against teams in the same division and problem. Grade level determines the division for teams.\n\n• In the competition, teams have eight minutes to present their long-term problem solution. They will be scored for how well they meet the requirements of the problem (Long-Term score) and for their creativity in categories specific to that problem (Style score).\n\nCost\n\nYearly memberships are required to participate in OM. Each membership supports one team per problem per division.\n\n• Standard Membership \\$290: Individual schools/ Multiple schools sharing a principal.\n\n• Additional Membership \\$190: Only for schools who enter two teams in the same problem and division in competition.\n\nAwards\n\n• Ranatra Fusca Creativity Award: It represents the essence of OM. It is presented to teams or individuals who exhibit exceptional creativity, either through some aspect of their problem solution, or an extraordinary idea beyond the problem solution.\n\n• OMER's Award: It recognizes individuals or teams who demonstrate outstanding sportsmanship, excellent behavior, or exceptional talent.\n\n• Odyssey of the Mind Creativity Award: It recognizes an individual and/ or organization for extraordinary creative achievement or exceptional effort.\n\n• Odyssey of the Mind Spirit Award: It recognizes an individual involved in the program who demonstrates the encouragement and development of cooperation, self-respect, and the appreciation and understanding of others.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What does Odyssey of the Mind value most?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Having innovative solutions."
+            },
+            {
+              "id": "b",
+              "label": "Getting the right answer."
+            },
+            {
+              "id": "c",
+              "label": "Impacting others' daily lives."
+            },
+            {
+              "id": "d",
+              "label": "Facing more challenges."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第11题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "In Odyssey of the Mind, students will",
+          "options": [
+            {
+              "id": "a",
+              "label": "work in groups of at least seven"
+            },
+            {
+              "id": "b",
+              "label": "be scored from two different aspects"
+            },
+            {
+              "id": "c",
+              "label": "address six problems at the same time"
+            },
+            {
+              "id": "d",
+              "label": "prepare their solutions within eight minutes"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第12题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "The participant with the strongest sense of teamwork is most likely to be awarded",
+          "options": [
+            {
+              "id": "a",
+              "label": "OMER's Award"
+            },
+            {
+              "id": "b",
+              "label": "Ranatra Fusca Creativity Award"
+            },
+            {
+              "id": "c",
+              "label": "Odyssey of the Mind Spirit Award"
+            },
+            {
+              "id": "d",
+              "label": "Odyssey of the Mind Creativity Award"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第13题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解B",
+      "category": "阅读",
+      "score": 8,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "阅读",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "# B\n\nI've always been a daring risk taker. But when I was 15, my luck ran out. A horseback riding accident resulted in severe injuries, the death of my beloved horse Spooks, and the horrible news that I'd never ride again. I was set on proving the doctors wrong. Just a few months later, with my mother's support, I rode sidesaddle and won my first jumping competition. The excitement was incredible.\n\n![](https://gxwtf.cn/uploads/1785423844886-136979207.jpg)\nsidesaddle\n\nFrom then on, I committed my life to adventure, remembering my mother's lesson: never say, “I can't\". At 22, I read about an opening to be a motorcycle trick rider — I'd learned to ride a few years earlier. Still, it was 1976 and I knew they were unlikely to hire a woman. I thought about that as I signed my trick rider application, leaving off the honorific — Ms., hoping to hide the fact that I was a woman. But they never got back to me.\n\nI was heartbroken. Maybe the position had already been filled; maybe they'd discovered I was a woman. My friend Steve then proposed an idea that at first seemed crazy: learning to fly aeroplanes. “Flying is for men,\" I laughed at the idea. But gradually, I realized the suggestion had stuck with me.\n\nYears ago, trial flights — brief introductory sessions with an instructor — cost just £5 for 15 minutes in the air Steve and I both signed up, and after my first session, I couldn't stop talking about flying. I got my license and headed for the US to work as a pilot. It wasn't easy. Initially, people were doubtful about a woman working in the role, but I ended up outperforming my male colleagues. Twenty years later, I returned to England and started my own flying company.\n\nNow, I live a quieter life. I’ve settled in a village in Lincolnshire, spending much of my time volunteering in care homes. Last October, after nearly fifty years and countless adventures, I received a letter from a post office in Staines. It was my trick rider application. The post office apologized for the delay and explained it had been found stuck behind a drawer in the office — the company never received it.\n\nLooking back, I realized that even though I didn't get that job, it led me to a series of adventures that shaped my life in unexpected and fulfilling ways.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What did winning the jumping competition bring to the writer?",
+          "options": [
+            {
+              "id": "a",
+              "label": "The faith in friendship."
+            },
+            {
+              "id": "b",
+              "label": "The acquisition of a new skill."
+            },
+            {
+              "id": "c",
+              "label": "The recognition of mother's love."
+            },
+            {
+              "id": "d",
+              "label": "The determination to go adventuring."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第1题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "How did the writer feel at first when Steve suggested learning to fly?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Curious."
+            },
+            {
+              "id": "b",
+              "label": "Inspired."
+            },
+            {
+              "id": "c",
+              "label": "Desperate."
+            },
+            {
+              "id": "d",
+              "label": "Doubtful."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第1题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "Why did the writer fail to receive any reply about the trick ride position?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Because she forgot to sign the application."
+            },
+            {
+              "id": "b",
+              "label": "Because her application was not delivered."
+            },
+            {
+              "id": "c",
+              "label": "Because women were unfit for the position."
+            },
+            {
+              "id": "d",
+              "label": "Because the position had already been filled."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第2题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "content": "What can we learn from this passage?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Smart plans make big dreams."
+            },
+            {
+              "id": "b",
+              "label": "The best journeys are not mapped."
+            },
+            {
+              "id": "c",
+              "label": "Doubt kills more goals than failure."
+            },
+            {
+              "id": "d",
+              "label": "Strong women create strong societies."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第17题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解C",
+      "category": "阅读",
+      "score": 8,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "阅读",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "# C\n\nElephants and gorillas in the Republic of the Congo's rainforests spend a lot of time hiding in the shadows — or so we thought. Using drone (无人机) surveys and AI processing, scientists have discovered an extensive network of mysterious open clearings among the trees. Animals like elephants, gorillas visit these muddy areas, called bais, in the languages of the Indigenous Ba’Aka, to search for vital nutrition and maintain their complex social networks. The numerous playgrounds are visible in satellite images, and AI analysis is helping researchers find them more effectively.\n\nThe discovery began in 2021 when Sylvain Ngouma and Evan Hockridge came upon a massive clearing during fieldwork in Odzala-Kokoua National Park and found a trail (踪迹) of wet, pot-sized footprints leading through the woods to the open roundabout. Hockridge, who had thought bais were abnormal, says, “I had it backward. It kind of hit me when I was there. You can't understand animal interactions without first understanding bais.\"\n\nFor the next three summers, the team investigated the clearings. They analyzed camera-trap images, confirming what local people had told them — that these natural clearings are crucial gathering grounds for some of the world's most endangered mammals. The bais, they realized, are big melting pots, big playgrounds, for a collection of forest animals.\n\nDuring the initial surveys, the team followed elephant trails to move through the rainforest from bai to bai. This process led Hockridge to wonder about a network. Although previous studies documented animal behavior in selected bais, no one had counted them or had the means to map their distribution. The team partnered with African Parks, using drones to scan known sites. They trained an AI algorithm (算法) to identify bais in satellite imagery, revealing 2,176 clearings in one park — 10 times more than previously recorded.\n\nBais are always near rivers or streams. Most are smaller than a city block, but few, at more than 100 acres, are bigger than some college campuses. “Bais are ultimately islands of resources, and animals produce these networks of trails to essentially navigate to and from a network of bais,\" Hockridge says. The researchers' map of bais, the first of its kind, is also a map of conservation priorities. “We find that a huge portion of the animal community depends on this unique ecosystem. These species don't have alternative habitats other than bais,\" Hockridge says.\n\nThe study is also a step toward solving the ultimate mystery: How did bais form? Many ecologists have argued that a combination of hydrology (水文学) and animal landscaping is at play. But definitive proof remains elusive. Now, with a map in hand and camera traps still in place, the research team is tracking long-term changes, which have implications for the maintenance of these crucial animal habitats.\n\n“We have hypotheses (假说),\"Andrew Davies, an ecologist in Harvard, says, \"but the short answer is: we don't know.\"",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "For rainforest animals, bais are places for",
+          "options": [
+            {
+              "id": "a",
+              "label": "fun and safety"
+            },
+            {
+              "id": "b",
+              "label": "water and shelter"
+            },
+            {
+              "id": "c",
+              "label": "food and connection"
+            },
+            {
+              "id": "d",
+              "label": "shade and entertainment"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第18题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "What can we learn about Ngouma and Hockridge's research?",
+          "options": [
+            {
+              "id": "a",
+              "label": "It discovered how bais formed."
+            },
+            {
+              "id": "b",
+              "label": "It was the first to map the network of bais."
+            },
+            {
+              "id": "c",
+              "label": "It analyzed images of bais provided by local people."
+            },
+            {
+              "id": "d",
+              "label": "It concluded bais were spots intended for endangered species."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第19题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "What does the underlined word “elusive\" in Paragraph 6 probably mean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Difficult to find."
+            },
+            {
+              "id": "b",
+              "label": "Simple to clarify."
+            },
+            {
+              "id": "c",
+              "label": "Possible to overestimate."
+            },
+            {
+              "id": "d",
+              "label": "Unlikely to question."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第20题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "content": "Which would be the best title for this passage?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Conservation Priorities in Rainforests"
+            },
+            {
+              "id": "b",
+              "label": "Hidden Playgrounds Revealed in Rainforests"
+            },
+            {
+              "id": "c",
+              "label": "Secrets of Rainforest Animals' Social Networks"
+            },
+            {
+              "id": "d",
+              "label": "Modern Tools Adopted for Rainforest Exploration"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第21题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解D",
+      "category": "阅读",
+      "score": 6,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "阅读",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "# D\n\nMonday was the first day of Dartmouth's spring term. So, as I often do at this time, I started teaching my course for non-science majors called “Understanding the Universe: From Atoms to the Big Bang\".\n\nThis is what students like to call a “physics for poets\" class — a class that explores the history of how humanity has faced some of the deepest questions we can ask about the material world and our place in it, without the math. It is a class that tries to capture the true spirit of the liberal-arts education, mixing the sciences and the humanities as different and complementary ways of knowing the world and why we matter. In fancier words, as an intellectual history of physics and astronomy (天文学), the class requires that scientific thinking be contextualized culturally, so that students can situate the ways in which some of the most revolutionary ideas in the past 2,000 years emerged when they did.\n\nScientists, by training, have little exposure to the humanities. Given that a major in the sciences requires a lot of technical work, we spend precious little time dealing with what happened culturally and historically around the science we are trying to understand. This, I believe, is the reason why so many scientists in the public media condemn (遣责) the humanities as useless. As a consequence, many scientific ideas are presented as having addressed some of the deepest questions we have been asking, when they haven't.\n\nHumanities students, on the other hand, are typically those who avoid the sciences or, at least, math. Their training is also technical, involving lots of reading and critical writing. You can often tell, when you teach this kind of class, who the scientists and the humanists are. All you have to do is write an equation (方程) on the blackboard and look at the class. Humanists will quickly look bored. The scientists will become lively. As you read from Aristotle's Metaphysics, the opposite will happen. To bridge this gap is the challenge.\n\nThe classroom is the ideal place for this conversation between the sciences and the humanities to unfold. By exposing students to the two sides of the cultural divide, we stand a chance of creating something that will actually close the gap. Scientists should recognize that some research topics — AI, biotechnology, climate change, life extension, nature, and many others — need to be investigated together with humanists as a joint effort.\n\nI finished the first class by reminding the students that not even the best teacher in the world can teach someone who doesn't want to learn. After all, as Tom Stoppard reminded us in his brilliant play Arcadia, it is wanting to know that makes us matter — scientists and humanists alike.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What's special about the author's class?",
+          "options": [
+            {
+              "id": "a",
+              "label": "It guides students to explain revolutionary ideas."
+            },
+            {
+              "id": "b",
+              "label": "It appeals to arts students to switch to scientific thinking."
+            },
+            {
+              "id": "c",
+              "label": "It breaks the boundary between the sciences and the humanities."
+            },
+            {
+              "id": "d",
+              "label": "It 挖 s into the secrets of human's position in the material world."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第22题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "Which of the following would the author applaud?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Mary, a history major, quit computer engineering for lack of interest."
+            },
+            {
+              "id": "b",
+              "label": "Mia, an art student, drew pictures of famous scientists for a science fair."
+            },
+            {
+              "id": "c",
+              "label": "Ben, teaching chemistry, guided his students to focus on technology work."
+            },
+            {
+              "id": "d",
+              "label": "David, studying physics, worked with a philosophy student for his project."
+            }
+          ],
+          "answer": "d",
+          "analysis": "第23题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "What message does the author intend to deliver to his students?",
+          "options": [
+            {
+              "id": "a",
+              "label": "University courses present challenges."
+            },
+            {
+              "id": "b",
+              "label": "The cultural divide deserves approval."
+            },
+            {
+              "id": "c",
+              "label": "The eagerness to learn is of significance."
+            },
+            {
+              "id": "d",
+              "label": "Prejudice towards the humanities is history."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第24题解析: 根据文章内容选择正确答案。",
+          "score": 2,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "七选五",
+      "questionType": "seven-choose-five",
+      "title": "七选五",
+      "category": "七选五",
+      "score": 10,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "七选五",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "content": "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项。选项中有两项为多余选项。",
+      "article": "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项，并在答题卡上将该项涂黑。选项中共有两项为多余选项。\n\nForgiveness is something that many of us strive for, but it can often feel difficult to achieve. Over the years, we've heard countless people express the intention to forgive, only to struggle with the emotional roadblocks that prevent them from truly letting go.\n\nFirst, let's define forgiveness.<Blank />It's not about forgetting what happened or excusing harmful behavior. In fact, our minds tell us that if we stay angry, bitter, or distant, we'll be safe from further hurt. <Blank />While holding onto memories and creating distance may offer temporary emotional safeguards, it often deepens our sadness, isolates us, and prevents us from healing. Forgiveness, on the other hand, is about choosing not to let that pain continue to define your thoughts, emotions, and behaviors.\n\nForgiveness is essential because we're all human, and we all make mistakes. If we want to cultivate meaningful relationships, there will unavoidably be times when we hurt one another. Forgiveness becomes crucial in maintaining those connections and our own peace of mind.<Blank />Forgiving yourself is especially important. Raising walls of bitterness or anger toward yourself is deeply damaging. When you hold on to shame or guilt, you create emotional barriers that prevent you from living fully and authentically.\n\nSo, how do we forgive? While the journey is deeply personal and can vary from person to person, there are key steps that can help guide us. Acknowledge the hurt and pain exactly as it is.<Blank />This perspective allows us to see others (and ourselves) as imperfect humans doing the best they can with what they have. Extend sympathy to yourself and others. Choose to release bitterness and move forward in line with your values.\n\n<Blank />It's an ongoing practice. But every time you choose forgiveness, you create space for love and healing to flow through your life.",
+      "options": [
+        {
+          "id": "A",
+          "label": "It is a continuous process."
+        },
+        {
+          "id": "B",
+          "label": "But we know that this isn't true."
+        },
+        {
+          "id": "C",
+          "label": "Recognize that everyone has faults."
+        },
+        {
+          "id": "D",
+          "label": "Remember that forgiveness isn't a one-time event."
+        },
+        {
+          "id": "E",
+          "label": "Forgiveness is the decision to release attachment to a painful past."
+        },
+        {
+          "id": "F",
+          "label": "You don't have to communicate with the person who wronged you."
+        },
+        {
+          "id": "G",
+          "label": "In fact, we may need to forgive not only others but ourselves as well.\n\n## 第Ⅱ卷（共57分）"
+        }
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "blankIndex": 0,
+          "answer": "E",
+          "analysis": "第25题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "blankIndex": 1,
+          "answer": "B",
+          "analysis": "第26题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "blankIndex": 2,
+          "answer": "G",
+          "analysis": "第27题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "blankIndex": 3,
+          "answer": "C",
+          "analysis": "第28题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 5,
+          "questionType": "choice",
+          "blankIndex": 4,
+          "answer": "D",
+          "analysis": "第29题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "语法填空",
+      "questionType": "grammar",
+      "title": "语法填空",
+      "category": "语法填空",
+      "score": 15,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "语法填空",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "## A\nThe World Health Day, <Input/> (celebrate) every year on April 7, is a global initiative started by the World Health Organization (WHO). The aim of the day is<Input/>(spread) awareness around key health issues and run campaigns and discussions around it. This year's theme is “Healthy Beginning, Hopeful Futures\". The health of mothers and babies is the foundation of healthy<Input/>(family) and communities, helping ensure hopeful futures for us all.\n\n## B\nA tortoise at the Philadelphia Zoo has become the oldest first-time mother of her species after<Input/>(have) her first babies at <Input/> years old. The tortoise, named Mommy, is a critically endangered species in their native home. There are <Input/> (few) than <Input/> kept in US zoos. Mommy arrived at the Zoo in <Input/>, meaning anyone that <Input/>(visit) the Zoo for the last <Input/> years has likely seen her. This is a significant milestone<Input/>the history of the Zoo.\n\n## C\nA Chinese automaker has created a battery<Input/>will enable electric vehicles (EVs) to charge almost as quickly as it takes to fill a regular car's gas tank. The new battery, named the e platform,<Input/>(develop) last year by BYD, a Chinese firm that is overtaking Tesla as the world's top seller of electric vehicles. BYD says it will install a network of 4,<Input/> flash-charging stations across China. This technology is currently only available in China, and the company has yet to confirm<Input/>it will make it available internationally or not.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "input",
+          "answer": "celebrated",
+          "analysis": "第35题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "input",
+          "answer": "to spread",
+          "analysis": "第36题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "input",
+          "answer": "families",
+          "analysis": "第37题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 4,
+          "questionType": "input",
+          "answer": "having",
+          "analysis": "第38题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 5,
+          "questionType": "input",
+          "answer": "fewer",
+          "analysis": "第39题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 6,
+          "questionType": "input",
+          "answer": "has visited",
+          "analysis": "第40题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 7,
+          "questionType": "input",
+          "answer": "in",
+          "analysis": "第41题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 8,
+          "questionType": "input",
+          "answer": "which##that",
+          "analysis": "第42题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 9,
+          "questionType": "input",
+          "answer": "was developed",
+          "analysis": "第43题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        },
+        {
+          "id": 10,
+          "questionType": "input",
+          "answer": "whether",
+          "analysis": "第44题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "阅读表达",
+      "questionType": "en-reading-expression",
+      "title": "阅读表达",
+      "category": "阅读表达",
+      "score": 12,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "阅读表达",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "We live in a world filled with distractions. Everywhere we look, we can find instant pleasures available for next-day delivery right to our homes. In a culture surrounded by messages saying that we can lose the discomfort right now, delayed gratification, which refers to the ability to wait for a long-term reward, is less attractive. But research shows it makes all the difference in achieving a more important and satisfying goal.\n\nDelayed gratification and instant gratification involve the timing and approach to achieving satisfaction or rewards. The former requires self-discipline and the ability to manage impulses, while the latter often involves giving in to immediate desires. An example of this could be when a young man chooses to resist the urge to splurge (挥霍) on luxury items and instead save money regularly and patiently to buy a house. The delayed gratification is the goal and satisfaction he would achieve from owning a dream home, rather than the instant delight of impulsive shopping.\n\nDelayed gratification has to do with one's natural ability and environment and what one is taught. Learning to delay the impulse for immediate pleasure in favor of long-term satisfaction is a skill required for progressive and long-term growth. We can start by making small changes every day and staying consistent with those changes. Over time, these habits can accumulate and lead to big changes and results. Consistent reminders of why we want to reach our goals can also help.\n\nIf we were all masters at delayed gratification, our environment would not be filled with “quick\" solutions to everything under the sun. Our culture demands that successful humans rise above the constant distraction to selfmotivate and delay personal gratification in favor of distant goals. However, a balance between our thirst for instant rewards and our desire to create longevity in our career, relationships, and health is difficult to achieve. Our entire lives require that we weigh the choices of“okay right now\" vs. “bigger better later\". It takes a joint effort to override the environment to create our successful personal worlds.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "text",
+          "content": "What is delayed gratification?",
+          "answer": "Delayed gratification refers to the ability to wait for a long-term reward.",
+          "analysis": "第45题解析: 根据文章内容回答问题。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 2,
+          "questionType": "text",
+          "content": "What is the difference between delayed gratification and instant gratification?",
+          "answer": "Delayed gratification requires self-discipline and the ability to manage impulses, while instant gratification often involves giving in to immediate desires.",
+          "analysis": "第46题解析: 根据文章内容回答问题。",
+          "score": 2,
+          "correctRate": 0.7
+        },
+        {
+          "id": 3,
+          "questionType": "text",
+          "content": "Please decide which part is false in the following statement, then underline it and explain why. Delayed gratification is merely related to one's environment, and it can contribute to one's long-term development.",
+          "answer": "",
+          "analysis": "第47题解析: 根据文章内容回答问题。",
+          "score": 3,
+          "correctRate": 0.7
+        },
+        {
+          "id": 4,
+          "questionType": "text",
+          "content": "Please use an example to show how you would practice delayed gratification in your daily life. (In about 40 words)",
+          "answer": "I have been longing for a new gaming console. Instead of buying it immediately, I save a fixed amount weekly to get it in a few months.",
+          "analysis": "第48题解析: 根据文章内容回答问题。",
+          "score": 5,
+          "correctRate": 0.7
+        }
+      ]
+    },
+    {
+      "type": "作文",
+      "questionType": "en-writing",
+      "title": "写作",
+      "category": "作文",
+      "score": 20,
+      "grade": "高二",
+      "source": "2025北京西城高二（下）期末",
+      "tags": [
+        "作文",
+        "英语",
+        "高二",
+        "练习"
+      ],
+      "article": "假设你是红星中学高二学生李华。你的外国好友Jim要给校报“AIandTeenLife”专栏投稿，他想重点介绍北京中学生的“智慧生活”，发来邮件询问你的建议。请你用英文给他回复，内容包括：\n\n1. 建议内容；\n\n2.说明理由。\n\n注意：1.词数100左右；\n\n2.开头和结尾已给出，不计入总词数。\n\nDear Jim,\n\nYours, Li Hua",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "text",
+          "content": "假设你是红星中学高二学生李华。你的外国好友Jim要给校报“AIandTeenLife”专栏投稿，他想重点介绍北京中学生的“智慧生活”，发来邮件询问你的建议。请你用英文给他回复，内容包括：\n\n1. 建议内容；\n\n2.说明理由。\n\n注意：1.词数100左右；\n\n2.开头和结尾已给出，不计入总词数。\n\nDear Jim,\n\nYours, Li Hua",
+          "answer": "",
+          "analysis": "写作题评分标准：内容要点完整，语言表达准确流畅，结构清晰，词数符合要求。",
+          "score": 20,
+          "correctRate": 0.7
+        }
+      ]
+    }
+  ]
+}
