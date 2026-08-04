@@ -759,8 +759,8 @@
         "高二",
         "练习"
       ],
-      "content": "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项。选项中有两项为多余选项。",
-      "article": "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项，并在答题卡上将该项涂黑。选项中共有两项为多余选项。\n\nForgiveness is something that many of us strive for, but it can often feel difficult to achieve. Over the years, we've heard countless people express the intention to forgive, only to struggle with the emotional roadblocks that prevent them from truly letting go.\n\nFirst, let's define forgiveness.<Blank />It's not about forgetting what happened or excusing harmful behavior. In fact, our minds tell us that if we stay angry, bitter, or distant, we'll be safe from further hurt. <Blank />While holding onto memories and creating distance may offer temporary emotional safeguards, it often deepens our sadness, isolates us, and prevents us from healing. Forgiveness, on the other hand, is about choosing not to let that pain continue to define your thoughts, emotions, and behaviors.\n\nForgiveness is essential because we're all human, and we all make mistakes. If we want to cultivate meaningful relationships, there will unavoidably be times when we hurt one another. Forgiveness becomes crucial in maintaining those connections and our own peace of mind.<Blank />Forgiving yourself is especially important. Raising walls of bitterness or anger toward yourself is deeply damaging. When you hold on to shame or guilt, you create emotional barriers that prevent you from living fully and authentically.\n\nSo, how do we forgive? While the journey is deeply personal and can vary from person to person, there are key steps that can help guide us. Acknowledge the hurt and pain exactly as it is.<Blank />This perspective allows us to see others (and ourselves) as imperfect humans doing the best they can with what they have. Extend sympathy to yourself and others. Choose to release bitterness and move forward in line with your values.\n\n<Blank />It's an ongoing practice. But every time you choose forgiveness, you create space for love and healing to flow through your life.",
+      "content": "",
+      "article": "Forgiveness is something that many of us strive for, but it can often feel difficult to achieve. Over the years, we've heard countless people express the intention to forgive, only to struggle with the emotional roadblocks that prevent them from truly letting go.\n\nFirst, let's define forgiveness.<Blank />It's not about forgetting what happened or excusing harmful behavior. In fact, our minds tell us that if we stay angry, bitter, or distant, we'll be safe from further hurt. <Blank />While holding onto memories and creating distance may offer temporary emotional safeguards, it often deepens our sadness, isolates us, and prevents us from healing. Forgiveness, on the other hand, is about choosing not to let that pain continue to define your thoughts, emotions, and behaviors.\n\nForgiveness is essential because we're all human, and we all make mistakes. If we want to cultivate meaningful relationships, there will unavoidably be times when we hurt one another. Forgiveness becomes crucial in maintaining those connections and our own peace of mind.<Blank />Forgiving yourself is especially important. Raising walls of bitterness or anger toward yourself is deeply damaging. When you hold on to shame or guilt, you create emotional barriers that prevent you from living fully and authentically.\n\nSo, how do we forgive? While the journey is deeply personal and can vary from person to person, there are key steps that can help guide us. Acknowledge the hurt and pain exactly as it is.<Blank />This perspective allows us to see others (and ourselves) as imperfect humans doing the best they can with what they have. Extend sympathy to yourself and others. Choose to release bitterness and move forward in line with your values.\n\n<Blank />It's an ongoing practice. But every time you choose forgiveness, you create space for love and healing to flow through your life.",
       "options": [
         {
           "id": "A",
@@ -788,13 +788,43 @@
         },
         {
           "id": "G",
-          "label": "In fact, we may need to forgive not only others but ourselves as well.\n\n## 第Ⅱ卷（共57分）"
+          "label": "In fact, we may need to forgive not only others but ourselves as well."
         }
       ],
       "questions": [
         {
           "id": 1,
           "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is a continuous process."
+            },
+            {
+              "id": "B",
+              "label": "But we know that this isn't true."
+            },
+            {
+              "id": "C",
+              "label": "Recognize that everyone has faults."
+            },
+            {
+              "id": "D",
+              "label": "Remember that forgiveness isn't a one-time event."
+            },
+            {
+              "id": "E",
+              "label": "Forgiveness is the decision to release attachment to a painful past."
+            },
+            {
+              "id": "F",
+              "label": "You don't have to communicate with the person who wronged you."
+            },
+            {
+              "id": "G",
+              "label": "In fact, we may need to forgive not only others but ourselves as well."
+            }
+          ],
           "blankIndex": 0,
           "answer": "E",
           "analysis": "第25题解析: 根据上下文逻辑选择最佳选项。",
@@ -804,6 +834,36 @@
         {
           "id": 2,
           "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is a continuous process."
+            },
+            {
+              "id": "B",
+              "label": "But we know that this isn't true."
+            },
+            {
+              "id": "C",
+              "label": "Recognize that everyone has faults."
+            },
+            {
+              "id": "D",
+              "label": "Remember that forgiveness isn't a one-time event."
+            },
+            {
+              "id": "E",
+              "label": "Forgiveness is the decision to release attachment to a painful past."
+            },
+            {
+              "id": "F",
+              "label": "You don't have to communicate with the person who wronged you."
+            },
+            {
+              "id": "G",
+              "label": "In fact, we may need to forgive not only others but ourselves as well."
+            }
+          ],
           "blankIndex": 1,
           "answer": "B",
           "analysis": "第26题解析: 根据上下文逻辑选择最佳选项。",
@@ -813,6 +873,36 @@
         {
           "id": 3,
           "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is a continuous process."
+            },
+            {
+              "id": "B",
+              "label": "But we know that this isn't true."
+            },
+            {
+              "id": "C",
+              "label": "Recognize that everyone has faults."
+            },
+            {
+              "id": "D",
+              "label": "Remember that forgiveness isn't a one-time event."
+            },
+            {
+              "id": "E",
+              "label": "Forgiveness is the decision to release attachment to a painful past."
+            },
+            {
+              "id": "F",
+              "label": "You don't have to communicate with the person who wronged you."
+            },
+            {
+              "id": "G",
+              "label": "In fact, we may need to forgive not only others but ourselves as well."
+            }
+          ],
           "blankIndex": 2,
           "answer": "G",
           "analysis": "第27题解析: 根据上下文逻辑选择最佳选项。",
@@ -822,6 +912,36 @@
         {
           "id": 4,
           "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is a continuous process."
+            },
+            {
+              "id": "B",
+              "label": "But we know that this isn't true."
+            },
+            {
+              "id": "C",
+              "label": "Recognize that everyone has faults."
+            },
+            {
+              "id": "D",
+              "label": "Remember that forgiveness isn't a one-time event."
+            },
+            {
+              "id": "E",
+              "label": "Forgiveness is the decision to release attachment to a painful past."
+            },
+            {
+              "id": "F",
+              "label": "You don't have to communicate with the person who wronged you."
+            },
+            {
+              "id": "G",
+              "label": "In fact, we may need to forgive not only others but ourselves as well."
+            }
+          ],
           "blankIndex": 3,
           "answer": "C",
           "analysis": "第28题解析: 根据上下文逻辑选择最佳选项。",
@@ -831,6 +951,36 @@
         {
           "id": 5,
           "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is a continuous process."
+            },
+            {
+              "id": "B",
+              "label": "But we know that this isn't true."
+            },
+            {
+              "id": "C",
+              "label": "Recognize that everyone has faults."
+            },
+            {
+              "id": "D",
+              "label": "Remember that forgiveness isn't a one-time event."
+            },
+            {
+              "id": "E",
+              "label": "Forgiveness is the decision to release attachment to a painful past."
+            },
+            {
+              "id": "F",
+              "label": "You don't have to communicate with the person who wronged you."
+            },
+            {
+              "id": "G",
+              "label": "In fact, we may need to forgive not only others but ourselves as well."
+            }
+          ],
           "blankIndex": 4,
           "answer": "D",
           "analysis": "第29题解析: 根据上下文逻辑选择最佳选项。",
@@ -853,7 +1003,7 @@
         "高二",
         "练习"
       ],
-      "article": "## A\nThe World Health Day, <Input/> (celebrate) every year on April 7, is a global initiative started by the World Health Organization (WHO). The aim of the day is<Input/>(spread) awareness around key health issues and run campaigns and discussions around it. This year's theme is “Healthy Beginning, Hopeful Futures\". The health of mothers and babies is the foundation of healthy<Input/>(family) and communities, helping ensure hopeful futures for us all.\n\n## B\nA tortoise at the Philadelphia Zoo has become the oldest first-time mother of her species after<Input/>(have) her first babies at <Input/> years old. The tortoise, named Mommy, is a critically endangered species in their native home. There are <Input/> (few) than <Input/> kept in US zoos. Mommy arrived at the Zoo in <Input/>, meaning anyone that <Input/>(visit) the Zoo for the last <Input/> years has likely seen her. This is a significant milestone<Input/>the history of the Zoo.\n\n## C\nA Chinese automaker has created a battery<Input/>will enable electric vehicles (EVs) to charge almost as quickly as it takes to fill a regular car's gas tank. The new battery, named the e platform,<Input/>(develop) last year by BYD, a Chinese firm that is overtaking Tesla as the world's top seller of electric vehicles. BYD says it will install a network of 4,<Input/> flash-charging stations across China. This technology is currently only available in China, and the company has yet to confirm<Input/>it will make it available internationally or not.",
+      "article": "## A\n\nThe World Health Day, <Input/> (celebrate) every year on April 7, is a global initiative started by the World Health Organization (WHO). The aim of the day is <Input/> (spread) awareness around key health issues and run campaigns and discussions around it. This year's theme is “Healthy Beginning, Hopeful Futures\". The health of mothers and babies is the foundation of healthy <Input/> (family) and communities, helping ensure hopeful futures for us all.\n\n## B\n\nA tortoise at the Philadelphia Zoo has become the oldest first-time mother of her species after <Input/> (have) her first babies at 100 years old. The tortoise, named Mommy, is a critically endangered species in their native home. There are <Input/> (few) than 50 kept in US zoos. Mommy arrived at the Zoo in 1932, meaning anyone that <Input/> (visit) the Zoo for the last 93 years has likely seen her. This is a significant milestone <Input/> the history of the Zoo.\n\n## C\n\nA Chinese automaker has created a battery <Input/> will enable electric vehicles (EVs) to charge almost as quickly as it takes to fill a regular car's gas tank. The new battery, named the e platform, <Input/> (develop) last year by BYD, a Chinese firm that is overtaking Tesla as the world's top seller of electric vehicles. BYD says it will install a network of 4,000 flash-charging stations across China. This technology is currently only available in China, and the company has yet to confirm <Input/> it will make it available internationally or not.",
       "questions": [
         {
           "id": 1,
@@ -939,7 +1089,7 @@
     },
     {
       "type": "阅读表达",
-      "questionType": "en-reading-expression",
+      "questionType": "reading-expression",
       "title": "阅读表达",
       "category": "阅读表达",
       "score": 12,
@@ -974,7 +1124,7 @@
         {
           "id": 3,
           "questionType": "text",
-          "content": "Please decide which part is false in the following statement, then underline it and explain why. Delayed gratification is merely related to one's environment, and it can contribute to one's long-term development.",
+          "content": "Please decide which part is false in the following statement, then underline it and explain why.\nDelayed gratification is merely related to one's environment, and it can contribute to one's long-term development.",
           "answer": "",
           "analysis": "第47题解析: 根据文章内容回答问题。",
           "score": 3,

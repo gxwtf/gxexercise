@@ -48,7 +48,9 @@ export async function POST(request: Request) {
         const correctAnswer = question.question.answer ?? '';
         const questionScore = question.question.score ?? 0;
 
-        const isCorrect = userAnswer === correctAnswer;
+        const isCorrect = correctAnswer.includes("##")
+          ? correctAnswer.split("##").some((ans: string) => ans.trim() === userAnswer.trim())
+          : userAnswer === correctAnswer;
         const score = isCorrect ? questionScore : 0;
 
         if (isCorrect) {

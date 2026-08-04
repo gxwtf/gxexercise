@@ -159,7 +159,7 @@ function getTotalScoreFromHeader(headerLine) {
 
 function isSectionHeader(line) {
   if (/^# 参考/.test(line)) return true;
-  if (/^##\s+第[一二三]卷/.test(line)) return true;
+  if (/^##\s+第[一二三ⅠⅡⅢ]卷/.test(line)) return true;
   if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|阅读理解|语法填空|书面表达|选词填空)/.test(line)) return true;
   return false;
 }
@@ -401,11 +401,11 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空|第[一二三]卷)/.test(line)) {
+    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空|第[一二三ⅠⅡⅢ]卷)/.test(line)) {
       break;
     }
 
-    if (/^##\s+第[一二三]卷/.test(line)) {
+    if (/^##\s+第[一二三ⅠⅡⅢ]卷/.test(line)) {
       break;
     }
 
@@ -414,7 +414,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   }
 
   let fullText = allLines.join("\n").trim();
-  fullText = fullText.replace(/^>?\s*根据短文内容[\s\S]*?选项中有两项为多余选项。\s*/g, "").trim();
+  fullText = fullText.replace(/^>?\s*根据短文内容[\s\S]*?选项中共?有两项为多余选项。\s*/g, "").trim();
 
   const optionRegex = /\s+A\.\s+(.+?)\s+B\.\s+(.+?)\s+C\.\s+(.+?)\s+D\.\s+(.+?)\s+E\.\s+(.+?)\s+F\.\s+(.+?)\s+G\.\s+(.+?)$/s;
   const optionMatch = fullText.match(optionRegex);
@@ -473,6 +473,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
     questions.push({
       id: idx + 1,
       questionType: "choice",
+      options,
       blankIndex: idx,
       answer,
       analysis: `第${originalNum}题解析: 根据上下文逻辑选择最佳选项。`,
@@ -493,7 +494,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
       grade: paper.grade,
       source: paper.source,
       tags: ["七选五", "英语", paper.grade, "练习"],
-      content: "根据短文内容，从短文后的七个选项中选出能填入空白处的最佳选项。选项中有两项为多余选项。",
+      content: "",
       article,
       options,
       questions,
@@ -517,7 +518,7 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
       break;
     }
 
-    if (/^##\s+第[一二三]卷/.test(line)) {
+    if (/^##\s+第[一二三ⅠⅡⅢ]卷/.test(line)) {
       break;
     }
 
@@ -526,7 +527,8 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   }
 
   let article = articleLines.join("\n").trim();
-  article = article.replace(/^>?\s*阅读下面短文[\s\S]*?用括号内所给词的正确形式填空。\s*/gm, "").trim();
+  article = article.replace(/^>?\s*阅读下面短文[\s\S]*?用括号内所给词的正确形式填空。\n?/gm, "").trim();
+  article = article.replace(/\n{3,}/g, "\n\n").trim();
 
   const blankRegex = /(\d{2,})/g;
   const blankNums = [];
@@ -541,7 +543,10 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
 
   const validBlankNums = blankNums.filter((num) => referenceAnswers[num] !== undefined);
 
-  article = article.replace(/(\d{2,})/g, "<Input/>");
+  for (const num of validBlankNums) {
+    article = article.replace(new RegExp(`\\s*${num}\\s*`, "g"), " <Input/> ");
+  }
+  article = article.replace(/ {2,}/g, " ");
 
   let questions = [];
   for (let idx = 0; idx < validBlankNums.length; idx++) {
@@ -685,6 +690,8 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
       const originalNum = parseInt(match[1]);
       let content = match[2].trim();
 
+      content = content.replace(/(the following statement[^.]*\.)\s*/i, "$1\n");
+
       let answer = "";
       const refAns = referenceAnswers[originalNum];
       if (refAns) {
@@ -713,7 +720,7 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
   return {
     section: {
       type: "阅读表达",
-      questionType: "en-reading-expression",
+      questionType: "reading-expression",
       title: "阅读表达",
       category: "阅读表达",
       score: totalScore,
