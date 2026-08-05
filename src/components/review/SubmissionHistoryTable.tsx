@@ -38,7 +38,7 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
     )
   }
 
-  const isChoiceType = questionType.includes("选择") || questionType.includes("七选五")
+  const isChoiceType = questionType === "choice" || questionType === "single" || questionType === "multiple" || questionType.includes("选择") || questionType.includes("七选五")
 
   const formatDate = (date: Date) => {
     const d = new Date(date)

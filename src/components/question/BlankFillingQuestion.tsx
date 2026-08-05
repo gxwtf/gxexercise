@@ -37,7 +37,7 @@ export function BlankFillingQuestion({ availableOptions, selectedOption, onOptio
                 <FieldContent>
                   <FieldTitle className="text-base">
                     {option.labelMdx ? (
-                      <MDXRemote {...option.labelMdx} components={components} />
+                      <span>{option.id}. <MDXRemote {...option.labelMdx} components={{ ...components, p: (props) => <span>{props.children}</span> }} /></span>
                     ) : (
                       `${option.id}. ${option.label}`
                     )}

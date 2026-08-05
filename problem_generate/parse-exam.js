@@ -203,15 +203,30 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
   let article = articleLines.join("\n").trim();
   article = article.replace(/^>?\s*##\s*阅读下面短文[\s\S]*?在答题卡上将该选项涂黑。\s*/g, "").trim();
 
-  article = article.replace(/(\d+)/g, (match, num) => {
-    const numVal = parseInt(num);
-    if (numVal >= 1 && numVal <= 50) {
-      return "<ClozeBlank />";
-    }
-    return match;
+  const imageRegex = /!\[.*?\]\(([^\s)]+)\)/g;
+  const imagePlaceholders = [];
+  article = article.replace(imageRegex, (match) => {
+    imagePlaceholders.push(match);
+    return `__IMG_${imagePlaceholders.length - 1}__`;
   });
 
+  article = article.replace(/\n\n(\d{1,2})\b/g, " $1");
+
   article = article.replace(/\n{3,}/g, "\n\n").trim();
+
+  const validBlankNums = [];
+  for (let num = 1; num <= 50; num++) {
+    if (referenceAnswers[num] !== undefined) {
+      validBlankNums.push(num);
+    }
+  }
+  validBlankNums.sort((a, b) => b - a);
+
+  for (const num of validBlankNums) {
+    article = article.replace(new RegExp(`${num}(?!\\d)`, "g"), "<ClozeBlank></ClozeBlank>");
+  }
+
+  article = article.replace(/__IMG_(\d+)__/g, (_, i) => imagePlaceholders[parseInt(i)]);
 
   let questions = [];
   const optionRegex = /^(\d+)\.\s*A\.\s*(.+?)\s*B\.\s*(.+?)\s*C\.\s*(.+?)\s*D\.\s*(.+?)$/;
@@ -459,7 +474,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   }
   blankNums.sort((a, b) => a - b);
 
-  article = article.replace(/(\d{2,})/g, "<Blank />");
+  article = article.replace(/(\d{2,})/g, "<Blank></Blank>");
 
   let questions = [];
   for (let idx = 0; idx < blankNums.length; idx++) {
@@ -544,7 +559,7 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   const validBlankNums = blankNums.filter((num) => referenceAnswers[num] !== undefined);
 
   for (const num of validBlankNums) {
-    article = article.replace(new RegExp(`\\s*${num}\\s*`, "g"), " <Input/> ");
+    article = article.replace(new RegExp(`\\s*${num}\\s*`, "g"), " <Input></Input> ");
   }
   article = article.replace(/ {2,}/g, " ");
 
@@ -690,7 +705,7 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
       const originalNum = parseInt(match[1]);
       let content = match[2].trim();
 
-      content = content.replace(/(the following statement[^.]*\.)\s*/i, "$1\n");
+      content = content.replace(/(the following statement[^.]*?explain why\.)\s*([\s\S]+)$/i, "$1\n\n➢ $2");
 
       let answer = "";
       const refAns = referenceAnswers[originalNum];
@@ -761,6 +776,11 @@ function parseWriting(lines, startIndex, referenceAnswers, paper) {
     originalNum = parseInt(questionMatch[1]);
     content = content.replace(/^\d+\.\s*/, "").trim();
   }
+
+  content = content.replace(/\n(\d+)\.(\S)/g, "\n$1. $2");
+  content = content.replace(/^(\d+)\.(\S)/, "$1. $2");
+
+  content = content.replace(/\n{2,}Dear [\s\S]*$/i, "").trim();
 
   let answer = "";
   const refAns = referenceAnswers[originalNum];

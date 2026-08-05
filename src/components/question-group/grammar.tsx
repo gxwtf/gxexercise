@@ -52,7 +52,7 @@ export default function Grammar({ questions, mdxSource }: GrammarProps) {
           indentParagraphs
         >
           <MathInput2Provider onInputChange={handleInput2Change}>
-            <div className="[&>p:first-of-type]:!indent-0">
+            <div>
               <MDXRemote {...mdxSource} components={components} />
             </div>
           </MathInput2Provider>

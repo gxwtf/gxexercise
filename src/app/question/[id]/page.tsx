@@ -134,7 +134,7 @@ async function QuestionPageContent({ id }: { id: string }) {
           questions={questions as any} 
           mdxSource={mdxSource}
           language="en"
-          indentParagraphs={false}
+          indentParagraphs
           startQuestionNumber={1}
         />
       </>
