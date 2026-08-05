@@ -8,6 +8,7 @@ import Grammar from "@/components/question-group/grammar";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
 import Problem from "@/components/question-group/Problem";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
+import { QuestionSection } from "@/components/QuestionSection";
 
 function escapeLatexBraces(content: string): string {
   let result = ''
@@ -88,7 +89,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       })
     );
     
-    if (item.question.questionType === 'input') {
+    if (item.question.questionType === 'input' || item.question.questionType === 'input2') {
       return {
         id: item.question.id,
         stem: item.question.content,
@@ -149,6 +150,27 @@ async function QuestionPageContent({ id }: { id: string }) {
         <Grammar 
           questions={questions as any} 
           mdxSource={mdxSource}
+        />
+      </>
+    );
+  }
+
+  if (questionGroup.questionType === 'word-choice') {
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        {questionGroup.content && (
+          <div className="max-w-4xl mx-auto px-6 mt-4">
+            <QuestionSection>
+              <div className="border-1 border-black p-4 text-lg">
+                {questionGroup.content}
+              </div>
+            </QuestionSection>
+          </div>
+        )}
+        <Problem
+          questions={questions as any}
+          language="en"
         />
       </>
     );

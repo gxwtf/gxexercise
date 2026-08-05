@@ -48,10 +48,10 @@ function getQuestionCategory(questionType: string, groupType: string): "choice" 
     if (questionType === "single" || questionType === "multiple" || questionType === "choice") return "choice"
     const combined = `${questionType} ${groupType}`
     if (combined.includes("选择") || combined.includes("七选五") || groupType === "math-choice") return "choice"
-    if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || groupType === "math-fill") return "fill"
+    if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || combined.includes("input2") || groupType === "word-choice" || groupType === "math-fill") return "fill"
     if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
     if (groupType === "chinese-reading") {
-        if (questionType === "input") return "fill"
+        if (questionType === "input" || questionType === "input2") return "fill"
         if (questionType === "text") return "essay"
     }
     return "choice"
@@ -83,6 +83,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const isChoiceType = category === "choice"
     const isEnWriting = questionGroup.questionType === "en-writing"
     const isMathType = questionGroup.questionType === "math-fill" || questionGroup.questionType === "math-choice"
+    const isWordChoice = questionGroup.questionType === "word-choice"
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
     const displayUserAnswer = userAnswer
@@ -90,7 +91,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         : null
     const displayCorrectAnswer = isChoiceType ? correctAnswer.toUpperCase() : correctAnswer
 
-    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression"].includes(questionGroup.questionType)
+    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice"].includes(questionGroup.questionType)
 
     return (
         <div className="h-screen overflow-hidden bg-background">
@@ -102,7 +103,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                 </div>
             </header>
             <div className="flex" style={{ height: "calc(100vh - 56px)" }}>
-                {!isEnWriting && !isMathType && (
+                {!isEnWriting && !isMathType && !isWordChoice && (
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
                             <EnglishReading

@@ -2,7 +2,19 @@
 
 const fs = require("fs");
 
+function normalizeMineruMarkdown(article) {
+  article = article.replace(/\r\n/g, "\n");
+
+  article = article.replace(
+    /\\_\*\*(?:\\_|_)+(\d+)(?:\\_|_)+\*\*(?:\\_+|_+)?/g,
+    (_, id) => `{{BLANK:${id}}}`
+  );
+
+  return article;
+}
+
 function parseExam(mdContent) {
+  mdContent = normalizeMineruMarkdown(mdContent);
   const lines = mdContent.split("\n");
 
   const paper = extractPaperInfo(lines);
@@ -13,11 +25,20 @@ function parseExam(mdContent) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^# 参考/.test(line)) {
+    if (/^参考答案/.test(line)) {
       break;
     }
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*完形填空/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*选词填空/.test(line)) {
+      const result = parseWordChoice(lines, i, referenceAnswers, paper);
+      if (result) {
+        sections.push(result.section);
+        i = result.nextIndex;
+        continue;
+      }
+    }
+
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*完形填空/.test(line)) {
       const result = parseCloze(lines, i, referenceAnswers, paper);
       if (result) {
         sections.push(result.section);
@@ -26,7 +47,7 @@ function parseExam(mdContent) {
       }
     }
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*阅读理解/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*阅读理解/.test(line)) {
       const result = parseReading(lines, i, referenceAnswers, paper);
       if (result) {
         sections.push(...result.sections);
@@ -35,7 +56,7 @@ function parseExam(mdContent) {
       }
     }
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*语法填空/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*语法填空/.test(line)) {
       const result = parseGrammarFill(lines, i, referenceAnswers, paper);
       if (result) {
         sections.push(result.section);
@@ -44,7 +65,7 @@ function parseExam(mdContent) {
       }
     }
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*书面表达/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*书面表达/.test(line)) {
       const result = parseWritingSection(lines, i, referenceAnswers, paper);
       if (result) {
         sections.push(...result.sections);
@@ -69,7 +90,7 @@ function extractPaperInfo(lines) {
   let duration = null;
   let description = "";
 
-  const titleMatch = fullText.match(/^#\s+(.+)$/m);
+  const titleMatch = fullText.match(/^(\d{4}[^\n]+)/m);
   if (titleMatch) title = titleMatch[1].trim();
 
   const gradeMatch = title.match(/高二|高一|高三|初一|初二|初三|小学/);
@@ -105,7 +126,7 @@ function extractPaperInfo(lines) {
 function extractReferenceAnswers(mdContent) {
   const answers = {};
 
-  const refSectionMatch = mdContent.match(/# 参考答案\n([\s\S]*)$/);
+  const refSectionMatch = mdContent.match(/^参考答案\n([\s\S]*)$/m);
   if (!refSectionMatch) return answers;
 
   const refText = refSectionMatch[1];
@@ -114,10 +135,12 @@ function extractReferenceAnswers(mdContent) {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    if (/^##\s/.test(trimmed)) continue;
 
-    const inlineAnswerRegex = /(\d+)\.([A-G])/g;
-    if (/^(\d+)\.([A-G])\s+(\d+)\.([A-G])/.test(trimmed)) {
+    if (/^\*\*/.test(trimmed)) continue;
+
+    const inlineAnswerRegex = /(\d+)\\?\.([A-G])/g;
+
+    if (/^(\d+)\\?\.([A-G])\s+(\d+)\\?\.([A-G])/.test(trimmed)) {
       let m;
       while ((m = inlineAnswerRegex.exec(trimmed)) !== null) {
         const num = parseInt(m[1]);
@@ -126,9 +149,9 @@ function extractReferenceAnswers(mdContent) {
       continue;
     }
 
-    const parts = trimmed.split(/\s+(?=\d+\.\s+)/);
+    const parts = trimmed.split(/\s+(?=\d+\\?\.\s+)/);
     for (const part of parts) {
-      const answerMatch = part.match(/^(\d+)\.\s*(.+)$/);
+      const answerMatch = part.match(/^(\d+)\\?\.\s*(.+)$/);
       if (answerMatch) {
         const num = parseInt(answerMatch[1]);
         let answer = answerMatch[2].trim();
@@ -158,15 +181,15 @@ function getTotalScoreFromHeader(headerLine) {
 }
 
 function isSectionHeader(line) {
-  if (/^# 参考/.test(line)) return true;
-  if (/^##\s+第[一二三ⅠⅡⅢ]卷/.test(line)) return true;
-  if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|阅读理解|语法填空|书面表达|选词填空)/.test(line)) return true;
+  if (/^参考答案/.test(line)) return true;
+  if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) return true;
+  if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|阅读理解|语法填空|书面表达|选词填空)/.test(line)) return true;
   return false;
 }
 
 function isSubSectionHeader(line) {
-  if (/^##\s+第[一二三]节/.test(line)) return true;
-  if (/^##\s+[A-D]\s*$/.test(line.trim())) return true;
+  if (/^\*\*第[一二三]节/.test(line)) return true;
+  if (/^\*\*[A-D]\*\*\s*$/.test(line.trim())) return true;
   return false;
 }
 
@@ -183,11 +206,11 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (isSectionHeader(line) && !/^##\s+[A-D]\s*$/.test(line.trim())) {
+    if (isSectionHeader(line) && !/^\*\*[A-D]\*\*\s*$/.test(line.trim())) {
       break;
     }
 
-    if (/^\d+\.\s*[A-D]\./.test(line.trim())) {
+    if (/^\d+\\?\.\s*[A-D]\\?\./.test(line.trim())) {
       inArticle = false;
     }
 
@@ -201,7 +224,7 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
   }
 
   let article = articleLines.join("\n").trim();
-  article = article.replace(/^>?\s*##\s*阅读下面短文[\s\S]*?在答题卡上将该选项涂黑。\s*/g, "").trim();
+  article = article.replace(/^>?\s*\*\*阅读下面短文[\s\S]*?在答题卡上将该选项涂黑。\*\*\s*/g, "").trim();
 
   const imageRegex = /!\[.*?\]\(([^\s)]+)\)/g;
   const imagePlaceholders = [];
@@ -210,26 +233,14 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
     return `__IMG_${imagePlaceholders.length - 1}__`;
   });
 
-  article = article.replace(/\n\n(\d{1,2})\b/g, " $1");
+  article = article.replace(/{{BLANK:(\d+)}}/g, "<ClozeBlank></ClozeBlank>");
 
   article = article.replace(/\n{3,}/g, "\n\n").trim();
-
-  const validBlankNums = [];
-  for (let num = 1; num <= 50; num++) {
-    if (referenceAnswers[num] !== undefined) {
-      validBlankNums.push(num);
-    }
-  }
-  validBlankNums.sort((a, b) => b - a);
-
-  for (const num of validBlankNums) {
-    article = article.replace(new RegExp(`${num}(?!\\d)`, "g"), "<ClozeBlank></ClozeBlank>");
-  }
 
   article = article.replace(/__IMG_(\d+)__/g, (_, i) => imagePlaceholders[parseInt(i)]);
 
   let questions = [];
-  const optionRegex = /^(\d+)\.\s*A\.\s*(.+?)\s*B\.\s*(.+?)\s*C\.\s*(.+?)\s*D\.\s*(.+?)$/;
+  const optionRegex = /^(\d+)\\?\.\s*A\\?\.\s*(.+?)\s*B\\?\.\s*(.+?)\s*C\\?\.\s*(.+?)\s*D\\?\.\s*(.+?)$/;
 
   for (const optLine of optionLines) {
     const match = optLine.match(optionRegex);
@@ -289,11 +300,11 @@ function parseReading(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空)/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空)/.test(line)) {
       break;
     }
 
-    if (/^##\s+第二节/.test(line)) {
+    if (/^\*\*第二节/.test(line)) {
       const result = parseSevenChooseFive(lines, i, referenceAnswers, paper);
       if (result) {
         sections.push(result.section);
@@ -302,8 +313,13 @@ function parseReading(lines, startIndex, referenceAnswers, paper) {
       continue;
     }
 
-    if (/^##\s+[A-D]\s*$/.test(line.trim())) {
-      const articleLabel = line.trim().replace(/^##\s+/, "");
+    if (/^\*\*第一节/.test(line)) {
+      i++;
+      continue;
+    }
+
+    if (/^\*\*[A-D]\*\*\s*$/.test(line.trim())) {
+      const articleLabel = line.trim().match(/^\*\*([A-D])\*\*/)[1];
       const result = parseReadingArticle(lines, i, articleLabel, referenceAnswers, paper);
       if (result) {
         sections.push(result.section);
@@ -325,11 +341,11 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s+[A-D]\s*$/.test(line.trim()) && i > startIndex + 1) {
+    if (/^\*\*[A-D]\*\*\s*$/.test(line.trim()) && i > startIndex + 1) {
       break;
     }
 
-    if (/^##\s+(第二节|第[一二三]节|[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、])/.test(line)) {
+    if (/^\*\*(第二节|第[一二三]节|[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、])/.test(line)) {
       break;
     }
 
@@ -338,9 +354,9 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
   }
 
   let fullText = allLines.join("\n").trim();
-  fullText = fullText.replace(/^>?\s*阅读下面短文[\s\S]*?在答题卡上将该项涂黑。\s*/g, "").trim();
+  fullText = fullText.replace(/^>?\s*\*\*阅读下面短文[\s\S]*?在答题卡上将该项涂黑。\*\*\s*/g, "").trim();
 
-  const firstQuestionMatch = fullText.match(/\n(\d+)\.\s/);
+  const firstQuestionMatch = fullText.match(/\n(\d+)\\?\.\s/);
   let articleText = fullText;
   let questionText = "";
 
@@ -355,7 +371,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
 
   let questions = [];
   if (questionText) {
-    const questionBlockRegex = /(\d+)\.\s+(.+?)\s+A\.\s*(.+?)\s*B\.\s*(.+?)\s*C\.\s*(.+?)\s*D\.\s*(.+?)(?=\n?\d+\.\s|$)/gs;
+    const questionBlockRegex = /(\d+)\\?\.\s+(.+?)\s+A\\?\.\s*(.+?)\s*B\\?\.\s*(.+?)\s*C\\?\.\s*(.+?)\s*D\\?\.\s*(.+?)(?=\n?\d+\\?\.\s|$)/gs;
     let qm;
     while ((qm = questionBlockRegex.exec(questionText)) !== null) {
       const originalNum = parseInt(qm[1]);
@@ -416,11 +432,11 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空|第[一二三ⅠⅡⅢ]卷)/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空|第[一二三ⅠⅡⅢ]卷)/.test(line)) {
       break;
     }
 
-    if (/^##\s+第[一二三ⅠⅡⅢ]卷/.test(line)) {
+    if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) {
       break;
     }
 
@@ -429,9 +445,9 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   }
 
   let fullText = allLines.join("\n").trim();
-  fullText = fullText.replace(/^>?\s*根据短文内容[\s\S]*?选项中共?有两项为多余选项。\s*/g, "").trim();
+  fullText = fullText.replace(/^>?\s*\*\*根据短文内容[\s\S]*?选项中共?有两项为多余选项。\*\*\s*/g, "").trim();
 
-  const optionRegex = /\s+A\.\s+(.+?)\s+B\.\s+(.+?)\s+C\.\s+(.+?)\s+D\.\s+(.+?)\s+E\.\s+(.+?)\s+F\.\s+(.+?)\s+G\.\s+(.+?)$/s;
+  const optionRegex = /\s+A\\?\.\s+(.+?)\s+B\\?\.\s+(.+?)\s+C\\?\.\s+(.+?)\s+D\\?\.\s+(.+?)\s+E\\?\.\s+(.+?)\s+F\\?\.\s+(.+?)\s+G\\?\.\s+(.+?)$/s;
   const optionMatch = fullText.match(optionRegex);
 
   let article = fullText;
@@ -463,7 +479,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
 
   article = article.replace(/\n{3,}/g, "\n\n").trim();
 
-  const blankRegex = /(\d{2,})/g;
+  const blankRegex = /{{BLANK:(\d+)}}/g;
   const blankNums = [];
   let bm;
   while ((bm = blankRegex.exec(article)) !== null) {
@@ -474,7 +490,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   }
   blankNums.sort((a, b) => a - b);
 
-  article = article.replace(/(\d{2,})/g, "<Blank></Blank>");
+  article = article.replace(/{{BLANK:(\d+)}}/g, "<Blank></Blank>");
 
   let questions = [];
   for (let idx = 0; idx < blankNums.length; idx++) {
@@ -529,11 +545,11 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(书面表达|选词填空|完形填空)/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(书面表达|选词填空|完形填空)/.test(line)) {
       break;
     }
 
-    if (/^##\s+第[一二三ⅠⅡⅢ]卷/.test(line)) {
+    if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) {
       break;
     }
 
@@ -542,10 +558,12 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   }
 
   let article = articleLines.join("\n").trim();
-  article = article.replace(/^>?\s*阅读下面短文[\s\S]*?用括号内所给词的正确形式填空。\n?/gm, "").trim();
+  article = article.replace(/阅读下面短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。\s*/g, "").trim();
   article = article.replace(/\n{3,}/g, "\n\n").trim();
 
-  const blankRegex = /(\d{2,})/g;
+  article = article.replace(/^\*\*([A-D])\*\*\s*$/gm, "## $1");
+
+  const blankRegex = /{{BLANK:(\d+)}}/g;
   const blankNums = [];
   let gm;
   while ((gm = blankRegex.exec(article)) !== null) {
@@ -558,9 +576,7 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
 
   const validBlankNums = blankNums.filter((num) => referenceAnswers[num] !== undefined);
 
-  for (const num of validBlankNums) {
-    article = article.replace(new RegExp(`\\s*${num}\\s*`, "g"), " <Input></Input> ");
-  }
+  article = article.replace(/{{BLANK:(\d+)}}/g, " <Input></Input> ");
   article = article.replace(/ {2,}/g, " ");
 
   let questions = [];
@@ -599,6 +615,87 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   };
 }
 
+function parseWordChoice(lines, startIndex, referenceAnswers, paper) {
+  const headerLine = lines[startIndex];
+  const perQuestionScore = getScoreFromHeader(headerLine) || 2;
+  const totalScore = getTotalScoreFromHeader(headerLine);
+
+  let wordBank = "";
+  let questionLines = [];
+  let i = startIndex + 1;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(语法填空|书面表达|完形填空)/.test(line)) {
+      break;
+    }
+
+    if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) {
+      break;
+    }
+
+    const trimmed = line.trim();
+    if (!trimmed) {
+      i++;
+      continue;
+    }
+
+    if (/^(\d+)\\?\.\s/.test(trimmed)) {
+      questionLines.push(trimmed);
+    } else if (/^[a-zA-Z]/.test(trimmed) && trimmed.includes(",")) {
+      wordBank = trimmed;
+    }
+
+    i++;
+  }
+
+  let questions = [];
+  for (let idx = 0; idx < questionLines.length; idx++) {
+    const qLine = questionLines[idx];
+    const qMatch = qLine.match(/^(\d+)\\?\.\s+(.+)$/);
+    if (!qMatch) continue;
+
+    const originalNum = parseInt(qMatch[1]);
+    let content = qMatch[2].trim();
+
+    content = content.replace(/\\_\*\*(?:\\_|_)+\*\*(?:\\_+|_+)?/g, "<Input2></Input2>");
+
+    let answer = "";
+    const refAns = referenceAnswers[originalNum];
+    if (refAns) {
+      answer = refAns.join("##");
+    }
+
+    questions.push({
+      id: idx + 1,
+      questionType: "input2",
+      content,
+      answer,
+      analysis: `第${originalNum}题解析: 根据句意和单词的适当形式填空。`,
+      score: perQuestionScore,
+      correctRate: 0.7,
+    });
+  }
+
+  return {
+    section: {
+      type: "选词填空",
+      questionType: "word-choice",
+      title: "选词填空",
+      category: "选词填空",
+      score: totalScore || questions.length * perQuestionScore,
+      grade: paper.grade,
+      source: paper.source,
+      tags: ["选词填空", "英语", paper.grade, "练习"],
+      content: wordBank,
+      article: "",
+      questions,
+    },
+    nextIndex: i,
+  };
+}
+
 function parseWritingSection(lines, startIndex, referenceAnswers, paper) {
   const sections = [];
   let i = startIndex + 1;
@@ -606,19 +703,19 @@ function parseWritingSection(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^# 参考/.test(line)) {
+    if (/^参考答案/.test(line)) {
       break;
     }
 
-    if (/^##\s+[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|阅读理解|选词填空)/.test(line)) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|阅读理解|选词填空)/.test(line)) {
       break;
     }
 
-    if (/^##\s+第一节/.test(line)) {
+    if (/^\*\*第一节/.test(line)) {
       let isReadingExpression = false;
       for (let j = i + 1; j < lines.length; j++) {
         const forwardLine = lines[j];
-        if (/^##\s+第二节/.test(forwardLine)) break;
+        if (/^\*\*第二节/.test(forwardLine)) break;
         if (/阅读下面的短文，根据题目要求用英文回答问题/.test(forwardLine)) {
           isReadingExpression = true;
           break;
@@ -635,7 +732,7 @@ function parseWritingSection(lines, startIndex, referenceAnswers, paper) {
       }
     }
 
-    if (/^##\s+第二节/.test(line) && /20分/.test(line)) {
+    if (/^\*\*第二节/.test(line) && /20分/.test(line)) {
       const result = parseWriting(lines, i, referenceAnswers, paper);
       if (result) {
         sections.push(result.section);
@@ -672,11 +769,11 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s+第二节/.test(line)) {
+    if (/^\*\*第二节/.test(line)) {
       break;
     }
 
-    if (/^(\d+)\.\s/.test(line.trim()) && inArticle) {
+    if (/^(\d+)\\?\.\s/.test(line.trim()) && inArticle) {
       inArticle = false;
     }
 
@@ -690,11 +787,13 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
   }
 
   let article = articleLines.join("\n").trim();
-  article = article.replace(/^>?\s*阅读下面的短文[^。]*。?\s*/g, "").trim();
+  article = article.replace(/^>?\s*\*\*阅读下面的短文[^。]*。?\*\*\s*/g, "").trim();
+  article = article.replace(/^阅读下面的短文，根据题目要求用英文回答问题。\s*/gm, "").trim();
   article = article.replace(/\n{3,}/g, "\n\n").trim();
 
   let questions = [];
-  const questionRegex = /^(\d+)\.\s+(.+)$/;
+  const questionRegex = /^(\d+)\\?\.\s+(.+)$/;
+  let currentQuestion = null;
 
   for (const qLine of questionLines) {
     const trimmed = qLine.trim();
@@ -702,27 +801,41 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
 
     const match = trimmed.match(questionRegex);
     if (match) {
+      if (currentQuestion) {
+        questions.push(currentQuestion);
+      }
       const originalNum = parseInt(match[1]);
       let content = match[2].trim();
 
       content = content.replace(/(the following statement[^.]*?explain why\.)\s*([\s\S]+)$/i, "$1\n\n➢ $2");
 
+      const readingExpressionScores = { 45: 2, 46: 2, 47: 3, 48: 5 };
+
       let answer = "";
       const refAns = referenceAnswers[originalNum];
       if (refAns) {
         answer = refAns.join("##");
+      } else if (referenceAnswers[originalNum + 33]) {
+        answer = referenceAnswers[originalNum + 33].join("##");
       }
 
-      questions.push({
+      const score = readingExpressionScores[originalNum] || 2;
+
+      currentQuestion = {
         id: originalNum,
         questionType: "text",
         content,
         answer,
         analysis: `第${originalNum}题解析: 根据文章内容回答问题。`,
-        score: 2,
+        score,
         correctRate: 0.7,
-      });
+      };
+    } else if (currentQuestion && !/^\\_/.test(trimmed) && !/^答案/.test(trimmed)) {
+      currentQuestion.content += "\n\n" + trimmed;
     }
+  }
+  if (currentQuestion) {
+    questions.push(currentQuestion);
   }
 
   questions = renumberQuestions(questions);
@@ -756,10 +869,10 @@ function parseWriting(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^##\s/.test(line) && !/^##\s+/.test(line.trim())) {
+    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]/.test(line)) {
       break;
     }
-    if (/^# 参考/.test(line)) {
+    if (/^参考答案/.test(line)) {
       break;
     }
 
@@ -771,16 +884,16 @@ function parseWriting(lines, startIndex, referenceAnswers, paper) {
   content = content.replace(/\n{3,}/g, "\n\n").trim();
 
   let originalNum = 49;
-  const questionMatch = content.match(/^(\d+)\.\s*/);
+  const questionMatch = content.match(/^(\d+)\\?\.\s*/);
   if (questionMatch) {
     originalNum = parseInt(questionMatch[1]);
-    content = content.replace(/^\d+\.\s*/, "").trim();
+    content = content.replace(/^\d+\\?\.\s*/, "").trim();
   }
 
-  content = content.replace(/\n(\d+)\.(\S)/g, "\n$1. $2");
-  content = content.replace(/^(\d+)\.(\S)/, "$1. $2");
+  content = content.replace(/\n(\d+)\\?\.(\S)/g, "\n$1. $2");
+  content = content.replace(/^(\d+)\\?\.(\S)/, "$1. $2");
 
-  content = content.replace(/\n{2,}Dear [\s\S]*$/i, "").trim();
+  content = content.replace(/\n{2,}_+[\s\S]*$/i, "").trim();
 
   let answer = "";
   const refAns = referenceAnswers[originalNum];
