@@ -17,7 +17,7 @@ interface TestCardProps {
     year: number | null
     grade: string | null
     subject: string
-    onStart?: (id: string) => void
+    latestSubmissionId?: string | null
 }
 
 export function TestCard({
@@ -27,10 +27,13 @@ export function TestCard({
     year,
     grade,
     subject,
-    onStart
+    latestSubmissionId,
 }: TestCardProps) {
     return (
-        <Item variant="outline" className="w-full">
+        <Item
+            variant="outline"
+            className="w-full"
+        >
             <ItemMedia variant="icon">
                 <FileText className="w-5 h-5 text-muted-foreground" />
             </ItemMedia>
@@ -55,9 +58,23 @@ export function TestCard({
                 </ItemDescription>
             </ItemContent>
             <ItemActions>
+                {latestSubmissionId && (
+                    <Button
+                        variant="outline"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            window.open(`/test-paper/${id}/result/${latestSubmissionId}`, "_blank")
+                        }}
+                    >
+                        练习报告
+                    </Button>
+                )}
                 <Button
                     variant="default"
-                    onClick={() => onStart?.(id)}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(`/test-paper/${id}`, "_blank")
+                    }}
                 >
                     开始练习
                 </Button>

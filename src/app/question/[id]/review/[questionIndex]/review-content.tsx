@@ -37,6 +37,10 @@ interface ReviewContentData {
     allUserBlanks: Record<string, string>
     allCorrectBlanks: Record<string, string>
     currentSubmissionId: string | null
+    isSubjective: boolean
+    userScore: number | null
+    questionScore: number
+    avgScore: number | null
 }
 
 interface ReviewContentProps {
@@ -77,6 +81,10 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         correctRate,
         allUserBlanks,
         allCorrectBlanks,
+        isSubjective,
+        userScore,
+        questionScore,
+        avgScore,
     } = data
 
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
@@ -160,6 +168,24 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
 
                     {category === "essay" ? (
                         <div className="mt-6 mb-6">
+                            {isSubjective && (
+                                <div className="mb-4 p-4 rounded-lg bg-muted/50">
+                                    <p className="text-base">
+                                        得分：
+                                        <span className="font-medium">
+                                            {isCorrect === null ? (
+                                                <span className="text-amber-600">评阅中</span>
+                                            ) : (
+                                                <>{userScore ?? "-"} / {questionScore}</>
+                                            )}
+                                        </span>
+                                        {"  "}平均得分：
+                                        <span className="font-medium">
+                                            {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
+                                        </span>
+                                    </p>
+                                </div>
+                            )}
                             <Tabs defaultValue={userAnswerMdx ? "my-answer" : "reference-answer"}>
                                 <TabsList>
                                     {userAnswerMdx && (
@@ -200,6 +226,10 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                 <span className="text-green-600 font-medium">{displayCorrectAnswer}</span>
                                 {"  "}正确率：
                                 <span className="font-medium">{correctRateDisplay}</span>
+                                {"  "}平均得分：
+                                <span className="font-medium">
+                                    {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
+                                </span>
                             </p>
                         </div>
                     )}

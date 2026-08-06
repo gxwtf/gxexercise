@@ -130,7 +130,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -146,7 +146,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Grammar 
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -158,7 +158,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   if (questionGroup.questionType === 'word-choice') {
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         {questionGroup.content && (
           <div className="max-w-4xl mx-auto px-6 mt-4">
             <QuestionSection>
@@ -180,7 +180,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Grammar 
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -193,7 +193,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -207,7 +207,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <SevenChooseFive 
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -220,7 +220,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -234,7 +234,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   if (questionGroup.questionType === 'en-writing') {
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any}
           language="en"
@@ -248,7 +248,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   if (questionGroup.questionType === 'chinese-micro-writing') {
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any}
           language="zh"
@@ -261,7 +261,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   if (questionGroup.questionType === 'chinese-essay') {
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any}
           language="zh"
@@ -275,7 +275,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   if (questionGroup.questionType === 'math-fill') {
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any}
           language="zh"
@@ -287,7 +287,7 @@ async function QuestionPageContent({ id }: { id: string }) {
   if (questionGroup.questionType === 'math-choice') {
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any}
           language="zh"
@@ -300,7 +300,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
     return (
       <>
-        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 
           mdxSource={mdxSource}
@@ -312,7 +312,7 @@ async function QuestionPageContent({ id }: { id: string }) {
 
   return (
     <div className="p-8">
-      <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} />
+      <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
       <div className="mt-8">
         <h1 className="text-2xl font-bold mb-4">题组: {questionGroup.title}</h1>
         <p>题型: {questionGroup.questionType}</p>

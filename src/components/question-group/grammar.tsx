@@ -16,13 +16,14 @@ interface GrammarQuestion {
 interface GrammarProps {
   questions: GrammarQuestion[]
   mdxSource: MDXRemoteSerializeResult
+  startQuestionNumber?: number
 }
 
-export default function Grammar({ questions, mdxSource }: GrammarProps) {
+export default function Grammar({ questions, mdxSource, startQuestionNumber = 1 }: GrammarProps) {
   const { setAnswer } = useAnswer()
 
   const handleInputChange = (questionNumber: string, value: string) => {
-    const questionIndex = parseInt(questionNumber) - 1
+    const questionIndex = parseInt(questionNumber) - startQuestionNumber
     const question = questions[questionIndex]
     
     if (question) {
@@ -47,7 +48,7 @@ export default function Grammar({ questions, mdxSource }: GrammarProps) {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6">
         <EnglishReading 
-          startQuestionNumber={1}
+          startQuestionNumber={startQuestionNumber}
           onInputChange={handleInputChange}
           indentParagraphs
         >

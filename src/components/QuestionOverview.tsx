@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { QuestionCard } from "./QuestionCard";
 import { TestCard } from "./TestCard";
 import { Search, FileText } from "lucide-react";
@@ -9,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import useSession from "@/lib/use-session";
 
 type Question = {
   id: string;
@@ -91,6 +93,18 @@ export function QuestionOverview({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedGrade, setSelectedGrade] = useState("all");
+  const router = useRouter()
+  const { session } = useSession()
+  const [testSubmissions, setTestSubmissions] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (!session.userid || !initialTestPapers?.length) return
+    const ids = initialTestPapers.map(p => p.id).join(",")
+    fetch(`/api/submissions/test-paper/latest?userId=${session.userid}&testPaperIds=${ids}`)
+      .then(res => res.json())
+      .then(data => setTestSubmissions(data))
+      .catch(() => {})
+  }, [session.userid, initialTestPapers])
 
   // 使用从props传入的套卷数据
   const testPapers = initialTestPapers;
@@ -176,11 +190,7 @@ export function QuestionOverview({
     return grades;
   }, [initialGroups]);
 
-  // 处理套卷开始练习
-  const handleStartTest = (testId: string) => {
-    console.log("开始套卷练习:", testId);
-    // 这里可以添加跳转到套卷练习页面的逻辑
-  };
+  // 处理单个题组练习
 
   const filteredGroups = useMemo(() => {
     return initialGroups.filter((group) => {
@@ -296,7 +306,7 @@ export function QuestionOverview({
                       year={paper.year || null}
                       grade={paper.grade || null}
                       subject={paper.subject}
-                      onStart={handleStartTest}
+                      latestSubmissionId={testSubmissions[paper.id]}
                     />
                   ))}
                 </div>
@@ -353,7 +363,7 @@ export function QuestionOverview({
                           year={paper.year || null}
                           grade={paper.grade || null}
                           subject={paper.subject}
-                          onStart={handleStartTest}
+                          latestSubmissionId={testSubmissions[paper.id]}
                         />
                       ))}
                     </div>

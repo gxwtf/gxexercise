@@ -1,5 +1,12 @@
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma"
+import { NextResponse } from "next/server"
+
+function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
+  const combined = `${questionType} ${groupType}`
+  if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return true
+  if (groupType === "chinese-reading" && questionType === "text") return true
+  return false
+}
 
 export async function POST(request: Request) {
   try {
@@ -47,6 +54,17 @@ export async function POST(request: Request) {
         const userAnswer = sub.content?.answer ?? '';
         const correctAnswer = question.question.answer ?? '';
         const questionScore = question.question.score ?? 0;
+        const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType);
+
+        if (isSubjective) {
+          return {
+            userId,
+            questionId: sub.questionId,
+            content: { answer: userAnswer },
+            score: null,
+            isCorrect: null
+          };
+        }
 
         const isCorrect = correctAnswer.includes("##")
           ? correctAnswer.split("##").some((ans: string) => ans.trim() === userAnswer.trim())

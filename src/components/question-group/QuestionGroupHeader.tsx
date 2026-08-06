@@ -10,9 +10,11 @@ import { useAnswer } from './AnswerContext';
 interface QuestionGroupHeaderProps {
   title: string;
   questionGroupId: string;
+  questionCount?: number;
+  score?: number | null;
 }
 
-export default function QuestionGroupHeader({ title, questionGroupId }: QuestionGroupHeaderProps) {
+export default function QuestionGroupHeader({ title, questionGroupId, questionCount, score }: QuestionGroupHeaderProps) {
   const [seconds, setSeconds] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { session } = useSession();
@@ -78,8 +80,8 @@ export default function QuestionGroupHeader({ title, questionGroupId }: Question
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="flex items-center justify-between h-16 px-6">
-        <h1 className="text-xl font-semibold text-foreground truncate max-w-md">
-          {title}
+        <h1 className="text-xl font-semibold text-foreground truncate">
+          {title}{questionCount != null ? `（共${questionCount}小题${score != null ? `；共${score}分` : ""}）` : ""}
         </h1>
 
         <div className="flex items-center gap-4">

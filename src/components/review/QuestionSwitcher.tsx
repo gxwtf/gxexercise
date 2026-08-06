@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 export interface QuestionSwitcherItem {
   index: number
   questionId: string
-  status: "correct" | "wrong" | "unanswered"
+  status: "correct" | "wrong" | "unanswered" | "reviewing"
 }
 
 interface QuestionSwitcherProps {
@@ -34,6 +34,8 @@ export function QuestionSwitcher({ questions, currentIndex, basePath }: Question
             buttonStyle = cn(baseStyle, "bg-green-500 border-green-500 text-white")
           } else if (q.status === "wrong") {
             buttonStyle = cn(baseStyle, "bg-red-500 border-red-500 text-white")
+          } else if (q.status === "reviewing") {
+            buttonStyle = cn(baseStyle, "bg-amber-500 border-amber-500 text-white")
           } else {
             buttonStyle = cn(baseStyle, "bg-gray-400 border-gray-400 text-white dark:bg-gray-500 dark:border-gray-500")
           }
@@ -42,6 +44,8 @@ export function QuestionSwitcher({ questions, currentIndex, basePath }: Question
             buttonStyle = cn(baseStyle, "bg-transparent border-green-500 text-green-600")
           } else if (q.status === "wrong") {
             buttonStyle = cn(baseStyle, "bg-transparent border-red-500 text-red-600")
+          } else if (q.status === "reviewing") {
+            buttonStyle = cn(baseStyle, "bg-transparent border-amber-500 text-amber-600")
           } else {
             buttonStyle = cn(baseStyle, "bg-transparent border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400")
           }

@@ -45,6 +45,13 @@ function escapeLatexBraces(content: string): string {
   return result
 }
 
+function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
+  const combined = `${questionType} ${groupType}`
+  if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return true
+  if (groupType === "chinese-reading" && questionType === "text") return true
+  return false
+}
+
 async function buildReviewData(
   questionGroupId: string,
   questionIndex: number,
@@ -141,9 +148,13 @@ async function buildReviewData(
 
   const questionSwitcherItems: QuestionSwitcherItem[] = questions.map((item, idx) => {
     const sub = questionSubmissions.find((s) => s.questionId === item.question.id)
-    let status: "correct" | "wrong" | "unanswered" = "unanswered"
+    let status: "correct" | "wrong" | "unanswered" | "reviewing" = "unanswered"
     if (sub) {
-      status = sub.isCorrect ? "correct" : "wrong"
+      if (sub.isCorrect === null && isSubjectiveQuestion(item.question.questionType, questionGroup.questionType)) {
+        status = "reviewing"
+      } else {
+        status = sub.isCorrect ? "correct" : "wrong"
+      }
     }
     return {
       index: idx + 1,
@@ -164,7 +175,8 @@ async function buildReviewData(
       id: sub.id,
       answer,
       answerMdx,
-      isCorrect: sub.isCorrect ?? false,
+      isCorrect: sub.isCorrect,
+      score: sub.score,
       createdAt: sub.createdAt,
     }
   }))
@@ -195,6 +207,24 @@ async function buildReviewData(
     allCorrectBlanks[blankId] = item.question.answer || ''
   })
 
+  const isSubjective = isSubjectiveQuestion(currentQuestion.questionType, questionGroup.questionType)
+
+  let avgScore: number | null = null
+  const allSubmissionsWithScore = await prisma.questionSubmission.findMany({
+    where: {
+      questionId: currentQuestion.id,
+      score: { not: null },
+    },
+    select: { score: true },
+  })
+  if (allSubmissionsWithScore.length > 0) {
+    const total = allSubmissionsWithScore.reduce((sum, s) => sum + (s.score ?? 0), 0)
+    avgScore = total / allSubmissionsWithScore.length
+  }
+
+  const userScore = selectedSubmission?.score ?? null
+  const questionScore = currentQuestion.score ?? 0
+
   return {
     questionGroup: {
       id: questionGroup.id,
@@ -218,6 +248,10 @@ async function buildReviewData(
     allUserBlanks,
     allCorrectBlanks,
     currentSubmissionId: selectedSubmission?.id ?? null,
+    isSubjective,
+    userScore,
+    questionScore,
+    avgScore,
   }
 }
 

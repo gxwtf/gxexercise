@@ -7,6 +7,7 @@ interface ProgressCircleProps {
   size?: number
   strokeWidth?: number
   className?: string
+  fontSize?: string
 }
 
 export function ProgressCircle({
@@ -14,7 +15,8 @@ export function ProgressCircle({
   total,
   size = 48,
   strokeWidth = 6,
-  className
+  className,
+  fontSize,
 }: ProgressCircleProps) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -64,7 +66,8 @@ export function ProgressCircle({
       {/* 中间文字 */}
       <div className="absolute inset-0 flex items-center justify-center">
         <span className={cn(
-          "text-[10px] font-medium",
+          fontSize || "text-[10px]",
+          "font-medium",
           hasAttempt ? "text-gray-700" : "text-gray-400"
         )}>
           {correct}/{total}
