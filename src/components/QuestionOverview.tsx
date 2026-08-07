@@ -103,11 +103,26 @@ export function QuestionOverview({
     fetch(`/api/submissions/test-paper/latest?userId=${session.userid}&testPaperIds=${ids}`)
       .then(res => res.json())
       .then(data => setTestSubmissions(data))
-      .catch(() => {})
+      .catch(() => { })
   }, [session.userid, initialTestPapers])
 
   // 使用从props传入的套卷数据
   const testPapers = initialTestPapers;
+
+  // 筛选选项
+  const categoryOptions = [
+    { value: "all", label: "全部题型" },
+    { value: "高考真题", label: "高考真题" },
+    { value: "高考模拟", label: "高考模拟" },
+    { value: "各区期末", label: "各区期末" },
+    { value: "广学模拟", label: "广学模拟" }
+  ];
+
+  const categoryTagMap: Record<string, string> = {
+    "高考真题": "真题",
+    "高考模拟": "模拟",
+    "各区期末": "期末",
+  };
 
   // 过滤套卷数据
   const filteredTestPapers = useMemo(() => {
@@ -117,11 +132,16 @@ export function QuestionOverview({
         paper.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         paper.tags.some((tag) =>
           tag.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        ) ||
+        paper.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        paper.year?.toString().includes(searchTerm) ||
+        paper.grade?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesSubject = !subject || paper.subject === subject;
 
-      // 套卷新增筛选条件
-      const matchesCategoryFilter = selectedCategory === "all" || paper.source === selectedCategory;
+      const matchesCategoryFilter = selectedCategory === "all" ||
+        (categoryTagMap[selectedCategory]
+          ? paper.tags.includes(categoryTagMap[selectedCategory])
+          : paper.source === selectedCategory);
       const matchesYearFilter = selectedYear === "all" || paper.year?.toString() === selectedYear;
       const matchesGradeFilter = selectedGrade === "all" || paper.grade === selectedGrade;
 
@@ -130,20 +150,11 @@ export function QuestionOverview({
     });
   }, [testPapers, searchTerm, subject, selectedCategory, selectedYear, selectedGrade]);
 
-  // 筛选选项 - 固定的四个选项
-  const categoryOptions = [
-    { value: "all", label: "全部题型" },
-    { value: "高考真题", label: "高考真题" },
-    { value: "高考模拟", label: "高考模拟" },
-    { value: "各区期末", label: "各区期末" },
-    { value: "广学模拟", label: "广学模拟" }
-  ];
-
-  // 动态生成年份选项（从组题关联的题目中提取）
+  // 动态生成年份选项
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
     const years = [{ value: "all", label: "全部" }];
-    
+
     // 从组题关联的题目中提取所有年份
     const uniqueYears = new Set<number>();
     initialGroups.forEach(group => {
@@ -151,26 +162,26 @@ export function QuestionOverview({
         if (item.question && item.question.year) uniqueYears.add(item.question.year);
       });
     });
-    
+
     // 添加最近5年
     for (let i = currentYear; i >= currentYear - 5; i--) {
       uniqueYears.add(i);
     }
-    
+
     // 转换为选项
     Array.from(uniqueYears)
       .sort((a, b) => b - a)
       .forEach(year => {
         years.push({ value: year.toString(), label: year.toString() });
       });
-    
+
     return years;
   }, [initialGroups]);
 
   // 动态生成年级选项（从组题中提取）
   const gradeOptions = useMemo(() => {
     const grades = [{ value: "all", label: "全部" }];
-    
+
     // 从组题数据中提取所有年级
     const uniqueGrades = new Set<string>();
     initialGroups.forEach(group => {
@@ -179,14 +190,14 @@ export function QuestionOverview({
         if (item.question && item.question.grade) uniqueGrades.add(item.question.grade!);
       });
     });
-    
+
     // 添加标准年级选项
     ["高一", "高二", "高三"].forEach(grade => {
       if (uniqueGrades.has(grade)) {
         grades.push({ value: grade, label: grade });
       }
     });
-    
+
     return grades;
   }, [initialGroups]);
 
@@ -199,16 +210,23 @@ export function QuestionOverview({
         group.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
         group.tags.some((tag) =>
           tag.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        group.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        group.groupItems.some((item) =>
+          item.question.year?.toString().includes(searchTerm)
         );
       const matchesSubject = !subject || group.subject === subject;
       const matchesCategory = !category || group.category === category;
       const matchesType = !questionType || group.questionType === questionType;
 
       // 新增筛选条件
-      const matchesCategoryFilter = selectedCategory === "all" || group.source === selectedCategory;
-      const matchesYearFilter = selectedYear === "all" || 
+      const matchesCategoryFilter = selectedCategory === "all" ||
+        (categoryTagMap[selectedCategory]
+          ? group.tags.includes(categoryTagMap[selectedCategory])
+          : group.source === selectedCategory);
+      const matchesYearFilter = selectedYear === "all" ||
         group.groupItems.some(item => item.question.year?.toString() === selectedYear);
-      const matchesGradeFilter = selectedGrade === "all" || 
+      const matchesGradeFilter = selectedGrade === "all" ||
         group.grade === selectedGrade ||
         group.groupItems.some(item => item.question.grade === selectedGrade);
 
@@ -284,7 +302,7 @@ export function QuestionOverview({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="搜索题目..."
+                  placeholder="搜索题目或套卷..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
@@ -295,7 +313,6 @@ export function QuestionOverview({
             {isTestPaperPage ? (
               // 套卷页面：只显示套卷内容，每行一个
               <div>
-                <h2 className="text-2xl font-bold mb-6">{subject}套卷练习</h2>
                 <div className="grid grid-cols-1 gap-4">
                   {filteredTestPapers.map((paper) => (
                     <TestCard
@@ -312,7 +329,7 @@ export function QuestionOverview({
                 </div>
 
                 {filteredTestPapers.length === 0 && (
-                  <div className="text-center py-16 bg-card rounded-xl border border-border">
+                  <div className="text-center py-16 bg-card rounded-xl">
                     <div className="text-muted-foreground mb-2">
                       <FileText className="w-12 h-12 mx-auto" />
                     </div>
@@ -320,7 +337,7 @@ export function QuestionOverview({
                       暂无{subject}套卷
                     </h3>
                     <p className="text-muted-foreground">
-                      请稍后查看或联系管理员添加
+                      尝试调整筛选条件或搜索关键词
                     </p>
                   </div>
                 )}
@@ -332,8 +349,6 @@ export function QuestionOverview({
                   {filteredGroups.map((group, index) => (
                     <div
                       key={group.id}
-                      className="animate-in fade-in slide-in-from-bottom-4 duration-500"
-                      style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <QuestionCard
                         id={group.id}
@@ -347,32 +362,10 @@ export function QuestionOverview({
                     </div>
                   ))}
                 </div>
-
-                {/* 套卷推荐 */}
-                {testPapers.length > 0 && (
-                  <div className="mt-12">
-                    <Separator className="my-6" />
-                    <h3 className="text-lg font-semibold mb-4">推荐套卷</h3>
-                    <div className="grid gap-4">
-                      {testPapers.slice(0, 3).map((paper) => (
-                        <TestCard
-                          key={paper.id}
-                          id={paper.id}
-                          title={paper.title}
-                          type={paper.source}
-                          year={paper.year || null}
-                          grade={paper.grade || null}
-                          subject={paper.subject}
-                          latestSubmissionId={testSubmissions[paper.id]}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
               </>
             ) : (
               // 无匹配组题
-              <div className="text-center py-16 bg-card rounded-xl border border-border">
+              <div className="text-center py-16 bg-card rounded-xl">
                 <div className="text-muted-foreground mb-2">
                   <Search className="w-12 h-12 mx-auto" />
                 </div>
@@ -384,12 +377,6 @@ export function QuestionOverview({
                 </p>
               </div>
             )}
-
-            <div className="mt-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                当前显示 {filteredGroups.length} 个组题
-              </p>
-            </div>
           </div>
         </div>
       </div>

@@ -108,6 +108,7 @@ function extractPaperInfo(lines) {
   const descMatch = fullText.match(/^本试卷[^。]*。$/m);
   if (descMatch) description = descMatch[0];
 
+  const { baseTags } = generateTagsAndSource(title, grade);
   const source = title;
 
   return {
@@ -119,8 +120,41 @@ function extractPaperInfo(lines) {
     totalScore,
     duration,
     description,
-    tags: ["英语", grade, year ? String(year) : "", "期末", "北京"].filter(Boolean),
+    tags: baseTags,
   };
+}
+
+function generateTagsAndSource(title, grade) {
+  const districts = ["西城", "东城", "海淀", "朝阳", "丰台", "石景山", "通州", "大兴", "昌平", "顺义", "房山", "门头沟", "平谷", "怀柔", "密云", "延庆"];
+
+  let source = "";
+  const baseTags = ["英语"];
+
+  if (grade) baseTags.push(grade);
+
+  const district = districts.find((d) => title.includes(d));
+  if (district) baseTags.push(district);
+
+  if (title.includes("高考")) {
+    source = "高考真题";
+    baseTags.push("真题");
+  } else if (title.includes("一模") || title.includes("二模") || title.includes("三模")) {
+    source = "高考模拟";
+    baseTags.push("模拟");
+  } else if (title.includes("期末")) {
+    source = "各区期末";
+    baseTags.push("期末");
+  } else if (title.includes("期中")) {
+    source = "各区期末";
+    baseTags.push("期中");
+  }
+
+  const yearMatch = title.match(/(\d{4})/);
+  if (yearMatch) baseTags.push(yearMatch[1]);
+
+  if (title.includes("北京")) baseTags.push("北京");
+
+  return { source, baseTags };
 }
 
 function extractReferenceAnswers(mdContent) {
@@ -285,7 +319,7 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
       score: totalScore || questions.length * perQuestionScore,
       grade: paper.grade,
       source: paper.source,
-      tags: ["完形填空", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "完形填空"],
       article,
       questions,
     },
@@ -414,7 +448,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
       score: totalScore,
       grade: paper.grade,
       source: paper.source,
-      tags: ["阅读", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "阅读"],
       article: articleText,
       questions,
     },
@@ -524,7 +558,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
       score: totalScore,
       grade: paper.grade,
       source: paper.source,
-      tags: ["七选五", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "七选五"],
       content: "",
       article,
       options,
@@ -607,7 +641,7 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
       score: totalScore || questions.length * perQuestionScore,
       grade: paper.grade,
       source: paper.source,
-      tags: ["语法填空", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "语法填空"],
       article,
       questions,
     },
@@ -687,7 +721,7 @@ function parseWordChoice(lines, startIndex, referenceAnswers, paper) {
       score: totalScore || questions.length * perQuestionScore,
       grade: paper.grade,
       source: paper.source,
-      tags: ["选词填空", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "选词填空"],
       content: wordBank,
       article: "",
       questions,
@@ -854,7 +888,7 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
       score: totalScore,
       grade: paper.grade,
       source: paper.source,
-      tags: ["阅读表达", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "阅读表达"],
       article,
       questions,
     },
@@ -910,7 +944,7 @@ function parseWriting(lines, startIndex, referenceAnswers, paper) {
       score: 20,
       grade: paper.grade,
       source: paper.source,
-      tags: ["作文", "英语", paper.grade, "练习"],
+      tags: [...paper.tags, "作文"],
       article: content,
       questions: [
         {
