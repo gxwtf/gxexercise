@@ -9,9 +9,6 @@ import {
     ItemTitle,
     ItemDescription,
 } from "@/components/ui/item"
-import useSession from "@/lib/use-session"
-import { useRouter } from "next/navigation"
-import { useAlertContext } from "@/components/alert-provider"
 
 interface TestCardProps {
     id: string
@@ -34,20 +31,6 @@ export function TestCard({
     latestSubmissionId,
     submissionCount = 0,
 }: TestCardProps) {
-    const { session } = useSession()
-    const router = useRouter()
-    const { showAlert } = useAlertContext()
-
-    const handleStartPractice = (e: React.MouseEvent) => {
-        e.stopPropagation()
-        if (!session.isLoggedIn) {
-            showAlert({ type: 'destructive', title: '请先登录' })
-            router.push(`/login?back=/test-paper/${id}`)
-            return
-        }
-        window.open(`/test-paper/${id}`, "_blank")
-    }
-
     return (
         <Item
             variant="outline"
@@ -94,7 +77,10 @@ export function TestCard({
                 )}
                 <Button
                     variant="default"
-                    onClick={handleStartPractice}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(`/test-paper/${id}`, "_blank")
+                    }}
                 >
                     开始练习
                 </Button>

@@ -6,6 +6,7 @@ import { MDXRemoteSerializeResult } from "next-mdx-remote"
 import { Button } from "@/components/ui/button"
 import { Clock, ChevronLeft, ChevronRight, Send } from "lucide-react"
 import useSession from "@/lib/use-session"
+import { useAlertContext } from "@/components/alert-provider"
 import { useAnswer } from "@/components/question-group/AnswerContext"
 import { QuestionSection } from "@/components/QuestionSection"
 import Problem from "@/components/question-group/Problem"
@@ -50,6 +51,7 @@ export function TestPaperPractice({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { session } = useSession()
   const router = useRouter()
+  const { showAlert } = useAlertContext()
   const { getAllAnswers } = useAnswer()
 
   const totalGroups = groupsData.length
@@ -90,7 +92,8 @@ export function TestPaperPractice({
 
   const handleSubmit = useCallback(async () => {
     if (!session.userid) {
-      alert("请先登录")
+      showAlert({ type: 'destructive', title: '请先登录' })
+      router.push(`/login?back=/test-paper/${testPaperId}`)
       return
     }
 
@@ -307,7 +310,7 @@ export function TestPaperPractice({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="flex items-center justify-between h-16 px-6">
           <h1 className="flex items-center gap-3 text-xl font-semibold text-foreground truncate">
@@ -360,7 +363,7 @@ export function TestPaperPractice({
         </div>
       </header>
 
-      <div className="pb-20">{renderGroup()}</div>
+      <div className="flex-1 overflow-hidden">{renderGroup()}</div>
     </div>
   )
 }

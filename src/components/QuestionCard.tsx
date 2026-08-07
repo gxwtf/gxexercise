@@ -16,8 +16,6 @@ import { ProgressCircle } from "@/components/ui/progress-circle"
 import { Users, FileText, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import useSession from '@/lib/use-session'
-import { useRouter } from 'next/navigation'
-import { useAlertContext } from '@/components/alert-provider'
 
 interface QuestionCardProps {
   id: string
@@ -49,8 +47,6 @@ export function QuestionCard({
   totalQuestions = 0,
 }: QuestionCardProps) {
   const { session } = useSession()
-  const router = useRouter()
-  const { showAlert } = useAlertContext()
   const [userStats, setUserStats] = useState<{ correctNum: number; totalNum: number } | null>(null)
 
   useEffect(() => {
@@ -114,18 +110,7 @@ export function QuestionCard({
       <CardFooter>
         {/* 按钮区域 */}
         <div className="flex gap-2 w-full">
-          <Link
-            href={`/question/${id}`}
-            className="w-full"
-            target="_blank"
-            onClick={(e) => {
-              if (!session.isLoggedIn) {
-                e.preventDefault()
-                showAlert({ type: 'destructive', title: '请先登录' })
-                router.push(`/login?back=/question/${id}`)
-              }
-            }}
-          >
+          <Link href={`/question/${id}`} className="w-full" target="_blank">
             <Button className="w-full">
               开始练习
             </Button>

@@ -23,8 +23,8 @@ export function ReadingLayout({
   const components = useMDXComponents()
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
-      <div className="flex h-screen">
+    <div className="h-full overflow-hidden bg-background">
+      <div className="flex h-full">
         <div className="flex-1 overflow-y-auto p-6">
           <EnglishReading
             indentParagraphs={indentParagraphs}

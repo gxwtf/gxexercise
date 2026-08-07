@@ -143,8 +143,8 @@ export default function Problem({
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-background font-question">
-      <div className="flex h-screen">
+    <div className="h-full overflow-hidden bg-background font-question">
+      <div className="flex h-full">
         <div className="flex-1 p-6 overflow-y-auto max-w-4xl mx-auto">
           <QuestionSection>
             {body}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Clock, Send } from 'lucide-react';
 import useSession from '@/lib/use-session';
 import { useRouter } from 'next/navigation';
+import { useAlertContext } from '@/components/alert-provider';
 import { useAnswer } from './AnswerContext';
 
 interface QuestionGroupHeaderProps {
@@ -19,6 +20,7 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { session } = useSession();
   const router = useRouter();
+  const { showAlert } = useAlertContext();
   const { getAllAnswers } = useAnswer();
 
   useEffect(() => {
@@ -40,7 +42,8 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
 
   const handleSubmit = useCallback(async () => {
     if (!session.userid) {
-      alert('Please login first');
+      showAlert({ type: 'destructive', title: '请先登录' })
+      router.push(`/login?back=/question/${questionGroupId}`)
       return;
     }
 

@@ -48,8 +48,8 @@ export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiv
   const components = useMDXComponents()
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex h-screen">
+    <div className="h-full overflow-hidden bg-background">
+      <div className="flex h-full">
         {/* 左侧文章区域 */}
         <div className="flex-1 overflow-y-auto p-6">
           <EnglishReading

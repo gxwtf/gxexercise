@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
+import { cookies } from "next/headers"
+import { getIronSession } from "iron-session"
+import { sessionOptions, type SessionData } from "@/lib/iron"
 import { serialize } from 'next-mdx-remote/serialize'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
@@ -14,6 +17,11 @@ interface PageProps {
 
 export default async function TestPaperPage({ params }: PageProps) {
   const { id } = await params
+
+  const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
+  if (!session.isLoggedIn || !session.userid) {
+    redirect(`/login?back=/test-paper/${id}`)
+  }
 
   const testPaper = await prisma.testPaper.findUnique({
     where: { id },

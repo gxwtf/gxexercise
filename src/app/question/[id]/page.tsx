@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
+import { sessionOptions, type SessionData } from "@/lib/iron";
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
@@ -324,10 +327,17 @@ async function QuestionPageContent({ id }: { id: string }) {
 
 export default async function QuestionPage({ params }: PageProps) {
   const { id } = await params;
+
+  const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+  if (!session.isLoggedIn || !session.userid) {
+    redirect(`/login?back=/question/${id}`);
+  }
   
   return (
     <AnswerProvider>
-      <QuestionPageContent id={id} />
+      <div className="h-screen flex flex-col overflow-hidden">
+        <QuestionPageContent id={id} />
+      </div>
     </AnswerProvider>
   );
 }
