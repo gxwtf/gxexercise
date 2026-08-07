@@ -166,11 +166,16 @@ function extractReferenceAnswers(mdContent) {
   const refText = refSectionMatch[1];
   const lines = refText.split("\n");
 
+  let lastAnswerNum = null;
+
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
-    if (/^\*\*/.test(trimmed)) continue;
+    if (/^\*\*/.test(trimmed)) {
+      lastAnswerNum = null;
+      continue;
+    }
 
     const inlineAnswerRegex = /(\d+)\\?\.([A-G])/g;
 
@@ -180,10 +185,12 @@ function extractReferenceAnswers(mdContent) {
         const num = parseInt(m[1]);
         answers[num] = [m[2]];
       }
+      lastAnswerNum = null;
       continue;
     }
 
     const parts = trimmed.split(/\s+(?=\d+\\?\.\s+)/);
+    let foundNewAnswer = false;
     for (const part of parts) {
       const answerMatch = part.match(/^(\d+)\\?\.\s*(.+)$/);
       if (answerMatch) {
@@ -195,7 +202,13 @@ function extractReferenceAnswers(mdContent) {
           answer = [answer];
         }
         answers[num] = answer;
+        lastAnswerNum = num;
+        foundNewAnswer = true;
       }
+    }
+
+    if (!foundNewAnswer && lastAnswerNum !== null && answers[lastAnswerNum]) {
+      answers[lastAnswerNum].push(trimmed);
     }
   }
 
@@ -848,9 +861,9 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
       let answer = "";
       const refAns = referenceAnswers[originalNum];
       if (refAns) {
-        answer = refAns.join("##");
+        answer = refAns.join("\n\n");
       } else if (referenceAnswers[originalNum + 33]) {
-        answer = referenceAnswers[originalNum + 33].join("##");
+        answer = referenceAnswers[originalNum + 33].join("\n\n");
       }
 
       const score = readingExpressionScores[originalNum] || 2;
@@ -871,6 +884,16 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
   if (currentQuestion) {
     questions.push(currentQuestion);
   }
+
+  questions = questions.map((q) => {
+    if (q.id === 47 && /underline it and explain why/i.test(q.content)) {
+      q.content = q.content.replace(
+        /(underline it and explain why\.)/i,
+        "$1 (**_Write the underlined part directly on the first line of the answer section_**)"
+      );
+    }
+    return q;
+  });
 
   questions = renumberQuestions(questions);
   questions = questions.map((q, idx) => ({

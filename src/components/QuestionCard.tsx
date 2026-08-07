@@ -29,6 +29,13 @@ interface QuestionCardProps {
   completedCount?: number
   correctCount?: number
   totalQuestions?: number
+  totalScore?: number
+}
+
+const subjectiveTypes = ["reading-expression", "阅读表达", "en-writing", "chinese-essay", "chinese-micro-writing"];
+
+function isSubjective(questionType: string): boolean {
+  return subjectiveTypes.includes(questionType);
 }
 
 const defaultImageUrl = 'https://neeko-copilot.bytedance.net/api/text2image?prompt=education%20learning%20exam%20question%20abstract%20blue%20gradient&image_size=square'
@@ -45,9 +52,10 @@ export function QuestionCard({
   completedCount = 0,
   correctCount = 0,
   totalQuestions = 0,
+  totalScore = 0,
 }: QuestionCardProps) {
   const { session } = useSession()
-  const [userStats, setUserStats] = useState<{ correctNum: number; totalNum: number } | null>(null)
+  const [userStats, setUserStats] = useState<{ correctNum: number; totalNum: number; score: number | null } | null>(null)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -71,6 +79,13 @@ export function QuestionCard({
 
   const displayCorrectCount = userStats?.correctNum ?? correctCount
   const displayTotalNum = userStats?.totalNum ?? totalQuestions
+  const subjective = isSubjective(questionType)
+  const displayScore = subjective
+    ? (userStats?.score ?? 0)
+    : displayCorrectCount
+  const displayTotal = subjective
+    ? totalScore
+    : displayTotalNum
 
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
@@ -87,8 +102,8 @@ export function QuestionCard({
       <CardHeader>
         <CardAction>
           <ProgressCircle
-            correct={displayCorrectCount}
-            total={displayTotalNum}
+            correct={displayScore}
+            total={displayTotal}
           />
         </CardAction>
         <CardTitle className="line-clamp-1">

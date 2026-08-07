@@ -41,6 +41,7 @@ interface ReviewContentData {
     userScore: number | null
     questionScore: number
     avgScore: number | null
+    aiFeedback: string | null
 }
 
 interface ReviewContentProps {
@@ -85,6 +86,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         userScore,
         questionScore,
         avgScore,
+        aiFeedback,
     } = data
 
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
@@ -200,6 +202,12 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             <MDXRemote {...userAnswerMdx} components={components} />
                                         </div>
                                     </QuestionSection>
+                                    {aiFeedback && (
+                                        <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                                            <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">失分原因</p>
+                                            <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{aiFeedback}</p>
+                                        </div>
+                                    )}
                                 </TabsContent>
                             )}
                                 <TabsContent value="reference-answer">

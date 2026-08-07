@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
+import { gradeReadingExpression } from "@/lib/ai-service"
 
 function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
   const combined = `${questionType} ${groupType}`
@@ -176,6 +178,81 @@ export async function POST(request: Request) {
         score: totalScore,
       },
     })
+
+    const readingExpressionGroupIds = groupSubmissionsCreated
+      .filter(Boolean)
+      .map((g) => g!.id);
+
+    if (readingExpressionGroupIds.length > 0) {
+      const reSubmissions = await prisma.questionSubmission.findMany({
+        where: {
+          groupSubmissionId: { in: readingExpressionGroupIds },
+        },
+        include: {
+          question: { select: { content: true, answer: true, score: true } },
+          groupSubmission: {
+            select: {
+              questionGroupId: true,
+            },
+          },
+        },
+      });
+
+      const reGroupIds = [...new Set(reSubmissions.map((s) => s.groupSubmission?.questionGroupId).filter(Boolean))];
+      const reGroups = reGroupIds.length > 0
+        ? await prisma.questionGroup.findMany({
+            where: { id: { in: reGroupIds as string[] } },
+            include: { groupItems: { orderBy: { orderIndex: "asc" } } },
+          })
+        : [];
+
+      const reGroupMap = new Map(reGroups.map((g) => [g.id, g]));
+      const reGraded = reSubmissions.filter((sub) => {
+        const groupId = sub.groupSubmission?.questionGroupId;
+        const group = groupId ? reGroupMap.get(groupId) : undefined;
+        if (!group) return false;
+        const isRE = group.questionType === "reading-expression" || group.questionType === "阅读表达";
+        if (!isRE) return false;
+        const firstThreeIds = new Set(group.groupItems.slice(0, 3).map((item) => item.questionId));
+        return firstThreeIds.has(sub.questionId);
+      });
+
+      if (reGraded.length > 0) {
+        Promise.all(
+          reGraded.map(async (sub) => {
+            try {
+              const content = sub.content as { answer?: string } | null;
+              const userAnswer = content?.answer ?? "";
+              if (!userAnswer.trim()) {
+                await prisma.questionSubmission.update({
+                  where: { id: sub.id },
+                  data: { score: 0, isCorrect: false, aiFeedback: { feedback: "未作答" } },
+                });
+                return;
+              }
+              const result = await gradeReadingExpression(
+                sub.question.content,
+                userAnswer,
+                sub.question.answer,
+                sub.question.score,
+              );
+              await prisma.questionSubmission.update({
+                where: { id: sub.id },
+                data: {
+                  score: result.score,
+                  isCorrect: result.score === sub.question.score,
+                  aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
+                },
+              });
+            } catch (error) {
+              console.error(`AI grading failed for submission ${sub.id}:`, error);
+            }
+          })
+        ).catch((error) => {
+          console.error("AI grading batch failed:", error);
+        });
+      }
+    }
 
     return NextResponse.json({
       success: true,

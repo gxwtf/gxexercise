@@ -382,6 +382,7 @@ export function QuestionOverview({
                         questionType={group.questionType}
                         source={group.source}
                         tags={group.tags}
+                        totalScore={group.score}
                         completedCount={submissionCounts.groups[group.id] || 0}
                       />
                     </div>

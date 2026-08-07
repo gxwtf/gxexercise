@@ -25,18 +25,20 @@ export async function GET(request: Request) {
         questionGroupId: true,
         correctNum: true,
         totalNum: true,
+        score: true,
         createdAt: true
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    const stats: Record<string, { correctNum: number; totalNum: number; lastAttempt: Date }> = {};
+    const stats: Record<string, { correctNum: number; totalNum: number; score: number | null; lastAttempt: Date }> = {};
     
     for (const sub of submissions) {
       if (!stats[sub.questionGroupId]) {
         stats[sub.questionGroupId] = {
           correctNum: sub.correctNum || 0,
           totalNum: sub.totalNum || 0,
+          score: sub.score,
           lastAttempt: sub.createdAt
         };
       }

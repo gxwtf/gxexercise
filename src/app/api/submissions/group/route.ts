@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { gradeReadingExpression } from "@/lib/ai-service"
 
 function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
   const combined = `${questionType} ${groupType}`
@@ -139,6 +140,64 @@ export async function POST(request: Request) {
           groupSubmissionId: groupSubmission.id
         }))
       });
+    }
+
+    const isReadingExpression = questionGroup.questionType === "reading-expression" || questionGroup.questionType === "阅读表达";
+    if (isReadingExpression) {
+      const readingExpressionSubmissions = await prisma.questionSubmission.findMany({
+        where: { groupSubmissionId: groupSubmission.id },
+        include: {
+          question: {
+            select: { content: true, answer: true, score: true },
+          },
+        },
+      });
+
+      const itemsSorted = questionGroup.groupItems.sort((a, b) => a.orderIndex - b.orderIndex);
+      const firstThreeQuestionIds = new Set(itemsSorted.slice(0, 3).map((item) => item.question.id));
+
+      const toGrade = readingExpressionSubmissions.filter((sub) =>
+        firstThreeQuestionIds.has(sub.questionId)
+      );
+
+      if (toGrade.length > 0) {
+        Promise.all(
+          toGrade.map(async (sub) => {
+            try {
+              const content = sub.content as { answer?: string } | null;
+              const userAnswer = content?.answer ?? "";
+
+              if (!userAnswer.trim()) {
+                await prisma.questionSubmission.update({
+                  where: { id: sub.id },
+                  data: { score: 0, isCorrect: false, aiFeedback: { feedback: "未作答" } },
+                });
+                return;
+              }
+
+              const result = await gradeReadingExpression(
+                sub.question.content,
+                userAnswer,
+                sub.question.answer,
+                sub.question.score,
+              );
+
+              await prisma.questionSubmission.update({
+                where: { id: sub.id },
+                data: {
+                  score: result.score,
+                  isCorrect: result.score === sub.question.score,
+                  aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
+                },
+              });
+            } catch (error) {
+              console.error(`AI grading failed for submission ${sub.id}:`, error);
+            }
+          })
+        ).catch((error) => {
+          console.error("AI grading batch failed:", error);
+        });
+      }
     }
 
     return NextResponse.json({

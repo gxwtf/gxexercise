@@ -114,6 +114,7 @@ model QuestionSubmission {
   content         Json?
   score           Float?    @db.Real
   isCorrect       Boolean?
+  aiFeedback      Json?
   createdAt       DateTime  @default(now())
 
   user            User      @relation(fields: [userId], references: [id])

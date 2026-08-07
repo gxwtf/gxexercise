@@ -230,6 +230,7 @@ async function buildReviewData(
 
   const userScore = selectedSubmission?.score ?? null
   const questionScore = currentQuestion.score ?? 0
+  const aiFeedback = (selectedSubmission?.aiFeedback as { feedback?: string } | null)?.feedback ?? null
 
   return {
     questionGroup: {
@@ -258,6 +259,7 @@ async function buildReviewData(
     userScore,
     questionScore,
     avgScore,
+    aiFeedback,
   }
 }
 
