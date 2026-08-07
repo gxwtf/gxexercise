@@ -66,8 +66,10 @@ export async function POST(request: Request) {
         if (!questionGroup) return null
 
         let groupCorrectNum = 0
-        let groupTotalNum = 0
+        let groupTotalNum = questionGroup.groupItems.length
         let groupScore = 0
+
+        const submittedIds = new Set(groupSub.questionSubmissions.map((s) => s.questionId))
 
         const processedSubmissions = await Promise.all(
           groupSub.questionSubmissions.map(async (sub) => {
@@ -83,11 +85,28 @@ export async function POST(request: Request) {
             const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType)
 
             if (isSubjective) {
+              if (!userAnswer.trim()) {
+                return {
+                  questionId: sub.questionId,
+                  content: { answer: "" },
+                  score: 0,
+                  isCorrect: false,
+                }
+              }
               return {
                 questionId: sub.questionId,
                 content: { answer: userAnswer },
                 score: null,
                 isCorrect: null,
+              }
+            }
+
+            if (!userAnswer.trim()) {
+              return {
+                questionId: sub.questionId,
+                content: { answer: "" },
+                score: 0,
+                isCorrect: false,
               }
             }
 
@@ -99,7 +118,6 @@ export async function POST(request: Request) {
             if (isCorrect) {
               groupCorrectNum++
             }
-            groupTotalNum++
             groupScore += score
 
             return {
@@ -111,7 +129,16 @@ export async function POST(request: Request) {
           })
         )
 
-        const validSubmissions = processedSubmissions.filter(Boolean) as NonNullable<typeof processedSubmissions[0]>[]
+        const unansweredSubmissions = questionGroup.groupItems
+          .filter((item) => !submittedIds.has(item.question.id))
+          .map((item) => ({
+            questionId: item.question.id,
+            content: { answer: "" },
+            score: 0,
+            isCorrect: false,
+          }))
+
+        const validSubmissions = [...processedSubmissions.filter(Boolean), ...unansweredSubmissions] as NonNullable<typeof processedSubmissions[0]>[]
 
         const groupSubmission = await prisma.questionGroupSubmission.create({
           data: {

@@ -60,8 +60,7 @@
           ],
           "answer": "a",
           "analysis": "第1题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 2,
@@ -86,8 +85,7 @@
           ],
           "answer": "c",
           "analysis": "第2题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 3,
@@ -112,8 +110,7 @@
           ],
           "answer": "b",
           "analysis": "第3题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 4,
@@ -138,8 +135,7 @@
           ],
           "answer": "b",
           "analysis": "第4题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 5,
@@ -164,8 +160,7 @@
           ],
           "answer": "d",
           "analysis": "第5题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 6,
@@ -190,8 +185,7 @@
           ],
           "answer": "c",
           "analysis": "第6题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 7,
@@ -216,8 +210,7 @@
           ],
           "answer": "a",
           "analysis": "第7题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 8,
@@ -242,8 +235,7 @@
           ],
           "answer": "d",
           "analysis": "第8题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 9,
@@ -268,8 +260,7 @@
           ],
           "answer": "a",
           "analysis": "第9题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 10,
@@ -294,8 +285,7 @@
           ],
           "answer": "c",
           "analysis": "第10题解析: 根据上下文语境选择最合适的词汇。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         }
       ]
     },
@@ -342,8 +332,7 @@
           ],
           "answer": "a",
           "analysis": "第11题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -369,8 +358,7 @@
           ],
           "answer": "b",
           "analysis": "第12题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -396,8 +384,7 @@
           ],
           "answer": "c",
           "analysis": "第13题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         }
       ]
     },
@@ -444,8 +431,7 @@
           ],
           "answer": "d",
           "analysis": "第14题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -471,8 +457,7 @@
           ],
           "answer": "d",
           "analysis": "第15题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -498,8 +483,7 @@
           ],
           "answer": "b",
           "analysis": "第16题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 4,
@@ -525,8 +509,7 @@
           ],
           "answer": "b",
           "analysis": "第17题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         }
       ]
     },
@@ -573,8 +556,7 @@
           ],
           "answer": "c",
           "analysis": "第18题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -600,8 +582,7 @@
           ],
           "answer": "b",
           "analysis": "第19题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -627,8 +608,7 @@
           ],
           "answer": "a",
           "analysis": "第20题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 4,
@@ -654,8 +634,7 @@
           ],
           "answer": "b",
           "analysis": "第21题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         }
       ]
     },
@@ -702,8 +681,7 @@
           ],
           "answer": "c",
           "analysis": "第22题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -729,8 +707,7 @@
           ],
           "answer": "d",
           "analysis": "第23题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -756,8 +733,7 @@
           ],
           "answer": "c",
           "analysis": "第24题解析: 根据文章内容选择正确答案。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         }
       ]
     },
@@ -847,8 +823,7 @@
           "blankIndex": 0,
           "answer": "E",
           "analysis": "第25题解析: 根据上下文逻辑选择最佳选项。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -886,8 +861,7 @@
           "blankIndex": 1,
           "answer": "B",
           "analysis": "第26题解析: 根据上下文逻辑选择最佳选项。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -925,8 +899,7 @@
           "blankIndex": 2,
           "answer": "G",
           "analysis": "第27题解析: 根据上下文逻辑选择最佳选项。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 4,
@@ -964,8 +937,7 @@
           "blankIndex": 3,
           "answer": "C",
           "analysis": "第28题解析: 根据上下文逻辑选择最佳选项。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 5,
@@ -1003,8 +975,7 @@
           "blankIndex": 4,
           "answer": "D",
           "analysis": "第29题解析: 根据上下文逻辑选择最佳选项。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         }
       ]
     },
@@ -1034,8 +1005,7 @@
           "content": "The <Input2></Input2> performance of the athlete left everyone amazed.",
           "answer": "impressive",
           "analysis": "第30题解析: 根据句意和单词的适当形式填空。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -1043,8 +1013,7 @@
           "content": "He is a bright student, but he just lacks the <Input2></Input2> to learn new things.",
           "answer": "motivation",
           "analysis": "第31题解析: 根据句意和单词的适当形式填空。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -1052,8 +1021,7 @@
           "content": "Many patients are not getting the medical <Input2></Input2> they need.",
           "answer": "treatment##treatments",
           "analysis": "第32题解析: 根据句意和单词的适当形式填空。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 4,
@@ -1061,8 +1029,7 @@
           "content": "Cycling is highly <Input2></Input2> to health and the environment.",
           "answer": "beneficial",
           "analysis": "第33题解析: 根据句意和单词的适当形式填空。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 5,
@@ -1070,8 +1037,7 @@
           "content": "Programming requires <Input2></Input2> thinking to gradually break big problems into smaller steps.",
           "answer": "logical",
           "analysis": "第34题解析: 根据句意和单词的适当形式填空。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         }
       ]
     },
@@ -1099,80 +1065,70 @@
           "questionType": "input",
           "answer": "celebrated",
           "analysis": "第35题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 2,
           "questionType": "input",
           "answer": "to spread",
           "analysis": "第36题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 3,
           "questionType": "input",
           "answer": "families",
           "analysis": "第37题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 4,
           "questionType": "input",
           "answer": "having",
           "analysis": "第38题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 5,
           "questionType": "input",
           "answer": "fewer",
           "analysis": "第39题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 6,
           "questionType": "input",
           "answer": "has visited",
           "analysis": "第40题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 7,
           "questionType": "input",
           "answer": "in",
           "analysis": "第41题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 8,
           "questionType": "input",
           "answer": "which##that",
           "analysis": "第42题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 9,
           "questionType": "input",
           "answer": "was developed",
           "analysis": "第43题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         },
         {
           "id": 10,
           "questionType": "input",
           "answer": "whether",
           "analysis": "第44题解析: 根据上下文和语法规则填写正确答案。",
-          "score": 1.5,
-          "correctRate": 0.7
+          "score": 1.5
         }
       ]
     },
@@ -1201,8 +1157,7 @@
           "content": "What is delayed gratification?",
           "answer": "Delayed gratification refers to the ability to wait for a long-term reward.",
           "analysis": "第45题解析: 根据文章内容回答问题。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 2,
@@ -1210,8 +1165,7 @@
           "content": "What is the difference between delayed gratification and instant gratification?",
           "answer": "Delayed gratification requires self-discipline and the ability to manage impulses, while instant gratification often involves giving in to immediate desires.",
           "analysis": "第46题解析: 根据文章内容回答问题。",
-          "score": 2,
-          "correctRate": 0.7
+          "score": 2
         },
         {
           "id": 3,
@@ -1219,8 +1173,7 @@
           "content": "Please decide which part is false in the following statement, then underline it and explain why.\n\n**_Delayed gratification is merely related to one's environment, and it can contribute to one's long-term development._**",
           "answer": "**_Delayed gratification is merely related to one's environment, and it can contribute to one's long- term development._**",
           "analysis": "第47题解析: 根据文章内容回答问题。",
-          "score": 3,
-          "correctRate": 0.7
+          "score": 3
         },
         {
           "id": 4,
@@ -1228,8 +1181,7 @@
           "content": "Please use an example to show how you would practice delayed gratification in your daily life. (**_In about 40 words_**)",
           "answer": "I have been longing for a new gaming console. Instead of buying it immediately, I save a fixed amount weekly to get it in a few months.",
           "analysis": "第48题解析: 根据文章内容回答问题。",
-          "score": 5,
-          "correctRate": 0.7
+          "score": 5
         }
       ]
     },
@@ -1258,8 +1210,7 @@
           "content": "假设你是红星中学高二学生李华。你的外国好友Jim要给校报\"AI and Teen Life\"专栏投稿，他想重点介绍北京中学生的\"智慧生活\"，发来邮件询问你的建议。请你用英文给他回复，内容包括：\n\n1. 建议内容；\n\n2. 说明理由。\n\n注意：1.词数100左右；\n\n2. 开头和结尾已给出，不计入总词数。",
           "answer": "",
           "analysis": "写作题评分标准：内容要点完整，语言表达准确流畅，结构清晰，词数符合要求。",
-          "score": 20,
-          "correctRate": 0.7
+          "score": 20
         }
       ]
     }

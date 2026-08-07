@@ -135,11 +135,10 @@ async function importExam(jsonPath: string) {
         data: {
           content: questionContent,
           questionType: q.questionType,
-          options: q.options || [],
+          options: (q.options || []) as any,
           answer: q.answer || "",
           analysis: q.analysis || "",
           score: q.score,
-          correctRate: q.correctRate || 0.7,
           subject: paper.subject,
           source: section.source || paper.source,
           category: section.category,

@@ -96,6 +96,29 @@ export function QuestionOverview({
   const router = useRouter()
   const { session } = useSession()
   const [testSubmissions, setTestSubmissions] = useState<Record<string, string>>({})
+  const [submissionCounts, setSubmissionCounts] = useState<{ groups: Record<string, number>; testPapers: Record<string, number> }>({ groups: {}, testPapers: {} })
+
+  useEffect(() => {
+    const groupIds = initialGroups.map((g) => g.id).join(",")
+    const testPaperIds = initialTestPapers.map((p) => p.id).join(",")
+    if (!groupIds && !testPaperIds) return
+
+    const params = new URLSearchParams()
+    if (groupIds) params.set("groupIds", groupIds)
+    if (testPaperIds) params.set("testPaperIds", testPaperIds)
+
+    fetch(`/api/stats/submission-counts?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setSubmissionCounts({
+            groups: data.data.groups || {},
+            testPapers: data.data.testPapers || {},
+          })
+        }
+      })
+      .catch(() => {})
+  }, [initialGroups, initialTestPapers])
 
   useEffect(() => {
     if (!session.userid || !initialTestPapers?.length) return
@@ -324,6 +347,7 @@ export function QuestionOverview({
                       grade={paper.grade || null}
                       subject={paper.subject}
                       latestSubmissionId={testSubmissions[paper.id]}
+                      submissionCount={submissionCounts.testPapers[paper.id] || 0}
                     />
                   ))}
                 </div>
@@ -358,6 +382,7 @@ export function QuestionOverview({
                         questionType={group.questionType}
                         source={group.source}
                         tags={group.tags}
+                        completedCount={submissionCounts.groups[group.id] || 0}
                       />
                     </div>
                   ))}

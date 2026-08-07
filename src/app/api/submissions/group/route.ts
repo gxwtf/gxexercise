@@ -41,6 +41,8 @@ export async function POST(request: Request) {
     let correctNum = 0;
     const totalNum = questionGroup.groupItems.length;
 
+    const submittedIds = new Set(questionSubmissions.map((s: any) => s.questionId));
+
     const processedSubmissions = await Promise.all(
       questionSubmissions.map(async (sub: any) => {
         const question = questionGroup.groupItems.find(
@@ -57,12 +59,31 @@ export async function POST(request: Request) {
         const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType);
 
         if (isSubjective) {
+          if (!userAnswer.trim()) {
+            return {
+              userId,
+              questionId: sub.questionId,
+              content: { answer: "" },
+              score: 0,
+              isCorrect: false,
+            };
+          }
           return {
             userId,
             questionId: sub.questionId,
             content: { answer: userAnswer },
             score: null,
             isCorrect: null
+          };
+        }
+
+        if (!userAnswer.trim()) {
+          return {
+            userId,
+            questionId: sub.questionId,
+            content: { answer: "" },
+            score: 0,
+            isCorrect: false,
           };
         }
 
@@ -86,7 +107,17 @@ export async function POST(request: Request) {
       })
     );
 
-    const validSubmissions = processedSubmissions.filter((s) => s !== null);
+    const unansweredSubmissions = questionGroup.groupItems
+      .filter((item) => !submittedIds.has(item.question.id))
+      .map((item) => ({
+        userId,
+        questionId: item.question.id,
+        content: { answer: "" },
+        score: 0,
+        isCorrect: false,
+      }));
+
+    const validSubmissions = [...processedSubmissions.filter((s) => s !== null), ...unansweredSubmissions];
     const isAllCorrect = correctNum === totalNum && totalNum > 0;
 
     const groupSubmission = await prisma.questionGroupSubmission.create({

@@ -300,7 +300,7 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
         answer,
         analysis: `第${originalNum}题解析: 根据上下文语境选择最合适的词汇。`,
         score: perQuestionScore,
-        correctRate: 0.7,
+        
       });
     }
   }
@@ -431,7 +431,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
         answer,
         analysis: `第${originalNum}题解析: 根据文章内容选择正确答案。`,
         score: 2,
-        correctRate: 0.7,
+        
       });
     }
   }
@@ -543,7 +543,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
       answer,
       analysis: `第${originalNum}题解析: 根据上下文逻辑选择最佳选项。`,
       score: perQuestionScore,
-      correctRate: 0.7,
+      
     });
   }
 
@@ -628,7 +628,7 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
       answer,
       analysis: `第${originalNum}题解析: 根据上下文和语法规则填写正确答案。`,
       score: perQuestionScore,
-      correctRate: 0.7,
+      
     });
   }
 
@@ -708,7 +708,7 @@ function parseWordChoice(lines, startIndex, referenceAnswers, paper) {
       answer,
       analysis: `第${originalNum}题解析: 根据句意和单词的适当形式填空。`,
       score: perQuestionScore,
-      correctRate: 0.7,
+      
     });
   }
 
@@ -862,7 +862,7 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
         answer,
         analysis: `第${originalNum}题解析: 根据文章内容回答问题。`,
         score,
-        correctRate: 0.7,
+        
       };
     } else if (currentQuestion && !/^\\_/.test(trimmed) && !/^答案/.test(trimmed)) {
       currentQuestion.content += "\n\n" + trimmed;
@@ -954,7 +954,7 @@ function parseWriting(lines, startIndex, referenceAnswers, paper) {
           answer,
           analysis: "写作题评分标准：内容要点完整，语言表达准确流畅，结构清晰，词数符合要求。",
           score: 20,
-          correctRate: 0.7,
+          
         },
       ],
     },

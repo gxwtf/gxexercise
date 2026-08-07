@@ -210,16 +210,22 @@ async function buildReviewData(
   const isSubjective = isSubjectiveQuestion(currentQuestion.questionType, questionGroup.questionType)
 
   let avgScore: number | null = null
+  let correctRate: number | null = null
   const allSubmissionsWithScore = await prisma.questionSubmission.findMany({
     where: {
       questionId: currentQuestion.id,
       score: { not: null },
     },
-    select: { score: true },
+    select: { score: true, isCorrect: true },
   })
   if (allSubmissionsWithScore.length > 0) {
     const total = allSubmissionsWithScore.reduce((sum, s) => sum + (s.score ?? 0), 0)
     avgScore = total / allSubmissionsWithScore.length
+    const judgedSubmissions = allSubmissionsWithScore.filter(s => s.isCorrect !== null)
+    if (judgedSubmissions.length > 0) {
+      const correctCount = judgedSubmissions.filter(s => s.isCorrect === true).length
+      correctRate = correctCount / judgedSubmissions.length
+    }
   }
 
   const userScore = selectedSubmission?.score ?? null
@@ -244,7 +250,7 @@ async function buildReviewData(
     isCorrect,
     currentIndex: questionIndex,
     historyItems,
-    correctRate: currentQuestion.correctRate,
+    correctRate,
     allUserBlanks,
     allCorrectBlanks,
     currentSubmissionId: selectedSubmission?.id ?? null,
@@ -265,11 +271,7 @@ export default async function ReviewQuestionPage({ params }: PageProps) {
 
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
 
-  if (!session.isLoggedIn || !session.userid) {
-    redirect("/login")
-  }
-
-  const userId = session.userid
+  const userId = session.userid || 0
 
   // 检测 id 是 questionGroupId 还是 questionSubmissionId
   // 先尝试作为 questionSubmissionId 查找
