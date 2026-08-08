@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { gradeReadingExpression, preCheckGrade } from "@/lib/ai-service";
+import { gradeWithConfig, preCheckGrade } from "@/lib/ai-service";
+import { getGradingPrompt } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
 
 export async function POST() {
@@ -14,6 +15,19 @@ export async function POST() {
             score: true,
           },
         },
+        groupSubmission: {
+          select: {
+            questionGroup: {
+              select: {
+                questionType: true,
+                groupItems: {
+                  select: { questionId: true },
+                  orderBy: { orderIndex: "asc" },
+                },
+              },
+            },
+          },
+        },
       },
       take: 50,
     });
@@ -26,14 +40,20 @@ export async function POST() {
     let failedCount = 0;
     const affectedGroupIds = new Set<string>();
 
-    const results = await Promise.all(
+    await Promise.all(
       pendingSubmissions.map(async (sub) => {
         try {
+          const groupItems = sub.groupSubmission?.questionGroup?.groupItems ?? [];
+          const idx = groupItems.findIndex((item) => item.questionId === sub.questionId);
+          const questionType = sub.groupSubmission?.questionGroup?.questionType ?? "";
+          const config = getGradingPrompt(questionType, idx);
+          if (!config) return;
+
           const content = sub.content as { answer?: string } | null;
           const userAnswer = content?.answer ?? "";
           const maxScore = sub.question.score;
 
-          const pre = preCheckGrade(userAnswer, sub.question.answer, maxScore, false);
+          const pre = preCheckGrade(userAnswer, sub.question.answer, maxScore, config.enableExactMatch ?? false);
           if (pre) {
             await prisma.questionSubmission.update({
               where: { id: sub.id },
@@ -49,7 +69,8 @@ export async function POST() {
             return;
           }
 
-          const result = await gradeReadingExpression(
+          const result = await gradeWithConfig(
+            config,
             sub.question.content,
             userAnswer,
             sub.question.answer,

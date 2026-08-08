@@ -1,44 +1,18 @@
 import OpenAI from "openai";
+import type { GradingPromptConfig } from "./grading-prompts";
 
 const openai = new OpenAI({
-  apiKey: process.env.POIXE_API_KEY!,
-  baseURL: "https://api.poixe.com/v1",
+  apiKey: process.env.SILICONFLOW_API_API_KEY!,
+  // apiKey: process.env.POIXE_API_KEY!,
+  baseURL: "https://api.siliconflow.cn",
+  // baseURL: "https://api.poixe.com",
 });
 
-const MODEL = "doubao-1-5-lite-32k-250115:free";
+const MODEL = "deepseek-ai/DeepSeek-V4-Flash";
 
-interface GradeResult {
+export interface GradeResult {
   score: number;
   feedback?: string;
-}
-
-const SYSTEM_PROMPT = `你是一名英语阅卷老师。你必须只输出一个 JSON 对象，不要输出任何其他内容。
-
-回复格式（严格遵循）：
-{"score":<数字>,"feedback":"<中文原因，满分则空字符串>"}
-
-示例：
-{"score":2,"feedback":"拼写错误扣0.5分，缺少关键信息扣1分"}
-{"score":3,"feedback":""}`;
-
-function buildPrompt(stem: string, userAnswer: string, correctAnswer: string, maxScore: number): string {
-  return `根据以下信息评阅学生的作答，只输出 JSON：
-
-【题目】${stem}
-
-【参考答案】${correctAnswer}
-
-【学生作答】${userAnswer}
-
-【分值】${maxScore}分
-
-评分规则：
-- 回答完全错误或不相关：0分
-- 缺少关键信息：扣1分（每缺少一处）
-- 存在语法错误：扣0.5分（每处）
-- 扣分到0为止，不得为负
-
-立即输出 JSON，不要输出任何其他内容。`
 }
 
 function parseResponse(text: string, maxScore: number): GradeResult {
@@ -84,12 +58,13 @@ function clampScore(score: unknown, maxScore: number): number {
   return 0;
 }
 
-async function callModel(prompt: string, maxScore: number): Promise<GradeResult> {
+async function callModel(systemPrompt: string, userPrompt: string, maxScore: number): Promise<GradeResult> {
+  // console.log("[AI Prompt]", JSON.stringify({ system: systemPrompt, user: userPrompt }, null, 2))
   const completion = await openai.chat.completions.create({
     model: MODEL,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: prompt },
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
     ],
     temperature: 0,
     max_tokens: 200,
@@ -100,19 +75,38 @@ async function callModel(prompt: string, maxScore: number): Promise<GradeResult>
   return parseResponse(text, maxScore);
 }
 
+function buildPrompt(template: string, stem: string, userAnswer: string, correctAnswer: string, maxScore: number): string {
+  return template
+    .replace(/\{stem\}/g, stem)
+    .replace(/\{userAnswer\}/g, userAnswer)
+    .replace(/\{correctAnswer\}/g, correctAnswer)
+    .replace(/\{maxScore\}/g, String(maxScore));
+}
+
 export function preCheckGrade(
   userAnswer: string,
   correctAnswer: string,
   maxScore: number,
-  skipAI: boolean,
+  enableExactMatch: boolean,
 ): GradeResult | null {
   if (!userAnswer.trim()) {
     return { score: 0, feedback: "未作答" };
   }
-  if (skipAI && userAnswer.trim() === correctAnswer.trim()) {
+  if (enableExactMatch && userAnswer.trim() === correctAnswer.trim()) {
     return { score: maxScore, feedback: "" };
   }
   return null;
+}
+
+export async function gradeWithConfig(
+  config: GradingPromptConfig,
+  stem: string,
+  userAnswer: string,
+  correctAnswer: string,
+  maxScore: number,
+): Promise<GradeResult> {
+  const prompt = buildPrompt(config.promptTemplate, stem, userAnswer, correctAnswer, maxScore);
+  return await callModel(config.systemPrompt, prompt, maxScore);
 }
 
 export async function gradeReadingExpression(
@@ -121,6 +115,8 @@ export async function gradeReadingExpression(
   correctAnswer: string,
   maxScore: number,
 ): Promise<GradeResult> {
-  const prompt = buildPrompt(stem, userAnswer, correctAnswer, maxScore);
-  return await callModel(prompt, maxScore);
+  const { getGradingPrompt } = await import("./grading-prompts");
+  const config = getGradingPrompt("reading-expression", 0)!;
+  const prompt = buildPrompt(config.promptTemplate, stem, userAnswer, correctAnswer, maxScore);
+  return await callModel(config.systemPrompt, prompt, maxScore);
 }

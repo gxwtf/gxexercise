@@ -1,0 +1,17 @@
+{
+  "questionType": "reading-expression",
+  "configs": [
+    {
+      "questionIndices": [0, 1],
+      "enableExactMatch": true,
+      "systemPrompt": "你是一名英语阅卷老师。你必须只输出一个 JSON 对象，不要输出任何其他内容。\n\n回复格式（严格遵循）：\n{\"score\":<数字>,\"feedback\":\"<中文原因，满分则空字符串>\"}",
+      "promptFile": "prompt-q1q2.md"
+    },
+    {
+      "questionIndices": [2],
+      "enableExactMatch": false,
+      "systemPrompt": "你是一名英语阅卷老师。你必须只输出一个 JSON 对象，不要输出任何其他内容。\n\n回复格式（严格遵循）：\n{\"score\":<数字>,\"feedback\":\"<中文原因，满分则空字符串>\"}",
+      "promptFile": "prompt-q3.md"
+    }
+  ]
+}

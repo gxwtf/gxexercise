@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-import { gradeReadingExpression, preCheckGrade } from "@/lib/ai-service"
+
 
 function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
   const combined = `${questionType} ${groupType}`
@@ -87,6 +87,7 @@ export async function POST(request: Request) {
             content: { answer: "" },
             score: 0,
             isCorrect: false,
+            gradingStatus: "graded",
           };
         }
 
@@ -118,6 +119,7 @@ export async function POST(request: Request) {
         content: { answer: "" },
         score: 0,
         isCorrect: false,
+        gradingStatus: "graded",
       }));
 
     const validSubmissions = [...processedSubmissions.filter((s) => s !== null), ...unansweredSubmissions];
@@ -142,83 +144,6 @@ export async function POST(request: Request) {
           groupSubmissionId: groupSubmission.id
         }))
       });
-    }
-
-    const isReadingExpression = questionGroup.questionType === "reading-expression" || questionGroup.questionType === "阅读表达";
-    if (isReadingExpression) {
-      const readingExpressionSubmissions = await prisma.questionSubmission.findMany({
-        where: { groupSubmissionId: groupSubmission.id },
-        include: {
-          question: {
-            select: { content: true, answer: true, score: true },
-          },
-        },
-      });
-
-      const itemsSorted = questionGroup.groupItems.sort((a, b) => a.orderIndex - b.orderIndex);
-      const firstThreeQuestionIds = new Set(itemsSorted.slice(0, 3).map((item) => item.question.id));
-      const firstTwoQuestionIds = new Set(itemsSorted.slice(0, 2).map((item) => item.question.id));
-
-      const toGrade = readingExpressionSubmissions.filter((sub) =>
-        firstThreeQuestionIds.has(sub.questionId)
-      );
-
-      if (toGrade.length > 0) {
-        await Promise.all(
-          toGrade.map(async (sub) => {
-            try {
-              const content = sub.content as { answer?: string } | null;
-              const userAnswer = content?.answer ?? "";
-              const maxScore = sub.question.score;
-
-              const pre = preCheckGrade(userAnswer, sub.question.answer, maxScore, firstTwoQuestionIds.has(sub.questionId));
-              if (pre) {
-                await prisma.questionSubmission.update({
-                  where: { id: sub.id },
-                  data: {
-                    score: pre.score,
-                    isCorrect: pre.score === maxScore,
-                    gradingStatus: "graded",
-                    aiFeedback: pre.feedback ? { feedback: pre.feedback } : undefined,
-                  },
-                });
-                return;
-              }
-
-              const result = await gradeReadingExpression(
-                sub.question.content,
-                userAnswer,
-                sub.question.answer,
-                maxScore,
-              );
-
-              await prisma.questionSubmission.update({
-                where: { id: sub.id },
-                data: {
-                  score: result.score,
-                  isCorrect: result.score === maxScore,
-                  gradingStatus: "graded",
-                  aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
-                },
-              });
-            } catch (error) {
-              console.error(`AI grading failed for submission ${sub.id}:`, error);
-            }
-          })
-        );
-
-        const allSubs = await prisma.questionSubmission.findMany({
-          where: { groupSubmissionId: groupSubmission.id },
-          select: { score: true, isCorrect: true, gradingStatus: true },
-        });
-        const newTotalScore = allSubs.reduce((sum, s) => sum + (s.score ?? 0), 0);
-        const gradedSubs = allSubs.filter(s => s.gradingStatus === "graded");
-        const newCorrectNum = gradedSubs.filter(s => s.isCorrect).length;
-        await prisma.questionGroupSubmission.update({
-          where: { id: groupSubmission.id },
-          data: { score: newTotalScore, correctNum: newCorrectNum },
-        });
-      }
     }
 
     return NextResponse.json({

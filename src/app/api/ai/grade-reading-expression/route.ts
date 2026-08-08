@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { gradeReadingExpression, preCheckGrade } from "@/lib/ai-service";
+import { gradeWithConfig, preCheckGrade } from "@/lib/ai-service";
+import { getGradingPrompt } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -23,6 +24,19 @@ export async function POST(request: Request) {
             score: true,
           },
         },
+        groupSubmission: {
+          select: {
+            questionGroup: {
+              select: {
+                questionType: true,
+                groupItems: {
+                  select: { questionId: true },
+                  orderBy: { orderIndex: "asc" },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -34,7 +48,15 @@ export async function POST(request: Request) {
           const correctAnswer = sub.question.answer;
           const maxScore = sub.question.score;
 
-          const pre = preCheckGrade(userAnswer, correctAnswer, maxScore, false);
+          const groupItems = sub.groupSubmission?.questionGroup?.groupItems ?? [];
+          const idx = groupItems.findIndex((item) => item.questionId === sub.questionId);
+          const questionType = sub.groupSubmission?.questionGroup?.questionType ?? "";
+          const config = getGradingPrompt(questionType, idx);
+          if (!config) {
+            return { id: sub.id, error: "No grading prompt configured", status: "pending" };
+          }
+
+          const pre = preCheckGrade(userAnswer, correctAnswer, maxScore, config.enableExactMatch ?? false);
           if (pre) {
             await prisma.questionSubmission.update({
               where: { id: sub.id },
@@ -48,7 +70,8 @@ export async function POST(request: Request) {
             return { id: sub.id, score: pre.score, feedback: pre.feedback, status: "graded" };
           }
 
-          const result = await gradeReadingExpression(
+          const result = await gradeWithConfig(
+            config,
             sub.question.content,
             userAnswer,
             correctAnswer,

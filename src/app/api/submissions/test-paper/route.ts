@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-import { gradeReadingExpression, preCheckGrade } from "@/lib/ai-service"
 
 function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
   const combined = `${questionType} ${groupType}`
@@ -110,6 +109,7 @@ export async function POST(request: Request) {
                 content: { answer: "" },
                 score: 0,
                 isCorrect: false,
+                gradingStatus: "graded",
               }
             }
 
@@ -180,108 +180,6 @@ export async function POST(request: Request) {
         score: totalScore,
       },
     })
-
-    const readingExpressionGroupIds = groupSubmissionsCreated
-      .filter(Boolean)
-      .map((g) => g!.id);
-
-    if (readingExpressionGroupIds.length > 0) {
-      const reSubmissions = await prisma.questionSubmission.findMany({
-        where: {
-          groupSubmissionId: { in: readingExpressionGroupIds },
-        },
-        include: {
-          question: { select: { content: true, answer: true, score: true } },
-          groupSubmission: {
-            select: {
-              questionGroupId: true,
-            },
-          },
-        },
-      });
-
-      const reGroupIds = [...new Set(reSubmissions.map((s) => s.groupSubmission?.questionGroupId).filter(Boolean))];
-      const reGroups = reGroupIds.length > 0
-        ? await prisma.questionGroup.findMany({
-            where: { id: { in: reGroupIds as string[] } },
-            include: { groupItems: { orderBy: { orderIndex: "asc" } } },
-          })
-        : [];
-
-      const reGroupMap = new Map(reGroups.map((g) => [g.id, g]));
-      const reGraded = reSubmissions.filter((sub) => {
-        const groupId = sub.groupSubmission?.questionGroupId;
-        const group = groupId ? reGroupMap.get(groupId) : undefined;
-        if (!group) return false;
-        const isRE = group.questionType === "reading-expression" || group.questionType === "阅读表达";
-        if (!isRE) return false;
-        const firstThreeIds = new Set(group.groupItems.slice(0, 3).map((item) => item.questionId));
-        return firstThreeIds.has(sub.questionId);
-      });
-
-      if (reGraded.length > 0) {
-        await Promise.all(
-          reGraded.map(async (sub) => {
-            try {
-              const content = sub.content as { answer?: string } | null;
-              const userAnswer = content?.answer ?? "";
-              const maxScore = sub.question.score;
-              const groupId = sub.groupSubmission?.questionGroupId;
-              const group = groupId ? reGroupMap.get(groupId) : undefined;
-              const firstTwoIds = group ? new Set(group.groupItems.slice(0, 2).map((item) => item.questionId)) : new Set<string>();
-              const isFirstTwo = firstTwoIds.has(sub.questionId);
-
-              const pre = preCheckGrade(userAnswer, sub.question.answer, maxScore, isFirstTwo);
-              if (pre) {
-                await prisma.questionSubmission.update({
-                  where: { id: sub.id },
-                  data: {
-                    score: pre.score,
-                    isCorrect: pre.score === maxScore,
-                    gradingStatus: "graded",
-                    aiFeedback: pre.feedback ? { feedback: pre.feedback } : undefined,
-                  },
-                });
-                return;
-              }
-
-              const result = await gradeReadingExpression(
-                sub.question.content,
-                userAnswer,
-                sub.question.answer,
-                maxScore,
-              );
-              await prisma.questionSubmission.update({
-                where: { id: sub.id },
-                data: {
-                  score: result.score,
-                  isCorrect: result.score === maxScore,
-                  gradingStatus: "graded",
-                  aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
-                },
-              });
-            } catch (error) {
-              console.error(`AI grading failed for submission ${sub.id}:`, error);
-            }
-          })
-        );
-
-        const groupIds = [...new Set(reGraded.map(s => s.groupSubmissionId).filter(Boolean))];
-        for (const gid of groupIds) {
-          const allSubs = await prisma.questionSubmission.findMany({
-            where: { groupSubmissionId: gid! },
-            select: { score: true, isCorrect: true, gradingStatus: true },
-          });
-          const newTotalScore = allSubs.reduce((sum, s) => sum + (s.score ?? 0), 0);
-          const gradedSubs = allSubs.filter(s => s.gradingStatus === "graded");
-          const newCorrectNum = gradedSubs.filter(s => s.isCorrect).length;
-          await prisma.questionGroupSubmission.update({
-            where: { id: gid! },
-            data: { score: newTotalScore, correctNum: newCorrectNum },
-          });
-        }
-      }
-    }
 
     return NextResponse.json({
       success: true,
