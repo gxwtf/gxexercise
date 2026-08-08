@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { gradeReadingExpression } from "@/lib/ai-service";
+import { gradeReadingExpression, preCheckGrade } from "@/lib/ai-service";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -34,16 +34,18 @@ export async function POST(request: Request) {
           const correctAnswer = sub.question.answer;
           const maxScore = sub.question.score;
 
-          if (!userAnswer.trim()) {
+          const pre = preCheckGrade(userAnswer, correctAnswer, maxScore, false);
+          if (pre) {
             await prisma.questionSubmission.update({
               where: { id: sub.id },
               data: {
-                score: 0,
-                isCorrect: false,
-                aiFeedback: { feedback: "未作答" },
+                score: pre.score,
+                isCorrect: pre.score === maxScore,
+                gradingStatus: "graded",
+                aiFeedback: pre.feedback ? { feedback: pre.feedback } : undefined,
               },
             });
-            return { id: sub.id, score: 0, feedback: "未作答" };
+            return { id: sub.id, score: pre.score, feedback: pre.feedback, status: "graded" };
           }
 
           const result = await gradeReadingExpression(
@@ -58,14 +60,15 @@ export async function POST(request: Request) {
             data: {
               score: result.score,
               isCorrect: result.score === maxScore,
+              gradingStatus: "graded",
               aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
             },
           });
 
-          return { id: sub.id, score: result.score, feedback: result.feedback };
+          return { id: sub.id, score: result.score, feedback: result.feedback, status: "graded" };
         } catch (error) {
           console.error(`Failed to grade submission ${sub.id}:`, error);
-          return { id: sub.id, error: "Failed to grade" };
+          return { id: sub.id, error: "Failed to grade", status: "pending" };
         }
       })
     );

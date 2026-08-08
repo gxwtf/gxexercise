@@ -31,6 +31,7 @@ interface ReviewContentData {
     userAnswer: string | null
     userAnswerMdx: MDXRemoteSerializeResult | null
     isCorrect: boolean | null
+    gradingStatus: string | null
     currentIndex: number
     historyItems: SubmissionHistoryItem[]
     correctRate: number | null
@@ -77,6 +78,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         userAnswer,
         userAnswerMdx,
         isCorrect,
+        gradingStatus,
         currentIndex,
         historyItems,
         correctRate,
@@ -96,6 +98,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const isWordChoice = questionGroup.questionType === "word-choice"
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
+    const isPending = gradingStatus === "pending"
+
     const displayUserAnswer = userAnswer
         ? (isChoiceType ? userAnswer.toUpperCase() : userAnswer)
         : null
@@ -175,7 +179,9 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     <p className="text-base">
                                         得分：
                                         <span className="font-medium">
-                                            {isCorrect === null ? (
+                                            {isPending ? (
+                                                <span className="text-amber-600">评阅中</span>
+                                            ) : isCorrect === null ? (
                                                 <span className="text-amber-600">评阅中</span>
                                             ) : (
                                                 <>{userScore ?? "-"} / {questionScore}</>
@@ -206,6 +212,12 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
                                             <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">失分原因</p>
                                             <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{aiFeedback}</p>
+                                        </div>
+                                    )}
+                                    {isPending && (
+                                        <div className="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                                            <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">评阅中</p>
+                                            <p className="text-sm text-blue-700 dark:text-blue-300">AI正在评阅你的作答，请稍后刷新页面查看结果。</p>
                                         </div>
                                     )}
                                 </TabsContent>

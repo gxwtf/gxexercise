@@ -125,6 +125,7 @@ async function buildReviewData(
     : null
 
   const isCorrect = selectedSubmission?.isCorrect ?? null
+  const gradingStatus = selectedSubmission?.gradingStatus ?? null
 
   const articleMdx = questionGroup.content
     ? await serialize(escapeLatexBraces(questionGroup.content), { mdxOptions })
@@ -150,8 +151,10 @@ async function buildReviewData(
     const sub = questionSubmissions.find((s) => s.questionId === item.question.id)
     let status: "correct" | "wrong" | "unanswered" | "reviewing" = "unanswered"
     if (sub) {
-      if (sub.isCorrect === null && isSubjectiveQuestion(item.question.questionType, questionGroup.questionType)) {
+      if (sub.gradingStatus === "pending" && isSubjectiveQuestion(item.question.questionType, questionGroup.questionType)) {
         status = "reviewing"
+      } else if (sub.isCorrect === null) {
+        status = "unanswered"
       } else {
         status = sub.isCorrect ? "correct" : "wrong"
       }
@@ -249,6 +252,7 @@ async function buildReviewData(
     userAnswer,
     userAnswerMdx,
     isCorrect,
+    gradingStatus,
     currentIndex: questionIndex,
     historyItems,
     correctRate,

@@ -1,6 +1,11 @@
-const AI_BASE = "https://api.poixe.com/v1";
-const API_KEY = "sk-0ObCJMNQ87XwePNIqVOuKkvBweHwW73cB049BtAfA1JvVn2l";
-const MODEL = "claude-fable-5";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.POIXE_API_KEY!,
+  baseURL: "https://api.poixe.com/v1",
+});
+
+const MODEL = "doubao-1-5-lite-32k-250115:free";
 
 interface GradeResult {
   score: number;
@@ -80,31 +85,34 @@ function clampScore(score: unknown, maxScore: number): number {
 }
 
 async function callModel(prompt: string, maxScore: number): Promise<GradeResult> {
-  const response = await fetch(`${AI_BASE}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0,
-      max_tokens: 200,
-      response_format: { type: "json_object" },
-    }),
+  const completion = await openai.chat.completions.create({
+    model: MODEL,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0,
+    max_tokens: 200,
+    response_format: { type: "json_object" },
   });
 
-  if (!response.ok) {
-    throw new Error(`AI API error: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const text = data.choices?.[0]?.message?.content || "";
+  const text = completion.choices[0]?.message?.content || "";
   return parseResponse(text, maxScore);
+}
+
+export function preCheckGrade(
+  userAnswer: string,
+  correctAnswer: string,
+  maxScore: number,
+  skipAI: boolean,
+): GradeResult | null {
+  if (!userAnswer.trim()) {
+    return { score: 0, feedback: "未作答" };
+  }
+  if (skipAI && userAnswer.trim() === correctAnswer.trim()) {
+    return { score: maxScore, feedback: "" };
+  }
+  return null;
 }
 
 export async function gradeReadingExpression(
@@ -114,11 +122,5 @@ export async function gradeReadingExpression(
   maxScore: number,
 ): Promise<GradeResult> {
   const prompt = buildPrompt(stem, userAnswer, correctAnswer, maxScore);
-
-  try {
-    return await callModel(prompt, maxScore);
-  } catch (error) {
-    console.error("AI grading failed:", error);
-    return { score: 0, feedback: "AI评阅暂时不可用，请稍后重试" };
-  }
+  return await callModel(prompt, maxScore);
 }

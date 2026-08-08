@@ -115,6 +115,7 @@ model QuestionSubmission {
   score           Float?    @db.Real
   isCorrect       Boolean?
   aiFeedback      Json?
+  gradingStatus   String    @default("pending")
   createdAt       DateTime  @default(now())
 
   user            User      @relation(fields: [userId], references: [id])
@@ -125,6 +126,7 @@ model QuestionSubmission {
   @@index([questionId])
   @@index([userId, questionId])
   @@index([groupSubmissionId])
+  @@index([gradingStatus])
 }
 
 model QuestionGroupSubmission {
