@@ -43,6 +43,13 @@ interface ReviewContentData {
     questionScore: number
     avgScore: number | null
     aiFeedback: string | null
+    enWritingFeedback: Record<string, unknown> | null
+    enWritingSubMaxes: { contentMax: number; languageMax: number; structureMax: number } | null
+    overallCommentMdx: MDXRemoteSerializeResult | null
+    lineCorrectionsMdx: MDXRemoteSerializeResult | null
+    correctionsMdx: MDXRemoteSerializeResult | null
+    betterExpressionsMdx: MDXRemoteSerializeResult | null
+    modelEssayMdx: MDXRemoteSerializeResult | null
 }
 
 interface ReviewContentProps {
@@ -89,6 +96,13 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         questionScore,
         avgScore,
         aiFeedback,
+        enWritingFeedback,
+        enWritingSubMaxes,
+        overallCommentMdx,
+        lineCorrectionsMdx,
+        correctionsMdx,
+        betterExpressionsMdx,
+        modelEssayMdx,
     } = data
 
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
@@ -208,11 +222,25 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             <MDXRemote {...userAnswerMdx} components={components} />
                                         </div>
                                     </QuestionSection>
-                                    {aiFeedback && (
-                                        <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-                                            <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">失分原因</p>
-                                            <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{aiFeedback}</p>
-                                        </div>
+                                    {isEnWriting && enWritingFeedback && !isPending ? (
+                                        <EnWritingFeedbackSection
+                                          feedback={enWritingFeedback}
+                                          subMaxes={enWritingSubMaxes}
+                                          overallCommentMdx={overallCommentMdx}
+                                          lineCorrectionsMdx={lineCorrectionsMdx}
+                                          correctionsMdx={correctionsMdx}
+                                          betterExpressionsMdx={betterExpressionsMdx}
+                                          modelEssayMdx={modelEssayMdx}
+                                        />
+                                    ) : (
+                                        <>
+                                            {aiFeedback && (
+                                                <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                                                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">失分原因</p>
+                                                    <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{aiFeedback}</p>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                     {isPending && (
                                         <div className="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
@@ -280,4 +308,107 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
             </div>
         </div>
     )
+}
+
+function EnWritingFeedbackSection({
+  feedback,
+  subMaxes,
+  overallCommentMdx,
+  lineCorrectionsMdx,
+  correctionsMdx,
+  betterExpressionsMdx,
+  modelEssayMdx,
+}: {
+  feedback: Record<string, unknown>
+  subMaxes: { contentMax: number; languageMax: number; structureMax: number } | null
+  overallCommentMdx: MDXRemoteSerializeResult | null
+  lineCorrectionsMdx: MDXRemoteSerializeResult | null
+  correctionsMdx: MDXRemoteSerializeResult | null
+  betterExpressionsMdx: MDXRemoteSerializeResult | null
+  modelEssayMdx: MDXRemoteSerializeResult | null
+}) {
+  const components = useMDXComponents()
+  const subScores = feedback.subScores as Record<string, number> | undefined
+
+  const subScoreItems = [
+    { key: "内容", max: subMaxes?.contentMax ?? 0, bg: "bg-blue-50 dark:bg-blue-950/30", bar: "bg-blue-500" },
+    { key: "语言", max: subMaxes?.languageMax ?? 0, bg: "bg-emerald-50 dark:bg-emerald-950/30", bar: "bg-emerald-500" },
+    { key: "结构", max: subMaxes?.structureMax ?? 0, bg: "bg-purple-50 dark:bg-purple-950/30", bar: "bg-purple-500" },
+  ]
+
+  return (
+    <div className="mt-6 space-y-6 en-writing-feedback">
+      <style>{`
+        .en-writing-feedback .katex { font-size: 0.85em; }
+      `}</style>
+      {subScores && (
+        <div>
+          <h3 className="text-lg font-semibold mb-3">评分明细</h3>
+          <QuestionSection>
+            <div className="grid grid-cols-3 gap-3">
+              {subScoreItems.map(({ key, max, bg, bar }) => {
+                const score = subScores[key] ?? 0
+                const pct = max > 0 ? Math.round((score / max) * 100) : 0
+                return (
+                  <div key={key} className={`rounded-lg p-4 ${bg}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-base font-semibold text-foreground">{key}</span>
+                      <span className="text-xl font-bold tabular-nums">{score}<span className="text-sm font-normal text-muted-foreground">/{max}</span></span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-secondary">
+                      <div className={`h-full rounded-full ${bar} transition-all`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </QuestionSection>
+        </div>
+      )}
+
+      {overallCommentMdx && (
+        <div>
+          <h3 className="text-lg font-semibold mb-3">整体评价</h3>
+          <QuestionSection>
+            <div className="prose dark:prose-invert max-w-none">
+              <MDXRemote {...overallCommentMdx} components={components} />
+            </div>
+          </QuestionSection>
+        </div>
+      )}
+
+      {(lineCorrectionsMdx || correctionsMdx) && (
+        <div>
+          <h3 className="text-lg font-semibold mb-3">批改结果</h3>
+          <QuestionSection>
+            <div className="prose dark:prose-invert max-w-none">
+              <MDXRemote {...(lineCorrectionsMdx || correctionsMdx!)} components={components} />
+            </div>
+          </QuestionSection>
+        </div>
+      )}
+
+      {betterExpressionsMdx && (
+        <div>
+          <h3 className="text-lg font-semibold mb-3">更多表达</h3>
+          <QuestionSection>
+            <div className="prose dark:prose-invert max-w-none">
+              <MDXRemote {...betterExpressionsMdx} components={components} />
+            </div>
+          </QuestionSection>
+        </div>
+      )}
+
+      {modelEssayMdx && (
+        <div>
+          <h3 className="text-lg font-semibold mb-3">个性化范文</h3>
+          <QuestionSection>
+            <div className="prose dark:prose-invert max-w-none">
+              <MDXRemote {...modelEssayMdx} components={components} />
+            </div>
+          </QuestionSection>
+        </div>
+      )}
+    </div>
+  )
 }

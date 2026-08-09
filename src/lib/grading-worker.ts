@@ -1,6 +1,17 @@
 import { prisma } from "./prisma"
-import { gradeWithConfig, preCheckGrade } from "./ai-service"
+import { gradeWithConfig, preCheckGrade, type GradeResult } from "./ai-service"
 import { getGradingPrompt } from "./grading-prompts"
+
+function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
+  const data: Record<string, unknown> = {}
+  if (result.feedback) data.feedback = result.feedback
+  if (result.subScores) data.subScores = result.subScores
+  if (result.overallComment) data.overallComment = result.overallComment
+  if (result.lineCorrections) data.lineCorrections = result.lineCorrections
+  if (result.betterExpressions) data.betterExpressions = result.betterExpressions
+  if (result.modelEssay) data.modelEssay = result.modelEssay
+  return Object.keys(data).length > 0 ? data : undefined
+}
 
 let running = false
 let polling = false
@@ -40,6 +51,9 @@ export function startGradingWorker() {
 
       if (pending.length === 0) return
 
+      console.log(`[GradingWorker] Poll: found ${pending.length} pending, matching prompts...`)
+      console.log(`[GradingWorker] Pending IDs: ${pending.map(s => s.id).join(", ")}`)
+
       const toGrade = pending.filter((sub) => {
         const groupItems = sub.groupSubmission?.questionGroup?.groupItems ?? []
         const idx = groupItems.findIndex((item) => item.questionId === sub.questionId)
@@ -47,12 +61,16 @@ export function startGradingWorker() {
         return getGradingPrompt(questionType, idx) !== null
       })
 
-      if (toGrade.length === 0) return
+      if (toGrade.length === 0) {
+        console.log(`[GradingWorker] No prompt matched - pending types: ${pending.map(s => s.groupSubmission?.questionGroup?.questionType ?? "?").join(", ")}`)
+        return
+      }
 
       const updatedGroupIds = new Set<string>()
 
       for (const sub of toGrade) {
         try {
+          console.log(`[GradingWorker] Grading submission ${sub.id} (type: ${sub.groupSubmission?.questionGroup?.questionType}, question: ${sub.questionId})`)
           const groupItems = sub.groupSubmission?.questionGroup?.groupItems ?? []
           const idx = groupItems.findIndex((item) => item.questionId === sub.questionId)
           const questionType = sub.groupSubmission?.questionGroup?.questionType ?? ""
@@ -93,7 +111,7 @@ export function startGradingWorker() {
               score: result.score,
               isCorrect: result.score === maxScore,
               gradingStatus: "graded",
-              aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
+              aiFeedback: buildAiFeedback(result) as any,
             },
           })
           console.log(`[GradingWorker] ${sub.id} graded: score=${result.score}`)

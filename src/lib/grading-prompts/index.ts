@@ -1,6 +1,7 @@
 import { readFileSync } from "fs"
 import path from "path"
 import readingExpression from "./reading-expression/config.json"
+import enWriting from "./en-writing/config.json"
 
 export interface GradingPromptConfig {
   questionType: string
@@ -30,9 +31,7 @@ function loadPrompt(questionType: string, promptFile: string): string {
 function loadPrompts(): GradingPromptConfig[] {
   const jsonFiles: JsonEntry[] = [
     readingExpression,
-    // 未来新增题型：
-    // enWriting,
-    // chineseEssay,
+    enWriting,
   ]
 
   return jsonFiles.flatMap((entry) =>
@@ -50,7 +49,7 @@ export const GRADING_PROMPT_REGISTRY: GradingPromptConfig[] = loadPrompts()
 
 function normalizeType(t: string): string {
   if (t === "阅读表达") return "reading-expression"
-  if (t === "英文写作" || t === "英语作文") return "en-writing"
+  if (t === "英文写作" || t === "英语作文" || t === "作文") return "en-writing"
   if (t === "语文作文" || t === "中文写作") return "chinese-essay"
   return t
 }

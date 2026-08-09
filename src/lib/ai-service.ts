@@ -13,6 +13,11 @@ const MODEL = "deepseek-ai/DeepSeek-V4-Flash";
 export interface GradeResult {
   score: number;
   feedback?: string;
+  subScores?: Record<string, number>;
+  overallComment?: string;
+  lineCorrections?: string;
+  betterExpressions?: string;
+  modelEssay?: string;
 }
 
 function parseResponse(text: string, maxScore: number): GradeResult {
@@ -23,6 +28,11 @@ function parseResponse(text: string, maxScore: number): GradeResult {
       return {
         score: clampScore(parsed.score, maxScore),
         feedback: parsed.feedback || undefined,
+        subScores: parsed.subScores || undefined,
+        overallComment: parsed.overallComment || undefined,
+        lineCorrections: parsed.lineCorrections || undefined,
+        betterExpressions: parsed.betterExpressions || undefined,
+        modelEssay: parsed.modelEssay || undefined,
       };
     } catch {
       // JSON parse failed, continue to regex fallback
@@ -58,7 +68,7 @@ function clampScore(score: unknown, maxScore: number): number {
   return 0;
 }
 
-async function callModel(systemPrompt: string, userPrompt: string, maxScore: number): Promise<GradeResult> {
+async function callModel(systemPrompt: string, userPrompt: string, maxScore: number, maxTokens = 200): Promise<GradeResult> {
   // console.log("[AI Prompt]", JSON.stringify({ system: systemPrompt, user: userPrompt }, null, 2))
   const completion = await openai.chat.completions.create({
     model: MODEL,
@@ -67,7 +77,7 @@ async function callModel(systemPrompt: string, userPrompt: string, maxScore: num
       { role: "user", content: userPrompt },
     ],
     temperature: 0,
-    max_tokens: 200,
+    max_tokens: maxTokens,
     response_format: { type: "json_object" },
   });
 
@@ -106,7 +116,9 @@ export async function gradeWithConfig(
   maxScore: number,
 ): Promise<GradeResult> {
   const prompt = buildPrompt(config.promptTemplate, stem, userAnswer, correctAnswer, maxScore);
-  return await callModel(config.systemPrompt, prompt, maxScore);
+  const isEnWriting = config.questionType === "en-writing";
+  const maxTokens = isEnWriting ? 4096 : 200;
+  return await callModel(config.systemPrompt, prompt, maxScore, maxTokens);
 }
 
 export async function gradeReadingExpression(

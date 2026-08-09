@@ -1,7 +1,18 @@
 import { prisma } from "@/lib/prisma";
-import { gradeWithConfig, preCheckGrade } from "@/lib/ai-service";
+import { gradeWithConfig, preCheckGrade, type GradeResult } from "@/lib/ai-service";
 import { getGradingPrompt } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
+
+function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
+  const data: Record<string, unknown> = {}
+  if (result.feedback) data.feedback = result.feedback
+  if (result.subScores) data.subScores = result.subScores
+  if (result.overallComment) data.overallComment = result.overallComment
+  if (result.lineCorrections) data.lineCorrections = result.lineCorrections
+  if (result.betterExpressions) data.betterExpressions = result.betterExpressions
+  if (result.modelEssay) data.modelEssay = result.modelEssay
+  return Object.keys(data).length > 0 ? data : undefined
+}
 
 export async function POST() {
   try {
@@ -83,7 +94,7 @@ export async function POST() {
               score: result.score,
               isCorrect: result.score === maxScore,
               gradingStatus: "graded",
-              aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
+              aiFeedback: buildAiFeedback(result) as any,
             },
           });
           if (sub.groupSubmissionId) affectedGroupIds.add(sub.groupSubmissionId);

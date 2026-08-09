@@ -233,7 +233,34 @@ async function buildReviewData(
 
   const userScore = selectedSubmission?.score ?? null
   const questionScore = currentQuestion.score ?? 0
-  const aiFeedback = (selectedSubmission?.aiFeedback as { feedback?: string } | null)?.feedback ?? null
+  const aiFeedbackRaw = selectedSubmission?.aiFeedback as Record<string, unknown> | null
+  const aiFeedback = (aiFeedbackRaw?.feedback as string) ?? null
+  const enWritingFeedback = questionGroup.questionType === "en-writing" ? aiFeedbackRaw : null
+
+  const enWritingSubMaxes = enWritingFeedback
+    ? (() => {
+        const contentMax = Math.round(questionScore * 0.4)
+        const languageMax = Math.round(questionScore * 0.4)
+        const structureMax = questionScore - contentMax - languageMax
+        return { contentMax, languageMax, structureMax }
+      })()
+    : null
+
+  const overallCommentMdx = enWritingFeedback?.overallComment
+    ? await serialize(String(enWritingFeedback.overallComment), { mdxOptions })
+    : null
+  const lineCorrectionsMdx = enWritingFeedback?.lineCorrections
+    ? await serialize(String(enWritingFeedback.lineCorrections), { mdxOptions })
+    : null
+  const correctionsMdx = enWritingFeedback?.corrections
+    ? await serialize(String(enWritingFeedback.corrections), { mdxOptions })
+    : null
+  const betterExpressionsMdx = enWritingFeedback?.betterExpressions
+    ? await serialize(String(enWritingFeedback.betterExpressions), { mdxOptions })
+    : null
+  const modelEssayMdx = enWritingFeedback?.modelEssay
+    ? await serialize(String(enWritingFeedback.modelEssay), { mdxOptions })
+    : null
 
   return {
     questionGroup: {
@@ -264,6 +291,13 @@ async function buildReviewData(
     questionScore,
     avgScore,
     aiFeedback,
+    enWritingFeedback,
+    enWritingSubMaxes,
+    overallCommentMdx,
+    lineCorrectionsMdx,
+    correctionsMdx,
+    betterExpressionsMdx,
+    modelEssayMdx,
   }
 }
 
