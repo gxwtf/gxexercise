@@ -84,7 +84,7 @@ export function QuestionCard({
     ? (userStats?.score ?? 0)
     : displayCorrectCount
   const displayTotal = subjective
-    ? totalScore
+    ? (userStats?.score != null ? totalScore : 0)
     : displayTotalNum
 
   return (

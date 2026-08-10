@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
+const path = require("path");
 
 function normalizeMineruMarkdown(article) {
   article = article.replace(/\r\n/g, "\n");
@@ -13,7 +14,100 @@ function normalizeMineruMarkdown(article) {
   return article;
 }
 
-function parseExam(mdContent) {
+function normalizeFallbackBlanks(article, referenceAnswers) {
+  if (/{{BLANK:(\d+)}}/.test(article)) return article;
+
+  const answerKeys = Object.keys(referenceAnswers).map(Number).sort((a, b) => a - b);
+  if (answerKeys.length === 0) return article;
+
+  const minKey = answerKeys[0];
+  const maxKey = answerKeys[answerKeys.length - 1];
+
+  const hintRegex = /\(([a-zA-Z]+)\)/g;
+  const hintMatches = [];
+  let hm;
+  while ((hm = hintRegex.exec(article)) !== null) {
+    hintMatches.push({ index: hm.index, word: hm[1], length: hm[0].length });
+  }
+
+  if (hintMatches.length > 0) {
+    const usedKeys = new Set();
+    const matchedPairs = [];
+
+    for (const hint of hintMatches) {
+      let matchedKey = null;
+      for (const key of answerKeys) {
+        if (usedKeys.has(key)) continue;
+        const refAns = referenceAnswers[key];
+        if (!refAns || !refAns[0]) continue;
+        const ansLower = refAns[0].toLowerCase();
+        const hintLower = hint.word.toLowerCase();
+
+        if (ansLower.includes(hintLower)) {
+          matchedKey = key;
+          break;
+        }
+      }
+      if (matchedKey !== null) {
+        usedKeys.add(matchedKey);
+        matchedPairs.push({ hint, key: matchedKey });
+      }
+    }
+
+    const unmatchedHints = hintMatches.filter(
+      (h) => !matchedPairs.some((p) => p.hint === h)
+    );
+    const remainingKeys = answerKeys.filter((k) => !usedKeys.has(k));
+
+    for (let i = 0; i < unmatchedHints.length && i < remainingKeys.length; i++) {
+      usedKeys.add(remainingKeys[i]);
+      matchedPairs.push({ hint: unmatchedHints[i], key: remainingKeys[i] });
+    }
+
+    matchedPairs.sort((a, b) => a.hint.index - b.hint.index);
+
+    if (matchedPairs.length > 0) {
+      const result = [];
+      let lastIndex = 0;
+      for (const pair of matchedPairs) {
+        result.push(article.substring(lastIndex, pair.hint.index));
+        result.push(`{{BLANK:${pair.key}}}`);
+        lastIndex = pair.hint.index + pair.hint.length;
+      }
+      result.push(article.substring(lastIndex));
+      return result.join("");
+    }
+  }
+
+  const numberRegex = /\b(\d+)\b(?!\.)/g;
+  const numberMatches = [];
+  let nm;
+  while ((nm = numberRegex.exec(article)) !== null) {
+    const num = parseInt(nm[1]);
+    if (num >= minKey && num <= maxKey && referenceAnswers[num] !== undefined) {
+      if (!numberMatches.some(m => m.num === num)) {
+        numberMatches.push({ index: nm.index, num, length: nm[0].length });
+      }
+    }
+  }
+
+  if (numberMatches.length > 0) {
+    numberMatches.sort((a, b) => a.index - b.index);
+    const result = [];
+    let lastIndex = 0;
+    for (const match of numberMatches) {
+      result.push(article.substring(lastIndex, match.index));
+      result.push(`{{BLANK:${match.num}}}`);
+      lastIndex = match.index + match.length;
+    }
+    result.push(article.substring(lastIndex));
+    return result.join("");
+  }
+
+  return article;
+}
+
+function parseExam(mdContent, txtContent) {
   mdContent = normalizeMineruMarkdown(mdContent);
   const lines = mdContent.split("\n");
 
@@ -29,6 +123,73 @@ function parseExam(mdContent) {
       break;
     }
 
+    if (/^(?:\*\*)?第[一二三四五六七八九十]+部分/.test(line)) {
+      const partMatch = line.match(/第[一二三四五六七八九十]+部分[：:]\s*(.+?)[（(]/);
+      if (partMatch) {
+        const partName = partMatch[1];
+        i++;
+        while (i < lines.length) {
+          const subLine = lines[i];
+
+          if (/^参考答案/.test(subLine)) break;
+          if (/^(?:\*\*)?第[一二三四五六七八九十]+部分/.test(subLine)) break;
+
+          if (/^(?:\*\*)?第一节/.test(subLine)) {
+            if (partName.includes("知识运用")) {
+              const result = parseCloze(lines, i, referenceAnswers, paper, txtContent);
+              if (result) {
+                sections.push(result.section);
+                i = result.nextIndex;
+                continue;
+              }
+            } else if (partName.includes("阅读理解")) {
+              const result = parseReadingArticlesInPart(lines, i, referenceAnswers, paper);
+              if (result) {
+                sections.push(...result.sections);
+                i = result.nextIndex;
+                continue;
+              }
+            } else if (partName.includes("书面表达")) {
+              const result = parseReadingExpression(lines, i, referenceAnswers, paper);
+              if (result) {
+                sections.push(result.section);
+                i = result.nextIndex;
+                continue;
+              }
+            }
+          }
+
+          if (/^(?:\*\*)?第二节/.test(subLine)) {
+            if (partName.includes("知识运用")) {
+              const result = parseGrammarFill(lines, i, referenceAnswers, paper, txtContent);
+              if (result) {
+                sections.push(result.section);
+                i = result.nextIndex;
+                continue;
+              }
+            } else if (partName.includes("阅读理解")) {
+              const result = parseSevenChooseFive(lines, i, referenceAnswers, paper, txtContent);
+              if (result) {
+                sections.push(result.section);
+                i = result.nextIndex;
+                continue;
+              }
+            } else if (partName.includes("书面表达")) {
+              const result = parseWriting(lines, i, referenceAnswers, paper);
+              if (result) {
+                sections.push(result.section);
+                i = result.nextIndex;
+                continue;
+              }
+            }
+          }
+
+          i++;
+        }
+      }
+      continue;
+    }
+
     if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*选词填空/.test(line)) {
       const result = parseWordChoice(lines, i, referenceAnswers, paper);
       if (result) {
@@ -39,7 +200,7 @@ function parseExam(mdContent) {
     }
 
     if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*完形填空/.test(line)) {
-      const result = parseCloze(lines, i, referenceAnswers, paper);
+      const result = parseCloze(lines, i, referenceAnswers, paper, txtContent);
       if (result) {
         sections.push(result.section);
         i = result.nextIndex;
@@ -57,7 +218,7 @@ function parseExam(mdContent) {
     }
 
     if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*语法填空/.test(line)) {
-      const result = parseGrammarFill(lines, i, referenceAnswers, paper);
+      const result = parseGrammarFill(lines, i, referenceAnswers, paper, txtContent);
       if (result) {
         sections.push(result.section);
         i = result.nextIndex;
@@ -77,7 +238,107 @@ function parseExam(mdContent) {
     i++;
   }
 
+  const validationErrors = validateSections(sections);
+
+  if (validationErrors.length > 0) {
+    console.error("\n=== 解析校验警告/错误 ===");
+    for (const err of validationErrors) {
+      if (err.level === "error") {
+        console.error(`  [错误] ${err.message}`);
+      } else {
+        console.warn(`  [警告] ${err.message}`);
+      }
+    }
+    console.error("=== 校验结束 ===\n");
+  }
+
   return { paper, sections };
+}
+
+function validateSections(sections) {
+  const errors = [];
+  const sectionCounts = {};
+
+  for (const sec of sections) {
+    const type = sec.type;
+    if (!sectionCounts[type]) {
+      sectionCounts[type] = [];
+    }
+    sectionCounts[type].push({ questions: sec.questions.length, score: sec.score });
+  }
+
+  if (sectionCounts["完形填空"]) {
+    const cloze = sectionCounts["完形填空"][0];
+    const validClozeCounts = [10, 12, 15, 20];
+    if (cloze.questions === 0) {
+      errors.push({ level: "error", message: "完形填空题目数为0，解析失败。请检查markdown中完形填空的空白标记格式（应为{{BLANK:N}}或数字标记）。" });
+    } else if (!validClozeCounts.includes(cloze.questions)) {
+      errors.push({ level: "warning", message: `完形填空题目数为${cloze.questions}，通常为10/12/15/20题，请核实。` });
+    }
+  } else {
+    errors.push({ level: "warning", message: "未检测到完形填空题型。" });
+  }
+
+  if (sectionCounts["语法填空"]) {
+    const gf = sectionCounts["语法填空"][0];
+    if (gf.questions === 0) {
+      errors.push({ level: "error", message: "语法填空题目数为0，解析失败。请检查markdown和txt中语法填空的空白标记格式，或提供txt文件。如果txt也匹配失败，请确认txt中空白数字格式正确（如\"11 (calm)\"）。" });
+    } else if (gf.questions !== 10) {
+      errors.push({ level: "warning", message: `语法填空题目数为${gf.questions}，通常为10题，请核实。` });
+    }
+  }
+
+  if (sectionCounts["阅读"]) {
+    const validReadingCounts = [3, 4, 5];
+    const readingArticles = sectionCounts["阅读"];
+    if (readingArticles.length < 3 || readingArticles.length > 4) {
+      errors.push({ level: "warning", message: `阅读篇章数为${readingArticles.length}，通常为3-4篇，请核实。` });
+    }
+    for (let i = 0; i < readingArticles.length; i++) {
+      const ra = readingArticles[i];
+      if (ra.questions === 0) {
+        errors.push({ level: "error", message: `第${i + 1}篇阅读题目数为0，解析失败。` });
+      } else if (!validReadingCounts.includes(ra.questions)) {
+        errors.push({ level: "warning", message: `第${i + 1}篇阅读题目数为${ra.questions}，通常为3/4/5题，请核实。` });
+      }
+    }
+  } else {
+    errors.push({ level: "warning", message: "未检测到阅读题型。" });
+  }
+
+  if (sectionCounts["七选五"]) {
+    const scf = sectionCounts["七选五"][0];
+    if (scf.questions === 0) {
+      errors.push({ level: "error", message: "七选五题目数为0，解析失败。请检查markdown中七选五的空白标记格式（应为{{BLANK:N}}或数字标记）。" });
+    } else if (scf.questions !== 5) {
+      errors.push({ level: "warning", message: `七选五题目数为${scf.questions}，通常为5题，请核实。` });
+    }
+  }
+
+  if (sectionCounts["阅读表达"]) {
+    const re = sectionCounts["阅读表达"][0];
+    const validRECounts = [4, 5];
+    if (re.questions === 0) {
+      errors.push({ level: "error", message: "阅读表达题目数为0，解析失败。" });
+    } else if (!validRECounts.includes(re.questions)) {
+      errors.push({ level: "warning", message: `阅读表达题目数为${re.questions}，通常为4/5题，请核实。` });
+    }
+  } else {
+    errors.push({ level: "warning", message: "未检测到阅读表达题型。" });
+  }
+
+  if (sectionCounts["作文"]) {
+    const writing = sectionCounts["作文"][0];
+    if (writing.questions === 0) {
+      errors.push({ level: "error", message: "作文题目数为0，解析失败。" });
+    } else if (writing.questions !== 1) {
+      errors.push({ level: "warning", message: `作文题目数为${writing.questions}，通常为1题，请核实。` });
+    }
+  } else {
+    errors.push({ level: "warning", message: "未检测到作文题型。" });
+  }
+
+  return errors;
 }
 
 function extractPaperInfo(lines) {
@@ -230,6 +491,8 @@ function getTotalScoreFromHeader(headerLine) {
 function isSectionHeader(line) {
   if (/^参考答案/.test(line)) return true;
   if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) return true;
+  if (/^(?:\*\*)?第[一二三四五六七八九十]+部分/.test(line)) return true;
+  if (/^(?:\*\*)?第[一二三]节/.test(line)) return true;
   if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|阅读理解|语法填空|书面表达|选词填空)/.test(line)) return true;
   return false;
 }
@@ -240,7 +503,7 @@ function isSubSectionHeader(line) {
   return false;
 }
 
-function parseCloze(lines, startIndex, referenceAnswers, paper) {
+function parseCloze(lines, startIndex, referenceAnswers, paper, txtContent) {
   const headerLine = lines[startIndex];
   const perQuestionScore = getScoreFromHeader(headerLine);
   const totalScore = getTotalScoreFromHeader(headerLine);
@@ -272,6 +535,7 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
 
   let article = articleLines.join("\n").trim();
   article = article.replace(/^>?\s*\*\*阅读下面短文[\s\S]*?在答题卡上将该选项涂黑。\*\*\s*/g, "").trim();
+  article = article.replace(/^阅读下面短文，[^。]*。\s*/g, "").trim();
 
   const imageRegex = /!\[.*?\]\(([^\s)]+)\)/g;
   const imagePlaceholders = [];
@@ -279,6 +543,8 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
     imagePlaceholders.push(match);
     return `__IMG_${imagePlaceholders.length - 1}__`;
   });
+
+  article = normalizeFallbackBlanks(article, referenceAnswers);
 
   article = article.replace(/{{BLANK:(\d+)}}/g, "<ClozeBlank></ClozeBlank>");
 
@@ -340,6 +606,33 @@ function parseCloze(lines, startIndex, referenceAnswers, paper) {
   };
 }
 
+function parseReadingArticlesInPart(lines, startIndex, referenceAnswers, paper) {
+  const sections = [];
+  let i = startIndex + 1;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (/^参考答案/.test(line)) break;
+    if (/^(?:\*\*)?第[一二三四五六七八九十]+部分/.test(line)) break;
+    if (/^(?:\*\*)?第二节/.test(line)) break;
+
+    if (/^\*\*[A-D]\*\*\s*$/.test(line.trim())) {
+      const articleLabel = line.trim().match(/^\*\*([A-D])\*\*/)[1];
+      const result = parseReadingArticle(lines, i, articleLabel, referenceAnswers, paper);
+      if (result) {
+        sections.push(result.section);
+        i = result.nextIndex;
+        continue;
+      }
+    }
+
+    i++;
+  }
+
+  return { sections, nextIndex: i };
+}
+
 function parseReading(lines, startIndex, referenceAnswers, paper) {
   const sections = [];
   let i = startIndex + 1;
@@ -392,7 +685,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
       break;
     }
 
-    if (/^\*\*(第二节|第[一二三]节|[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、])/.test(line)) {
+    if (/^\*\*(第二节|第[一二三]节|第[一二三四五六七八九十]+部分|[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、])/.test(line) || /^(?:\*\*)?(第二节|第[一二三]节|第[一二三四五六七八九十]+部分)/.test(line)) {
       break;
     }
 
@@ -469,7 +762,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
   };
 }
 
-function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
+function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper, txtContent) {
   const headerLine = lines[startIndex];
   const perQuestionScore = getScoreFromHeader(headerLine) || 2;
 
@@ -479,11 +772,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(完形填空|语法填空|书面表达|选词填空|第[一二三ⅠⅡⅢ]卷)/.test(line)) {
-      break;
-    }
-
-    if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) {
+    if (isSectionHeader(line)) {
       break;
     }
 
@@ -493,6 +782,7 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
 
   let fullText = allLines.join("\n").trim();
   fullText = fullText.replace(/^>?\s*\*\*根据短文内容[\s\S]*?选项中共?有两项为多余选项。\*\*\s*/g, "").trim();
+  fullText = fullText.replace(/^根据短文内容，[\s\S]*?选项中有两项为多余选项。\s*/g, "").trim();
 
   const optionRegex = /\s+A\\?\.\s+(.+?)\s+B\\?\.\s+(.+?)\s+C\\?\.\s+(.+?)\s+D\\?\.\s+(.+?)\s+E\\?\.\s+(.+?)\s+F\\?\.\s+(.+?)\s+G\\?\.\s+(.+?)$/s;
   const optionMatch = fullText.match(optionRegex);
@@ -521,10 +811,42 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
         optionMap[match[1]] = match[2].trim();
       }
     }
-    options = Object.entries(optionMap).map(([id, label]) => ({ id, label }));
+    if (Object.keys(optionMap).length > 0) {
+      options = Object.entries(optionMap).map(([id, label]) => ({ id, label }));
+    }
+  }
+
+  if (options.length === 0) {
+    const numberedOptionRegex = /^(\d+)\.\s+(.+)$/;
+    const numberedOptions = [];
+    for (const line of allLines) {
+      const trimmed = line.trim();
+      const match = trimmed.match(numberedOptionRegex);
+      if (match) {
+        const num = parseInt(match[1]);
+        if (num >= 1 && num <= 7) {
+          numberedOptions.push({ num, label: match[2].trim() });
+        }
+      }
+    }
+    if (numberedOptions.length > 0) {
+      numberedOptions.sort((a, b) => a.num - b.num);
+      const optionLabels = ["A", "B", "C", "D", "E", "F", "G"];
+      options = numberedOptions.map((opt, idx) => ({
+        id: optionLabels[idx],
+        label: opt.label,
+      }));
+      const firstOptionIdx = allLines.findIndex((l) => numberedOptionRegex.test(l.trim()));
+      if (firstOptionIdx >= 0) {
+        article = allLines.slice(0, firstOptionIdx).join("\n").trim();
+        article = article.replace(/^根据短文内容，[\s\S]*?选项中有两项为多余选项。\s*/g, "").trim();
+      }
+    }
   }
 
   article = article.replace(/\n{3,}/g, "\n\n").trim();
+
+  article = normalizeFallbackBlanks(article, referenceAnswers);
 
   const blankRegex = /{{BLANK:(\d+)}}/g;
   const blankNums = [];
@@ -581,7 +903,32 @@ function parseSevenChooseFive(lines, startIndex, referenceAnswers, paper) {
   };
 }
 
-function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
+function extractGrammarFillFromTxt(txtContent) {
+  const sectionRegex = /第二节（共10小题；每小题1\.5分，共15分）\s*\n([\s\S]*?)(?=\n第二部分|\n第三部分|$)/;
+  const match = txtContent.match(sectionRegex);
+  if (!match) return null;
+
+  let sectionText = match[1];
+
+  sectionText = sectionText
+    .replace(/阅读下列短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。请在答题卡指定区域作答。\s*/g, "")
+    .trim();
+
+  sectionText = sectionText.replace(/\s{2,}(\d+)\s{2,}(\([a-zA-Z]+\))?/g, (fullMatch, num, hint) => {
+    return `{{BLANK:${num}}}`;
+  });
+
+  sectionText = sectionText.replace(/^(\s*)([A-C])\s*$/gm, "\n\n## $2\n\n");
+
+  sectionText = sectionText.replace(/[ \t]{2,}/g, " ");
+  sectionText = sectionText.replace(/\n{3,}/g, "\n\n");
+  sectionText = sectionText.replace(/^[ \t]+/gm, "");
+  sectionText = sectionText.trim();
+
+  return sectionText;
+}
+
+function parseGrammarFill(lines, startIndex, referenceAnswers, paper, txtContent) {
   const headerLine = lines[startIndex];
   const perQuestionScore = getScoreFromHeader(headerLine) || 1.5;
   const totalScore = getTotalScoreFromHeader(headerLine);
@@ -592,11 +939,7 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(书面表达|选词填空|完形填空)/.test(line)) {
-      break;
-    }
-
-    if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) {
+    if (isSectionHeader(line)) {
       break;
     }
 
@@ -606,9 +949,12 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
 
   let article = articleLines.join("\n").trim();
   article = article.replace(/阅读下面短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。\s*/g, "").trim();
+  article = article.replace(/阅读下列短文，根据短文内容填空。在未给提示词的空白处仅填写1个恰当的单词，在给出提示词的空白处用括号内所给词的正确形式填空。请在答题卡指定区域作答。\s*/g, "").trim();
   article = article.replace(/\n{3,}/g, "\n\n").trim();
 
   article = article.replace(/^\*\*([A-D])\*\*\s*$/gm, "## $1");
+
+  article = normalizeFallbackBlanks(article, referenceAnswers);
 
   const blankRegex = /{{BLANK:(\d+)}}/g;
   const blankNums = [];
@@ -622,6 +968,28 @@ function parseGrammarFill(lines, startIndex, referenceAnswers, paper) {
   blankNums.sort((a, b) => a - b);
 
   const validBlankNums = blankNums.filter((num) => referenceAnswers[num] !== undefined);
+
+  if (validBlankNums.length < 10 && txtContent) {
+    const txtArticle = extractGrammarFillFromTxt(txtContent);
+    if (txtArticle) {
+      article = txtArticle.replace(/^\*\*([A-D])\*\*\s*$/gm, "## $1");
+
+      blankNums.length = 0;
+      blankRegex.lastIndex = 0;
+      let gm2;
+      while ((gm2 = blankRegex.exec(article)) !== null) {
+        const num = parseInt(gm2[1]);
+        if (!blankNums.includes(num)) {
+          blankNums.push(num);
+        }
+      }
+      blankNums.sort((a, b) => a - b);
+
+      validBlankNums.length = 0;
+      const newValid = blankNums.filter((num) => referenceAnswers[num] !== undefined);
+      validBlankNums.push(...newValid);
+    }
+  }
 
   article = article.replace(/{{BLANK:(\d+)}}/g, " <Input></Input> ");
   article = article.replace(/ {2,}/g, " ");
@@ -674,11 +1042,7 @@ function parseWordChoice(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]\s*(语法填空|书面表达|完形填空)/.test(line)) {
-      break;
-    }
-
-    if (/^\*\*第[一二三ⅠⅡⅢ]卷/.test(line)) {
+    if (isSectionHeader(line)) {
       break;
     }
 
@@ -816,7 +1180,7 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^\*\*第二节/.test(line)) {
+    if (/^\*\*第二节/.test(line) || /^(?:\*\*)?第二节/.test(line) || /^(?:\*\*)?第[一二三四五六七八九十]+部分/.test(line)) {
       break;
     }
 
@@ -835,7 +1199,8 @@ function parseReadingExpression(lines, startIndex, referenceAnswers, paper) {
 
   let article = articleLines.join("\n").trim();
   article = article.replace(/^>?\s*\*\*阅读下面的短文[^。]*。?\*\*\s*/g, "").trim();
-  article = article.replace(/^阅读下面的短文，根据题目要求用英文回答问题。\s*/gm, "").trim();
+  article = article.replace(/^阅读下面的短文，根据题目要求用英文回答问题。请在答题卡指定区域作答。\s*/gm, "").trim();
+  article = article.replace(/^阅读下面短文，根据题目要求用英文回答问题。请在答题卡指定区域作答。\s*/gm, "").trim();
   article = article.replace(/\n{3,}/g, "\n\n").trim();
 
   let questions = [];
@@ -926,10 +1291,7 @@ function parseWriting(lines, startIndex, referenceAnswers, paper) {
   while (i < lines.length) {
     const line = lines[i];
 
-    if (/^\*\*[IVⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+[.、]/.test(line)) {
-      break;
-    }
-    if (/^参考答案/.test(line)) {
+    if (isSectionHeader(line)) {
       break;
     }
 
@@ -997,15 +1359,33 @@ module.exports = { parseExam };
 if (require.main === module) {
   const args = process.argv.slice(2);
   if (args.length < 1) {
-    console.error("Usage: node parse-exam.js <md-file-path> [output-json-path]");
+    console.error("Usage: node parse-exam.js <folder-name-or-path>");
     process.exit(1);
   }
 
-  const mdPath = args[0];
-  const outputPath = args[1] || mdPath.replace(/\.md$/, ".json");
+  let folderPath = args[0];
+  if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {
+    folderPath = path.join(__dirname, folderPath);
+    if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {
+      console.error(`Error: folder not found: ${args[0]}`);
+      process.exit(1);
+    }
+  }
+
+  const folderName = path.basename(folderPath);
+  const mdPath = path.join(folderPath, `${folderName}.md`);
+  const txtPath = path.join(folderPath, `${folderName}.txt`);
+  const outputPath = path.join(folderPath, `${folderName}.json`);
 
   const mdContent = fs.readFileSync(mdPath, "utf-8");
-  const result = parseExam(mdContent);
+  let txtContent = null;
+  try {
+    txtContent = fs.readFileSync(txtPath, "utf-8");
+  } catch (e) {
+    console.log("  (No .txt file found, using markdown only)");
+  }
+
+  const result = parseExam(mdContent, txtContent);
 
   fs.writeFileSync(outputPath, JSON.stringify(result, null, 2), "utf-8");
   console.log(`Parsed exam saved to: ${outputPath}`);

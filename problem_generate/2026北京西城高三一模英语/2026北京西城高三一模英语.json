@@ -1,0 +1,1156 @@
+{
+  "paper": {
+    "title": "2026北京西城高三一模",
+    "subject": "英语",
+    "source": "2026北京西城高三一模",
+    "grade": "高三",
+    "year": 2026,
+    "totalScore": 15,
+    "duration": null,
+    "description": "",
+    "tags": [
+      "英语",
+      "高三",
+      "西城",
+      "模拟",
+      "2026",
+      "北京"
+    ]
+  },
+  "sections": [
+    {
+      "type": "完形填空",
+      "questionType": "cloze",
+      "title": "完形填空",
+      "category": "完形填空",
+      "score": 15,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "完形填空"
+      ],
+      "article": "We are told never to judge a book by its cover, but few of us actually follow that advice. I used to think I had a good <ClozeBlank></ClozeBlank> on people. Quiet meant cold, and confident meant arrogant (自大的). I was especially sure of this when it came to Marcus Greene, who sat behind me in chemistry class. He was the type of person who never raised his hand and rarely made eye contact. <ClozeBlank></ClozeBlank> , I assumed he thought he was too good for the rest of us. Distant. Maybe even rude.\n\nOne day in class, we were paired up for a group project. When the teacher announced our names together, I <ClozeBlank></ClozeBlank> heavily. He looked over and gave me a small nod. No smile, no greeting, just that. I rolled my eyes.\n\nOur first meeting was in the library after school. I expected it to be <ClozeBlank></ClozeBlank> , maybe even annoying, but to my surprise, Marcus came prepared. He had notes and questions. Not only that, but he even had suggestions for how we could divide the work fairly. I asked “Are you always this <ClozeBlank></ClozeBlank> ?” He said, “Only when I care about something.”\n\nOver the next two weeks, we worked side by side. He wasn't the person I thought he was. He didn't look down on others; he was just shy. He didn't avoid people; he just didn't know how to <ClozeBlank></ClozeBlank> . Slowly, I learned more about him. None of that arrogance I'd <ClozeBlank></ClozeBlank> to him was real. It had been nothing more than my assumption, wrapped up in his silence.\n\nThe day we presented our project, our teacher praised us for our <ClozeBlank></ClozeBlank> . I turned to Marcus and said, \"I'm glad we got paired up.\" He looked down, smiled faintly, and replied, \"Me too.\"\n\nThat was the day I realized I was wrong about him. And more importantly, it was the day I realized how easy it is to <ClozeBlank></ClozeBlank> someone when you don't bother to look deeper. Since then, I've tried to listen more closely, judge more slowly, and give people the <ClozeBlank></ClozeBlank> to show me who they are.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "read"
+            },
+            {
+              "id": "b",
+              "label": "focus"
+            },
+            {
+              "id": "c",
+              "label": "comment"
+            },
+            {
+              "id": "d",
+              "label": "impression"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第1题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "Luckily"
+            },
+            {
+              "id": "b",
+              "label": "Naturally"
+            },
+            {
+              "id": "c",
+              "label": "Hopefully"
+            },
+            {
+              "id": "d",
+              "label": "Suddenly"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第2题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "cried"
+            },
+            {
+              "id": "b",
+              "label": "sighed"
+            },
+            {
+              "id": "c",
+              "label": "protested"
+            },
+            {
+              "id": "d",
+              "label": "sweated"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第3题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "formal"
+            },
+            {
+              "id": "b",
+              "label": "smooth"
+            },
+            {
+              "id": "c",
+              "label": "urgent"
+            },
+            {
+              "id": "d",
+              "label": "awkward"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第4题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 5,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "relaxed"
+            },
+            {
+              "id": "b",
+              "label": "critical"
+            },
+            {
+              "id": "c",
+              "label": "organized"
+            },
+            {
+              "id": "d",
+              "label": "confident"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第5题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 6,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "hang on"
+            },
+            {
+              "id": "b",
+              "label": "show off"
+            },
+            {
+              "id": "c",
+              "label": "reach out"
+            },
+            {
+              "id": "d",
+              "label": "make up"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第6题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 7,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "assigned"
+            },
+            {
+              "id": "b",
+              "label": "owed"
+            },
+            {
+              "id": "c",
+              "label": "explained"
+            },
+            {
+              "id": "d",
+              "label": "presented"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第7题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 8,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "ambition"
+            },
+            {
+              "id": "b",
+              "label": "curiosity"
+            },
+            {
+              "id": "c",
+              "label": "tolerance"
+            },
+            {
+              "id": "d",
+              "label": "cooperation"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第8题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 9,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "ignore"
+            },
+            {
+              "id": "b",
+              "label": "describe"
+            },
+            {
+              "id": "c",
+              "label": "recognize"
+            },
+            {
+              "id": "d",
+              "label": "misunderstand"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第9题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 10,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "space"
+            },
+            {
+              "id": "b",
+              "label": "reason"
+            },
+            {
+              "id": "c",
+              "label": "guidance"
+            },
+            {
+              "id": "d",
+              "label": "pressure"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第10题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        }
+      ]
+    },
+    {
+      "type": "语法填空",
+      "questionType": "grammar",
+      "title": "语法填空",
+      "category": "语法填空",
+      "score": 15,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "语法填空"
+      ],
+      "article": "## A\n\nI sat in my professor's office and spoke out everything that had been troubling me for months: the stress and the self-doubt. He <Input></Input> listened and said, “You are here to learn to ride a bicycle, not to invent a bicycle.” That sentence opened something up. This experience marked a turning point, <Input></Input> I realized the need to refocus on my initial purpose. I <Input></Input> to worry less, and every project became a meaningful step forward and a story worth sharing, whether it failed or succeeded.\n\n## B\n\nDo you ever struggle to stay focused and get tasks <Input></Input> ? If so, you can try the Pomodoro Technique, a time management tool. It involves dividing work tasks into 25-minute periods, known as pomodoros, with breaks scheduled <Input></Input> periods. Introduced in the 1980s, the Pomodoro Technique <Input></Input> greater popularity over the past years thanks to its ability to help prevent burnout and boredom. Combining focused work with brief breaks <Input></Input> people to achieve more without losing concentration or getting stressed.\n\n## C\n\nProfessor Zhao Haiying leads a team combining AI, big data and archaeology (考古学) <Input></Input> a “digital gene bank of Chinese civilization”. Her inspiration came through carpets while she was studying <Input></Input> one art form connects countries and regions. Her team has designed six core categories of cultural genes, which is essential for revealing patterns of evolution through time and space. <Input></Input> with various museums, they have interconnected millions of digital artifacts. “Our mission is connection, not just collection,” Zhao says.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "input",
+          "answer": "calmly",
+          "analysis": "第11题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 2,
+          "questionType": "input",
+          "answer": "where/ when",
+          "analysis": "第12题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 3,
+          "questionType": "input",
+          "answer": "sought",
+          "analysis": "第13题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 4,
+          "questionType": "input",
+          "answer": "done",
+          "analysis": "第14题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 5,
+          "questionType": "input",
+          "answer": "between",
+          "analysis": "第15题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 6,
+          "questionType": "input",
+          "answer": "has gained",
+          "analysis": "第16题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 7,
+          "questionType": "input",
+          "answer": "allows",
+          "analysis": "第17题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 8,
+          "questionType": "input",
+          "answer": "to build",
+          "analysis": "第18题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 9,
+          "questionType": "input",
+          "answer": "how",
+          "analysis": "第19题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        },
+        {
+          "id": 10,
+          "questionType": "input",
+          "answer": "Partnering",
+          "analysis": "第20题解析: 根据上下文和语法规则填写正确答案。",
+          "score": 1.5
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解A",
+      "category": "阅读",
+      "score": 6,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "阅读"
+      ],
+      "article": "# A\n\n**Loved Before**\n\n_The first eco-friendly, fully sustainable soft toy adoption agency_\n\n“Several years back, during my time as a volunteer at a charity shop, I observed the arrival of second-hand toys at the store. These pre-loved toys, often handed over with cherished memories and emotional significance, were carelessly cast aside, sometimes became dog toys or, even more dishearteningly, destined for the landfill.”\n\nIt became evident to me how the love, lively life, and stories of these eco-toys were at risk of being lost and forgotten in an instant. That was when Loved Before was born with the mission to revolutionize our perspective on sustainable toys.”\n\n—Charlotte, Founder\n\n**What we do**\n\n- Your pre-loved toys arrive at our headquarter where they officially become Loved Befores and have a tailored and thorough “Spa” treatment to make them clean.\n- Each toy will have its own photoshoot, be added to the store along with the story of their previous lives and adventures, and be re-homed to their new family!\n- At least half of the profit from every one of our sustainable toys once adopted goes to Make-A-Wish, a non-profit organization who creates and fulfils life-changing wishes for children living with critical illnesses.\n\n**What we believe**\n\n- **~~Imperfect~~ I’m perfect:** Our collections showcase toys that have weathered the journey of life—worn and beautifully imperfect. Loved Before believes that in the world of love and acceptance, “imperfections” hold no weight. True beauty lies in the individuality of each toy, and there’s no such thing as “perfect”.\n- **Saving the world, one teddy at a time:** While our passion for teddies is undeniable, at Loved Before, we view our mission as a driving force for a broader shift in mindset—one where sustainable toys, particularly our eco-friendly teddies, mark just the beginning! We passionately believe that the world is already filled with enough soft toys to last a lifetime, eliminating (消除) the necessity to produce more. By shifting perceptions of pre-loved items, we’re on a mission to revolutionize the toy industry forever. Our collection is a movement towards a greener, more conscious playtime.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What inspired Charlotte to start Loved Before?",
+          "options": [
+            {
+              "id": "a",
+              "label": "The improper treatment of old toys."
+            },
+            {
+              "id": "b",
+              "label": "The new attitude toward dog toys."
+            },
+            {
+              "id": "c",
+              "label": "The profits from charities."
+            },
+            {
+              "id": "d",
+              "label": "The donations from kids."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第21题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "According to the passage, Loved Before \\___\\___.",
+          "options": [
+            {
+              "id": "a",
+              "label": "fulfils toy owners’ wishes"
+            },
+            {
+              "id": "b",
+              "label": "helps to cure sick children"
+            },
+            {
+              "id": "c",
+              "label": "shares the toys’ life stories"
+            },
+            {
+              "id": "d",
+              "label": "buys thoroughly cleaned toys"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第22题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "What is the significance of Loved Before?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Achieving perfection in life."
+            },
+            {
+              "id": "b",
+              "label": "Stressing the impact of teddies."
+            },
+            {
+              "id": "c",
+              "label": "Promoting the production of toys."
+            },
+            {
+              "id": "d",
+              "label": "Raising environmental awareness."
+            }
+          ],
+          "answer": "d",
+          "analysis": "第23题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解B",
+      "category": "阅读",
+      "score": 8,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "阅读"
+      ],
+      "article": "# B\n\nI have always felt most comfortable in the classroom, and I enjoy the recognition from family and teachers for accomplishing a job well. Although I was a high achiever, I was not a student who joined every club. Throughout my life, I wanted to learn more than I wanted to be in a bunch of extracurriculars (课外活动).\n\nMy academic journey continued at a community college, where I joined the student newspaper. In the newsroom, I discovered an engaging, fast-paced world that allowed me to never stop learning. It was just what I had expected. Now my transfer (转学) to Drake University for a journalism degree was a no-brainer. It was exciting to see my future become clear, but I never pictured the shock waves headed my way.\n\nThe campus phenomenon known as “Drake Busy” was completely unexpected. The term describes the idea that constant busyness is the main indicator of college success. Within the first week, I felt heavy pressure to be active in all the ways my peers (同伴) were. I saw students trying to balance multiple jobs and organizations alongside schoolwork. As a student used to having confidence in the classroom, I felt this new standard threatened my identity and worsened my anxiety. I spent my first term struggling with doubts about my worthiness. My anxious thoughts tricked my mind into believing lies like “You’re not good enough.” A part of my mind realized those thoughts were not true, but that sensible voice was a whisper compared to the shouts of doubt. As a witness to this battle every day, I have learned that sometimes it just takes time to chip away at my mind’s inventions.\n\nIn time, I recognized that my experience as a transfer student was different but valuable. The outsider perspective helped me tackle “Drake Busy”. I watched people trying to do too much at the expense of their well-being. I wanted to shake them and say, “Why do this to yourself?”\n\nInstead of fighting the current, I eventually learned to swim in my own lane. The pressure didn’t disappear, but my need to give in to it did. I realized that my worth wasn’t calculated by the number of meetings on my calendar, but by the real satisfaction I felt in my work. On the days I managed to balance my ambition with my peace of mind, I felt most motivated. I discovered that: true success is defined internally, not by the noise around you.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "Before entering Drake University, the author \\___\\___.",
+          "options": [
+            {
+              "id": "a",
+              "label": "adopted a relaxing lifestyle"
+            },
+            {
+              "id": "b",
+              "label": "longed to become a teacher"
+            },
+            {
+              "id": "c",
+              "label": "struggled to choose a major"
+            },
+            {
+              "id": "d",
+              "label": "performed well academically"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第24题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "How did the author feel within the first week at Drake University?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Unaccustomed."
+            },
+            {
+              "id": "b",
+              "label": "Relieved."
+            },
+            {
+              "id": "c",
+              "label": "Regretful."
+            },
+            {
+              "id": "d",
+              "label": "Expectant."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第25题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "What does the author think of the “Drake Busy” lifestyle?",
+          "options": [
+            {
+              "id": "a",
+              "label": "It lowers students’ learning efficiency."
+            },
+            {
+              "id": "b",
+              "label": "It indicates students’ future success."
+            },
+            {
+              "id": "c",
+              "label": "It threatens students’ well-being."
+            },
+            {
+              "id": "d",
+              "label": "It erases students’ self-doubt."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第26题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "content": "What message does the passage deliver?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Outsiders rarely win."
+            },
+            {
+              "id": "b",
+              "label": "Your own pace matters."
+            },
+            {
+              "id": "c",
+              "label": "Busyness equals worthiness."
+            },
+            {
+              "id": "d",
+              "label": "Your anxiety drives you forward."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第27题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解C",
+      "category": "阅读",
+      "score": 6,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "阅读"
+      ],
+      "article": "# C\n\nIntelligence is changing. For most of modern history, IQ was treated as the gold standard for potential, and later, EQ became the best way to succeed in relationship-driven spaces. Now, both are being challenged because AI models can complete cognitive (认知的) tasks with superior speed and accuracy while simulating (模拟) emotional connections with users in ways that feel increasingly realistic.\n\nMany of the abilities we once relied on to stand out are no longer exclusively human. Once, being the smartest in the room ensured success. Today, this advantage weakens—AI drafts complex strategies and processes information at a range and speed no human can match. The differentiator shifts from accessing information to interpreting it wisely, leaving many questioning their place as human skills are easily automated.\n\nOne capacity gaining attention is spiritual intelligence (SQ). Although the term is often misunderstood as religious, most researchers use it in a worldly way to describe how people find meaning and direction in their lives. The common thread is that SQ can influence how we orient（标定方向）ourselves when familiar strategies fail, encouraging us to question whether productivity alone can sustain a meaningful life.\n\nSQ can serve as a framework to exercise our agency and stay connected to what matters during periods of rapid change and uncertainty. Unlike IQ and EQ, SQ resists automation because it develops through lived experience and the ongoing process of making meaning in our lives. It helps us perceive not only what we can do, but why it matters.\n\nCurrent research has associated higher levels of SQ with greater resilience（韧性）, more moral leadership behaviors, higher well-being, and stronger interpersonal trust. One incredible explanation is that SQ strengthens our sense of agency: when we root our decisions in meaning, we approach complexity with intentionality instead of urgency. Such value is reflected in its key qualities.\n\nThree key qualities of people who have developed SQ are often identified in research. First is systems awareness. Scholars believe SQ enables a broader perspective to spot event patterns and connections, with qualitative studies showing high SQ scorers often think interdependently. Besides, individuals with strong SQ tend to exhibit a purpose-driven orientation. Cambridge research suggests that having a sense of purpose is linked to motivation, creativity and well-being. SQ centers on correlational rather than definitive. Equally important is the quality of presence. Practices like mindfulness tied to SQ reduce reactivity and boost attention regulation, helping individuals stay grounded under stress for intentional actions.\n\nPerhaps SQ's most notable trait is its gradual growth, with no dramatic reinvention needed. It emerges through honest reflection and a willingness to revisit long-held beliefs, accessible to anyone willing to engage with themselves intentionally and curiously. As AI advances, human uniqueness may shift from what we can produce to how we interpret, make choices, and live out our values. IQ and EQ will remain valuable, but no longer define our uniqueness. SQ—the ability to find consistence amid rapid change—may become our most essential human skill.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What are the first two paragraphs mainly about?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Why new competitive skills are challenged."
+            },
+            {
+              "id": "b",
+              "label": "When traditional human advantages will fail."
+            },
+            {
+              "id": "c",
+              "label": "How human uniqueness is shifting in the AI era."
+            },
+            {
+              "id": "d",
+              "label": "What makes AI superior in information processing."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第28题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "What can be inferred about spiritual intelligence?",
+          "options": [
+            {
+              "id": "a",
+              "label": "It proves to be the cause of purpose."
+            },
+            {
+              "id": "b",
+              "label": "It grows by abandoning long-held beliefs."
+            },
+            {
+              "id": "c",
+              "label": "It helps people stay rooted amid uncertainty."
+            },
+            {
+              "id": "d",
+              "label": "It facilitates urgent decisions in complex situations."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第29题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "Which would be the best title for the passage?",
+          "options": [
+            {
+              "id": "a",
+              "label": "SQ’s Advantages Over IQ & EQ"
+            },
+            {
+              "id": "b",
+              "label": "The Rise of Spiritual Intelligence"
+            },
+            {
+              "id": "c",
+              "label": "The Development of Human Intelligence"
+            },
+            {
+              "id": "d",
+              "label": "How Human Intelligence Outperforms AI"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第30题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解D",
+      "category": "阅读",
+      "score": 8,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "阅读"
+      ],
+      "article": "# D\n\nPictures and videos of all sorts of animals regularly go viral these days because people connect with the apparent joy, friendship and playfulness of these animals. Unfortunately, the initial enthusiasm of these posts is often squashed by someone rightly noting that the animal’s reaction is not joy or pleasure, but fear, anger or pain.\n\nThe reason we often get cases like this wrong is that we interpret the emotional content of many behaviors automatically and unconsciously. This is a version of anthropomorphism: interpreting animals as we would interpret another human. The standard view has been that anthropomorphism is primarily an error of overestimating the intelligence of animals. In recent decades, many authors have pushed back against this attitude towards anthropomorphism, arguing animals are a lot like us and that many “anthropomorphic” claims about animals are actually true.\n\nInstead of getting caught in a black-and-white debate, however, I want a more complicated, informed discussion of competing ideas. Once we agree that animals do, in fact, have emotions, we can acknowledge that the anthropomorphic mistake is not seeing emotion where there is none—it is seeing the wrong emotion.\n\nEach of us has a set of perceptual, emotional and cognitive capacities that allow us to engage and understand one another socially. These capacities help guide and structure all sorts of interactions, and we are generally not even aware we are using them. They are generally, but not perfectly, tuned for human interaction. Things can get messy, though, when we use them to interpret animals. Perhaps the best-studied version of this is the primate “grin” (灵长类动物的咧嘴笑). The animal is not happy, it turns out. The exact signaling function varies by species, but it usually signals something more like fear or anxiety, often by a submissive individual in a tense social situation. This is, in fact, anthropomorphism, because you are interpreting an animal’s behavior in the same way we would interpret human behavior. This kind of anthropomorphism is a form of cognitive bias (偏见) resulting from shortcuts taken by our reasoning processes, usually without our awareness.\n\nWe should approach the topic of anthropomorphism from the angle of bias. Traditionally, assumptions about how and when people anthropomorphise have been so fixed that the psychology did not seem worth investigating. Slightly different attitudes can be found. For example, even though they advocate for anthropomorphic views of animals, the zoologists Jesús Rivas and Gordon Burghardt memorably note that it can be tricky: “Anthropomorphism comes in many forms and can catch you off guard!” While the recognition of “many forms” is progress, it makes the need for evidence-based research only more pressing. By focusing on implicit (隐性的) anthropomorphism, we shift attention from debating specific “humanlike” features to examining the deeper psychological mechanisms that make anthropomorphism so slippery. This, I believe, is the most challenging and most significant dimension of the problem.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What does the word “squashed” underlined in Paragraph 1 probably mean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Awakened."
+            },
+            {
+              "id": "b",
+              "label": "Dampened."
+            },
+            {
+              "id": "c",
+              "label": "Misguided."
+            },
+            {
+              "id": "d",
+              "label": "Underestimated."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第31题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "What can we learn about anthropomorphism?",
+          "options": [
+            {
+              "id": "a",
+              "label": "It turns animals’ negative emotions into positive ones."
+            },
+            {
+              "id": "b",
+              "label": "It underrates the emotional capacities of animal species."
+            },
+            {
+              "id": "c",
+              "label": "It contributes to the shortcuts of our reasoning processes."
+            },
+            {
+              "id": "d",
+              "label": "It reflects the projection of human qualities onto animals."
+            }
+          ],
+          "answer": "d",
+          "analysis": "第32题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "The author quotes Jesús and Gordon to \\___\\___.",
+          "options": [
+            {
+              "id": "a",
+              "label": "confirm the value of anthropomorphism"
+            },
+            {
+              "id": "b",
+              "label": "highlight the complexity of anthropomorphism"
+            },
+            {
+              "id": "c",
+              "label": "warn us of the limitations of anthropomorphism"
+            },
+            {
+              "id": "d",
+              "label": "remind us to view anthropomorphism positively"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第33题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "content": "What does the author intend to do by writing this passage?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Propose a fresh perspective."
+            },
+            {
+              "id": "b",
+              "label": "Analyze a worrying tendency."
+            },
+            {
+              "id": "c",
+              "label": "Evaluate the credibility of a theory."
+            },
+            {
+              "id": "d",
+              "label": "Explore the origin of a phenomenon."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第34题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "七选五",
+      "questionType": "seven-choose-five",
+      "title": "七选五",
+      "category": "七选五",
+      "score": 10,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "七选五"
+      ],
+      "content": "",
+      "article": "Cut your sugar, get some exercise, eat your vegetables, sleep well. Every day, we are surrounded by information about how to live longer, healthier, happier lives. <Blank></Blank> It is to engage in the arts.\n\nOver the past few decades, evidence has been increasing to suggest that being more creative works wonders for our health. <Blank></Blank> And the results are astonishing, from music in surgery reducing the amount of painkillers and anti-anxiety medicines needed, to dance programs helping people with Parkinson’s disease to walk.\n\nBut the arts aren’t just there for us when we are sick. As a public health scientist, I spend my days looking at data from studies—massive datasets that contain thousands of individuals who have completed questionnaires, had nurse interviews, donated blood samples and undergone brain imaging every few years of their lives.\n\n<Blank></Blank> Using complex statistical methods, we can look at the long-term relationship between everyday arts engagement and dozens of health outcomes.\n\nThe results are remarkable. Children who engage more with the arts have a reduced risk of developing problems like depression later in life. Adults who participate more frequently in the arts and visit cultural venues are happier and feel more satisfied with their lives over the years and decades that follow.\n\n<Blank></Blank> Kindergarteners who engage in music activities have increased prosocial skills as they head into primary school. Teenagers who are involved in bands, dance and editing school newspapers are less likely to get involved in antisocial behaviors or crime.\n\nI want to be clear: I am not suggesting the arts can solve all problems. <Blank></Blank> But the evidence remains that engaging regularly in creative activities that you enjoy is an investment in your health that is worth making.",
+      "options": [
+        {
+          "id": "A",
+          "label": "The benefits aren’t just psychological either."
+        },
+        {
+          "id": "B",
+          "label": "Regular arts engagement goes beyond boosting physical health."
+        },
+        {
+          "id": "C",
+          "label": "But there is one piece of advice I bet you have never been given."
+        },
+        {
+          "id": "D",
+          "label": "Many of these studies contain buried questions on arts engagement."
+        },
+        {
+          "id": "E",
+          "label": "Arts can be inaccessible to people because of cost and other reasons."
+        },
+        {
+          "id": "F",
+          "label": "Crafts, singing, theatre and writing are good for us as part of our daily lives."
+        },
+        {
+          "id": "G",
+          "label": "Programs being developed around the world are starting to integrate the arts into healthcare."
+        }
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The benefits aren’t just psychological either."
+            },
+            {
+              "id": "B",
+              "label": "Regular arts engagement goes beyond boosting physical health."
+            },
+            {
+              "id": "C",
+              "label": "But there is one piece of advice I bet you have never been given."
+            },
+            {
+              "id": "D",
+              "label": "Many of these studies contain buried questions on arts engagement."
+            },
+            {
+              "id": "E",
+              "label": "Arts can be inaccessible to people because of cost and other reasons."
+            },
+            {
+              "id": "F",
+              "label": "Crafts, singing, theatre and writing are good for us as part of our daily lives."
+            },
+            {
+              "id": "G",
+              "label": "Programs being developed around the world are starting to integrate the arts into healthcare."
+            }
+          ],
+          "blankIndex": 0,
+          "answer": "C",
+          "analysis": "第35题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The benefits aren’t just psychological either."
+            },
+            {
+              "id": "B",
+              "label": "Regular arts engagement goes beyond boosting physical health."
+            },
+            {
+              "id": "C",
+              "label": "But there is one piece of advice I bet you have never been given."
+            },
+            {
+              "id": "D",
+              "label": "Many of these studies contain buried questions on arts engagement."
+            },
+            {
+              "id": "E",
+              "label": "Arts can be inaccessible to people because of cost and other reasons."
+            },
+            {
+              "id": "F",
+              "label": "Crafts, singing, theatre and writing are good for us as part of our daily lives."
+            },
+            {
+              "id": "G",
+              "label": "Programs being developed around the world are starting to integrate the arts into healthcare."
+            }
+          ],
+          "blankIndex": 1,
+          "answer": "G",
+          "analysis": "第36题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The benefits aren’t just psychological either."
+            },
+            {
+              "id": "B",
+              "label": "Regular arts engagement goes beyond boosting physical health."
+            },
+            {
+              "id": "C",
+              "label": "But there is one piece of advice I bet you have never been given."
+            },
+            {
+              "id": "D",
+              "label": "Many of these studies contain buried questions on arts engagement."
+            },
+            {
+              "id": "E",
+              "label": "Arts can be inaccessible to people because of cost and other reasons."
+            },
+            {
+              "id": "F",
+              "label": "Crafts, singing, theatre and writing are good for us as part of our daily lives."
+            },
+            {
+              "id": "G",
+              "label": "Programs being developed around the world are starting to integrate the arts into healthcare."
+            }
+          ],
+          "blankIndex": 2,
+          "answer": "D",
+          "analysis": "第37题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The benefits aren’t just psychological either."
+            },
+            {
+              "id": "B",
+              "label": "Regular arts engagement goes beyond boosting physical health."
+            },
+            {
+              "id": "C",
+              "label": "But there is one piece of advice I bet you have never been given."
+            },
+            {
+              "id": "D",
+              "label": "Many of these studies contain buried questions on arts engagement."
+            },
+            {
+              "id": "E",
+              "label": "Arts can be inaccessible to people because of cost and other reasons."
+            },
+            {
+              "id": "F",
+              "label": "Crafts, singing, theatre and writing are good for us as part of our daily lives."
+            },
+            {
+              "id": "G",
+              "label": "Programs being developed around the world are starting to integrate the arts into healthcare."
+            }
+          ],
+          "blankIndex": 3,
+          "answer": "A",
+          "analysis": "第38题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 5,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "The benefits aren’t just psychological either."
+            },
+            {
+              "id": "B",
+              "label": "Regular arts engagement goes beyond boosting physical health."
+            },
+            {
+              "id": "C",
+              "label": "But there is one piece of advice I bet you have never been given."
+            },
+            {
+              "id": "D",
+              "label": "Many of these studies contain buried questions on arts engagement."
+            },
+            {
+              "id": "E",
+              "label": "Arts can be inaccessible to people because of cost and other reasons."
+            },
+            {
+              "id": "F",
+              "label": "Crafts, singing, theatre and writing are good for us as part of our daily lives."
+            },
+            {
+              "id": "G",
+              "label": "Programs being developed around the world are starting to integrate the arts into healthcare."
+            }
+          ],
+          "blankIndex": 4,
+          "answer": "E",
+          "analysis": "第39题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读表达",
+      "questionType": "reading-expression",
+      "title": "阅读表达",
+      "category": "阅读表达",
+      "score": 12,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "阅读表达"
+      ],
+      "article": "It often took me weeks or even months to begin writing something. I tended to put it off, reasoning that at some point I would land in that perfect moment where my thoughts would flow. But that moment didn’t always arrive, and I ended up putting together a hurriedly written piece only when the deadline became dangerously close.\n\nIt was 10 p.m. on a winter night and I was sitting at my laptop, staring at a blank Word document. My thesis proposal deadline approached. I hadn’t written a word despite weeks of thinking. Earlier that evening, when I met another Ph.D. student, Sachin, for our regular monthly dinner, he was equally stuck—buried under the weight of a fellowship application. We set out to make a change. So, we made a pact (约定): After dinner, we would sit together, laptops open, phones away, no excuses. It was the fuel I needed to finally start writing.\n\nOur informal pact soon became a habit. We scheduled weekly 90-minute sessions, which gave us a distraction-free space to write something, however imperfect. We began each session by naming a small goal. That 5-minute planning made the rest of the session surprisingly productive. Instead of worrying about writing an entire proposal, we only had to finish a tiny piece of it. Those small wins built confidence. A few sentences grew into paragraphs, then into complete proposals with enough time before the deadline to get feedback from professors. Writing never got easy, as I’d hoped, but it became less isolating and more productive. Sachin and I had both seen our mates face similar challenges and wanted to bring this experience to a broader group. So we launched co-working sessions for the students in our department. We started with 5 minutes of goal setting, followed by 75 minutes of silent, focused writing, and ended with a short reflection period.\n\nNow dozens of students have attended. What began as two anxious students staring at blank screens has grown into a small community that makes writing less lonely. Our experience showed us that accountability and a shared sense of purpose can lower the barriers that make writing so scary. No one should have to write alone.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "text",
+          "content": "What was the pact between the author and Sachin for writing?",
+          "answer": "After dinner, they would sit together, laptops open, phones away, no excuses.",
+          "analysis": "第40题解析: 根据文章内容回答问题。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "text",
+          "content": "Why did the author and Sachin start co-working sessions for their mates?",
+          "answer": "Because they had both seen their mates face similar challenges and wanted to bring this experience to a broader group.",
+          "analysis": "第41题解析: 根据文章内容回答问题。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "text",
+          "content": "Please decide which part is false in the following statement, then underline it and explain why.\n\n- **_The co-working sessions helped to remove the block that made writing frightening._**",
+          "answer": "The co-writing sessions helped to remove the block that made writing frightening. The co-writing sessions helped to lower the barriers that made writing frightening.",
+          "analysis": "第42题解析: 根据文章内容回答问题。",
+          "score": 3
+        },
+        {
+          "id": 4,
+          "questionType": "text",
+          "content": "Apart from making a pact, what other way(s) would you use to improve productivity? **(_In about 40 words_)**",
+          "answer": "略",
+          "analysis": "第43题解析: 根据文章内容回答问题。",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "type": "作文",
+      "questionType": "en-writing",
+      "title": "写作",
+      "category": "作文",
+      "score": 20,
+      "grade": "高三",
+      "source": "2026北京西城高三一模",
+      "tags": [
+        "英语",
+        "高三",
+        "西城",
+        "模拟",
+        "2026",
+        "北京",
+        "作文"
+      ],
+      "article": "假设你是红星中学高三学生李华。你的英国好友 Jim 听说你参加了全球青少年机器人设计大赛，想了解相关情况。请你用英文给他发邮件，内容包括:\n\n1\\. 介绍你的参赛作品；\n\n2\\. 分享参赛感想。\n\n注意：1.词数100左右；\n\n2. 开头和结尾已给出，不计入总词数。",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "text",
+          "content": "假设你是红星中学高三学生李华。你的英国好友 Jim 听说你参加了全球青少年机器人设计大赛，想了解相关情况。请你用英文给他发邮件，内容包括:\n\n1\\. 介绍你的参赛作品；\n\n2\\. 分享参赛感想。\n\n注意：1.词数100左右；\n\n2. 开头和结尾已给出，不计入总词数。",
+          "answer": "",
+          "analysis": "写作题评分标准：内容要点完整，语言表达准确流畅，结构清晰，词数符合要求。",
+          "score": 20
+        }
+      ]
+    }
+  ]
+}

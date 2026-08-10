@@ -220,12 +220,28 @@ function main() {
   const inputPaths = args.filter((a) => a !== "--delete");
 
   if (inputPaths.length < 1) {
-    console.error("Usage: npx tsx problem_generate/import-exam.ts [--delete] <json-file-path>");
-    console.error("  Or: npx tsx problem_generate/import-exam.ts [--delete] <directory-path>  (batch import all .json files)");
+    console.error("Usage: npx tsx problem_generate/import-exam.ts [--delete] <folder-name-or-json-path>");
+    console.error("  Examples:");
+    console.error("    npx tsx problem_generate/import-exam.ts 2025北京西城高二（下）期末英语（教师版）.json");
+    console.error("    npx tsx problem_generate/import-exam.ts 2025北京西城高二（下）期末英语（教师版）.json --delete");
     process.exit(1);
   }
 
-  const inputPath = inputPaths[0];
+  let inputPath = inputPaths[0];
+
+  if (!fs.existsSync(inputPath)) {
+    if (inputPath.endsWith(".json")) {
+      const folderName = inputPath.replace(/\.json$/, "");
+      inputPath = path.join(__dirname, folderName, inputPath);
+    } else {
+      inputPath = path.join(__dirname, inputPath);
+    }
+
+    if (!fs.existsSync(inputPath)) {
+      console.error(`Error: file not found: ${inputPaths[0]}`);
+      process.exit(1);
+    }
+  }
 
   (async () => {
     if (deleteFlag) {
