@@ -155,7 +155,7 @@ export default async function TestPaperPracticePage({ params }: PageProps) {
   )
 
   return (
-    <AnswerProvider>
+    <AnswerProvider storageKey={`test-paper-${id}`}>
       <TestPaperPractice
         testPaperId={id}
         testPaperTitle={testPaper.title}

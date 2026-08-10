@@ -25,6 +25,7 @@ interface ChoiceQuestionProps {
   type: ChoiceType
   options: Option[]
   onChange: (selected: string[]) => void
+  value?: string[]
 }
 
 // 判断选项长度的函数
@@ -46,8 +47,8 @@ function getLayoutType(options: Option[]): LayoutType {
   return 'two-columns'
 }
 
-export function ChoiceQuestion({ type, options, onChange }: ChoiceQuestionProps) {
-  const [selected, setSelected] = useState<string[]>([])
+export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestionProps) {
+  const [selected, setSelected] = useState<string[]>(value ?? [])
   const layoutType = getLayoutType(options)
   const components = useMDXComponents()
 

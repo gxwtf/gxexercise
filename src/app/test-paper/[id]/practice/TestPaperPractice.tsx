@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { MDXRemoteSerializeResult } from "next-mdx-remote"
 import { Button } from "@/components/ui/button"
-import { Clock, ChevronLeft, ChevronRight, Send } from "lucide-react"
+import { Clock, ChevronLeft, ChevronRight, Send, LayoutGrid } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import useSession from "@/lib/use-session"
 import { useAlertContext } from "@/components/alert-provider"
 import { useAnswer } from "@/components/question-group/AnswerContext"
@@ -12,6 +14,9 @@ import { QuestionSection } from "@/components/QuestionSection"
 import Problem from "@/components/question-group/Problem"
 import Grammar from "@/components/question-group/grammar"
 import SevenChooseFive from "@/components/question-group/seven-choose-five"
+
+const STORAGE_KEY = (id: string) => `exam_state_${id}`
+const ANSWERS_KEY = (id: string) => `exam_answers_test-paper-${id}`
 
 interface QuestionPracticeData {
   id: string
@@ -47,12 +52,36 @@ export function TestPaperPractice({
   groupsData,
 }: TestPaperPracticeProps) {
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0)
+  const [timerStart, setTimerStart] = useState<number | null>(null)
   const [seconds, setSeconds] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    let startTime: number
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY(testPaperId))
+      if (saved) {
+        const { startTime: savedStart, groupIndex: savedGroup } = JSON.parse(saved)
+        if (typeof savedStart === "number") {
+          startTime = savedStart
+        } else {
+          startTime = Date.now()
+        }
+        if (typeof savedGroup === "number" && savedGroup >= 0 && savedGroup < groupsData.length) {
+          setCurrentGroupIndex(savedGroup)
+        }
+      } else {
+        startTime = Date.now()
+      }
+    } catch {
+      startTime = Date.now()
+    }
+    setTimerStart(startTime)
+  }, [testPaperId, groupsData.length])
   const { session } = useSession()
   const router = useRouter()
   const { showAlert } = useAlertContext()
-  const { getAllAnswers } = useAnswer()
+  const { getAllAnswers, answers } = useAnswer()
 
   const totalGroups = groupsData.length
   const currentGroup = groupsData[currentGroupIndex]
@@ -60,11 +89,22 @@ export function TestPaperPractice({
   const isLastGroup = currentGroupIndex === totalGroups - 1
 
   useEffect(() => {
+    if (timerStart === null) return
     const timer = setInterval(() => {
-      setSeconds((prev) => prev + 1)
+      setSeconds(Math.floor((Date.now() - timerStart) / 1000))
     }, 1000)
     return () => clearInterval(timer)
-  }, [])
+  }, [timerStart])
+
+  useEffect(() => {
+    if (timerStart === null) return
+    try {
+      localStorage.setItem(STORAGE_KEY(testPaperId), JSON.stringify({
+        groupIndex: currentGroupIndex,
+        startTime: timerStart,
+      }))
+    } catch {}
+  }, [timerStart, testPaperId])
 
   const formatTime = (totalSeconds: number) => {
     const hours = Math.floor(totalSeconds / 3600)
@@ -76,19 +116,39 @@ export function TestPaperPractice({
     return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
+  const saveState = useCallback((targetGroupIndex?: number) => {
+    const idx = targetGroupIndex ?? currentGroupIndex
+    try {
+      localStorage.setItem(STORAGE_KEY(testPaperId), JSON.stringify({
+        groupIndex: idx,
+        startTime: timerStart ?? Date.now(),
+      }))
+      const allAnswers = getAllAnswers()
+      const answersRecord: Record<string, typeof allAnswers[number]> = {}
+      for (const a of allAnswers) {
+        answersRecord[a.questionId] = a
+      }
+      localStorage.setItem(ANSWERS_KEY(testPaperId), JSON.stringify(answersRecord))
+    } catch {}
+  }, [testPaperId, currentGroupIndex, timerStart, getAllAnswers])
+
   const handlePrev = useCallback(() => {
     if (currentGroupIndex > 0) {
-      setCurrentGroupIndex((prev) => prev - 1)
+      const target = currentGroupIndex - 1
+      saveState(target)
+      setCurrentGroupIndex(target)
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
-  }, [currentGroupIndex])
+  }, [currentGroupIndex, saveState])
 
   const handleNext = useCallback(() => {
     if (currentGroupIndex < totalGroups - 1) {
-      setCurrentGroupIndex((prev) => prev + 1)
+      const target = currentGroupIndex + 1
+      saveState(target)
+      setCurrentGroupIndex(target)
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
-  }, [currentGroupIndex, totalGroups])
+  }, [currentGroupIndex, totalGroups, saveState])
 
   const handleSubmit = useCallback(async () => {
     if (!session.userid) {
@@ -133,6 +193,8 @@ export function TestPaperPractice({
 
       if (response.ok) {
         const result = await response.json()
+        try { localStorage.removeItem(STORAGE_KEY(testPaperId)) } catch {}
+        try { localStorage.removeItem(ANSWERS_KEY(testPaperId)) } catch {}
         router.push(`/test-paper/${testPaperId}/result/${result.submissionId}`)
       } else {
         const error = await response.json()
@@ -145,6 +207,17 @@ export function TestPaperPractice({
       setIsSubmitting(false)
     }
   }, [session.userid, testPaperId, seconds, groupsData, getAllAnswers, router, totalGroups])
+
+  const isQuestionAnswered = useCallback((questionId: string) => {
+    const answer = answers[questionId]?.content.answer as string | undefined
+    return answer != null && answer !== ""
+  }, [answers])
+
+  const handleJumpToGroup = useCallback((groupIndex: number) => {
+    saveState(groupIndex)
+    setCurrentGroupIndex(groupIndex)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [saveState])
 
   const renderGroup = () => {
     if (!currentGroup) return null
@@ -218,6 +291,7 @@ export function TestPaperPractice({
         <SevenChooseFive
           questions={questions as any}
           mdxSource={contentMdx!}
+          startQuestionNumber={startQuestionNumber}
         />
       )
     }
@@ -329,6 +403,54 @@ export function TestPaperPractice({
             </div>
 
             <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <LayoutGrid className="w-4 h-4" />
+                    答题卡
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 max-h-96 overflow-y-auto" align="end">
+                  <div className="space-y-3">
+                    {groupsData.map((group, groupIndex) => {
+                      const answeredCount = group.questions.filter((q) => isQuestionAnswered(q.id)).length
+                      const totalCount = group.questions.length
+                      return (
+                        <div key={group.id}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs text-muted-foreground w-5">{groupIndex + 1}</span>
+                            <span className="text-sm font-medium flex-1 truncate">{group.title}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {answeredCount}/{totalCount}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 pl-7">
+                            {group.questions.map((q, qi) => {
+                              const answered = isQuestionAnswered(q.id)
+                              return (
+                                <button
+                                  key={q.id}
+                                  className={cn(
+                                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 transition-colors cursor-pointer",
+                                    answered
+                                      ? "bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-950 dark:border-blue-400 dark:text-blue-300 hover:bg-blue-200"
+                                      : "bg-gray-100 border-gray-300 text-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 hover:bg-gray-200"
+                                  )}
+                                  onClick={() => {
+                                    handleJumpToGroup(groupIndex)
+                                  }}
+                                >
+                                  {qi + 1}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
               {!isFirstGroup && (
                 <Button
                   variant="outline"

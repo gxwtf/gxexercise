@@ -4,6 +4,9 @@ import { cn } from '@/lib/utils'
 import { useBlankContext, ClozeContext, useInputChangeContext } from '@/components/article/english-reading'
 import { Input as ShadcnInput } from "@/components/ui/input"
 
+// ---- Input default values context (for restoring input values on navigation) ----
+export const InputDefaultValuesContext = React.createContext<Record<string, string>>({})
+
 // ---- MathInput2 context ----
 interface MathInput2ContextType {
   onInputChange?: (index: number, value: string) => void
@@ -35,6 +38,7 @@ export function MathInput2Provider({ children, onInputChange, disabled = false }
 // Input2 - 无序号短输入框，用于数学填空
 function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
   const ctx = React.useContext(MathInput2Context)
+  const defaultValues = React.useContext(InputDefaultValuesContext)
   const indexRef = React.useRef<number | undefined>(undefined)
   const isDisabled = ctx?.disabled ?? false
 
@@ -43,6 +47,8 @@ function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
       indexRef.current = ctx.getNextIndex()
     }
   }
+
+  const defaultValue = indexRef.current != null ? defaultValues[String(indexRef.current)] : undefined
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (ctx && indexRef.current !== undefined && ctx.onInputChange) {
@@ -56,6 +62,7 @@ function Input2(props: React.HTMLAttributes<HTMLSpanElement>) {
         type="text"
         className="w-32 h-8 text-base inline-block"
         disabled={isDisabled}
+        defaultValue={defaultValue}
         onChange={handleChange}
       />
     </span>
@@ -71,7 +78,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
         return <span {...props}>{children}</span>
     }
 
-    const { blanks, options, onBlankClick, onRemove, getNextBlankId, reviewMode, correctBlanks } = context
+    const { blanks, options, onBlankClick, onRemove, getNextBlankId, getNextBlankQuestionNum, reviewMode, correctBlanks } = context
 
     const blankIdRef = React.useRef<string | null>(null)
     if (blankIdRef.current === null) {
@@ -81,6 +88,11 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
 
     const filledOptionId = blanks[blankId]
     const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
+
+    const questionNumRef = React.useRef<number | null>(null)
+    if (getNextBlankQuestionNum && questionNumRef.current === null) {
+      questionNumRef.current = getNextBlankQuestionNum()
+    }
 
     if (reviewMode) {
       if (filledOption) {
@@ -96,7 +108,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
             )}
             {...props}
           >
-            [{filledOption.id}. {filledOption.label}]
+            {questionNumRef.current != null && <span className="mr-0.5">{questionNumRef.current}.</span>}[{filledOption.id}. {filledOption.label}]
           </span>
         )
       }
@@ -109,7 +121,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
           )}
           {...props}
         >
-          [■]
+          {questionNumRef.current != null && `${questionNumRef.current}`}[■]
         </span>
       )
     }
@@ -124,7 +136,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
             )}
             {...props}
         >
-            {filledOption ? `[${filledOption.id}. ${filledOption.label}]` : '[■]'}
+            {questionNumRef.current != null && <span className="mr-0.5">{questionNumRef.current}.</span>}{filledOption ? `[${filledOption.id}. ${filledOption.label}]` : '[■]'}
         </span>
     )
 }
@@ -159,6 +171,7 @@ function Input({
 }: React.HTMLAttributes<HTMLSpanElement> & { onChange?: (value: string) => void }) {
     const clozeContext = React.useContext(ClozeContext);
     const inputChangeContext = useInputChangeContext();
+    const defaultValues = React.useContext(InputDefaultValuesContext);
     const questionNumberRef = React.useRef<number | undefined>(undefined);
     const isReviewMode = clozeContext?.reviewMode ?? false;
 
@@ -179,6 +192,8 @@ function Input({
         questionNumberRef.current = clozeContext.getNextQuestionNumber();
     }
 
+    const defaultValue = questionNumberRef.current != null ? defaultValues[String(questionNumberRef.current)] : undefined
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange?.(e.target.value);
         // 通过 InputChangeContext 传递答案到父组件
@@ -196,6 +211,7 @@ function Input({
                 type="text"
                 className="w-30 rounded-l-none h-7 text-base"
                 disabled={isReviewMode}
+                defaultValue={defaultValue}
                 onChange={handleChange}
             />
         </span>

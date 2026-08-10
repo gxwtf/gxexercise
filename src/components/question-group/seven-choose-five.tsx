@@ -20,10 +20,11 @@ interface SevenChooseFiveQuestion {
 interface SevenChooseFiveProps {
   questions: SevenChooseFiveQuestion[]
   mdxSource: MDXRemoteSerializeResult
+  startQuestionNumber?: number
 }
 
-export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiveProps) {
-  const { setAnswer } = useAnswer()
+export default function SevenChooseFive({ questions, mdxSource, startQuestionNumber }: SevenChooseFiveProps) {
+  const { setAnswer, answers } = useAnswer()
   const options = questions.length > 0 ? questions[0].options : []
 
   const {
@@ -32,10 +33,24 @@ export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiv
     availableOptions,
     handleOptionSelect,
     handleBlankClick,
-    handleRemove
+    handleRemove,
+    setFilledBlanks,
   } = useBlankFillingLogic({
     options
   })
+
+  React.useEffect(() => {
+    const restored: Record<string, string> = {}
+    questions.forEach((q, index) => {
+      const saved = answers[q.id]?.content.answer as string | undefined
+      if (saved) {
+        restored[String(index + 1)] = saved
+      }
+    })
+    if (Object.keys(restored).length > 0) {
+      setFilledBlanks(restored)
+    }
+  }, [])
 
   React.useEffect(() => {
     questions.forEach((q, index) => {
@@ -58,6 +73,7 @@ export default function SevenChooseFive({ questions, mdxSource }: SevenChooseFiv
             options={options}
             onBlankClick={handleBlankClick}
             onRemove={handleRemove}
+            startQuestionNumber={startQuestionNumber}
           >
             <MDXRemote {...mdxSource} components={components} />
           </EnglishReading>

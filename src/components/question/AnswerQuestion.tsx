@@ -32,8 +32,9 @@ export function AnswerQuestion({
   wordCountLabel,
   showIndex = true,
 }: AnswerQuestionProps) {
-  const { setAnswer } = useAnswer()
-  const [text, setText] = React.useState('')
+  const { setAnswer, answers } = useAnswer()
+  const savedAnswer = answers[question.id]?.content.answer as string | undefined
+  const [text, setText] = React.useState(savedAnswer ?? '')
   const components = useMDXComponents()
 
   const isEnglish = language === 'en'

@@ -6,7 +6,7 @@ import { AnswerQuestion } from '@/components/question/AnswerQuestion'
 import { ReadingLayout } from '@/components/question-group/ReadingLayout'
 import { QuestionSection } from '@/components/QuestionSection'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { useMDXComponents, MathInput2Provider } from '@/mdx-components'
+import { useMDXComponents, MathInput2Provider, InputDefaultValuesContext } from '@/mdx-components'
 import { useAnswer } from './AnswerContext'
 
 interface ProblemQuestion {
@@ -37,7 +37,7 @@ export default function Problem({
   startQuestionNumber,
   showWordCount = false,
 }: ProblemProps) {
-  const { setAnswer } = useAnswer()
+  const { setAnswer, answers } = useAnswer()
   const components = useMDXComponents()
   const inputValuesRef = useRef<Record<string, Record<number, string>>>({})
 
@@ -86,23 +86,31 @@ export default function Problem({
             <ChoiceField
               key={seg.questions[0].id}
               questions={seg.questions as any}
-              startIndex={seg.startIndex}
+              startIndex={(startQuestionNumber ?? 1) - 1 + seg.startIndex}
               onChange={onChoiceChange}
             />
           )
         }
         if (seg.type === 'input') {
           const question = seg.question
+          const savedAnswer = answers[question.id]?.content.answer as string | undefined
+          const inputDefaults: Record<string, string> = {}
+          if (savedAnswer) {
+            const parts = savedAnswer.split(',')
+            parts.forEach((p, i) => { inputDefaults[String(i)] = p })
+          }
           return (
             <div key={question.id} className="space-y-3">
               <div className="flex items-start space-x-2">
-                <span className="text-lg font-medium text-gray-700">{seg.index + 1}.</span>
+                <span className="text-lg font-medium text-gray-700">{(startQuestionNumber ?? 1) + seg.index}.</span>
                 <div className="flex-1">
                   <div className="text-lg font-medium text-gray-900">
                     {question.stemMdx ? (
-                      <MathInput2Provider onInputChange={(idx, val) => onInputChange(question.id, idx, val)}>
-                        <MDXRemote {...question.stemMdx} components={components} />
-                      </MathInput2Provider>
+                      <InputDefaultValuesContext.Provider value={inputDefaults}>
+                        <MathInput2Provider onInputChange={(idx, val) => onInputChange(question.id, idx, val)}>
+                          <MDXRemote {...question.stemMdx} components={components} />
+                        </MathInput2Provider>
+                      </InputDefaultValuesContext.Provider>
                     ) : (
                       <p>{question.stem}</p>
                     )}
@@ -119,11 +127,11 @@ export default function Problem({
           <AnswerQuestion
             key={seg.question.id}
             question={seg.question}
-            index={seg.index + 1}
+            index={(startQuestionNumber ?? 1) + seg.index}
             language={language}
             minHeight={minHeight}
             showWordCount={showWordCount}
-            showIndex={!isSingleTextQuestion}
+            showIndex={!!startQuestionNumber || !isSingleTextQuestion}
           />
         )
       })}

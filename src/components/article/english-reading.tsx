@@ -15,6 +15,7 @@ export interface BlankContextValue {
   onBlankClick?: (blankId: string) => void;
   onRemove?: (blankId: string) => void;
   getNextBlankId: () => string;
+  getNextBlankQuestionNum?: () => number;
   reviewMode?: boolean;
   correctBlanks?: Record<string, string>;
 }
@@ -187,6 +188,15 @@ export function EnglishReading({
     return next;
   }, []);
 
+  const blankQuestionNumRef = React.useRef(startQuestionNumber ?? 1);
+  blankQuestionNumRef.current = startQuestionNumber ?? 1;
+
+  const getNextBlankQuestionNum = React.useCallback(() => {
+    const num = blankQuestionNumRef.current;
+    blankQuestionNumRef.current += 1;
+    return num;
+  }, []);
+
   const blankContextValue = React.useMemo(
     () => ({
       blanks,
@@ -194,10 +204,11 @@ export function EnglishReading({
       onBlankClick,
       onRemove,
       getNextBlankId,
+      getNextBlankQuestionNum: startQuestionNumber != null ? getNextBlankQuestionNum : undefined,
       reviewMode,
       correctBlanks,
     }),
-    [blanks, options, onBlankClick, onRemove, getNextBlankId, reviewMode, correctBlanks]
+    [blanks, options, onBlankClick, onRemove, getNextBlankId, getNextBlankQuestionNum, startQuestionNumber, reviewMode, correctBlanks]
   );
 
   const clozeContextValue = React.useMemo(
@@ -214,6 +225,21 @@ export function EnglishReading({
     }),
     [onInputChange]
   );
+
+  const styleId = 'article-indent-style'
+
+  React.useEffect(() => {
+    if (!indentParagraphs) return
+    if (document.getElementById(styleId)) return
+    const style = document.createElement('style')
+    style.id = styleId
+    style.textContent = '.article-indent p { text-indent: 2em; }'
+    document.head.appendChild(style)
+    return () => {
+      const el = document.getElementById(styleId)
+      if (el) el.remove()
+    }
+  }, [indentParagraphs])
 
   const renderedContent = () => {
     if (!children) return null;
@@ -244,12 +270,6 @@ export function EnglishReading({
                 </h1>
               </header>
             ) : null}
-
-            {indentParagraphs && (
-              <style>{`
-                .article-indent p { text-indent: 2em; }
-              `}</style>
-            )}
 
             <div className={cn('prose max-w-none dark:prose-invert', indentParagraphs && 'article-indent')}>
               {renderedContent()}

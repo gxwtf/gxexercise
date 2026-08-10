@@ -1,9 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { ProgressCircle } from "@/components/ui/progress-circle"
 import {
   Table,
@@ -14,6 +12,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ArrowLeft, Clock } from "lucide-react"
+
+interface QuestionSubResult {
+  questionId: string
+  questionNumber: number
+  questionIndex: number
+  isCorrect: boolean | null
+}
 
 interface GroupResult {
   id: string
@@ -28,6 +33,7 @@ interface GroupResult {
   hasUnreviewed: boolean
   hasWrong: boolean
   allCorrect: boolean
+  questionSubmissions: QuestionSubResult[]
 }
 
 interface SubmissionHistoryItem {
@@ -58,7 +64,6 @@ export function TestPaperResult({
   currentSubmissionId,
 }: TestPaperResultProps) {
   const router = useRouter()
-  const [onlyWrong, setOnlyWrong] = useState(false)
 
   const formatTime = (totalSeconds: number | null) => {
     if (totalSeconds == null) return "-"
@@ -85,11 +90,6 @@ export function TestPaperResult({
       minute: "2-digit",
     })
   }
-
-  const filteredGroups = useMemo(() => {
-    if (!onlyWrong) return groupResults
-    return groupResults.filter((g) => g.hasWrong || g.hasUnreviewed)
-  }, [groupResults, onlyWrong])
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,53 +118,66 @@ export function TestPaperResult({
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <h2 className="text-lg font-semibold">答题记录详情</h2>
-            <Button
-              variant={onlyWrong ? "default" : "outline"}
-              size="sm"
-              onClick={() => setOnlyWrong(!onlyWrong)}
-            >
-              只看错题
-            </Button>
           </div>
 
-          <Table>
-            <TableBody>
-              {filteredGroups.map((group, index) => (
-                <TableRow
-                  key={group.id}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/question/${group.id}/review`)}
-                >
-                  <TableCell className="w-[60px] text-muted-foreground">{index + 1}</TableCell>
-                  <TableCell className="font-medium">{group.title}</TableCell>
-                  <TableCell className="w-[120px] text-center">
-                    {group.hasUnreviewed ? (
-                      <span className="inline-flex items-center h-12 rounded-full px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
+          <div className="space-y-4">
+            {groupResults.map((group, groupIndex) => (
+              <div key={group.id}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-foreground font-medium w-6">{groupIndex + 1}</span>
+                    <span className="font-medium">{group.title}</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    {group.maxScore != null && group.maxScore > 0 && (
+                      <div className="w-20 h-1.5 rounded-full bg-secondary">
+                        <div
+                          className="h-full rounded-full transition-all bg-blue-500"
+                          style={{ width: `${Math.min(((group.score ?? 0) / group.maxScore) * 100, 100)}%` }}
+                        />
+                      </div>
+                    )}
+                    <span>
+                      <span className="font-medium text-foreground">{group.score ?? "-"}</span> / {group.maxScore ?? group.totalNum ?? "-"}
+                    </span>
+                    {group.hasUnreviewed && (
+                      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
                         评阅中
                       </span>
-                    ) : (
-                      <ProgressCircle
-                        correct={group.score ?? 0}
-                        total={group.maxScore ?? group.totalNum ?? 0}
-                        size={48}
-                        strokeWidth={6}
-                        fontSize="text-xs"
-                      />
                     )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredGroups.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                    暂无记录
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 pl-9">
+                  {group.questionSubmissions.map((qs) => {
+                    const isCorrect = qs.isCorrect
+                    return (
+                      <div
+                        key={qs.questionId}
+                        className={cn(
+                          "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-1 cursor-pointer hover:opacity-80 transition-opacity",
+                          isCorrect === true
+                            ? "bg-green-100 border-green-500 text-green-700 dark:bg-green-950 dark:border-green-400 dark:text-green-300"
+                            : isCorrect === false
+                              ? "bg-red-100 border-red-500 text-red-700 dark:bg-red-950 dark:border-red-400 dark:text-red-300"
+                              : "bg-amber-100 border-amber-400 text-amber-700 dark:bg-amber-950 dark:border-amber-400 dark:text-amber-300"
+                        )}
+                        onClick={() => router.push(`/question/${group.id}/review/${qs.questionIndex}`)}
+                      >
+                        {qs.questionNumber}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+            {groupResults.length === 0 && (
+              <div className="text-center text-muted-foreground py-8">
+                暂无记录
+              </div>
+            )}
+          </div>
         </div>
 
         {submissionHistory.length > 0 && (
@@ -195,13 +208,7 @@ export function TestPaperResult({
                         {index + 1}
                       </TableCell>
                       <TableCell className="text-center">
-                        <ProgressCircle
-                          correct={sub.score ?? 0}
-                          total={totalScoreMax ?? 100}
-                          size={52}
-                          strokeWidth={4}
-                          fontSize="text-xs"
-                        />
+                        <span className="font-medium">{sub.score ?? "-"}</span>
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground">
                         {formatDate(sub.submittedAt)}
