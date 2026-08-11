@@ -335,7 +335,7 @@ export default async function QuestionPage({ params }: PageProps) {
   
   return (
     <AnswerProvider>
-      <div className="h-screen flex flex-col overflow-hidden">
+      <div className="h-screen flex flex-col overflow-y-auto">
         <QuestionPageContent id={id} />
       </div>
     </AnswerProvider>

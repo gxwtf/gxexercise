@@ -56,21 +56,23 @@ export default function Grammar({ questions, mdxSource, startQuestionNumber = 1 
   const components = useMDXComponents()
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto p-6">
-        <EnglishReading 
-          startQuestionNumber={startQuestionNumber}
-          onInputChange={handleInputChange}
-          indentParagraphs
-        >
-          <InputDefaultValuesContext.Provider value={inputDefaultValues}>
-            <MathInput2Provider onInputChange={handleInput2Change}>
-              <div>
-                <MDXRemote {...mdxSource} components={components} />
-              </div>
-            </MathInput2Provider>
-          </InputDefaultValuesContext.Provider>
-        </EnglishReading>
+    <div className="h-full overflow-hidden bg-background font-question">
+      <div className="flex h-full">
+        <div className="flex-1 p-6 overflow-y-auto max-w-4xl mx-auto">
+          <EnglishReading 
+            startQuestionNumber={startQuestionNumber}
+            onInputChange={handleInputChange}
+            indentParagraphs
+          >
+            <InputDefaultValuesContext.Provider value={inputDefaultValues}>
+              <MathInput2Provider onInputChange={handleInput2Change}>
+                <div>
+                  <MDXRemote {...mdxSource} components={components} />
+                </div>
+              </MathInput2Provider>
+            </InputDefaultValuesContext.Provider>
+          </EnglishReading>
+        </div>
       </div>
     </div>
   )

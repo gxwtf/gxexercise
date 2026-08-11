@@ -81,7 +81,7 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
   }, [session.userid, questionGroupId, seconds, getAllAnswers, router]);
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+    <header className="sticky top-0 z-50 bg-background border-b">
       <div className="flex items-center justify-between h-16 px-6">
         <h1 className="text-xl font-semibold text-foreground truncate">
           {title}{questionCount != null ? `（共${questionCount}小题${score != null ? `；共${score}分` : ""}）` : ""}

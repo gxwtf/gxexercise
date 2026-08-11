@@ -384,7 +384,7 @@ export function TestPaperPractice({
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-background">
+    <div className="h-screen flex flex-col overflow-y-auto bg-background">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="flex items-center justify-between h-16 px-6">
           <h1 className="flex items-center gap-3 text-xl font-semibold text-foreground truncate">
@@ -485,7 +485,7 @@ export function TestPaperPractice({
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden">{renderGroup()}</div>
+      <div className="flex-1 overflow-y-auto">{renderGroup()}</div>
     </div>
   )
 }
