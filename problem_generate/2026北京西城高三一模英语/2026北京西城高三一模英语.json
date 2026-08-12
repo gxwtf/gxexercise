@@ -15,7 +15,8 @@
       "模拟",
       "2026",
       "北京"
-    ]
+    ],
+    "analyses": {}
   },
   "sections": [
     {
@@ -306,76 +307,76 @@
         "北京",
         "语法填空"
       ],
-      "article": "## A\n\nI sat in my professor's office and spoke out everything that had been troubling me for months: the stress and the self-doubt. He <Input></Input> listened and said, “You are here to learn to ride a bicycle, not to invent a bicycle.” That sentence opened something up. This experience marked a turning point, <Input></Input> I realized the need to refocus on my initial purpose. I <Input></Input> to worry less, and every project became a meaningful step forward and a story worth sharing, whether it failed or succeeded.\n\n## B\n\nDo you ever struggle to stay focused and get tasks <Input></Input> ? If so, you can try the Pomodoro Technique, a time management tool. It involves dividing work tasks into 25-minute periods, known as pomodoros, with breaks scheduled <Input></Input> periods. Introduced in the 1980s, the Pomodoro Technique <Input></Input> greater popularity over the past years thanks to its ability to help prevent burnout and boredom. Combining focused work with brief breaks <Input></Input> people to achieve more without losing concentration or getting stressed.\n\n## C\n\nProfessor Zhao Haiying leads a team combining AI, big data and archaeology (考古学) <Input></Input> a “digital gene bank of Chinese civilization”. Her inspiration came through carpets while she was studying <Input></Input> one art form connects countries and regions. Her team has designed six core categories of cultural genes, which is essential for revealing patterns of evolution through time and space. <Input></Input> with various museums, they have interconnected millions of digital artifacts. “Our mission is connection, not just collection,” Zhao says.",
+      "article": "## A\n\nI sat in my professor's office and spoke out everything that had been troubling me for months: the stress and the self-doubt. He <Input></Input> (calm) listened and said, “You are here to learn to ride a bicycle, not to invent a bicycle.” That sentence opened something up. This experience marked a turning point, <Input></Input> I realized the need to refocus on my initial purpose. I <Input></Input> (seek) to worry less, and every project became a meaningful step forward and a story worth sharing, whether it failed or succeeded.\n\n## B\n\nDo you ever struggle to stay focused and get tasks <Input></Input> (do)? If so, you can try the Pomodoro Technique, a time management tool. It involves dividing work tasks into 25-minute periods, known as pomodoros, with breaks scheduled <Input></Input> periods. Introduced in the 1980s, the Pomodoro Technique <Input></Input> (gain) greater popularity over the past years thanks to its ability to help prevent burnout and boredom. Combining focused work with brief breaks <Input></Input> (allow) people to achieve more without losing concentration or getting stressed.\n\n## C\n\nProfessor Zhao Haiying leads a team combining AI, big data and archaeology (考古学) <Input></Input> (build) a “digital gene bank of Chinese civilization”. Her inspiration came through carpets while she was studying <Input></Input> one art form connects countries and regions. Her team has designed six core categories of cultural genes, which is essential for revealing patterns of evolution through time and space. <Input></Input> (partner) with various museums, they have interconnected millions of digital artifacts. “Our mission is connection, not just collection,” Zhao says.",
       "questions": [
         {
           "id": 1,
           "questionType": "input",
           "answer": "calmly",
-          "analysis": "第11题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第11题解析",
           "score": 1.5
         },
         {
           "id": 2,
           "questionType": "input",
           "answer": "where/ when",
-          "analysis": "第12题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第12题解析",
           "score": 1.5
         },
         {
           "id": 3,
           "questionType": "input",
           "answer": "sought",
-          "analysis": "第13题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第13题解析",
           "score": 1.5
         },
         {
           "id": 4,
           "questionType": "input",
           "answer": "done",
-          "analysis": "第14题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第14题解析",
           "score": 1.5
         },
         {
           "id": 5,
           "questionType": "input",
           "answer": "between",
-          "analysis": "第15题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第15题解析",
           "score": 1.5
         },
         {
           "id": 6,
           "questionType": "input",
           "answer": "has gained",
-          "analysis": "第16题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第16题解析",
           "score": 1.5
         },
         {
           "id": 7,
           "questionType": "input",
           "answer": "allows",
-          "analysis": "第17题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第17题解析",
           "score": 1.5
         },
         {
           "id": 8,
           "questionType": "input",
           "answer": "to build",
-          "analysis": "第18题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第18题解析",
           "score": 1.5
         },
         {
           "id": 9,
           "questionType": "input",
           "answer": "how",
-          "analysis": "第19题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第19题解析",
           "score": 1.5
         },
         {
           "id": 10,
           "questionType": "input",
           "answer": "Partnering",
-          "analysis": "第20题解析: 根据上下文和语法规则填写正确答案。",
+          "analysis": "第20题解析",
           "score": 1.5
         }
       ]
@@ -846,7 +847,7 @@
         "七选五"
       ],
       "content": "",
-      "article": "Cut your sugar, get some exercise, eat your vegetables, sleep well. Every day, we are surrounded by information about how to live longer, healthier, happier lives. <Blank></Blank> It is to engage in the arts.\n\nOver the past few decades, evidence has been increasing to suggest that being more creative works wonders for our health. <Blank></Blank> And the results are astonishing, from music in surgery reducing the amount of painkillers and anti-anxiety medicines needed, to dance programs helping people with Parkinson’s disease to walk.\n\nBut the arts aren’t just there for us when we are sick. As a public health scientist, I spend my days looking at data from studies—massive datasets that contain thousands of individuals who have completed questionnaires, had nurse interviews, donated blood samples and undergone brain imaging every few years of their lives.\n\n<Blank></Blank> Using complex statistical methods, we can look at the long-term relationship between everyday arts engagement and dozens of health outcomes.\n\nThe results are remarkable. Children who engage more with the arts have a reduced risk of developing problems like depression later in life. Adults who participate more frequently in the arts and visit cultural venues are happier and feel more satisfied with their lives over the years and decades that follow.\n\n<Blank></Blank> Kindergarteners who engage in music activities have increased prosocial skills as they head into primary school. Teenagers who are involved in bands, dance and editing school newspapers are less likely to get involved in antisocial behaviors or crime.\n\nI want to be clear: I am not suggesting the arts can solve all problems. <Blank></Blank> But the evidence remains that engaging regularly in creative activities that you enjoy is an investment in your health that is worth making.",
+      "article": "Cut your sugar, get some exercise, eat your vegetables, sleep well. Every day, we are surrounded by information about how to live longer, healthier, happier lives. <Blank></Blank> It is to engage in the arts.\n\nOver the past few decades, evidence has been increasing to suggest that being more creative works wonders for our health. <Blank></Blank> And the results are astonishing, from music in surgery reducing the amount of painkillers and anti-anxiety medicines needed, to dance programs helping people with Parkinson’s disease to walk.\n\nBut the arts aren’t just there for us when we are sick. As a public health scientist, I spend my days looking at data from studies—massive datasets that contain thousands of individuals who have completed questionnaires, had nurse interviews, donated blood samples and undergone brain imaging every few years of their lives. <Blank></Blank> Using complex statistical methods, we can look at the long-term relationship between everyday arts engagement and dozens of health outcomes.\n\nThe results are remarkable. Children who engage more with the arts have a reduced risk of developing problems like depression later in life. Adults who participate more frequently in the arts and visit cultural venues are happier and feel more satisfied with their lives over the years and decades that follow. <Blank></Blank> Kindergarteners who engage in music activities have increased prosocial skills as they head into primary school. Teenagers who are involved in bands, dance and editing school newspapers are less likely to get involved in antisocial behaviors or crime.\n\nI want to be clear: I am not suggesting the arts can solve all problems. <Blank></Blank> But the evidence remains that engaging regularly in creative activities that you enjoy is an investment in your health that is worth making.",
       "options": [
         {
           "id": "A",
@@ -1140,12 +1141,12 @@
         "北京",
         "作文"
       ],
-      "article": "假设你是红星中学高三学生李华。你的英国好友 Jim 听说你参加了全球青少年机器人设计大赛，想了解相关情况。请你用英文给他发邮件，内容包括:\n\n1\\. 介绍你的参赛作品；\n\n2\\. 分享参赛感想。\n\n注意：1.词数100左右；\n\n2. 开头和结尾已给出，不计入总词数。",
+      "article": "假设你是红星中学高三学生李华。你的英国好友 Jim 听说你参加了全球青少年机器人设计大赛，想了解相关情况。请你用英文给他发邮件，内容包括:\n\n1\\. 介绍你的参赛作品；\n\n2\\. 分享参赛感想。\n\n注意：1.词数100左右； {{BLANK:2}} .开头和结尾已给出，不计入总词数。",
       "questions": [
         {
           "id": 1,
           "questionType": "text",
-          "content": "假设你是红星中学高三学生李华。你的英国好友 Jim 听说你参加了全球青少年机器人设计大赛，想了解相关情况。请你用英文给他发邮件，内容包括:\n\n1\\. 介绍你的参赛作品；\n\n2\\. 分享参赛感想。\n\n注意：1.词数100左右；\n\n2. 开头和结尾已给出，不计入总词数。",
+          "content": "假设你是红星中学高三学生李华。你的英国好友 Jim 听说你参加了全球青少年机器人设计大赛，想了解相关情况。请你用英文给他发邮件，内容包括:\n\n1\\. 介绍你的参赛作品；\n\n2\\. 分享参赛感想。\n\n注意：1.词数100左右； {{BLANK:2}} .开头和结尾已给出，不计入总词数。",
           "answer": "",
           "analysis": "写作题评分标准：内容要点完整，语言表达准确流畅，结构清晰，词数符合要求。",
           "score": 20

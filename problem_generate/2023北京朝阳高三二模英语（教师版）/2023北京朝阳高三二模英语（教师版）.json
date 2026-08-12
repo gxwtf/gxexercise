@@ -1,0 +1,1157 @@
+{
+  "paper": {
+    "title": "2023北京朝阳高三二模",
+    "subject": "英语",
+    "source": "2023北京朝阳高三二模",
+    "grade": "高三",
+    "year": 2023,
+    "totalScore": 15,
+    "duration": null,
+    "description": "",
+    "tags": [
+      "英语",
+      "高三",
+      "朝阳",
+      "模拟",
+      "2023",
+      "北京"
+    ],
+    "analyses": {}
+  },
+  "sections": [
+    {
+      "type": "完形填空",
+      "questionType": "cloze",
+      "title": "完形填空",
+      "category": "完形填空",
+      "score": 15,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "完形填空"
+      ],
+      "article": "My son was born with breathing difficulties, so he had to stay in NICU, the hospital unit for newborns needing intensive care. There he could only be fed through a tube. I hated the tube. The lovely dreams I had of nursing my baby were entirely <ClozeBlank></ClozeBlank> .\n\nOn the fifth day, I <ClozeBlank></ClozeBlank> about the tube, saying that I wanted to feed him with a bottle. The doctors agreed to let me try. My son’s feedings would be closely recorded to see if he was able to get <ClozeBlank></ClozeBlank> milk intake without the tube. After eighteen hours, it was determined he could not do that and the tube was back. This meant he wasn’t getting stronger. The <ClozeBlank></ClozeBlank> felt so dark.\n\nSeated outside the NICU, I started crying. Just then, a young nurse came and sat beside me. When I had <ClozeBlank></ClozeBlank> my sorrow a little, she handed me a tissue and asked if I wanted to talk. I asked again if we could remove the tube. The nurse replied, “Not today. But remember, tomorrow is a new day.”\n\nShe seemed much younger than me, but her words were <ClozeBlank></ClozeBlank> and hope-filled, and I held on to them. I remembered her advice and repeated it to myself multiple times a day. The nurse changed my perspective away from current <ClozeBlank></ClozeBlank> to see the hope of tomorrow. Gradually, things started to <ClozeBlank></ClozeBlank> . On day eight, my son drank half of his milk without the tube. On day ten, the doctors approved taking off the tube <ClozeBlank></ClozeBlank> . “Tomorrow” came. It just came a few days later than expected. On day fifteen, we were released from the hospital, and my son “graduated” from the NICU.\n\nWhat I learned from that nurse was to look beyond today and the suffering of it and to consider tomorrow with <ClozeBlank></ClozeBlank> . After all, tomorrow is a new day.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "controlled"
+            },
+            {
+              "id": "b",
+              "label": "destroyed"
+            },
+            {
+              "id": "c",
+              "label": "questioned"
+            },
+            {
+              "id": "d",
+              "label": "recalled"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第1题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "protested"
+            },
+            {
+              "id": "b",
+              "label": "wondered"
+            },
+            {
+              "id": "c",
+              "label": "forgot"
+            },
+            {
+              "id": "d",
+              "label": "warned"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第2题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "maximum"
+            },
+            {
+              "id": "b",
+              "label": "restricted"
+            },
+            {
+              "id": "c",
+              "label": "sufficient"
+            },
+            {
+              "id": "d",
+              "label": "additional"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第3题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "plot"
+            },
+            {
+              "id": "b",
+              "label": "spot"
+            },
+            {
+              "id": "c",
+              "label": "atmosphere"
+            },
+            {
+              "id": "d",
+              "label": "situation"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第4题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 5,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "spared"
+            },
+            {
+              "id": "b",
+              "label": "contained"
+            },
+            {
+              "id": "c",
+              "label": "shared"
+            },
+            {
+              "id": "d",
+              "label": "exhibited"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第5题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 6,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "wise"
+            },
+            {
+              "id": "b",
+              "label": "plain"
+            },
+            {
+              "id": "c",
+              "label": "familiar"
+            },
+            {
+              "id": "d",
+              "label": "sharp"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第6题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 7,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "mistakes"
+            },
+            {
+              "id": "b",
+              "label": "dreams"
+            },
+            {
+              "id": "c",
+              "label": "challenges"
+            },
+            {
+              "id": "d",
+              "label": "doubts"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第7题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 8,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "go away"
+            },
+            {
+              "id": "b",
+              "label": "look up"
+            },
+            {
+              "id": "c",
+              "label": "make sense"
+            },
+            {
+              "id": "d",
+              "label": "fall apart"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第8题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 9,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "frequently"
+            },
+            {
+              "id": "b",
+              "label": "slightly"
+            },
+            {
+              "id": "c",
+              "label": "completely"
+            },
+            {
+              "id": "d",
+              "label": "occasionally"
+            }
+          ],
+          "answer": "c",
+          "analysis": "第9题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        },
+        {
+          "id": 10,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "a",
+              "label": "intention"
+            },
+            {
+              "id": "b",
+              "label": "imagination"
+            },
+            {
+              "id": "c",
+              "label": "urge"
+            },
+            {
+              "id": "d",
+              "label": "faith"
+            }
+          ],
+          "answer": "",
+          "analysis": "第10题解析: 根据上下文语境选择最合适的词汇。",
+          "score": 1.5
+        }
+      ]
+    },
+    {
+      "type": "语法填空",
+      "questionType": "grammar",
+      "title": "语法填空",
+      "category": "语法填空",
+      "score": 15,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "语法填空"
+      ],
+      "article": "## A\n\nAs a variant of American football, flag football is a type of sport in which a player must remove a flag belt from the ball carrier to end a down. The first rule of the game is that contact <Input></Input> players is not permitted. Recently, it <Input></Input> (gain) great popularity in China among young people. It’s engaging and ridiculously fun. That’s why the percentage of people <Input></Input> (join) a flag football club through online channels has risen to a new high level.\n\n## B\n\nOld Connections, a telecommunications museum in Seattle, with a working exchange from the 1940s, <Input></Input> (show) how telephones brought us together, but also tore us apart. Perhaps it should not be <Input></Input> (surprise) that the Internet has brought with it a new wave of horrific destructiveness. History itself is a kind of radio programme, broadcast to us in frequencies that become harder to receive as we forget the old ways. But as long as we keep the ancient exchanges running, we have a way to remember and understand <Input></Input> we come from.\n\n## C\n\nWang Dakang, aged 88, is a model of lifelong learning. In the 1980s, he was the first person <Input></Input> (accomplish) a round trip of China using only a bicycle. To edit this experience into his book, Wang decided to go to college. At the age of 61, he <Input></Input> (admit) into college, majoring in journalism. By 2012, he had completed three majors in college. At present, Wang lives in Leshan, where he spends his days following carefully <Input></Input> (plan) routines. His study starts at 6 am every morning, during <Input></Input> he reads and takes notes from newspapers. Wang said, “There is so much to learn and I will continue learning until the very end.”",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "input",
+          "answer": "between",
+          "analysis": "第11题解析",
+          "score": 1.5
+        },
+        {
+          "id": 2,
+          "questionType": "input",
+          "answer": "has gained",
+          "analysis": "第12题解析",
+          "score": 1.5
+        },
+        {
+          "id": 3,
+          "questionType": "input",
+          "answer": "joining",
+          "analysis": "第13题解析",
+          "score": 1.5
+        },
+        {
+          "id": 4,
+          "questionType": "input",
+          "answer": "shows",
+          "analysis": "第14题解析",
+          "score": 1.5
+        },
+        {
+          "id": 5,
+          "questionType": "input",
+          "answer": "surprising",
+          "analysis": "第15题解析",
+          "score": 1.5
+        },
+        {
+          "id": 6,
+          "questionType": "input",
+          "answer": "where",
+          "analysis": "第16题解析",
+          "score": 1.5
+        },
+        {
+          "id": 7,
+          "questionType": "input",
+          "answer": "to accomplish",
+          "analysis": "第17题解析",
+          "score": 1.5
+        },
+        {
+          "id": 8,
+          "questionType": "input",
+          "answer": "was admitted",
+          "analysis": "第18题解析",
+          "score": 1.5
+        },
+        {
+          "id": 9,
+          "questionType": "input",
+          "answer": "planned",
+          "analysis": "第19题解析",
+          "score": 1.5
+        },
+        {
+          "id": 10,
+          "questionType": "input",
+          "answer": "which",
+          "analysis": "第20题解析",
+          "score": 1.5
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解A",
+      "category": "阅读",
+      "score": 6,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "阅读"
+      ],
+      "article": "# A\n\nColumbia Engineering’s Summer High School Academic Program for Engineers (SHAPE) is a selective pre-college program for high school students and recent graduates. SHAPE is tailored for students with a gift for STEM: science, technology, engineering, and mathematics. Each 3-week session offers college-level, project-based courses in engineering taught by celebrated professors at the university.\n\nSHAPE gives students a more realistic picture of what it means to be an engineer, and its professional development components help students develop the skills they need to get there.\n\n**Courses**\n\nSHAPE features creative problem-solving courses and exposes students to innovative engineering techniques and knowledge presented by professors. Please note that SHAPE does not provide college credit.\n\nStudents gain access to the famous MakerSpace and state-of-the-art research laboratories after completing the safety training and will only do so under close guidance.\n\nSHAPE also provides students with workshops to explore career fields, professional development, and guidance on sharpening one’s college application from admissions officers. Students in the program will be visiting companies and organizations that show the classroom content in practice.\n\n**Application**\n\nStudents are selected based on the following criteria:\n\n1\\. Strong academic record\n\n2\\. Personal statement to demonstrate excitement and interest in STEM through engagement in challenging courses, activities, projects, etc.\n\n3\\. Enthusiastic letter of recommendation submitted by a math or science teacher\n\n4\\. Creative responses to two required questions and one of the three optional questions\n\nWe encourage all students to apply by the priority deadline of June 15, 2023, so there is no application fee. After the priority deadline, a $50 application fee is required.\n\nSHAPE is dedicated to supporting students and their families in need of financial assistance. We offer a limited number of need-based scholarships, which cover the full cost of SHAPE. To be considered for a need-based scholarship, families will need to provide a recent pay receipt and complete a Family Income and Expense Worksheet.\n\nEmail: shape@columbia.edu for more information.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What can we learn about SHAPE?",
+          "options": [
+            {
+              "id": "a",
+              "label": "It suits students talented in STEM."
+            },
+            {
+              "id": "b",
+              "label": "It shows the procedure of learning STEM."
+            },
+            {
+              "id": "c",
+              "label": "It serves as the start of students’ college life."
+            },
+            {
+              "id": "d",
+              "label": "It gives students chances to work with engineers."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第21题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "In SHAPE, students can \\___\\___\\___\\_.",
+          "options": [
+            {
+              "id": "a",
+              "label": "be free to explore the MakerSpace"
+            },
+            {
+              "id": "b",
+              "label": "earn college credit for future study"
+            },
+            {
+              "id": "c",
+              "label": "put school knowledge into practice"
+            },
+            {
+              "id": "d",
+              "label": "be equipped with skills for engineering"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第22题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "To secure a place in SHAPE, students need to \\___\\___\\___\\_.",
+          "options": [
+            {
+              "id": "a",
+              "label": "show their family financial state"
+            },
+            {
+              "id": "b",
+              "label": "answer all the given questions"
+            },
+            {
+              "id": "c",
+              "label": "pay application fees before deadline"
+            },
+            {
+              "id": "d",
+              "label": "prove their learning capability"
+            }
+          ],
+          "answer": "d",
+          "analysis": "第23题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解B",
+      "category": "阅读",
+      "score": 6,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "阅读"
+      ],
+      "article": "# B\n\nI lost my leg to cancer at 30. My first trip out of the house as a one-legged woman would be to see a sick friend in hospital with my mom.\n\nAs I made my way through the hospital, I was prepared for looks of curiosity, sympathy, and even shock. But one thing shook me to a depth I had never experienced before. Two kids were playing in the hallway. As I passed by on my crutches (拐杖), they looked up at me, and suddenly, the little boy pointed at me. “Look at that lady!” It seemed that he was shouting loud enough for the entire hospital to hear. “She only has one leg! Doesn’t that look funny?”\n\nBoth of the kids burst into laughter. Heads turned, and I felt the blood rush to my face. I put my head down and rushed out as fast as I dared on my crutches. I held my tears back until the car door closed. As I fell into the seats, I cried, “How could they think this is funny?”\n\nMy mom tried her best to comfort me, “Honey, they are just kids. They don’t know any better.” They were just kids, but that did not excuse their rude behavior. I felt a wave of belief flood through me. I knew what I had to do. “Well, someone has to teach them!” I said. And I knew that someone would be me.\n\nWhen I was well enough, I started to visit elementary schools and talk to children about being different. I was teaching children to be respectful of people who are different, and teaching them people come in all shapes, colors and sizes and we are each special and unique.\n\nSpeaking to children was just the beginning for me. I became an inspirational speaker and author and learned that being grateful for all the remaining parts of me was the only way to start and end my day. I shared my story in my book called _I Am Choosing to Smile_. I do, indeed, choose to smile. Waking up every morning, I look down at my one foot and say with all sincerity, “Good morning, five toes. I’m very glad to see you!”",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What shocked the author in the hospital?",
+          "options": [
+            {
+              "id": "a",
+              "label": "The curious look a boy had."
+            },
+            {
+              "id": "b",
+              "label": "The words a boy shouted out."
+            },
+            {
+              "id": "c",
+              "label": "The game the boys were playing."
+            },
+            {
+              "id": "d",
+              "label": "The sympathy the boys expressed."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第24题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "How did the experience in the hospital change the author?",
+          "options": [
+            {
+              "id": "a",
+              "label": "She found the purpose of her life."
+            },
+            {
+              "id": "b",
+              "label": "She began to realize her difference."
+            },
+            {
+              "id": "c",
+              "label": "She understood kids’ characteristics."
+            },
+            {
+              "id": "d",
+              "label": "She learned the importance of respect."
+            }
+          ],
+          "answer": "a",
+          "analysis": "第25题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "Which of the following words can best describe the author?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Patient."
+            },
+            {
+              "id": "b",
+              "label": "Brave."
+            },
+            {
+              "id": "c",
+              "label": "Intelligent."
+            },
+            {
+              "id": "d",
+              "label": "Caring."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第26题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解C",
+      "category": "阅读",
+      "score": 8,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "阅读"
+      ],
+      "article": "# C\n\nResearchers from a U.K. plant research institute have found a way to provide plants with an antibody-based defense for a specific threat, potentially speeding the creation of crops resistant to any kind of emerging virus, or bacterium (细菌). The strategy is to inoculate a protein from the plant pathogen (病原体) to be targeted to a camel or other camel relatives, purify the unusually small antibodies the camels produce, and engineer the corresponding gene section for them into a plant’s own immune gene.\n\nFarmers lose many billions of dollars to plant diseases each year, and emerging pathogens pose new threats to food security in the developing world. Plants have evolved their own immune system, kick-started by cell receptors that recognize general pathogen features, such as a bacterial cell wall, as well as intracellular receptors for molecules (分子) produced by specific pathogens. If a plant cell detects these molecules, it may trigger its own death to save the rest of the plant. But plant pathogens often evolve and escape from those receptors.\n\nA long-standing dream in plant biotechnology is to create designer disease resistance genes that could be produced as fast as pathogens emerge. One approach is to edit the gene for a plant immune receptor, changing the protein’s shape to recognize a particular pathogenic molecule.\n\nInstead, Sophien Kamoun, a molecular biologist at the Sainsbury Laboratory, and his colleagues used an animal immune system to help make the receptor adjustments. During an infection with a new pathogen, animals produce billions of slightly different antibodies, ultimately selecting and mass-producing those that best target the virus.\n\nCamelids, which include camels, are workhorses for antibody design because their immune systems create unusually small versions, called nano-bodies. As a proof of principle of the new plant defense strategy, Kamoun’s group turned to two standard camelid nano-bodies that recognize two different molecules, including one called green fluorescent protein (GFP), to detect test viruses, in this case a potato virus, engineered to make the fluorescent proteins. They investigated how well plants with the nano-body-enhanced receptors detected the changed potato viruses. It was found that the plants increased an active immune response and experienced almost no viral reproduction.\n\n“The exciting part about this technology is that we have the potential of made-to-order resistance genes and keeping up with a pathogen,” Kamoun says. “This technology is a potential game changer,” says Jeff Dangl, a plant researcher at the University of North Carolina. Ksenia Krasileva, a scientist at the University of California, Berkeley, says the mixture of nano-bodies with plant immune receptors opens up a vast body of biomedical knowledge for plant scientists. “We can now dig into all of that research and translate it to save crops.”",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "What does the underlined word “inoculate” in Paragraph 1 probably mean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Compare."
+            },
+            {
+              "id": "b",
+              "label": "Restore."
+            },
+            {
+              "id": "c",
+              "label": "Introduce."
+            },
+            {
+              "id": "d",
+              "label": "Label."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第27题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "What is the main purpose of Paragraph 2?",
+          "options": [
+            {
+              "id": "a",
+              "label": "To illustrate the function of cells in saving the plant."
+            },
+            {
+              "id": "b",
+              "label": "To explain how to strengthen plant receptors effectively."
+            },
+            {
+              "id": "c",
+              "label": "To demonstrate the solutions to farmers’ annual heavy losses."
+            },
+            {
+              "id": "d",
+              "label": "To reveal why plants fail to handle constantly-updated diseases."
+            }
+          ],
+          "answer": "d",
+          "analysis": "第28题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "What can we learn from the passage?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Editing plant receptors is to match the shape of pathogens."
+            },
+            {
+              "id": "b",
+              "label": "Nano-bodies can help plants catch up with pathogen changes."
+            },
+            {
+              "id": "c",
+              "label": "Plants select the best antibodies from animals to fight viruses."
+            },
+            {
+              "id": "d",
+              "label": "Plants with nano-bodies respond actively in massive virus copying."
+            }
+          ],
+          "answer": "b",
+          "analysis": "第29题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "content": "According to the passage, scientists will \\___\\___\\___\\_.",
+          "options": [
+            {
+              "id": "a",
+              "label": "apply the outcome in the real world"
+            },
+            {
+              "id": "b",
+              "label": "prove the findings of resistance genes"
+            },
+            {
+              "id": "c",
+              "label": "identify similar means to fight diseases"
+            },
+            {
+              "id": "d",
+              "label": "seek more support for the new strategy"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第30题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读",
+      "questionType": "en-reading",
+      "title": "阅读理解D",
+      "category": "阅读",
+      "score": 8,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "阅读"
+      ],
+      "article": "# D\n\nSuperhuman artificial intelligence is already among us. Well, sort of. When it comes to playing games like chess and Go, or solving difficult scientific challenges like predicting protein structures, computers are well ahead of us. But we have one superpower they aren’t close to mastering: mind reading.\n\nHumans have a mysterious ability to reason the goals, desires and beliefs of others, a crucial skill that means we can anticipate other people’s actions and the consequences of our own. Reading minds comes so easily to us, though, that we often don’t think to spell out what we want. If AIs are to become truly useful in everyday life—to cooperate effectively with us or to understand that a child might run into the road after a bouncing ball—we have to give them this gift that evolution has given us to read other people’s minds.\n\nPsychologists refer to the ability to infer another’s mental state as theory of mind. In humans, this capacity starts to develop at a very young age. How to reproduce the capability in machines is far from clear, though. One of the main challenges is context. For instance, if someone asks whether you are going for a run and you reply “it’s raining”, they can quickly conclude that the answer is no. But this requires huge amounts of background knowledge about running, weather and human preferences.\n\nMoreover, whether humans or AI, the theory of mind is supposed to emerge naturally from one’s own learning process. Building prior knowledge into AI makes it reliant on our imperfect understanding of theory of mind. In addition, AI may be capable of developing approaches we could never imagine. There can be many forms of theory of mind that we don’t know about simply because we live in a human body that has certain types of senses and a certain ability to think.\n\nYet we might still want AI to have a more human-like form of theory of mind. Humans can clearly explain their goals and desires to each other using common language and ideas. While letting AI form the theory of mind in their learning process is likely to lead to developing more powerful AI, plainly building in shared ways to represent knowledge may be crucial for humans to trust and communicate with AI.\n\nIt is important to remember, though, that the pursuit of machines with theory of mind is about more than just building more useful robots. It is also a stepping stone on the path towards a deeper goal for AI and robotics research: building truly self-aware machines. Whether we will ever get there remains to be seen. But along the way thinking about other people and other agents, we are on the path to learning to think about ourselves.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "content": "According to the passage, which of the following contexts can AI understand well?",
+          "options": [
+            {
+              "id": "a",
+              "label": "When you are asked to eat spicy food for dinner and you reply “a sore throat”."
+            },
+            {
+              "id": "b",
+              "label": "When a teacher asks for a boy’s homework and he answers “my dog ate it”."
+            },
+            {
+              "id": "c",
+              "label": "When a mom tells her kid some food is good for health and the kid eats it."
+            },
+            {
+              "id": "d",
+              "label": "When kids see their mom after hurting themselves and they cry louder."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第31题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "content": "The author believes that \\___\\___\\___\\_.",
+          "options": [
+            {
+              "id": "a",
+              "label": "humans’ theory of mind is far from perfect"
+            },
+            {
+              "id": "b",
+              "label": "humans limit AI’s theory of mind to an extent"
+            },
+            {
+              "id": "c",
+              "label": "we should reject human-like forms of abilities for AI"
+            },
+            {
+              "id": "d",
+              "label": "shared forms of theory of mind result in more powerful AI"
+            }
+          ],
+          "answer": "b",
+          "analysis": "第32题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "content": "As for AIs, what does the author value most?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Reliability."
+            },
+            {
+              "id": "b",
+              "label": "Practicability."
+            },
+            {
+              "id": "c",
+              "label": "Reasoning capability."
+            },
+            {
+              "id": "d",
+              "label": "Communication ability."
+            }
+          ],
+          "answer": "c",
+          "analysis": "第33题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "content": "Which would be the best title for the passage?",
+          "options": [
+            {
+              "id": "a",
+              "label": "AI with Its Own Theory of Mind Is Expected"
+            },
+            {
+              "id": "b",
+              "label": "AI with Theory of Mind Will Reshape Our Future"
+            },
+            {
+              "id": "c",
+              "label": "AI’s Theory of Mind Is a Blessing or Suffering to Humans"
+            },
+            {
+              "id": "d",
+              "label": "Theory of Mind Bridges the Gap Between Humans and AI"
+            }
+          ],
+          "answer": "a",
+          "analysis": "第34题解析: 根据文章内容选择正确答案。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "七选五",
+      "questionType": "seven-choose-five",
+      "title": "七选五",
+      "category": "七选五",
+      "score": 10,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "七选五"
+      ],
+      "content": "",
+      "article": "In our modern world, there are endless alternatives. Have you ever found yourself wondering whether you should quit or stay in your job, accept an offer or give it up for another? There is a simple and practical method that solves this problem. <Blank></Blank> When you understand the concept, you have the power to measure every alternative with precision and make the right decision.\n\nIn the field of economics, opportunity cost is the value that you have to give up when you choose an option over another good option. <Blank></Blank> Every time you choose something, you give up other alternatives together with their financial benefits. It is not all the other options, but the most valued one that is defined as the opportunity cost. <Blank></Blank> Take the simple example of trying to decide whether to take public transportation for 80 minutes or to drive for 40 minutes. You might save on the cost of gas while riding the bus but double the trip length and miss out on other things you could have done during that time. <Blank></Blank> This is how you create priorities in your daily life.\n\nThough useful in decision making, the biggest drawback of opportunity cost is that it’s often related to what’s hard to quantify. <Blank></Blank> After all, putting a number to your peaceful mind or happiness can be difficult.\n\nOpportunity cost isn’t cut and dried. It varies from person to person. At the end of the day, you are in charge of what you own and what you want to gain.",
+      "options": [
+        {
+          "id": "A",
+          "label": "It is about finding out the opportunity cost."
+        },
+        {
+          "id": "B",
+          "label": "Weigh the losses and gains, and make your decision."
+        },
+        {
+          "id": "C",
+          "label": "Opportunity cost matters not only in economics but also in real life."
+        },
+        {
+          "id": "D",
+          "label": "This is especially true when the opportunity cost is of non-financial benefit."
+        },
+        {
+          "id": "E",
+          "label": "The key principle underlying the idea is that there is no such thing as free lunch."
+        },
+        {
+          "id": "F",
+          "label": "Most people overlook opportunity cost because the benefits are usually hidden from view."
+        },
+        {
+          "id": "G",
+          "label": "It is the development of important skills that would help you move forward in your daily life."
+        }
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is about finding out the opportunity cost."
+            },
+            {
+              "id": "B",
+              "label": "Weigh the losses and gains, and make your decision."
+            },
+            {
+              "id": "C",
+              "label": "Opportunity cost matters not only in economics but also in real life."
+            },
+            {
+              "id": "D",
+              "label": "This is especially true when the opportunity cost is of non-financial benefit."
+            },
+            {
+              "id": "E",
+              "label": "The key principle underlying the idea is that there is no such thing as free lunch."
+            },
+            {
+              "id": "F",
+              "label": "Most people overlook opportunity cost because the benefits are usually hidden from view."
+            },
+            {
+              "id": "G",
+              "label": "It is the development of important skills that would help you move forward in your daily life."
+            }
+          ],
+          "blankIndex": 0,
+          "answer": "A",
+          "analysis": "第35题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is about finding out the opportunity cost."
+            },
+            {
+              "id": "B",
+              "label": "Weigh the losses and gains, and make your decision."
+            },
+            {
+              "id": "C",
+              "label": "Opportunity cost matters not only in economics but also in real life."
+            },
+            {
+              "id": "D",
+              "label": "This is especially true when the opportunity cost is of non-financial benefit."
+            },
+            {
+              "id": "E",
+              "label": "The key principle underlying the idea is that there is no such thing as free lunch."
+            },
+            {
+              "id": "F",
+              "label": "Most people overlook opportunity cost because the benefits are usually hidden from view."
+            },
+            {
+              "id": "G",
+              "label": "It is the development of important skills that would help you move forward in your daily life."
+            }
+          ],
+          "blankIndex": 1,
+          "answer": "E",
+          "analysis": "第36题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is about finding out the opportunity cost."
+            },
+            {
+              "id": "B",
+              "label": "Weigh the losses and gains, and make your decision."
+            },
+            {
+              "id": "C",
+              "label": "Opportunity cost matters not only in economics but also in real life."
+            },
+            {
+              "id": "D",
+              "label": "This is especially true when the opportunity cost is of non-financial benefit."
+            },
+            {
+              "id": "E",
+              "label": "The key principle underlying the idea is that there is no such thing as free lunch."
+            },
+            {
+              "id": "F",
+              "label": "Most people overlook opportunity cost because the benefits are usually hidden from view."
+            },
+            {
+              "id": "G",
+              "label": "It is the development of important skills that would help you move forward in your daily life."
+            }
+          ],
+          "blankIndex": 2,
+          "answer": "C",
+          "analysis": "第37题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 4,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is about finding out the opportunity cost."
+            },
+            {
+              "id": "B",
+              "label": "Weigh the losses and gains, and make your decision."
+            },
+            {
+              "id": "C",
+              "label": "Opportunity cost matters not only in economics but also in real life."
+            },
+            {
+              "id": "D",
+              "label": "This is especially true when the opportunity cost is of non-financial benefit."
+            },
+            {
+              "id": "E",
+              "label": "The key principle underlying the idea is that there is no such thing as free lunch."
+            },
+            {
+              "id": "F",
+              "label": "Most people overlook opportunity cost because the benefits are usually hidden from view."
+            },
+            {
+              "id": "G",
+              "label": "It is the development of important skills that would help you move forward in your daily life."
+            }
+          ],
+          "blankIndex": 3,
+          "answer": "B",
+          "analysis": "第38题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        },
+        {
+          "id": 5,
+          "questionType": "choice",
+          "options": [
+            {
+              "id": "A",
+              "label": "It is about finding out the opportunity cost."
+            },
+            {
+              "id": "B",
+              "label": "Weigh the losses and gains, and make your decision."
+            },
+            {
+              "id": "C",
+              "label": "Opportunity cost matters not only in economics but also in real life."
+            },
+            {
+              "id": "D",
+              "label": "This is especially true when the opportunity cost is of non-financial benefit."
+            },
+            {
+              "id": "E",
+              "label": "The key principle underlying the idea is that there is no such thing as free lunch."
+            },
+            {
+              "id": "F",
+              "label": "Most people overlook opportunity cost because the benefits are usually hidden from view."
+            },
+            {
+              "id": "G",
+              "label": "It is the development of important skills that would help you move forward in your daily life."
+            }
+          ],
+          "blankIndex": 4,
+          "answer": "D",
+          "analysis": "第39题解析: 根据上下文逻辑选择最佳选项。",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "type": "阅读表达",
+      "questionType": "reading-expression",
+      "title": "阅读表达",
+      "category": "阅读表达",
+      "score": 12,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "阅读表达"
+      ],
+      "article": "The term “nostalgia” was first coined in 1688 and was defined as a mental illness of soldiers continually thinking about their homeland and longing for return. However, today we have a much more positive attitude to nostalgia. It’s a great example of the benefits of a strong memory.\n\nIn numerous scientific experiments, researchers have found that subjects are much more likely to report positive feelings from a given piece of music if they’ve heard it before. But there’s also a growing body of research into time travel “the other way”, because memory skills can take people into the future, too. Decades of studies have shown that time travel into the future can bring a whole new set of rewards. For example, athletes who practice by mentally visualizing and imagining successful performances in the future do perform better.\n\nAll these findings are inspiring and attractive. How could you become a confident time traveler to the past or into the future? Here are some tips for you:\n\nTo take pleasure in helpful memories, maybe to reawaken happy feelings, use all your senses—not just sight. Smell, taste, touch and sound will also help you to recreate the past in rich clarity.\n\nIf you find a memory that’s particularly helpful—for reassurance, say—keep using it! You’ll get faster at finding it, and add extra layers of detail each time.\n\nWhen you’re procrastinating (拖延), visualize an end result. Flash forward to see the floor swept or the essay finished, and use that positive image to drive you into action.\n\nAhead of major challenges, imagine the full impact of success. Don’t just picture yourself getting that great job: fill your mind with the really big ways it’s going to change your life.\n\nThere’ll still be times when old thoughts remind you of sadness, or you’re anxious about what’s next. But the more you learn to control your memory, the better you’ll be at mining your past, and shaping your future, to be your best self now.",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "text",
+          "content": "What did nostalgia originally mean?",
+          "answer": "A mental illness of soldiers continually thinking about their homeland and longing for return.",
+          "analysis": "第40题解析: 根据文章内容回答问题。",
+          "score": 2
+        },
+        {
+          "id": 2,
+          "questionType": "text",
+          "content": "What have the researchers found about time travel?",
+          "answer": "They have found that time travel to the past and into the future both bring benefits to us.",
+          "analysis": "第41题解析: 根据文章内容回答问题。",
+          "score": 2
+        },
+        {
+          "id": 3,
+          "questionType": "text",
+          "content": "Please decide which part is false in the following statement, then underline it and explain why.\n\n➢ **_Memory skills can bring us into the future, so we should imagine a negative end result to drive us into action when procrastinating._**",
+          "answer": "⮚ **_Memory skills can bring us into the future, so we should imagine a negative end result to drive us into action when procrastinating._**\n\nWe should use a positive end result to drive us into action when procrastinating.",
+          "analysis": "第42题解析: 根据文章内容回答问题。",
+          "score": 3
+        },
+        {
+          "id": 4,
+          "questionType": "text",
+          "content": "Describe one of the helpful time-travel experiences in your life. (**_In about 40 words_**)",
+          "answer": "(1) I often imagine myself attending my ideal university in September 2023 to cheer myself up. Picturing myself wandering on the campus and enjoying the harvest in the golden autumn can give me the motivation to overcome nervousness and stress at present with an optimistic attitude and in full gear.\n\n(2) I recall the time of winning the first prize in a speech contest two years ago. Standing on the stage reaching out for the prize, I was filled with pride. This experience serves as a constant source of encouragement and confidence for me to keep working hard to improve myself.",
+          "analysis": "第43题解析: 根据文章内容回答问题。",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "type": "作文",
+      "questionType": "en-writing",
+      "title": "写作",
+      "category": "作文",
+      "score": 20,
+      "grade": "高三",
+      "source": "2023北京朝阳高三二模",
+      "tags": [
+        "英语",
+        "高三",
+        "朝阳",
+        "模拟",
+        "2023",
+        "北京",
+        "作文"
+      ],
+      "article": "假设你是红星中学高三学生李华。你最近读完了外教 Jim 推荐的一本英文书，请你用英文给Jim 写一封邮件，内容包括：\n\n1. 表达感谢并分享读书收获；\n\n2. 交流后续英文书阅读计划。\n\n注意：1. 词数100 左右；\n\n2. 开头和结尾已给出，不计入总词数。",
+      "questions": [
+        {
+          "id": 1,
+          "questionType": "text",
+          "content": "假设你是红星中学高三学生李华。你最近读完了外教 Jim 推荐的一本英文书，请你用英文给Jim 写一封邮件，内容包括：\n\n1. 表达感谢并分享读书收获；\n\n2. 交流后续英文书阅读计划。\n\n注意：1. 词数100 左右；\n\n2. 开头和结尾已给出，不计入总词数。",
+          "answer": "",
+          "analysis": "写作题评分标准：内容要点完整，语言表达准确流畅，结构清晰，词数符合要求。",
+          "score": 20
+        }
+      ]
+    }
+  ]
+}
