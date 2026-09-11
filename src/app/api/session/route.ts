@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH() {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
-    session.counter++;
+    session.counter = (session.counter ?? 0) + 1;
     await session.save();
 
     return Response.json(session);

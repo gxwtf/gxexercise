@@ -1,9 +1,10 @@
 allowBuilds:
-  '@google/genai': set this to true or false
   '@prisma/engines': true
   esbuild: true
   msw: true
   prisma: true
-  protobufjs: set this to true or false
   sharp: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - lucide-react@1.45.0
+  - openai@7.15.0
