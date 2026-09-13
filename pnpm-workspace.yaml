@@ -8,3 +8,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - lucide-react@1.45.0
   - openai@7.15.0
+  - tailwind-merge@3.7.0
