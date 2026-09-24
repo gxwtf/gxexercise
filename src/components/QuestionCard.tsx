@@ -38,8 +38,6 @@ function isSubjective(questionType: string): boolean {
   return subjectiveTypes.includes(questionType);
 }
 
-const defaultImageUrl = 'https://neeko-copilot.bytedance.net/api/text2image?prompt=education%20learning%20exam%20question%20abstract%20blue%20gradient&image_size=square'
-
 export function QuestionCard({
   id,
   title,
@@ -92,7 +90,7 @@ export function QuestionCard({
       {/* 图片区域 */}
       <div className="relative aspect-video overflow-hidden">
         <img
-          src={imageUrl || defaultImageUrl}
+          src={imageUrl || `https://picsum.photos/seed/${id}/400/300`}
           alt={title}
           className="aspect-video w-full object-cover"
           loading="lazy"
