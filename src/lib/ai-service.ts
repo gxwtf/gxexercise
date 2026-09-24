@@ -2,13 +2,15 @@ import OpenAI from "openai";
 import type { GradingPromptConfig } from "./grading-prompts";
 
 const openai = new OpenAI({
-  apiKey: process.env.SILICONFLOW_API_API_KEY!,
+  // apiKey: process.env.SILICONFLOW_API_API_KEY!,
   // apiKey: process.env.POIXE_API_KEY!,
-  baseURL: "https://api.siliconflow.cn",
+  // baseURL: "https://api.siliconflow.cn",
   // baseURL: "https://api.poixe.com",
+  baseURL: process.env.OPENAI_BASE_URL!,
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
-const MODEL = "deepseek-ai/DeepSeek-V4-Flash";
+const MODEL = process.env.OPENAI_MODEL!;
 
 export interface GradeResult {
   score: number;
