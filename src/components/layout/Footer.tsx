@@ -4,8 +4,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const version = packageJson.version;
   
-  // 计算稳定运行天数（从2026年5月1日开始）
-  const startDate = new Date(2026, 4, 0); // 注意：月份从0开始，5月是4
+  // 计算稳定运行天数（从2026年9月24日开始）
+  const startDate = new Date(2026, 8, 23); // 注意：月份从0开始，9月是8
   const currentDate = new Date();
   const daysRunning = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   
