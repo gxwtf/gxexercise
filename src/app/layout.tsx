@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "广学题库",
-  description: "广学题库由广学五题坊开发",
+  description: "以题会友，广学天下",
 };
 
 export default function RootLayout({

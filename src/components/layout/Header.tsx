@@ -42,11 +42,11 @@ export default function Header() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Link href="/games" className="text-sm font-medium hover:text-primary">
+        <Link href="https://gxwtf.cn/game" className="text-sm font-medium hover:text-primary">
           游戏中心
         </Link>
         {session.isLoggedIn && session.admin && (
-          <Link href="/users" className="text-sm font-medium hover:text-primary">
+          <Link href="https://account.gxwtf.cn/admin/users" className="text-sm font-medium hover:text-primary">
             用户管理
           </Link>
         )}
@@ -75,14 +75,14 @@ export default function Header() {
         ))}
       </div>
       <Link
-        href="/games"
+        href="https://gxwtf.cn/game"
         className="text-sm font-medium hover:text-primary"
       >
         游戏中心
       </Link>
       {session.isLoggedIn && session.admin && (
         <Link
-          href="/users"
+          href="https://account.gxwtf.cn/admin/users"
           className="text-sm font-medium hover:text-primary"
         >
           用户管理

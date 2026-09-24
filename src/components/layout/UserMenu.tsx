@@ -75,10 +75,10 @@ export default function UserMenu() {
                     <DropdownMenuLabel>我的账户</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                        <Link href="/dashboard">个人信息</Link>
+                        <Link href="https://account.gxwtf.cn/">账号中心</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <Link href="/settings">设置</Link>
+                        <Link href="https://gxwtf.cn/feedback/new">网站反馈</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
