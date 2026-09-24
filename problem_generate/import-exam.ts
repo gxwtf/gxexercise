@@ -213,17 +213,108 @@ async function deleteAllEnglish() {
   );
 }
 
+async function deletePaperByTitle(title: string) {
+  const papers = await prisma.testPaper.findMany({
+    where: { title },
+    select: { id: true, title: true, subject: true },
+  });
+
+  if (papers.length === 0) {
+    console.error(`No test paper found with title: ${title}`);
+    process.exit(1);
+  }
+
+  const paperIds = papers.map((p) => p.id);
+
+  const paperItems = await prisma.paperItem.findMany({
+    where: { paperId: { in: paperIds } },
+    select: { itemId: true, itemType: true },
+  });
+  const groupIds = paperItems
+    .filter((pi) => pi.itemType === "questionGroup")
+    .map((pi) => pi.itemId);
+
+  const groupItems = await prisma.groupItem.findMany({
+    where: { groupId: { in: groupIds } },
+    select: { questionId: true },
+  });
+  const questionIds = groupItems.map((gi) => gi.questionId);
+
+  if (questionIds.length > 0) {
+    await prisma.questionSubmission.deleteMany({
+      where: { questionId: { in: questionIds } },
+    });
+  }
+  if (groupIds.length > 0) {
+    await prisma.questionGroupSubmission.deleteMany({
+      where: { questionGroupId: { in: groupIds } },
+    });
+  }
+  if (paperIds.length > 0) {
+    await prisma.testPaperSubmission.deleteMany({
+      where: { testPaperId: { in: paperIds } },
+    });
+  }
+
+  if (questionIds.length > 0) {
+    await prisma.question.deleteMany({ where: { id: { in: questionIds } } });
+  }
+  if (groupIds.length > 0) {
+    await prisma.questionGroup.deleteMany({ where: { id: { in: groupIds } } });
+  }
+  await prisma.testPaper.deleteMany({ where: { id: { in: paperIds } } });
+
+  console.log(
+    `Deleted ${paperIds.length} test paper(s), ${groupIds.length} question groups, ${questionIds.length} questions`
+  );
+  for (const p of papers) {
+    console.log(`  - [${p.subject}] ${p.title}`);
+  }
+}
+
 function main() {
   const args = process.argv.slice(2);
 
-  const deleteFlag = args.includes("--delete");
-  const inputPaths = args.filter((a) => a !== "--delete");
+  const hasDelete = args.includes("--delete");
+  const hasAll = args.includes("--all");
+
+  if (hasDelete) {
+    const titleArgs = args.filter((a) => a !== "--delete" && a !== "--all");
+
+    (async () => {
+      if (hasAll) {
+        console.log("Deleting all English questions...");
+        await deleteAllEnglish();
+      } else {
+        if (titleArgs.length < 1) {
+          console.error(
+            'Usage: npx tsx problem_generate/import-exam.ts --delete "<paper title>"'
+          );
+          console.error("       npx tsx problem_generate/import-exam.ts --delete --all");
+          process.exit(1);
+        }
+        const title = titleArgs[0];
+        console.log(`Deleting paper: ${title}`);
+        await deletePaperByTitle(title);
+      }
+      await prisma.$disconnect();
+    })().catch((err) => {
+      console.error("Delete failed:", err);
+      process.exit(1);
+    });
+    return;
+  }
+
+  const inputPaths = args;
 
   if (inputPaths.length < 1) {
-    console.error("Usage: npx tsx problem_generate/import-exam.ts [--delete] <folder-name-or-json-path>");
+    console.error("Usage: npx tsx problem_generate/import-exam.ts <folder-name-or-json-path>");
+    console.error("       npx tsx problem_generate/import-exam.ts --delete \"<paper title>\"");
+    console.error("       npx tsx problem_generate/import-exam.ts --delete --all");
     console.error("  Examples:");
     console.error("    npx tsx problem_generate/import-exam.ts 2025北京西城高二（下）期末英语（教师版）.json");
-    console.error("    npx tsx problem_generate/import-exam.ts 2025北京西城高二（下）期末英语（教师版）.json --delete");
+    console.error("    npx tsx problem_generate/import-exam.ts --delete \"2026北京丰台高三二模英语\"");
+    console.error("    npx tsx problem_generate/import-exam.ts --delete --all");
     process.exit(1);
   }
 
@@ -244,11 +335,6 @@ function main() {
   }
 
   (async () => {
-    if (deleteFlag) {
-      console.log("Deleting all English questions...");
-      await deleteAllEnglish();
-    }
-
     if (fs.statSync(inputPath).isDirectory()) {
       const files = fs.readdirSync(inputPath).filter((f) => f.endsWith(".json"));
       console.log(`Found ${files.length} JSON files in ${inputPath}`);
