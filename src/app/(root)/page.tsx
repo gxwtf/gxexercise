@@ -2,6 +2,8 @@ import Link from "next/link";
 import { subjects, subjectToRoute, categoriesBySubject, categoryToRoute } from "@/constants/subjects";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export default async function RootPage() {
   const groupCounts = await prisma.questionGroup.groupBy({
     by: ["subject", "category"],
