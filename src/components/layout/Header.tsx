@@ -91,6 +91,12 @@ export default function Header() {
           用户管理
         </Link>
       )}
+      <Link
+        href="https://gxwtf.cn/home"
+        className="text-sm font-medium hover:text-primary"
+      >
+        返回旧版主站
+      </Link>
     </nav>
   );
 
