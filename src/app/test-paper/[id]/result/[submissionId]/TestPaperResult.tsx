@@ -93,11 +93,11 @@ export function TestPaperResult({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-6">{testPaperTitle}</h1>
 
-          <div className="flex items-center justify-center gap-12 mb-6">
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-6 sm:gap-12">
             <div className="flex flex-col items-center gap-2">
               <ProgressCircle
                 correct={totalScore ?? 0}
@@ -183,6 +183,7 @@ export function TestPaperResult({
         {submissionHistory.length > 0 && (
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-3">练习记录</h2>
+            <div className="overflow-x-auto rounded-lg border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -218,6 +219,7 @@ export function TestPaperResult({
                 })}
               </TableBody>
             </Table>
+            </div>
           </div>
         )}
       </div>

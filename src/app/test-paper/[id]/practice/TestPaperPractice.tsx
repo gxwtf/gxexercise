@@ -14,6 +14,7 @@ import { QuestionSection } from "@/components/QuestionSection"
 import Problem from "@/components/question-group/Problem"
 import Grammar from "@/components/question-group/grammar"
 import SevenChooseFive from "@/components/question-group/seven-choose-five"
+import { PageBar } from "@/components/PageBar"
 
 const STORAGE_KEY = (id: string) => `exam_state_${id}`
 const ANSWERS_KEY = (id: string) => `exam_answers_test-paper-${id}`
@@ -386,18 +387,18 @@ export function TestPaperPractice({
   return (
     <div className="h-screen flex flex-col overflow-y-auto bg-background">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-        <div className="flex items-center justify-between h-16 px-6">
-          <h1 className="flex items-center gap-3 text-xl font-semibold text-foreground truncate">
+        <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-6">
+          <h1 className="flex min-w-0 items-center gap-2 text-base font-semibold text-foreground sm:gap-3 sm:text-xl">
             <span className="truncate">{testPaperTitle}</span>
             {currentGroup && (
-              <span className="text-muted-foreground text-sm font-normal whitespace-nowrap">
+              <span className="hidden truncate text-muted-foreground text-sm font-normal whitespace-nowrap md:inline">
                 {currentGroup.title}（共{currentGroup.questions.length}小题{currentGroup.score != null ? `；共${currentGroup.score}分` : ""}）
               </span>
             )}
           </h1>
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5 rounded-lg bg-muted/50 px-2 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <span className="font-mono text-sm font-medium">{formatTime(seconds)}</span>
             </div>
@@ -410,7 +411,7 @@ export function TestPaperPractice({
                     答题卡
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80 max-h-96 overflow-y-auto" align="end">
+                <PopoverContent className="max-h-96 w-[min(20rem,calc(100vw-2rem))] overflow-y-auto" align="end">
                   <div className="space-y-3">
                     {groupsData.map((group, groupIndex) => {
                       const answeredCount = group.questions.filter((q) => isQuestionAnswered(q.id)).length
@@ -486,6 +487,18 @@ export function TestPaperPractice({
       </header>
 
       <div className="flex-1 overflow-y-auto">{renderGroup()}</div>
+
+      {/* 页码：在各小节之间快速跳转 */}
+      <div className="border-t bg-background px-3 py-2 sm:px-6">
+        <PageBar
+          page={currentGroupIndex + 1}
+          pageCount={totalGroups}
+          onPageChange={(p) => handleJumpToGroup(p - 1)}
+          unit="节"
+          showLabel
+          className="mt-0"
+        />
+      </div>
     </div>
   )
 }

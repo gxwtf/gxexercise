@@ -55,17 +55,17 @@ export function AnswerQuestion({
   return (
     <div className="space-y-3">
       <div className="flex items-start space-x-2">
-        {showIndex && <span className="text-lg font-medium text-gray-700">{index}.</span>}
+        {showIndex && <span className="text-lg font-medium text-muted-foreground">{index}.</span>}
         <div className="flex-1">
           {question.stemMdx ? (
-            <div className="text-lg font-medium text-gray-900">
+            <div className="text-lg font-medium text-foreground">
               <MDXRemote {...question.stemMdx} components={components} />
             </div>
           ) : (
-            <p className="text-lg font-medium text-gray-900">{question.stem}</p>
+            <p className="text-lg font-medium text-foreground">{question.stem}</p>
           )}
           {question.subStem && (
-            <p className="mt-2 text-lg text-gray-700 italic">{question.subStem}</p>
+            <p className="mt-2 text-lg text-muted-foreground italic">{question.subStem}</p>
           )}
         </div>
       </div>

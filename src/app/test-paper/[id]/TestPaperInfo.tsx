@@ -37,7 +37,7 @@ export function TestPaperInfo({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="container mx-auto max-w-3xl px-3 py-6 sm:px-4 sm:py-8">
         <div>
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-muted-foreground" />
@@ -50,7 +50,7 @@ export function TestPaperInfo({
             {grade && <Badge variant="outline" className="text-xs">{grade}</Badge>}
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6 p-4 rounded-lg bg-muted/50">
+          <div className="mb-6 grid grid-cols-1 gap-3 rounded-lg bg-muted/50 p-4 sm:grid-cols-3 sm:gap-4">
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-muted-foreground" />
               <div>

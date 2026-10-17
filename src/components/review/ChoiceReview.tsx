@@ -47,7 +47,7 @@ export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceRevie
       ? "flex flex-col gap-3"
       : layoutType === "two-columns"
         ? "grid grid-cols-2 gap-3"
-        : "grid grid-cols-4 gap-3"
+        : "grid grid-cols-2 gap-3 sm:grid-cols-4"
 
   return (
     <div className={gridClass}>

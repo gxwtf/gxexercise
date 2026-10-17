@@ -4,42 +4,19 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { QuestionCard } from "./QuestionCard";
 import { TestCard } from "./TestCard";
-import { Search, FileText } from "lucide-react";
+import { Search, FileText, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import useSession from "@/lib/use-session";
+import { PageBar } from "@/components/PageBar";
 
-type Question = {
-  id: string;
-  questionType: string;
-  content: string;
-  options?: any | null;
-  answer: string;
-  analysis?: string | null;
-  score: number;
-  correctRate: number | null;
-  subject: string;
-  source: string;
-  grade?: string | null;
-  category: string;
-  year?: number | null;
-  tags: string[];
-  imageUrl?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type GroupItem = {
-  id: string;
-  groupId: string;
-  questionId: string;
-  orderIndex: number;
-  question: Question;
-};
-
+/**
+ * 列表页只需要每组内出现过的年份/年级（用于筛选），
+ * 不再下发 groupItems 明细与题目/文章正文，RSC 负载可降一个数量级（移动端首屏明显更快）。
+ */
 type QuestionGroup = {
   id: string;
   title: string;
@@ -54,7 +31,8 @@ type QuestionGroup = {
   imageUrl?: string | null;
   createdAt: Date;
   updatedAt: Date;
-  groupItems: GroupItem[];
+  years: number[];
+  grades: string[];
 };
 
 type TestPaper = {
@@ -93,6 +71,9 @@ export function QuestionOverview({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedGrade, setSelectedGrade] = useState("all");
+  const [page, setPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const PAGE_SIZE = 12;
   const router = useRouter()
   const { session } = useSession()
   const [testSubmissions, setTestSubmissions] = useState<Record<string, string>>({})
@@ -131,6 +112,12 @@ export function QuestionOverview({
 
   // 使用从props传入的套卷数据
   const testPapers = initialTestPapers;
+
+  // 筛选条件变化时回到第一页
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, selectedCategory, selectedYear, selectedGrade, questionType]);
+
 
   // 筛选选项
   const categoryOptions = [
@@ -183,9 +170,7 @@ export function QuestionOverview({
     // 从组题关联的题目中提取所有年份
     const uniqueYears = new Set<number>();
     initialGroups.forEach(group => {
-      group.groupItems.forEach(item => {
-        if (item.question && item.question.year) uniqueYears.add(item.question.year);
-      });
+      (group.years || []).forEach((y) => uniqueYears.add(y));
     });
 
     // 添加最近5年
@@ -210,10 +195,7 @@ export function QuestionOverview({
     // 从组题数据中提取所有年级
     const uniqueGrades = new Set<string>();
     initialGroups.forEach(group => {
-      if (group.grade) uniqueGrades.add(group.grade);
-      group.groupItems.forEach(item => {
-        if (item.question && item.question.grade) uniqueGrades.add(item.question.grade!);
-      });
+      (group.grades || []).forEach((g) => uniqueGrades.add(g));
     });
 
     // 添加标准年级选项
@@ -237,9 +219,7 @@ export function QuestionOverview({
           tag.toLowerCase().includes(searchTerm.toLowerCase())
         ) ||
         group.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        group.groupItems.some((item) =>
-          item.question.year?.toString().includes(searchTerm)
-        );
+        group.years.some((y) => y.toString().includes(searchTerm));
       const matchesSubject = !subject || group.subject === subject;
       const matchesCategory = !category || group.category === category;
       const matchesType = !questionType || group.questionType === questionType;
@@ -250,26 +230,36 @@ export function QuestionOverview({
           ? group.tags.includes(categoryTagMap[selectedCategory])
           : group.source === selectedCategory);
       const matchesYearFilter = selectedYear === "all" ||
-        group.groupItems.some(item => item.question.year?.toString() === selectedYear);
+        group.years.some((y) => y.toString() === selectedYear);
       const matchesGradeFilter = selectedGrade === "all" ||
         group.grade === selectedGrade ||
-        group.groupItems.some(item => item.question.grade === selectedGrade);
+        group.grades.includes(selectedGrade);
 
       return matchesSearch && matchesSubject && matchesCategory && matchesType &&
         matchesCategoryFilter && matchesYearFilter && matchesGradeFilter;
     });
   }, [initialGroups, searchTerm, subject, category, questionType, selectedCategory, selectedYear, selectedGrade]);
 
+  // 分页切片
+  const pagedGroups = useMemo(
+    () => filteredGroups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filteredGroups, page]
+  );
+  const pagedPapers = useMemo(
+    () => filteredTestPapers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filteredTestPapers, page]
+  );
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-6">
-          {/* 左侧筛选面板 */}
-          <Card className="w-68 bg-card rounded-xl p-6 h-fit">
-            <h3 className="text-lg font-semibold mb-5 border-l-4 border-primary pl-3">筛选条件</h3>
+      <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
+          {/* 左侧筛选面板（移动端默认折叠，用「筛选条件」按钮展开） */}
+          <Card className={`${filtersOpen ? "block" : "hidden"} w-full shrink-0 bg-card rounded-xl p-4 sm:p-6 h-fit lg:block lg:w-72`}>
+            <h3 className="text-base font-semibold mb-4 border-l-4 border-primary pl-3 sm:text-lg sm:mb-5">筛选条件</h3>
 
-            {/* 题型分类 */}
-            <div className="space-y-2 mb-6">
+            {/* 题型分类：移动端两列平铺，桌面端竖排 */}
+            <div className="mb-5 grid grid-cols-2 gap-2 lg:mb-6 lg:flex lg:flex-col">
               {categoryOptions.map((option) => (
                 <Button
                   size="lg"
@@ -322,16 +312,32 @@ export function QuestionOverview({
 
           {/* 右侧内容区域 */}
           <div className="flex-1">
-            <div className="bg-card rounded-xl mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="搜索题目或套卷..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-                />
+            <div className="mb-4 rounded-xl bg-card p-3 sm:mb-6 sm:p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="搜索题目或套卷..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-background py-2.5 pl-10 pr-4 text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-2 sm:justify-end">
+                  <span className="whitespace-nowrap text-xs text-muted-foreground sm:text-sm">
+                    {isTestPaperPage ? `共 ${filteredTestPapers.length} 份套卷` : `共 ${filteredGroups.length} 个题组`}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 lg:hidden"
+                    onClick={() => setFiltersOpen((v) => !v)}
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    筛选
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -339,7 +345,7 @@ export function QuestionOverview({
               // 套卷页面：只显示套卷内容，每行一个
               <div>
                 <div className="grid grid-cols-1 gap-4">
-                  {filteredTestPapers.map((paper) => (
+                  {pagedPapers.map((paper) => (
                     <TestCard
                       key={paper.id}
                       id={paper.id}
@@ -353,6 +359,15 @@ export function QuestionOverview({
                     />
                   ))}
                 </div>
+
+                <PageBar
+                  page={page}
+                  pageCount={Math.ceil(filteredTestPapers.length / PAGE_SIZE)}
+                  onPageChange={setPage}
+                  totalItems={filteredTestPapers.length}
+                  pageSize={PAGE_SIZE}
+                  unit="份套卷"
+                />
 
                 {filteredTestPapers.length === 0 && (
                   <div className="text-center py-16 bg-card rounded-xl">
@@ -372,7 +387,7 @@ export function QuestionOverview({
               // 普通题目页面：显示组题和套卷推荐
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {filteredGroups.map((group, index) => (
+                  {pagedGroups.map((group) => (
                     <div
                       key={group.id}
                     >
@@ -390,6 +405,14 @@ export function QuestionOverview({
                     </div>
                   ))}
                 </div>
+                <PageBar
+                  page={page}
+                  pageCount={Math.ceil(filteredGroups.length / PAGE_SIZE)}
+                  onPageChange={setPage}
+                  totalItems={filteredGroups.length}
+                  pageSize={PAGE_SIZE}
+                  unit="个题组"
+                />
               </>
             ) : (
               // 无匹配组题

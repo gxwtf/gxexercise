@@ -345,7 +345,7 @@ function EnWritingFeedbackSection({
         <div>
           <h3 className="text-lg font-semibold mb-3">评分明细</h3>
           <QuestionSection>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {subScoreItems.map(({ key, max, bg, bar }) => {
                 const score = subScores[key] ?? 0
                 const pct = max > 0 ? Math.round((score / max) * 100) : 0

@@ -53,7 +53,8 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
   }
 
   return (
-    <Table>
+    <div className="overflow-x-auto rounded-lg border">
+      <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[80px]">序号</TableHead>
@@ -105,5 +106,6 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
         })}
       </TableBody>
     </Table>
+      </div>
   )
 }
