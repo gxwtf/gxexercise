@@ -17,7 +17,7 @@ model Question {
   options        Json?
   answer         String     @default("")
   analysis       String?    @db.Text
-  score          Int        @default(5)
+  score          Float      @default(5)
   correctRate    Float?     @db.Real
   subject        String     @db.VarChar(100)
   source         String     @db.VarChar(200)
