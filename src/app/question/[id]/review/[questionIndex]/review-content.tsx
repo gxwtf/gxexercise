@@ -10,6 +10,10 @@ import { SubmissionHistoryTable, type SubmissionHistoryItem } from "@/components
 import { QuestionSection } from "@/components/QuestionSection"
 import { EnglishReading, ClozeContext } from "@/components/article/english-reading"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { QueueStatus } from "@/components/review/QueueStatus"
+import Link from "next/link"
+import { FileDown } from "lucide-react"
 
 interface ReviewContentData {
     questionGroup: {
@@ -222,6 +226,16 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             <MDXRemote {...userAnswerMdx} components={components} />
                                         </div>
                                     </QuestionSection>
+                                    {isEnWriting && enWritingFeedback && !isPending && (
+                                        <div className="mt-4 flex justify-end print:hidden">
+                                            <Button asChild variant="outline" size="sm" className="gap-1.5">
+                                                <Link href={`${basePath}/${data.currentIndex + 1}/report`} target="_blank" rel="noopener">
+                                                    <FileDown className="size-4" />
+                                                    导出 PDF
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    )}
                                     {isEnWriting && enWritingFeedback && !isPending ? (
                                         <EnWritingFeedbackSection
                                           feedback={enWritingFeedback}
@@ -242,11 +256,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             )}
                                         </>
                                     )}
-                                    {isPending && (
-                                        <div className="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-                                            <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">评阅中</p>
-                                            <p className="text-sm text-blue-700 dark:text-blue-300">AI正在评阅你的作答，请稍后刷新页面查看结果。</p>
-                                        </div>
+                                    {isPending && data.currentSubmissionId && (
+                                        <QueueStatus submissionIds={[data.currentSubmissionId]} />
                                     )}
                                 </TabsContent>
                             )}
