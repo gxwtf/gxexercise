@@ -136,14 +136,16 @@ export function QuestionOverview({
   const categoryOptions = [
     { value: "all", label: "全部题型" },
     { value: "高考真题", label: "高考真题" },
-    { value: "高考模拟", label: "高考模拟" },
+    { value: "各区一模", label: "各区一模" },
+    { value: "各区二模", label: "各区二模" },
     { value: "各区期末", label: "各区期末" },
     { value: "广学模拟", label: "广学模拟" }
   ];
 
   const categoryTagMap: Record<string, string> = {
     "高考真题": "真题",
-    "高考模拟": "模拟",
+    "各区一模": "一模",
+    "各区二模": "二模",
     "各区期末": "期末",
   };
 
