@@ -1,6 +1,6 @@
 import { prisma } from "./prisma"
 import { gradeWithConfig, preCheckGrade, type GradeResult } from "./ai-service"
-import { getGradingPrompt } from "./grading-prompts"
+import { getGradingPrompt, GRADING_PROMPT_REGISTRY } from "./grading-prompts"
 
 function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
   const data: Record<string, unknown> = {}
@@ -26,9 +26,19 @@ export function startGradingWorker() {
     if (polling) return
     polling = true
     try {
+      // 只捞有 AI 批改配置的题型：客观题（完形/阅读/语法/选词）在提交时就已算分，
+      // 它们的 gradingStatus 仍停留在 pending，如果不过滤会把队列堵死
+      // （曾导致新提交的作文永远排不到，worker 一直在重复处理 9 月的 grammar 记录）
+      const gradeableTypes = Array.from(new Set(GRADING_PROMPT_REGISTRY.map((p) => p.questionType)))
       const pending = await prisma.questionSubmission.findMany({
-        where: { gradingStatus: "pending" },
-        take: 5,
+        where: {
+          gradingStatus: "pending",
+          groupSubmission: {
+            questionGroup: { questionType: { in: gradeableTypes } },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+        take: 10,
         include: {
           question: {
             select: { content: true, answer: true, score: true },
