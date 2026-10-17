@@ -272,9 +272,7 @@ export function QuestionOverview({
                   page={page}
                   pageCount={pageCount}
                   hrefForPage={(p) => hrefWith({ page: p })}
-                  totalItems={total}
-                  pageSize={pageSize}
-                  unit="份套卷"
+                  showLabel={false}
                 />
 
                 {papers.length === 0 && (
@@ -310,9 +308,7 @@ export function QuestionOverview({
                   page={page}
                   pageCount={pageCount}
                   hrefForPage={(p) => hrefWith({ page: p })}
-                  totalItems={total}
-                  pageSize={pageSize}
-                  unit="个题组"
+                  showLabel={false}
                 />
               </>
             ) : (

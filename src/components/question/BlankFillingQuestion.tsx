@@ -37,9 +37,16 @@ export function BlankFillingQuestion({ availableOptions, selectedOption, onOptio
                 <FieldContent>
                   <FieldTitle className="text-base">
                     {option.labelMdx ? (
-                      <span>{option.id}. <MDXRemote {...option.labelMdx} components={{ ...components, p: (props) => <span>{props.children}</span> }} /></span>
+                      <span className="text-lg leading-7">
+                        {option.id}.{" "}
+                        <MDXRemote
+                          {...option.labelMdx}
+                          // 与阅读选择题一致：mdx 的 <p> 在这里换成 <span>，但要保留同样的字号/行高
+                          components={{ ...components, p: (props) => <span className="text-lg leading-7">{props.children}</span> }}
+                        />
+                      </span>
                     ) : (
-                      `${option.id}. ${option.label}`
+                      <span className="text-lg leading-7">{`${option.id}. ${option.label}`}</span>
                     )}
                   </FieldTitle>
                 </FieldContent>

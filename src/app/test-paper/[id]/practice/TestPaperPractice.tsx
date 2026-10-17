@@ -494,8 +494,7 @@ export function TestPaperPractice({
           page={currentGroupIndex + 1}
           pageCount={totalGroups}
           onPageChange={(p) => handleJumpToGroup(p - 1)}
-          unit="节"
-          showLabel
+          showLabel={false}
           className="mt-0"
         />
       </div>

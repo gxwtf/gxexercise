@@ -40,8 +40,9 @@ export interface PageBarProps {
 
 const itemClass = (active: boolean) =>
   cn(
-    buttonVariants({ variant: active ? "default" : "ghost", size: "icon" }),
-    "min-w-8 active:translate-y-0"
+    // 不固定宽度：一位数是 8 的方形，两位数（10+）会自然变宽，不会压到相邻按钮
+    buttonVariants({ variant: active ? "default" : "ghost", size: "default" }),
+    "h-8 min-w-8 shrink-0 px-2 tabular-nums active:translate-y-0"
   )
 
 /** 通用页码条：优先用链接跳转，避免依赖客户端状态；移动端自动收起文字 */
