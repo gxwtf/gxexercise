@@ -24,7 +24,7 @@ const REPORT_CSS = `
   .essay-report table { width: 100%; border-collapse: collapse; margin: 6pt 0 12pt; }
   .essay-report th, .essay-report td { border: 1pt solid #888; padding: 5pt 7pt; font-size: 11pt; }
   .essay-report th { background: #f2f2f2; font-weight: 700; text-align: center; }
-  .essay-report .box { border: 1pt solid #bbb; padding: 8pt 10pt; margin-bottom: 10pt; }
+  .essay-report .section-body { margin: 0 0 10pt; }
   .essay-report .score-line { font-size: 12.5pt; font-weight: 700; margin: 0 0 10pt; }
   .essay-report img { max-width: 100%; }
   .essay-report .katex { font-size: 0.92em; }
@@ -37,7 +37,7 @@ const REPORT_CSS = `
     .no-print { display: none !important; }
     .essay-report { max-width: none; margin: 0; padding: 0; box-shadow: none; }
     .essay-report h2 { break-after: avoid; }
-    .essay-report .box, .essay-report table { break-inside: avoid; }
+    .essay-report .section-body, .essay-report table { break-inside: avoid; }
   }
 `
 
@@ -116,12 +116,12 @@ export function EssayReport(props: EssayReportProps) {
         </p>
 
         <h2>一、题目</h2>
-        <div className="box">
+        <div className="section-body">
           {stemMdx ? <MDXRemote {...stemMdx} components={components} /> : <p>（无题目内容）</p>}
         </div>
 
         <h2>二、我的原稿</h2>
-        <div className="box">
+        <div className="section-body">
           {answerMdx ? <MDXRemote {...answerMdx} components={components} /> : <p>（未作答）</p>}
         </div>
 
@@ -181,7 +181,7 @@ export function EssayReport(props: EssayReportProps) {
         )}
 
         <h2>四、最终修改稿</h2>
-        <div className="box">
+        <div className="section-body">
           {modelEssayMdx ? <MDXRemote {...modelEssayMdx} components={components} /> : <p>（暂无修改稿）</p>}
         </div>
 
