@@ -229,7 +229,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     {isEnWriting && enWritingFeedback && !isPending && (
                                         <div className="mt-4 flex justify-end print:hidden">
                                             <Button asChild variant="outline" size="sm" className="gap-1.5">
-                                                <Link href={`${basePath}/${data.currentIndex + 1}/report`} target="_blank" rel="noopener">
+                                                <Link href={`${basePath}/${data.currentIndex}/report?q=${data.currentQuestion.id}`} target="_blank" rel="noopener">
                                                     <FileDown className="size-4" />
                                                     导出 PDF
                                                 </Link>

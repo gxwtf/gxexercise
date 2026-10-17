@@ -11,6 +11,7 @@ import { EssayReport } from "./EssayReport"
 
 interface PageProps {
   params: Promise<{ id: string; questionIndex: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 function escapeLatexBraces(content: string): string {
@@ -40,9 +41,12 @@ function escapeLatexBraces(content: string): string {
 }
 
 /** 单篇作文的批改报告：题目 / 原稿 / 评分与批改 / 修改稿，用于导出 PDF */
-export default async function EssayReportPage({ params }: PageProps) {
+export default async function EssayReportPage({ params, searchParams }: PageProps) {
   const { id, questionIndex } = await params
-  const index = Math.max(0, (Number.parseInt(questionIndex, 10) || 1) - 1)
+  const sp = await searchParams
+  const wantedQuestionId = (Array.isArray(sp.q) ? sp.q[0] : sp.q) || ""
+  // questionIndex 在 URL 里是 1 基
+  const requestedIndex = Math.max(0, (Number.parseInt(questionIndex, 10) || 1) - 1)
 
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   if (!session.isLoggedIn || !session.userid) {
@@ -57,9 +61,16 @@ export default async function EssayReportPage({ params }: PageProps) {
   })
   if (!questionGroup) notFound()
 
-  const item = questionGroup.groupItems[index]
+  // 优先用 ?q=<questionId> 精确定位；没有的话按题序，再兜底到最后一道题，
+  // 避免「题序越界」这种写法差异直接把报告页判成 404
+  const items = questionGroup.groupItems
+  const item =
+    (wantedQuestionId ? items.find((it) => it.question.id === wantedQuestionId) : undefined) ??
+    items[requestedIndex] ??
+    items[0]
   if (!item) notFound()
   const question = item.question
+  const index = items.findIndex((it) => it.question.id === question.id)
 
   const submission = await prisma.questionSubmission.findFirst({
     where: { userId: session.userid, questionId: question.id, gradingStatus: "graded" },
