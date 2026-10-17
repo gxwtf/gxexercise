@@ -40,6 +40,21 @@ function escapeLatexBraces(content: string): string {
   return result
 }
 
+/** 文件名里不能出现的字符统一清掉，「另存为 PDF」会以 <title> 作为默认文件名 */
+function safeFileName(name: string): string {
+  return (name || "英语作文").replace(/[\\/:*?"<>|\r\n\t]/g, "").trim().slice(0, 80) || "英语作文"
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { id } = await params
+  try {
+    const group = await prisma.questionGroup.findUnique({ where: { id }, select: { title: true } })
+    return { title: `${safeFileName(group?.title || "英语作文")} - 英语作文批改报告` }
+  } catch {
+    return { title: "英语作文批改报告" }
+  }
+}
+
 /** 单篇作文的批改报告：题目 / 原稿 / 评分与批改 / 修改稿，用于导出 PDF */
 export default async function EssayReportPage({ params, searchParams }: PageProps) {
   const { id, questionIndex } = await params

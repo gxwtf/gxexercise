@@ -78,6 +78,20 @@ export function EssayReport(props: EssayReportProps) {
   } = props
   const components = useMDXComponents()
 
+  // 设置页面标题 → 浏览器「另存为 PDF」会默认用这个文件名
+  React.useEffect(() => {
+    const safe = (text: string) => (text || "").replace(/[\\/:*?"<>|]/g, "").trim()
+    const today = new Date()
+    const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    const prefix = safe(title) || "英语作文"
+    const scorePart = typeof score === "number" ? `_${score}分` : ""
+    const previous = document.title
+    document.title = `${prefix}_英语作文批改报告${scorePart}_${date}`
+    return () => {
+      document.title = previous
+    }
+  }, [title, score])
+
   // 打开即调起打印（用户选择「另存为 PDF」即可下载）
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -101,7 +115,8 @@ export function EssayReport(props: EssayReportProps) {
 
       <div className="no-print mx-auto mb-3 flex max-w-[820px] items-center justify-between gap-3 px-4">
         <p className="text-sm text-muted-foreground">
-          回车/点击右侧按钮打开打印窗口，在「目标打印机」里选「另存为 PDF」即可下载
+          在打印窗口的「目标打印机」里选「另存为 PDF」即可下载，默认文件名已设为「{title}_英语作文批改报告
+          {typeof score === "number" ? `_${score}分` : ""}_日期」
         </p>
         <Button size="sm" className="gap-1.5" onClick={() => window.print()}>
           <Printer className="size-4" />
