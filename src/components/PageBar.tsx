@@ -1,18 +1,12 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
+import { buttonVariants } from "@/components/ui/button"
+import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
-/** 计算页码窗口：首页/末页固定，当前页左右各 span 个，中间用省略号 */
+/** 计算页码窗口：首尾固定 + 当前页左右 span 个 + 省略号 */
 export function getPageWindow(current: number, pageCount: number, span = 1): (number | "ellipsis")[] {
   if (pageCount <= 0) return []
   const pages = new Set<number>([1, pageCount])
@@ -34,24 +28,27 @@ export interface PageBarProps {
   /** 当前页，从 1 开始 */
   page: number
   pageCount: number
-  onPageChange: (page: number) => void
-  /** 可选：显示总数信息，如"共 222 条" */
+  /** 传了 hrefForPage 就用真实链接（服务端分页，最稳）；否则用回调（客户端分页） */
+  hrefForPage?: (page: number) => string
+  onPageChange?: (page: number) => void
   totalItems?: number
   pageSize?: number
-  /** 条目单位，默认"条" */
   unit?: string
   className?: string
-  /** 是否显示「第 x/y 页」文字 */
   showLabel?: boolean
 }
 
-/**
- * 通用页码条：基于 shadcn Pagination。
- * 移动端自动隐藏「上一页/下一页」文字，只留箭头，避免横向溢出。
- */
+const itemClass = (active: boolean) =>
+  cn(
+    buttonVariants({ variant: active ? "default" : "ghost", size: "icon" }),
+    "min-w-8 active:translate-y-0"
+  )
+
+/** 通用页码条：优先用链接跳转，避免依赖客户端状态；移动端自动收起文字 */
 export function PageBar({
   page,
   pageCount,
+  hrefForPage,
   onPageChange,
   totalItems,
   pageSize,
@@ -61,12 +58,46 @@ export function PageBar({
 }: PageBarProps) {
   if (pageCount <= 1) return null
 
+  const linkMode = typeof hrefForPage === "function"
+  const hrefOf = (p: number) => (hrefForPage ? hrefForPage(p) : "#")
   const go = (p: number) => {
     const next = Math.min(Math.max(1, p), pageCount)
-    if (next !== page) onPageChange(next)
+    if (next !== page && onPageChange) onPageChange(next)
   }
 
-  const window = getPageWindow(page, pageCount, pageCount > 7 ? 1 : 3)
+  const windowItems = getPageWindow(page, pageCount, pageCount > 7 ? 1 : 3)
+  const from = totalItems ? (page - 1) * (pageSize ?? 12) + 1 : undefined
+  const to = totalItems && pageSize ? Math.min(page * pageSize, totalItems) : undefined
+
+  const renderItem = (
+    key: string,
+    content: React.ReactNode,
+    opts: { href?: string; onClick?: () => void; label: string; disabled?: boolean; active?: boolean }
+  ) => {
+    const className = cn(itemClass(Boolean(opts.active)), opts.label.includes("上一页") || opts.label.includes("下一页") ? "gap-1 px-2.5" : "")
+    if (opts.disabled) {
+      return (
+        <li key={key}>
+          <span aria-disabled className={cn(className, "pointer-events-none opacity-40")} aria-label={opts.label}>
+            {content}
+          </span>
+        </li>
+      )
+    }
+    return (
+      <li key={key}>
+        {linkMode ? (
+          <Link href={opts.href ?? "#"} aria-label={opts.label} aria-current={opts.active ? "page" : undefined} className={className}>
+            {content}
+          </Link>
+        ) : (
+          <button type="button" onClick={opts.onClick} aria-label={opts.label} aria-current={opts.active ? "page" : undefined} className={className}>
+            {content}
+          </button>
+        )}
+      </li>
+    )
+  }
 
   return (
     <div className={cn("mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-between", className)}>
@@ -75,43 +106,48 @@ export function PageBar({
           {typeof totalItems === "number" && (
             <span>
               共 {totalItems} {unit}
+              {from && to ? `（当前 ${from}–${to}）` : ""}
               {" · "}
             </span>
           )}
           第 {page} / {pageCount} 页
-          {pageSize ? `（每页 ${pageSize} 条）` : ""}
         </p>
       )}
 
-      <Pagination className="mx-0 w-auto justify-center sm:justify-end">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious onClick={() => go(page - 1)} disabled={page <= 1} aria-disabled={page <= 1} />
-          </PaginationItem>
+      <nav role="navigation" aria-label="pagination" className="mx-0 flex w-auto justify-center sm:justify-end">
+        <ul className="flex flex-row flex-wrap items-center justify-center gap-1">
+          {renderItem("prev", <><ChevronLeftIcon className="size-4" /><span className="hidden sm:inline">上一页</span></>, {
+            href: hrefOf(page - 1),
+            onClick: () => go(page - 1),
+            label: "上一页",
+            disabled: page <= 1,
+          })}
 
-          {window.map((item, idx) =>
+          {windowItems.map((item, idx) =>
             item === "ellipsis" ? (
-              <PaginationItem key={`e-${idx}`} className="hidden sm:block">
-                <PaginationEllipsis />
-              </PaginationItem>
+              <li key={`e-${idx}`} className="hidden sm:block">
+                <span aria-hidden className="flex size-8 items-center justify-center">
+                  <MoreHorizontalIcon className="size-4" />
+                </span>
+              </li>
             ) : (
-              <PaginationItem key={item}>
-                <PaginationLink
-                  isActive={item === page}
-                  onClick={() => go(item)}
-                  aria-label={`第 ${item} 页`}
-                >
-                  {item}
-                </PaginationLink>
-              </PaginationItem>
+              renderItem(String(item), item, {
+                href: hrefOf(item),
+                onClick: () => go(item),
+                label: `第 ${item} 页`,
+                active: item === page,
+              })
             )
           )}
 
-          <PaginationItem>
-            <PaginationNext onClick={() => go(page + 1)} disabled={page >= pageCount} aria-disabled={page >= pageCount} />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+          {renderItem("next", <><span className="hidden sm:inline">下一页</span><ChevronRightIcon className="size-4" /></>, {
+            href: hrefOf(page + 1),
+            onClick: () => go(page + 1),
+            label: "下一页",
+            disabled: page >= pageCount,
+          })}
+        </ul>
+      </nav>
     </div>
   )
 }

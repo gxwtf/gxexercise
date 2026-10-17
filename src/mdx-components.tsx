@@ -117,7 +117,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
           className={cn(
             'inline rounded px-1 py-0.5 text-lg font-normal',
             'align-baseline leading-normal',
-            'text-muted-foreground'
+            'text-slate-600 dark:text-muted-foreground'
           )}
           {...props}
         >
@@ -132,7 +132,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
             className={cn(
                 'inline rounded px-1 py-0.5 text-lg font-normal transition cursor-pointer',
                 'align-baseline leading-normal',
-                filledOption ? 'text-[#A31F24] font-medium dark:text-red-400' : 'text-foreground'
+                filledOption ? 'text-[#A31F24] font-medium dark:text-red-400' : 'text-black dark:text-foreground'
             )}
             {...props}
         >
@@ -179,7 +179,7 @@ function Input({
         if (!clozeContext) {
             return (
                 <span className="inline-flex items-center h-8" style={{textIndent: 0}} {...props}>
-                    <span className="text-base font-medium text-foreground px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>?</span>
+                    <span className="text-base font-medium text-gray-700 dark:text-foreground px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>?</span>
                     <ShadcnInput
                         type="text"
                         className="w-30 rounded-l-none h-8 text-base"
@@ -204,7 +204,7 @@ function Input({
 
     return (
         <span className="inline-flex items-center h-7" style={{textIndent: 0}} {...props}>
-            <span className="text-base font-medium text-foreground px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>
+            <span className="text-base font-medium text-gray-700 dark:text-foreground px-2 py-1 border border-input rounded-l-lg border-r-0 bg-transparent cursor-default h-full flex items-center" style={{textIndent: 0}}>
                 {questionNumberRef.current}
             </span>
             <ShadcnInput
@@ -418,7 +418,7 @@ function Superscript({ children, className, ...props }: React.HTMLAttributes<HTM
     return (
         <span
             className={cn(
-                'inline align-[0.25em] text-[0.62em] font-normal text-muted-foreground ml-0.5',
+                'inline align-[0.25em] text-[0.62em] font-normal text-slate-600 dark:text-muted-foreground ml-0.5',
                 className
             )}
             {...props}
@@ -443,7 +443,7 @@ const components: MDXComponents = {
     li: Typography.LI,
     code: Typography.InlineCode,
     sup: ({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-        <sup className={cn('inline align-[0.25em] text-[0.7em] font-normal text-muted-foreground ml-0.5 leading-none', className)} {...props}>
+        <sup className={cn('inline align-[0.25em] text-[0.7em] font-normal text-slate-600 dark:text-muted-foreground ml-0.5 leading-none', className)} {...props}>
             {children}
         </sup>
     ),
