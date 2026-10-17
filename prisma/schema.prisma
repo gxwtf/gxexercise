@@ -80,7 +80,7 @@ model TestPaper {
   source      String      @db.VarChar(200)
   grade       String?     @db.VarChar(50)
   year        Int?
-  totalScore  Int?
+  totalScore  Float?
   duration    Int?
   tags        String[]
   createdAt   DateTime    @default(now())
