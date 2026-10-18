@@ -139,7 +139,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
     for (const section of raw.sections) {
       const group = await tx.questionGroup.create({
         data: {
-          title: `${title} · ${section.title}`,
+          title: `${title}·${section.category}`,
           content: "",
           questionType: section.questionType,
           score: Math.round(section.questions.reduce((n, q) => n + (q.score || 0), 0)),
