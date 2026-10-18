@@ -45,7 +45,7 @@ interface MathPaper {
 }
 
 /** 复制图片并改写引用路径 */
-function materializeImages(paper: MathPaper, stem: string, typeDir: string, imgSrcDirs: string[]): Map<string, string> {
+function materializeImages(paper: MathPaper, stem: string, typeDir: string, imgSrcDirs: string[], subject: string): Map<string, string> {
   const mapping = new Map<string, string>();
   const missing: string[] = [];
   const imgDstDir = path.join(MD_ROOT, typeDir, "数学", stem, "images");
@@ -64,7 +64,7 @@ function materializeImages(paper: MathPaper, stem: string, typeDir: string, imgS
     if (!src) { missing.push(file); continue; }
     fs.mkdirSync(imgDstDir, { recursive: true });
     fs.copyFileSync(src, path.join(imgDstDir, file));
-    mapping.set(ref, `/exam-images/${typeDir}/数学/${stem}/images/${file}`);
+    mapping.set(ref, `/exam-images/${typeDir}/${subject}/${stem}/images/${file}`);
   }
   if (missing.length) console.log(`  ⚠ ${stem}: ${missing.length} 张图片找不到（${missing.slice(0,2).join(", ")}）`);
   return mapping;
@@ -98,7 +98,7 @@ async function deletePaper(paperId: string, title: string) {
   console.log(`  已删除旧数据以便重导：${title}`);
 }
 
-async function importPaper(file: string, typeDir: string, dryRun: boolean, force: boolean) {
+async function importPaper(file: string, typeDir: string, dryRun: boolean, force: boolean, subject: string) {
   const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as MathPaper;
   const stem = path.basename(file, ".json");
   const title = raw.paper.title || stem;
@@ -110,7 +110,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
   }
 
   const imgSrcDirs = [path.join(path.dirname(file), "images"), path.join(JSON_ROOT, "images")];
-  const mapping = dryRun ? new Map<string, string>() : materializeImages(raw, stem, typeDir, imgSrcDirs);
+  const mapping = dryRun ? new Map<string, string>() : materializeImages(raw, stem, typeDir, imgSrcDirs, subject);
   const tags = Array.from(new Set([...(raw.paper.tags || []), "数学"]));
   const sectionCount = raw.sections.length;
   const totalQ = raw.sections.reduce((n, s) => n + s.questions.length, 0);
@@ -125,7 +125,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
       data: {
         title,
         description: `${raw.paper.source}（数学 · 选择+填空）`,
-        subject: "数学",
+        subject,
         source: raw.paper.source || title,
         grade: raw.paper.grade || "高三",
         year: raw.paper.year ?? null,
@@ -143,7 +143,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
           content: "",
           questionType: section.questionType,
           score: Math.round(section.questions.reduce((n, q) => n + (q.score || 0), 0)),
-          subject: "数学",
+          subject,
           source: raw.paper.source || title,
           grade: raw.paper.grade || "高三",
           category: section.category,
@@ -164,7 +164,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
             answer: q.answer || "",
             analysis: q.analysis || "",
             score: q.score ?? 5,
-            subject: "数学",
+            subject,
             source: raw.paper.source || title,
             grade: raw.paper.grade || "高三",
             category: section.category,
@@ -183,6 +183,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
 
 async function main() {
   const typeDir = arg("type", "二模")!;
+  const subject = arg("subject", "数学")!;
   const file = arg("file");
   const limit = Number(arg("limit", "0"));
   const dryRun = hasFlag("dry-run");
@@ -191,7 +192,7 @@ async function main() {
   let files: string[];
   if (file) files = [path.resolve(file)];
   else {
-    const dir = path.join(JSON_ROOT, typeDir, "数学");
+    const dir = path.join(JSON_ROOT, typeDir, subject);
     files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => path.join(dir, f)).sort();
   }
   if (limit > 0) files = files.slice(0, limit);
@@ -200,7 +201,7 @@ async function main() {
   let papers = 0, questions = 0, skipped = 0;
   for (const f of files) {
     try {
-      const r = await importPaper(f, typeDir, dryRun, force);
+      const r = await importPaper(f, typeDir, dryRun, force, subject);
       if (r.skipped) skipped++; else papers++;
       questions += r.questions;
     } catch (e) {
