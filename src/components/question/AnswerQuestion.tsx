@@ -54,8 +54,8 @@ export function AnswerQuestion({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-start space-x-2">
-        {showIndex && <span className="text-lg font-medium">{index}.</span>}
+      <div className="flex items-baseline space-x-2">
+        {showIndex && <span className="shrink-0 text-lg font-medium leading-7">{index}.</span>}
         <div className="flex-1">
           {question.stemMdx ? (
             <div className="text-lg font-medium text-foreground">

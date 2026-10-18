@@ -195,3 +195,23 @@
 .katex-display > .katex {
   font-size: 1.03em;
 }
+/* 上下标：KaTeX 默认按 0.7em 排，视觉上比印刷体偏大且贴着底字；
+   这里收到 0.64em 并加一点间隙，更接近真题卷的排法。
+   （二级上下标再小一号；只用 !important 压过 katex.min.css 的内部尺寸规则） */
+.katex .msupsub .sizing {
+  font-size: 0.64em !important;
+}
+.katex .msupsub .sizing .sizing {
+  font-size: 0.5em !important;
+}
+.katex .msupsub {
+  margin-left: 0.03em;
+}
+
+/* 数学/语法题的题干行距：inline 分式会把行盒撑高，行距太小会显得挤 */
+.font-question p {
+  line-height: 1.9;
+}
+.font-question li {
+  line-height: 1.9;
+}
