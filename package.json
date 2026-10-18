@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "check:colors": "node scripts/check-colors.mjs",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:seed-math": "npx tsx prisma/seed-math.ts",
     "db:seed-chinese": "npx tsx prisma/seed-chinese.ts",
