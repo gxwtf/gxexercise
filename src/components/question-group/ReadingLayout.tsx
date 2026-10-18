@@ -23,9 +23,10 @@ export function ReadingLayout({
   const components = useMDXComponents()
 
   return (
-    <div className="h-full overflow-hidden bg-background">
-      <div className="flex h-full">
-        <div className="flex-1 overflow-y-auto p-6">
+    <div className="bg-background lg:h-full lg:overflow-hidden">
+      <div className="flex flex-col lg:h-full lg:flex-row">
+        {/* 移动端：文章在上、题目在下，整页连续滚动 */}
+        <div className="w-full p-3 sm:p-6 lg:flex-1 lg:overflow-y-auto">
           <EnglishReading
             indentParagraphs={indentParagraphs}
             startQuestionNumber={startQuestionNumber}
@@ -34,9 +35,10 @@ export function ReadingLayout({
           </EnglishReading>
         </div>
 
-        <Separator orientation="vertical" />
+        <div className="mx-3 my-2 border-t border-border lg:hidden" />
+        <Separator orientation="vertical" className="hidden lg:block" />
 
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="w-full p-3 sm:p-6 lg:flex-1 lg:overflow-y-auto">
           <QuestionSection>
             {children}
           </QuestionSection>

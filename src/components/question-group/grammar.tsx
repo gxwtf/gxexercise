@@ -56,8 +56,8 @@ export default function Grammar({ questions, mdxSource, startQuestionNumber = 1 
   const components = useMDXComponents()
 
   return (
-    <div className="h-full overflow-hidden bg-background font-question">
-      <div className="flex h-full">
+    <div className="bg-background font-question lg:h-full lg:overflow-hidden">
+      <div className="flex flex-col lg:h-full lg:flex-row">
         <div className="flex-1 p-6 overflow-y-auto max-w-4xl mx-auto">
           <EnglishReading 
             startQuestionNumber={startQuestionNumber}
