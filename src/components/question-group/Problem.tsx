@@ -102,7 +102,7 @@ export default function Problem({
           return (
             <div key={question.id} className="space-y-3">
               <div className="flex items-start space-x-2">
-                <span className="text-lg font-medium text-muted-foreground">{(startQuestionNumber ?? 1) + seg.index}.</span>
+                <span className="text-lg font-medium">{(startQuestionNumber ?? 1) + seg.index}.</span>
                 <div className="flex-1">
                   <div className="text-lg font-medium text-foreground">
                     {question.stemMdx ? (

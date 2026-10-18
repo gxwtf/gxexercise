@@ -447,17 +447,7 @@ const components: MDXComponents = {
             {children}
         </sup>
     ),
-    img: ({ src, alt, className, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
-        // 题目/选项里的插图（来自 /exam-images/...）。之前组件映射里没有 img，
-        // markdown 图片会解析成 _components.img = undefined 而被直接丢弃。
-        <img
-            src={typeof src === "string" ? src : undefined}
-            alt={alt ?? ""}
-            loading="lazy"
-            className={cn("my-3 h-auto max-w-full rounded-md border border-border bg-muted/30", className)}
-            {...props}
-        />
-    ),
+    img: "img",
     Blank,
     ClozeBlank,
     Input,
