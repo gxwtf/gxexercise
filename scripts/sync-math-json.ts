@@ -21,6 +21,12 @@ interface Q { id: number; questionType: string; content: string; options: Opt[];
 interface Sec { type: string; questionType: string; title: string; category: string; questions: Q[] }
 interface Paper { paper: { title: string }; sections: Sec[] }
 
+/** 把 JSON 里的相对图片路径改写成 nginx 可服务的 /exam-images/... 路径 */
+function rewriteImages(text: string, typeDir: string, stem: string): string {
+  return (text || "").replace(/!\[\]\((images\/[^)]+)\)/g, (_m, p) =>
+    `![](${`/exam-images/${typeDir}/数学/${stem}/images/${path.basename(p)}`})`);
+}
+
 async function main() {
   const type = arg("type", "二模")!;
   const dir = path.join(JSON_ROOT, type, "数学");
@@ -54,15 +60,23 @@ async function main() {
       }
       groups++;
 
+      const stem = path.basename(f, ".json");
       for (let j = 0; j < sec.questions.length; j++) {
         const q = sec.questions[j];
         const gi = group.groupItems[j];
         if (!gi) continue;
-        const options = sec.type === "选择题" ? (q.options || []).map((o) => ({ id: o.id, label: o.label })) : undefined;
+        const options = sec.type === "选择题"
+          ? (q.options || []).map((o) => ({ id: o.id, label: rewriteImages(o.label, type, stem) }))
+          : undefined;
         if (!dryRun) {
           await prisma.question.update({
             where: { id: gi.questionId },
-            data: { content: q.content, options, answer: q.answer ?? "", score: q.score ?? 5 },
+            data: {
+              content: rewriteImages(q.content, type, stem),
+              options,
+              answer: q.answer ?? "",
+              score: q.score ?? 5,
+            },
           });
         }
         questions++;
