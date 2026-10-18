@@ -67,7 +67,7 @@ export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestio
   const renderOptionLabel = (option: Option) => {
     if (option.labelMdx) {
       return (
-        <FieldTitle className="text-base">
+        <FieldTitle className="text-base [&_img]:inline-block [&_img]:max-h-16 [&_img]:w-auto [&_img]:align-middle">
           <MDXRemote {...option.labelMdx} components={components} />
         </FieldTitle>
       )

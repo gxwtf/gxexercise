@@ -215,3 +215,9 @@
 .font-question li {
   line-height: 1.9;
 }
+
+/* 题目与选项里的插图：默认不超过一屏太高，避免撑爆卡片 */
+.font-question img {
+  max-width: 100%;
+  height: auto;
+}
