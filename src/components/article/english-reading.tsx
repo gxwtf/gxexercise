@@ -107,7 +107,7 @@ function replaceBlankTokens(
             return (
               <span
                 key={`blank-${blankId}-${index}`}
-                className="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium text-slate-600 dark:text-muted-foreground"
+                className="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium text-muted-foreground"
               >
                 [■]
               </span>
@@ -123,7 +123,7 @@ function replaceBlankTokens(
               }
               className={cn(
                 'inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium transition',
-                filledOption ? 'text-amber-700 dark:text-amber-400' : 'text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground'
+                filledOption ? 'text-amber-700 dark:text-amber-400' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {filledOption ? `[${filledOption.label}]` : '[■]'}

@@ -156,7 +156,7 @@ export function TestPaperResult({
                       <div
                         key={qs.questionId}
                         className={cn(
-                          "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-1 cursor-pointer hover:opacity-80 transition-opacity",
+                          "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border cursor-pointer hover:opacity-80 transition-opacity",
                           isCorrect === true
                             ? "bg-green-100 border-green-500 text-green-700 dark:bg-green-950 dark:border-green-400 dark:text-green-300"
                             : isCorrect === false

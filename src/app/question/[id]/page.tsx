@@ -165,7 +165,7 @@ async function QuestionPageContent({ id }: { id: string }) {
         {questionGroup.content && (
           <div className="max-w-4xl mx-auto px-6 mt-4">
             <QuestionSection>
-              <div className="border-1 border-black p-4 text-lg">
+              <div className="rounded-lg border border-border bg-muted/40 p-4 text-lg">
                 {questionGroup.content}
               </div>
             </QuestionSection>

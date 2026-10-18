@@ -84,14 +84,14 @@ export default function SubHeader({
               size="sm"
               className={`h-8 px-3 text-sm relative ${
                 isActive 
-                  ? 'text-[#A31F24] font-medium' 
+                  ? 'text-brand font-medium' 
                   : 'text-foreground'
               }`}
             >
               <Link href={item.href}>
                 {item.label}
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#A31F24]" />
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand" />
                 )}
               </Link>
             </Button>
@@ -111,7 +111,7 @@ export default function SubHeader({
             href={item.href}
             className={`text-sm font-medium ${
               isActive 
-                ? 'text-[#A31F24] font-semibold underline underline-offset-4' 
+                ? 'text-brand font-semibold underline underline-offset-4' 
                 : 'hover:text-primary'
             }`}
           >

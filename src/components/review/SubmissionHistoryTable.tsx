@@ -76,7 +76,7 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
               )}
             >
               <TableCell className="font-medium">
-                {isCurrent && <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">★</span>}
+                {isCurrent && <span className="text-xs text-muted-foreground mr-1">★</span>}
                 {index + 1}
               </TableCell>
               <TableCell>

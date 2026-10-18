@@ -31,23 +31,23 @@ export function QuestionSwitcher({ questions, currentIndex, basePath }: Question
 
         if (isCurrent) {
           if (q.status === "correct") {
-            buttonStyle = cn(baseStyle, "bg-green-500 border-green-500 text-white")
+            buttonStyle = cn(baseStyle, "border-green-600 bg-green-600 text-white dark:border-green-500 dark:bg-green-500 dark:text-green-950")
           } else if (q.status === "wrong") {
-            buttonStyle = cn(baseStyle, "bg-red-500 border-red-500 text-white")
+            buttonStyle = cn(baseStyle, "border-red-600 bg-red-600 text-white dark:border-red-500 dark:bg-red-500 dark:text-red-950")
           } else if (q.status === "reviewing") {
-            buttonStyle = cn(baseStyle, "bg-amber-500 border-amber-500 text-white")
+            buttonStyle = cn(baseStyle, "border-amber-500 bg-amber-500 text-amber-950 dark:border-amber-400 dark:bg-amber-400 dark:text-amber-950")
           } else {
-            buttonStyle = cn(baseStyle, "bg-gray-400 border-gray-400 text-white dark:bg-gray-500 dark:border-gray-500")
+            buttonStyle = cn(baseStyle, "border-border bg-muted text-foreground")
           }
         } else {
           if (q.status === "correct") {
-            buttonStyle = cn(baseStyle, "bg-transparent border-green-500 text-green-600")
+            buttonStyle = cn(baseStyle, "border-green-600 bg-transparent text-green-700 dark:border-green-500 dark:text-green-400")
           } else if (q.status === "wrong") {
-            buttonStyle = cn(baseStyle, "bg-transparent border-red-500 text-red-600")
+            buttonStyle = cn(baseStyle, "border-red-600 bg-transparent text-red-700 dark:border-red-500 dark:text-red-400")
           } else if (q.status === "reviewing") {
-            buttonStyle = cn(baseStyle, "bg-transparent border-amber-500 text-amber-600")
+            buttonStyle = cn(baseStyle, "border-amber-500 bg-transparent text-amber-700 dark:border-amber-400 dark:text-amber-300")
           } else {
-            buttonStyle = cn(baseStyle, "bg-transparent border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400")
+            buttonStyle = cn(baseStyle, "border-border bg-transparent text-muted-foreground")
           }
         }
 

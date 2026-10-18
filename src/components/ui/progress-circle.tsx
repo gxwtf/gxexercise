@@ -40,7 +40,7 @@ export function ProgressCircle({
           stroke="currentColor"
           strokeWidth={strokeWidth}
           fill="none"
-          className={hasAttempt ? "text-red-400" : "text-gray-200"}
+          className={hasAttempt ? "text-red-400/60 dark:text-red-500/50" : "text-muted"}
         />
         
         {/* 进度圆环 - 只有有答题记录时才显示绿色进度 */}
@@ -55,7 +55,7 @@ export function ProgressCircle({
             strokeDasharray={strokeDasharray}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            className="text-green-500"
+            className="text-green-500 dark:text-green-400"
             style={{
               transition: 'stroke-dashoffset 0.3s ease'
             }}
@@ -68,7 +68,7 @@ export function ProgressCircle({
         <span className={cn(
           fontSize || "text-[10px]",
           "font-medium",
-          hasAttempt ? "text-gray-700" : "text-gray-400"
+          hasAttempt ? "text-foreground" : "text-muted-foreground"
         )}>
           {correct}/{total}
         </span>

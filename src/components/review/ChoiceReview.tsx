@@ -71,14 +71,14 @@ export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceRevie
             "border-green-500 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
         } else {
           style =
-            "border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500"
+            "border-border bg-muted/40 text-muted-foreground"
         }
 
         return (
           <div
             key={option.id}
             className={cn(
-              "border-1 rounded-lg px-4 py-2 text-base",
+              "rounded-lg border px-4 py-2 text-base",
               style
             )}
           >

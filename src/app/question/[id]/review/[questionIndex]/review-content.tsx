@@ -198,9 +198,9 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         得分：
                                         <span className="font-medium">
                                             {isPending ? (
-                                                <span className="text-amber-600">评阅中</span>
+                                                <span className="text-amber-700 dark:text-amber-400">评阅中</span>
                                             ) : isCorrect === null ? (
-                                                <span className="text-amber-600">评阅中</span>
+                                                <span className="text-amber-700 dark:text-amber-400">评阅中</span>
                                             ) : (
                                                 <>{userScore ?? "-"} / {questionScore}</>
                                             )}
@@ -278,11 +278,11 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         <div className="mt-6 mb-6 p-4 rounded-lg bg-muted/50">
                             <p className="text-base">
                                 我的作答：
-                                <span className={isCorrect === null ? "text-muted-foreground font-medium" : isCorrect ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                                <span className={isCorrect === null ? "text-muted-foreground font-medium" : isCorrect ? "text-green-700 dark:text-green-400 font-medium" : "text-red-700 dark:text-red-400 font-medium"}>
                                     {displayUserAnswer ?? "未作答"}
                                 </span>
                                 {"  "}正确答案：
-                                <span className="text-green-600 font-medium">{displayCorrectAnswer}</span>
+                                <span className="text-green-700 dark:text-green-400 font-medium">{displayCorrectAnswer}</span>
                                 {"  "}正确率：
                                 <span className="font-medium">{correctRateDisplay}</span>
                                 {"  "}平均得分：

@@ -90,7 +90,7 @@ export function TestCard({
                         {title}
                     </ItemTitle>
                     <ItemDescription className="flex gap-1 items-center">
-                        <Badge variant="destructive" className="text-xs">
+                        <Badge variant="outline" className="text-xs">
                             {type}
                         </Badge>
                         {year && (

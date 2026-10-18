@@ -7,28 +7,55 @@ import { Button } from "@/components/ui/button"
 import { Printer } from "lucide-react"
 
 const REPORT_CSS = `
+  /*
+   * 批改报告是「白纸黑字」的打印稿：组件里用的是语义 token（text-foreground /
+   * text-muted-foreground / border 等），若直接继承 .dark 会变成「白纸 + 近白字」。
+   * 这里在报告容器上把语义色变量重新钉回浅色值，屏幕与打印都稳定为深色字、
+   * 白色/浅灰底，不随主题变化。
+   */
   .essay-report {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.4667 0.1672 25.06);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.42 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.505 0.213 27.5);
+    --border: oklch(0.85 0 0);
+    --input: oklch(0.85 0 0);
+    --ring: oklch(0.708 0 0);
+    --brand: oklch(0.4667 0.1672 25.06);
+
+    color-scheme: light;
     font-family: "Times New Roman", SimSun, "宋体", "Songti SC", STSong, serif;
-    color: #111;
+    color: oklch(0.145 0 0);
     font-size: 12pt;
     line-height: 1.75;
-    background: #fff;
+    background: oklch(1 0 0);
   }
   .essay-report h1 { font-size: 17pt; font-weight: 700; text-align: center; margin: 0 0 4pt; letter-spacing: .5pt; }
-  .essay-report .meta { font-size: 10.5pt; color: #444; text-align: center; margin: 0 0 16pt; }
-  .essay-report h2 { font-size: 13.5pt; font-weight: 700; margin: 18pt 0 8pt; padding-bottom: 3pt; border-bottom: 1.2pt solid #333; }
+  .essay-report .meta { font-size: 10.5pt; color: oklch(0.42 0 0); text-align: center; margin: 0 0 16pt; }
+  .essay-report h2 { font-size: 13.5pt; font-weight: 700; margin: 18pt 0 8pt; padding-bottom: 3pt; border-bottom: 1.2pt solid oklch(0.35 0 0); }
   .essay-report h3 { font-size: 12pt; font-weight: 700; margin: 12pt 0 6pt; }
   .essay-report p { margin: 0 0 8pt; text-align: justify; }
   .essay-report ul, .essay-report ol { margin: 0 0 8pt 18pt; }
   .essay-report li { margin-bottom: 3pt; }
   .essay-report table { width: 100%; border-collapse: collapse; margin: 6pt 0 12pt; }
-  .essay-report th, .essay-report td { border: 1pt solid #888; padding: 5pt 7pt; font-size: 11pt; }
-  .essay-report th { background: #f2f2f2; font-weight: 700; text-align: center; }
+  .essay-report th, .essay-report td { border: 1pt solid oklch(0.55 0 0); padding: 5pt 7pt; font-size: 11pt; }
+  .essay-report th { background: oklch(0.95 0 0); font-weight: 700; text-align: center; }
   .essay-report .section-body { margin: 0 0 10pt; }
   .essay-report .score-line { font-size: 12.5pt; font-weight: 700; margin: 0 0 10pt; }
   .essay-report img { max-width: 100%; }
   .essay-report .katex { font-size: 0.92em; }
-  .essay-report .footer { margin-top: 20pt; padding-top: 6pt; border-top: .8pt solid #999; font-size: 9.5pt; color: #666; text-align: center; }
+  .essay-report .footer { margin-top: 20pt; padding-top: 6pt; border-top: .8pt solid oklch(0.6 0 0); font-size: 9.5pt; color: oklch(0.45 0 0); text-align: center; }
   @media screen {
     .essay-report { max-width: 820px; margin: 24px auto 48px; padding: 36px 40px; box-shadow: 0 1px 8px rgba(0,0,0,.15); }
   }

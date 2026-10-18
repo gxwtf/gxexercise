@@ -45,7 +45,7 @@ export function TestPaperInfo({
           </div>
 
           <div className="flex flex-wrap gap-1 mb-6">
-            <Badge variant="destructive" className="text-xs">{source}</Badge>
+            <Badge variant="outline" className="text-xs">{source}</Badge>
             {year && <Badge variant="secondary" className="text-xs">{year}年</Badge>}
             {grade && <Badge variant="outline" className="text-xs">{grade}</Badge>}
           </div>

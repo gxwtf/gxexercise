@@ -253,7 +253,7 @@ export function TestPaperPractice({
           {content && (
             <div className="max-w-4xl mx-auto px-6 mt-4">
               <QuestionSection>
-                <div className="border-1 border-black p-4 text-lg">{content}</div>
+                <div className="rounded-lg border border-border bg-muted/40 p-4 text-lg">{content}</div>
               </QuestionSection>
             </div>
           )}
@@ -435,7 +435,7 @@ export function TestPaperPractice({
                                     "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 transition-colors cursor-pointer",
                                     answered
                                       ? "bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-950 dark:border-blue-400 dark:text-blue-300 hover:bg-blue-200"
-                                      : "bg-gray-100 border-gray-300 text-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 hover:bg-gray-200"
+                                      : "border-border bg-muted text-muted-foreground hover:bg-accent"
                                   )}
                                   onClick={() => {
                                     handleJumpToGroup(groupIndex)

@@ -7,6 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* 品牌色（深红）：浅色模式为品牌原色，深色模式自动提亮，业务代码只用 text-brand / bg-brand */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-muted: var(--brand-muted);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
@@ -73,6 +77,12 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
+  /* 让滚动条、原生表单控件、日期选择器等也跟随主题（否则深色页面里出现白色滚动条） */
+  color-scheme: light;
+  /* 品牌色：广学红 #A31F24（浅色模式直接用原色） */
+  --brand: oklch(0.4667 0.1672 25.06);
+  --brand-foreground: oklch(0.985 0 0);
+  --brand-muted: oklch(0.95 0.021 25.06);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -115,6 +125,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+  /* 品牌色深色变体：提亮到与深色底有足够对比度（≥4.5:1），不要沿用 #A31F24 原色 */
+  --brand: oklch(0.735 0.152 25.06);
+  --brand-foreground: oklch(0.145 0 0);
+  --brand-muted: oklch(0.283 0.049 25.06);
 }
 
 @layer base {
@@ -145,6 +160,19 @@
   }
   .footnote-backref,
   .footnote-back {
-    @apply ml-1 text-slate-400 hover:text-slate-600 no-underline;
+    @apply ml-1 text-muted-foreground/70 hover:text-muted-foreground no-underline;
   }
 }
+/*
+ * ============================================================================
+ * 主题色约定（改前端配色前必读，详见 AGENTS.md「颜色与深色模式约定」）
+ * ----------------------------------------------------------------------------
+ * 只能用语义 token：background / foreground / card / popover / muted / accent /
+ * primary / secondary / destructive / border / input / ring / sidebar-* / brand，
+ * 以及成对出现的状态色（如 bg-green-100 text-green-700 dark:bg-green-950
+ * dark:text-green-300）。新增颜色先在上面的 :root 与 .dark 各加一份变量，再在
+ * @theme inline 里映射成 Tailwind 颜色，业务代码只写语义名。
+ * 禁止 bg-white / text-black / border-black / bg-[#xxxxxx] 之类的固定色值，
+ * 改了要跑 `pnpm check:colors` 自检。
+ * ============================================================================
+ */
