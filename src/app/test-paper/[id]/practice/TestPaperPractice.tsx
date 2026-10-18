@@ -184,8 +184,8 @@ export function TestPaperPractice({
       const response = await fetch("/api/submissions/test-paper", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // userId 由服务端从登录会话读取，前端不再传递
         body: JSON.stringify({
-          userId: session.userid,
           testPaperId,
           duration: seconds,
           groupSubmissions,
@@ -197,8 +197,11 @@ export function TestPaperPractice({
         try { localStorage.removeItem(STORAGE_KEY(testPaperId)) } catch {}
         try { localStorage.removeItem(ANSWERS_KEY(testPaperId)) } catch {}
         router.push(`/test-paper/${testPaperId}/result/${result.submissionId}`)
+      } else if (response.status === 401) {
+        showAlert({ type: 'destructive', title: '登录已失效，请重新登录' })
+        router.push(`/login?back=/test-paper/${testPaperId}`)
       } else {
-        const error = await response.json()
+        const error = await response.json().catch(() => ({}))
         alert(error.error || "提交失败")
       }
     } catch (error) {

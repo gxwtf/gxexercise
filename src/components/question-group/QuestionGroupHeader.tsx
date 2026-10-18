@@ -58,7 +58,7 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: session.userid,
+          // userId 由服务端从登录会话读取，前端不再传递
           questionGroupId,
           questionSubmissions,
           duration: seconds,

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { requireLogin } from "@/lib/api-auth"
 
 
 function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
@@ -10,8 +11,13 @@ function isSubjectiveQuestion(questionType: string, groupType: string): boolean 
 }
 
 export async function POST(request: Request) {
+  // 身份一律取自登录会话，绝不信任请求体里的 userId
+  const auth = await requireLogin()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
-    const { userId, questionGroupId, questionSubmissions, duration } = await request.json();
+    const { questionGroupId, questionSubmissions, duration } = await request.json();
 
     const questionGroup = await prisma.questionGroup.findUnique({
       where: { id: questionGroupId },

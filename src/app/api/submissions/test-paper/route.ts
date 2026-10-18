@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { requireLogin } from "@/lib/api-auth"
 
 function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
   const combined = `${questionType} ${groupType}`
@@ -9,10 +10,15 @@ function isSubjectiveQuestion(questionType: string, groupType: string): boolean 
 }
 
 export async function POST(request: Request) {
+  // 身份一律取自登录会话，绝不信任请求体里的 userId
+  const auth = await requireLogin()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const body = await request.json()
-    const { userId, testPaperId, duration, groupSubmissions } = body as {
-      userId: number
+    const { testPaperId, duration, groupSubmissions } = body as {
+      userId?: number
       testPaperId: string
       duration: number
       groupSubmissions: Array<{
@@ -25,7 +31,7 @@ export async function POST(request: Request) {
       }>
     }
 
-    if (!userId || !testPaperId || !groupSubmissions) {
+    if (!testPaperId || !groupSubmissions) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 

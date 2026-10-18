@@ -1,19 +1,20 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { requireLogin } from "@/lib/api-auth"
 
 export async function GET(request: Request) {
+  // 身份取自会话，不再接受 query 里的 userId（否则可越权读他人记录）
+  const auth = await requireLogin()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get("userId")
     const testPaperIds = searchParams.get("testPaperIds")?.split(",") || []
-
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 })
-    }
 
     const submissions = await prisma.testPaperSubmission.findMany({
       where: {
-        userId: parseInt(userId),
+        userId: userId,
         testPaperId: testPaperIds.length > 0 ? { in: testPaperIds } : undefined,
       },
       orderBy: { submittedAt: "desc" },

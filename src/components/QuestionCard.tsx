@@ -61,8 +61,10 @@ export function QuestionCard({
 
       try {
         const response = await fetch(
-          `/api/submissions/group/stats?userId=${session.userid}&groupIds=${id}`
+          // userId 由服务端从登录会话读取，前端不再传递
+          `/api/submissions/group/stats?groupIds=${id}`
         )
+        if (!response.ok) return
         const result = await response.json()
         if (result.success && result.data[id]) {
           setUserStats(result.data[id])

@@ -119,8 +119,9 @@ export function QuestionOverview({
   useEffect(() => {
     if (!session.userid || !papers.length) return;
     const ids = papers.map((p) => p.id).join(",");
-    fetch(`/api/submissions/test-paper/latest?userId=${session.userid}&testPaperIds=${ids}`)
-      .then((res) => res.json())
+    // userId 由服务端从登录会话读取，前端不再传递
+    fetch(`/api/submissions/test-paper/latest?testPaperIds=${ids}`)
+      .then((res) => (res.ok ? res.json() : {}))
       .then((data) => setTestSubmissions(data))
       .catch(() => {});
   }, [session.userid, papers]);

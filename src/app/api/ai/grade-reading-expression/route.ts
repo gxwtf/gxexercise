@@ -2,8 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { gradeWithConfig, preCheckGrade } from "@/lib/ai-service";
 import { getGradingPrompt } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/api-auth";
 
 export async function POST(request: Request) {
+  // 此接口会并发触发多条 AI 批改，属于高成本操作，仅限管理员调用
+  const auth = await requireAdmin();
+  if (!auth.ok) return auth.response;
+
   try {
     const { submissionIds } = await request.json();
 

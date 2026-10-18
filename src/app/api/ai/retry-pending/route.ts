@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { gradeWithConfig, preCheckGrade, type GradeResult } from "@/lib/ai-service";
 import { getGradingPrompt } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/api-auth";
 
 function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
   const data: Record<string, unknown> = {}
@@ -15,6 +16,10 @@ function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefin
 }
 
 export async function POST() {
+  // 此接口会批量触发 AI 批改，属于高成本操作，仅限管理员调用
+  const auth = await requireAdmin();
+  if (!auth.ok) return auth.response;
+
   try {
     const pendingSubmissions = await prisma.questionSubmission.findMany({
       where: { gradingStatus: "pending" },

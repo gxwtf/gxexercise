@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { GRADING_PROMPT_REGISTRY } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
+import { requireLogin } from "@/lib/api-auth";
 
 /**
  * 查询 AI 批改排队位次（与 grading-worker 的队列口径一致：
  * 只看「有批改配置的题型」的 pending，按提交时间先进先出）
  */
 export async function GET(request: Request) {
+  const auth = await requireLogin();
+  if (!auth.ok) return auth.response;
+  const userId = auth.userId;
+
   try {
     const ids = (new URL(request.url).searchParams.get("ids") || "")
       .split(",")
@@ -20,7 +25,8 @@ export async function GET(request: Request) {
     const gradeableTypes = Array.from(new Set(GRADING_PROMPT_REGISTRY.map((p) => p.questionType)));
 
     const submissions = await prisma.questionSubmission.findMany({
-      where: { id: { in: ids } },
+      // 限定本人提交，避免用别人的 submissionId 探测批改状态
+      where: { id: { in: ids }, userId: userId },
       select: {
         id: true,
         gradingStatus: true,

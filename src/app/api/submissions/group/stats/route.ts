@@ -1,15 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { requireLogin } from "@/lib/api-auth";
 
 export async function GET(request: Request) {
+  // 身份取自会话，不再接受 query 里的 userId
+  const auth = await requireLogin();
+  if (!auth.ok) return auth.response;
+  const userId = auth.userId;
+
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
     const groupIds = searchParams.get('groupIds');
 
-    if (!userId || !groupIds) {
+    if (!groupIds) {
       return NextResponse.json(
-        { success: false, error: "Missing userId or groupIds" },
+        { success: false, error: "Missing groupIds" },
         { status: 400 }
       );
     }
@@ -18,7 +23,7 @@ export async function GET(request: Request) {
 
     const submissions = await prisma.questionGroupSubmission.findMany({
       where: {
-        userId: parseInt(userId),
+        userId: userId,
         questionGroupId: { in: groupIdArray }
       },
       select: {
