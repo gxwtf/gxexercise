@@ -38,7 +38,7 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
         const value = saved ? (question.type === 'single' ? [saved] : saved.split(',')) : undefined
         return (
           <div key={question.id} className="space-y-4">
-            {question.stem ? (
+            {question.stem?.trim() ? (
               <>
                 <div className="flex items-baseline gap-1">
                   <span className="text-lg font-medium">{startIndex + index + 1}.</span>
@@ -58,16 +58,19 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
                 />
               </>
             ) : (
-              <div className="flex items-center gap-4">
-                <span className="text-lg font-medium min-w-[30px]">
+              // 没有题干：题号与「第一个选项」顶部对齐（原来 items-center 会垂直居中）
+              <div className="flex items-start gap-4">
+                <span className="shrink-0 text-lg font-medium leading-7 min-w-[30px]">
                   {startIndex + index + 1}.
                 </span>
-                <ChoiceQuestion
-                  type={question.type}
-                  options={question.options}
-                  onChange={(selected) => onChange(question.id, selected)}
-                  value={value}
-                />
+                <div className="min-w-0 flex-1">
+                  <ChoiceQuestion
+                    type={question.type}
+                    options={question.options}
+                    onChange={(selected) => onChange(question.id, selected)}
+                    value={value}
+                  />
+                </div>
               </div>
             )}
           </div>
