@@ -176,3 +176,22 @@
  * 改了要跑 `pnpm check:colors` 自检。
  * ============================================================================
  */
+
+/* ── 数学公式（KaTeX）排版 ────────────────────────────────
+   行内公式默认 textstyle 会把分式压小、内容偏挤；这里统一放大一点，
+   并给独立公式块留出上下间距、允许横向滚动（长式子不撑破卡片）。 */
+.katex {
+  font-size: 1.06em;
+}
+.katex .frac-line {
+  border-bottom-width: 0.07em;
+}
+.katex-display {
+  margin: 0.75em 0;
+  padding: 2px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.katex-display > .katex {
+  font-size: 1.03em;
+}

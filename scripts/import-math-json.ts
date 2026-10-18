@@ -160,7 +160,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
             content: rewrite(q.content, mapping),
             options: section.type === "选择题"
               ? (q.options || []).map((o) => ({ id: o.id, label: rewrite(String(o.label || ""), mapping) }))
-              : null,
+              : undefined,
             answer: q.answer || "",
             analysis: q.analysis || "",
             score: q.score ?? 5,
