@@ -148,3 +148,24 @@ src/
 2. 使用 `import-exam.ts` 将 JSON 写入数据库（自动建立题组、套卷及题项关联）
 
 脚本依赖 `.env` 中的 `DATABASE_URL`，通过 `npx tsx` 运行。
+
+```bash
+npx tsx problem_generate/import-exam.ts "<json 文件或目录>"      # 导入（新建套卷）
+npx tsx problem_generate/import-exam.ts --delete "<套卷标题>"     # 删除某套
+npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部英语内容
+```
+
+⚠ **导入不是幂等的**：同一份 JSON 导两次会得到两套同名套卷，`--delete "<标题>"` 会按标题
+删除（连同该卷的作答记录）。重复导入前请先删同名套卷。
+
+### 批量维护题库数据
+
+本仓库只负责「JSON → 数据库」这一步。上游（爬取菁师帮新卷、docx → md → JSON、校验、批量入库、
+存量题干回填）由 `/home/gxwtf/jingshibang` 的流水线脚本负责，操作手册见
+`/home/gxwtf/jingshibang/README.md`：
+
+| 脚本 | 用途 |
+| --- | --- |
+| `jingshibang/check_missing.py` | 仅爬取线上新增的卷子（只下载缺失部分） |
+| `jingshibang/update_bank.py` | 按卷子跑 md → JSON → 校验 → 入库（`--list` 可看进度，`--replace` 覆盖同名套卷） |
+| `jingshibang/exam-parser/backfill_re_stems.py` | 用 md 重算「阅读表达」题干并回填 `Question.content`（不调 AI） |
