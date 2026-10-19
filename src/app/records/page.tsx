@@ -186,14 +186,23 @@ export default async function RecordsPage({ searchParams }: PageProps) {
                           <Badge variant="outline">已批改</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button asChild size="sm" variant="ghost">
-                          {inPaper ? (
-                            <Link href={`/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`}>查看结果</Link>
-                          ) : (
-                            <Link href={`/question/${g.id}/review/1`}>查看回顾</Link>
-                          )}
-                        </Button>
+                      <TableCell className="whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button asChild size="sm" variant="ghost">
+                            {inPaper ? (
+                              <Link href={`/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`}>查看结果</Link>
+                            ) : (
+                              <Link href={`/question/${g.id}/review/1`}>查看回顾</Link>
+                            )}
+                          </Button>
+                          <Button asChild size="sm" variant="outline">
+                            {inPaper ? (
+                              <Link href={`/test-paper/${inPaper.testPaperId}/practice`}>重新练习</Link>
+                            ) : (
+                              <Link href={`/question/${g.id}`}>重新练习</Link>
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
