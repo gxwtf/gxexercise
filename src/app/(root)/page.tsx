@@ -5,15 +5,33 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = 'force-dynamic';
 
 export default async function RootPage() {
-  const groupCounts = await prisma.questionGroup.groupBy({
-    by: ["subject", "category"],
-    _count: { id: true },
-  });
+  const [groupCounts, testPaperCounts] = await Promise.all([
+    prisma.questionGroup.groupBy({
+      by: ["subject", "category"],
+      _count: { id: true },
+    }),
+    // 「套卷」数据在 TestPaper 表（套卷分类页也只读这张表），QuestionGroup 里没有
+    // category='套卷' 的记录，必须单独按学科统计，否则首页套卷数量恒为 0。
+    prisma.testPaper.groupBy({
+      by: ["subject"],
+      _count: { id: true },
+    }),
+  ]);
 
   const countMap = new Map<string, number>();
   for (const row of groupCounts) {
     countMap.set(`${row.subject}-${row.category}`, row._count.id);
   }
+
+  const testPaperCountMap = new Map<string, number>();
+  for (const row of testPaperCounts) {
+    testPaperCountMap.set(row.subject, row._count.id);
+  }
+
+  const getCategoryCount = (subject: string, category: string) =>
+    category === "套卷"
+      ? testPaperCountMap.get(subject) || 0
+      : countMap.get(`${subject}-${category}`) || 0;
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
@@ -41,7 +59,7 @@ export default async function RootPage() {
               </Link>
               <ul className="space-y-1">
                 {categories.map((category) => {
-                  const count = countMap.get(`${subject}-${category}`) || 0;
+                  const count = getCategoryCount(subject, category);
                   return (
                     <li key={category}>
                       <Link
