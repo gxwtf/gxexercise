@@ -48,11 +48,11 @@ export default function SubHeader({
 
   const leftContent = (
     <div className="flex items-center">
-      <Link href="/" className="hidden lg:flex items-center">
-        <span className="text-xl font-bold text-foreground">广学题库</span>
+      <Link href="/" className="hidden shrink-0 items-center whitespace-nowrap lg:flex">
+        <span className="whitespace-nowrap text-xl font-bold text-foreground">广学题库</span>
       </Link>
 
-      <div className="ml-6 min-w-[160px]">
+      <div className="ml-4 w-[160px] shrink-0">
         <Combobox items={subjects} value={subject} onValueChange={(value) => {
           if (value && subjectToRoute[value]) {
             // 跳转到学科首页，默认显示第一个题型
@@ -73,7 +73,7 @@ export default function SubHeader({
         </Combobox>
       </div>
 
-      <nav className="ml-6 hidden flex-1 items-center gap-2 lg:flex">
+      <nav className="ml-4 hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap lg:flex">
         {currentNavItems.navButtons.map((item, index) => {
           const isActive = item.label === currentCategory;
           return (
@@ -82,7 +82,7 @@ export default function SubHeader({
               asChild
               variant="ghost"
               size="sm"
-              className={`h-8 px-3 text-sm relative ${
+              className={`h-8 shrink-0 px-3 text-sm relative ${
                 isActive 
                   ? 'text-brand font-medium' 
                   : 'text-foreground'

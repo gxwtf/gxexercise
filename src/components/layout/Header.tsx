@@ -18,7 +18,7 @@ export default function Header() {
 
   const leftContent = (
     <div className="flex items-center space-x-8">
-      <Link href="/" className="text-xl font-bold">
+      <Link href="/" className="shrink-0 whitespace-nowrap text-xl font-bold">
         广学五题坊
       </Link>
       <nav className="hidden md:flex items-center space-x-6">
