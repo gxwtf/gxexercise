@@ -35,41 +35,72 @@ const GAP = 32
 const CANDIDATES = [4, 2, 1]
 
 /**
- * 参考 exam-zh 的 choices 环境：它用 \settowidth 实测每个选项的宽度再决定列数，
- * 这里同样用真实渲染宽度测量（而不是数汉字/字符）：
- *   1. 用一个隐藏的 nowrap 副本量出每个选项的自然宽度
- *   2. 从 4 列往下试，取「最宽选项也能放下」的最大列数
- *   3. 只取 4 / 2 / 1 三档；长选项自然落到 1 列（独占一行，放不下才换行）
+ * 判断选项内容是否发生换行。
+ * 用「元素高度 / 行高」估算行数，而不是 Range 的行盒数量——
+ * 后者会被 KaTeX 的上下标（同一行里不同 top 的盒子）误判成多行。
+ */
+function isWrapped(el: HTMLElement): boolean {
+  if (!el) return false
+  const cs = getComputedStyle(el)
+  let lineH = parseFloat(cs.lineHeight)
+  if (!Number.isFinite(lineH)) lineH = parseFloat(cs.fontSize) * 1.6 || 24
+  const h = el.getBoundingClientRect().height
+  if (!h || !lineH) return false
+  return h / lineH > 1.6   // 明显超过一行（含 KaTeX 撑高的余量）
+}
+
+/**
+ * 参考 exam-zh 的 choices 环境：用真实渲染宽度决定列数（\settowidth 的等价做法）。
+ * 1. 隐藏的 nowrap 副本量出每个选项的自然宽度 → 由宽度推算可行列数（4/2/1）
+ * 2. 渲染后再检查：多列时只要有选项换行（哪怕只多出一个字），就降一档
+ *    4 → 2 → 1，最终保证「不留零碎换行」
+ * 3. ResizeObserver 跟随容器宽度重算
  */
 function useOptionColumns(options: Option[], deps: unknown[]) {
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const measureRef = useRef<HTMLDivElement | null>(null)
   const [cols, setCols] = useState(1)
 
-  const compute = useCallback(() => {
-    const wrap = wrapRef.current
+  const measureWidest = useCallback(() => {
     const box = measureRef.current
-    if (!wrap || !box) return
-    const avail = wrap.clientWidth
-    if (!avail) return
+    if (!box) return 0
     const items = Array.from(box.querySelectorAll<HTMLElement>("[data-measure-item]"))
-    if (!items.length) return
-    const widest = Math.max(...items.map((el) => el.offsetWidth)) + CONTROL_W
-    const fits = CANDIDATES.find(
-      (n) => n <= options.length && n * widest + (n - 1) * GAP <= avail
-    )
-    setCols(fits ?? 1)
-  }, [options.length])
+    if (!items.length) return 0
+    return Math.max(...items.map((el) => el.offsetWidth)) + CONTROL_W
+  }, [])
 
-  useLayoutEffect(() => { compute() }, [compute, ...deps])
+  const widestByWidth = useCallback(() => {
+    const wrap = wrapRef.current
+    if (!wrap) return 1
+    const avail = wrap.clientWidth
+    const widest = measureWidest()
+    if (!avail || !widest) return 1
+    return CANDIDATES.find((n) => n <= options.length && n * widest + (n - 1) * GAP <= avail) ?? 1
+  }, [measureWidest, options.length])
+
+  // 首帧：按宽度粗定列数
+  useLayoutEffect(() => {
+    setCols(widestByWidth())
+  }, [widestByWidth, ...deps])
+
+  // 渲染后：多列时若任一选项换行，降一档（4 → 2 → 1）
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current
+    if (!wrap || cols <= 1) return
+    const labels = Array.from(wrap.querySelectorAll<HTMLElement>("[data-opt-label]"))
+    const wrapped = labels.some((el) => isWrapped(el))
+    if (wrapped) {
+      setCols((prev) => (prev >= 4 ? 2 : 1))
+    }
+  })
 
   useEffect(() => {
     const wrap = wrapRef.current
     if (!wrap || typeof ResizeObserver === "undefined") return
-    const ro = new ResizeObserver(() => compute())
+    const ro = new ResizeObserver(() => setCols(widestByWidth()))
     ro.observe(wrap)
     return () => ro.disconnect()
-  }, [compute])
+  }, [widestByWidth])
 
   return { wrapRef, measureRef, cols }
 }
@@ -132,7 +163,9 @@ export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestio
           <FieldLabel key={option.id} className="min-w-0">
             <Field orientation="horizontal" className="!items-start">
               <span className="mt-[0.3rem] shrink-0">{control(option)}</span>
-              <FieldContent className="min-w-0">{renderOptionLabel(option)}</FieldContent>
+              <FieldContent className="min-w-0">
+                <div data-opt-label className="min-w-0">{renderOptionLabel(option)}</div>
+              </FieldContent>
             </Field>
           </FieldLabel>
         ))}
