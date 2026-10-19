@@ -46,8 +46,8 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
             <TableHead className="w-[70px]">学科</TableHead>
             <TableHead>试卷 / 题组</TableHead>
             <TableHead className="w-[120px]">得分 / 总分</TableHead>
-            <TableHead className="w-[100px]">状态</TableHead>
-            <TableHead className="w-[110px] text-right">操作</TableHead>
+            <TableHead className="w-[100px] text-center">状态</TableHead>
+            <TableHead className="w-[110px] text-left">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -73,7 +73,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                   row.score
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="text-center">
                 <span
                   className={cn(
                     "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
@@ -85,7 +85,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                   {row.pending ? "批改中" : "已批改"}
                 </span>
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-left">
                 <Button
                   asChild
                   size="sm"
