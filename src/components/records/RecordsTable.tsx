@@ -47,7 +47,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
             <TableHead>试卷 / 题组</TableHead>
             <TableHead className="w-[120px]">得分 / 总分</TableHead>
             <TableHead className="w-[100px] text-center">状态</TableHead>
-            <TableHead className="w-[110px] text-left">操作</TableHead>
+            <TableHead className="w-[110px] text-center">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -85,7 +85,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                   {row.pending ? "批改中" : "已批改"}
                 </span>
               </TableCell>
-              <TableCell className="text-left">
+              <TableCell className="text-center">
                 <Button
                   asChild
                   size="sm"
