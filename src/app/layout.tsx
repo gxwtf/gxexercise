@@ -30,6 +30,12 @@ export const metadata: Metadata = {
     title: "广学题库",
     statusBarStyle: "default",
   },
+  // Next 只输出标准的 mobile-web-app-capable；iOS 老版本仍认 apple- 前缀，这里补上
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+    "format-detection": "telephone=no",
+    "msapplication-TileColor": "#A31F24",
+  },
   icons: {
     icon: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
