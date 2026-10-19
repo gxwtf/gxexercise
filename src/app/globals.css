@@ -208,6 +208,26 @@
   margin-left: 0.03em;
 }
 
+
+/* ── 题目/文章正文的字体：模拟试卷排版 ─────────────────────
+   桌面浏览器默认 serif 时中文是宋体，但手机（iOS/Android）默认是系统黑体，
+   所以手机上看不到宋体。这里显式指定「西文 Times New Roman + 中文宋体」的字体栈：
+   - Windows：SimSun（宋体）
+   - iOS/macOS：Songti SC / STSong（宋体-简）
+   - Android / Linux：Noto Serif CJK SC / Source Han Serif SC，最后回落 serif */
+@utility font-question {
+  font-family:
+    "Times New Roman",
+    "SimSun",
+    "宋体",
+    "Songti SC",
+    "STSong",
+    "Noto Serif CJK SC",
+    "Source Han Serif SC",
+    "Source Han Serif",
+    serif;
+}
+
 /* 数学/语法题的题干行距：inline 分式会把行盒撑高，行距太小会显得挤 */
 .font-question p {
   line-height: 1.9;
@@ -216,8 +236,11 @@
   line-height: 1.9;
 }
 
-/* 题目与选项里的插图：默认不超过一屏太高，避免撑爆卡片 */
+/* 题目与选项里的插图：限制高度、宽度按比例自适应（不铺满整行） */
 .font-question img {
+  max-height: 18rem;   /* 太高会占满整屏 */
   max-width: 100%;
+  width: auto;
   height: auto;
+  object-fit: contain;
 }
