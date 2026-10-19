@@ -68,13 +68,33 @@
 
 ## 学科与类别映射
 
-| 学科 | 类别 |
-|------|------|
-| 数学 | 代数、几何、函数、概率统计、微积分 |
-| 语文 | 多文本、文言文、古诗、默写、名著、文学类、语用、微写作、作文 |
-| 英语 | 完形填空、语法填空、阅读、七选五、阅读表达、作文 |
-| 物理 | 力学、电磁学、热学、光学、实验题 |
-| 化学 | 化学方程式、有机化学、无机化学、实验操作、元素周期 |
+> 以下内容与 `src/constants/subjects.ts` 一一对应，改那边记得同步这里。
+> 类别即首页/学科页导航上的题型入口，路由 slug 见 `categoryToRoute`。
+
+| 学科 | 路由 | 类别（题型） |
+|------|------|------|
+| 数学 | `/questions/math` | 选择、填空、三角、概统、立几、解几、导数、新定义、套卷 |
+| 语文 | `/questions/chinese` | 多文本、文言文、古诗、默写、名著、文学类、语用、微写作、作文、套卷 |
+| 英语 | `/questions/english` | 完形填空、语法填空、选词填空、阅读、七选五、阅读表达、作文、套卷 |
+| 物理 | `/questions/physics` | 选择、力学、电磁学、热学、光学、实验题、套卷 |
+| 化学 | `/questions/chemistry` | 选择、物质结构与性质、化学反应原理、有机化学基础、工业流程、实验探究、套卷 |
+| 生物 | `/questions/biology` | 选择、遗传与进化、稳态与调节、生物技术与工程、实验探究、套卷 |
+| 历史 | `/questions/history` | 选择、观点论证、史料分析、修改补写、套卷 |
+| 政治 | `/questions/politics` | 选择、材料分析、开放性试题、套卷 |
+| 地理 | `/questions/geography` | 选择、自然地理、人文地理、区域发展、图表判读、套卷 |
+
+**生物 / 历史 / 政治 / 地理四科与化学的新题型为公测期预留**：按北京卷近年非选择题的稳定功能板块划分，
+不锁定「题号—考点」映射，入库时按题目实际内容归入对应板块即可。
+
+### 新增科目 / 题型时的注意事项
+
+1. 三处齐改：`subjects`、`subjectToRoute` + `routeToSubject`、`categoriesBySubject` + `categoryToRoute`
+   （漏掉 `categoryToRoute` 会让首页链接变成 `/questions/<学科>/undefined`）。
+2. 同一学科内，路由 slug **不能互为子串**（`SubHeader` 用 `pathname.includes(slug)` 判断当前题型高亮）。
+3. `QuestionGroup.questionType` 与 `Question.questionType` 使用独立词汇表（前者如 `math-choice`、`en-reading`，
+   后者如 `choice`、`input`、`text`）；`src/app/question/[id]/page.tsx` 与
+   `src/app/test-paper/[id]/practice/TestPaperPractice.tsx` 按 `questionType` 精确分支渲染，
+   **新题型入库前需要先在两处补上渲染分支**，否则题目页会显示「暂不支持的题型」。
 
 ## 运行命令
 
