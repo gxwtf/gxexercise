@@ -6,8 +6,9 @@ import { sessionOptions, type SessionData } from "@/lib/iron"
 import { prisma } from "@/lib/prisma"
 import { subjects } from "@/constants/subjects"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { RecordsFilter } from "@/components/records/RecordsFilter"
-import { Input } from "@/components/ui/input"
+import { RecordsPager } from "@/components/records/RecordsPager"
 import {
   Table,
   TableBody,
@@ -18,6 +19,8 @@ import {
 } from "@/components/ui/table"
 
 export const dynamic = "force-dynamic"
+
+const PAGE_SIZE = 20
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -34,14 +37,17 @@ function fmt(date: Date | null | undefined) {
   })
 }
 
+const round1 = (n: number) => Math.round(n * 10) / 10
 const scoreText = (score: number | null | undefined, max: number | null | undefined) => {
   if (score == null) return "-"
-  return max ? `${Math.round(score * 10) / 10} / ${max}` : `${Math.round(score * 10) / 10}`
+  return max ? `${round1(score)} / ${max}` : `${round1(score)}`
 }
 
-/** 主观题（作文/阅读表达等）没有对错，只看得分 */
-function isSubjectiveGroup(questionType: string) {
-  return /writing|essay|reading-expression|作文|写作|阅读表达/.test(questionType)
+const ORDER_MAP: Record<string, Record<string, "asc" | "desc">[]> = {
+  time_desc: [{ createdAt: "desc" }],
+  time_asc: [{ createdAt: "asc" }],
+  score_desc: [{ score: "desc" }, { createdAt: "desc" }],
+  score_asc: [{ score: "asc" }, { createdAt: "desc" }],
 }
 
 export default async function RecordsPage({ searchParams }: PageProps) {
@@ -52,37 +58,55 @@ export default async function RecordsPage({ searchParams }: PageProps) {
   }
   const subject = pick("subject") || "all"
   const keyword = pick("q").trim()
+  const sortRaw = pick("sort")
+  const sort = ORDER_MAP[sortRaw] ? sortRaw : "time_desc"
+  const pendingOnly = pick("pending") === "1"
 
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   if (!session.isLoggedIn || !session.userid) redirect("/login?back=/records")
   const userId = session.userid
 
-  const subjectFilter = subject !== "all" ? { subject } : {}
-  const groupNameFilter = keyword ? { title: { contains: keyword, mode: "insensitive" as const } } : {}
+  const pageRaw = Number.parseInt(pick("page"), 10)
+  const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1
 
-  const [groupSubs, paperSubs] = await Promise.all([
+  // 一次作答 = 一个 QuestionGroupSubmission（套卷的小节也在这张表，testSubmissionId 非空）
+  const where = {
+    userId,
+    questionGroup: {
+      ...(subject !== "all" ? { subject } : {}),
+      ...(keyword ? { title: { contains: keyword, mode: "insensitive" as const } } : {}),
+    },
+    ...(pendingOnly ? { submissions: { some: { gradingStatus: "pending" } } } : {}),
+  }
+
+  const [total, rows] = await Promise.all([
+    prisma.questionGroupSubmission.count({ where }),
     prisma.questionGroupSubmission.findMany({
-      where: {
-        userId,
-        questionGroup: { ...subjectFilter, ...groupNameFilter },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 100,
+      where,
+      orderBy: ORDER_MAP[sort],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
       include: {
         questionGroup: {
           select: { id: true, title: true, subject: true, category: true, questionType: true, score: true },
         },
+        submissions: { select: { gradingStatus: true }, take: 200 },
+        testSubmission: {
+          select: { id: true, testPaperId: true, testPaper: { select: { title: true } } },
+        },
       },
-    }),
-    prisma.testPaperSubmission.findMany({
-      where: { userId, testPaper: { ...subjectFilter, ...groupNameFilter } },
-      orderBy: { submittedAt: "desc" },
-      take: 100,
-      include: { testPaper: { select: { id: true, title: true, subject: true, totalScore: true } } },
     }),
   ])
 
-  const hasFilter = subject !== "all" || keyword.length > 0
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const safePage = Math.min(page, pageCount)
+
+  // 分页/链接所需的筛选条件（可序列化，传给客户端组件）
+  const pageQuery: Record<string, string> = {}
+  if (subject !== "all") pageQuery.subject = subject
+  if (keyword) pageQuery.q = keyword
+  if (sort !== "time_desc") pageQuery.sort = sort
+  if (pendingOnly) pageQuery.pending = "1"
 
   return (
     <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
@@ -90,8 +114,9 @@ export default async function RecordsPage({ searchParams }: PageProps) {
         <div>
           <h1 className="text-xl font-bold sm:text-2xl">我的作答记录</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            共 {paperSubs.length} 次套卷提交、{groupSubs.length} 次单节练习
-            {hasFilter && "（已按条件筛选，最多显示 100 条）"}
+            共 {total} 次作答记录
+            {pendingOnly && "（仅未批改）"}
+            {total > PAGE_SIZE && `，第 ${safePage} / ${pageCount} 页`}
           </p>
         </div>
         <Button asChild variant="outline" size="sm">
@@ -99,82 +124,75 @@ export default async function RecordsPage({ searchParams }: PageProps) {
         </Button>
       </div>
 
-      <RecordsFilter subject={subject} keyword={keyword} subjects={subjects} />
+      <RecordsFilter
+        subject={subject}
+        keyword={keyword}
+        sort={sort}
+        pendingOnly={pendingOnly}
+        subjects={subjects}
+      />
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-base font-semibold">套卷提交</h2>
-        {paperSubs.length === 0 ? (
-          <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">暂无记录</p>
-        ) : (
+      {rows.length === 0 ? (
+        <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+          暂无记录
+        </p>
+      ) : (
+        <>
           <div className="overflow-x-auto rounded-lg border border-border">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="whitespace-nowrap">提交时间</TableHead>
-                  <TableHead>学科</TableHead>
-                  <TableHead>试卷</TableHead>
+                  <TableHead className="whitespace-nowrap">学科</TableHead>
+                  <TableHead>内容</TableHead>
                   <TableHead className="whitespace-nowrap">得分 / 总分</TableHead>
-                  <TableHead className="whitespace-nowrap">用时</TableHead>
+                  <TableHead className="whitespace-nowrap">状态</TableHead>
                   <TableHead className="text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paperSubs.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">{fmt(s.submittedAt ?? s.createdAt)}</TableCell>
-                    <TableCell className="whitespace-nowrap">{s.testPaper.subject}</TableCell>
-                    <TableCell className="min-w-[12rem]">{s.testPaper.title}</TableCell>
-                    <TableCell className="whitespace-nowrap font-medium">{scoreText(s.score, s.testPaper.totalScore)}</TableCell>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {s.duration ? `${Math.round(s.duration / 60)} 分钟` : "-"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild size="sm" variant="ghost">
-                        <Link href={`/test-paper/${s.testPaper.id}/result/${s.id}`}>查看结果</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-base font-semibold">单节练习</h2>
-        {groupSubs.length === 0 ? (
-          <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">暂无记录</p>
-        ) : (
-          <div className="overflow-x-auto rounded-lg border border-border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="whitespace-nowrap">提交时间</TableHead>
-                  <TableHead>学科</TableHead>
-                  <TableHead>题组</TableHead>
-                  <TableHead className="whitespace-nowrap">结果</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {groupSubs.map((s) => {
+                {rows.map((s) => {
                   const g = s.questionGroup
-                  const subjective = isSubjectiveGroup(g.questionType)
-                  const resultText = subjective
-                    ? scoreText(s.score, g.score)                 // 主观题：得分 / 总分
-                    : s.correctNum != null && s.totalNum
-                      ? `${s.correctNum} / ${s.totalNum} 题正确`
-                      : scoreText(s.score, g.score)
+                  const pending = s.submissions.some((x) => x.gradingStatus === "pending")
+                  const inPaper = s.testSubmission
                   return (
                     <TableRow key={s.id}>
                       <TableCell className="whitespace-nowrap text-muted-foreground">{fmt(s.createdAt)}</TableCell>
                       <TableCell className="whitespace-nowrap">{g.subject}</TableCell>
-                      <TableCell className="min-w-[12rem]">{g.title}</TableCell>
-                      <TableCell className="whitespace-nowrap font-medium">{resultText}</TableCell>
+                      <TableCell className="min-w-[12rem]">
+                        <div className="flex flex-col gap-0.5">
+                          <span>{inPaper?.testPaper?.title ?? g.title}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {inPaper ? `套卷小节 · ${g.title}` : `单节练习 · ${g.category}`}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap font-medium">
+                        {pending ? (
+                          <span className="text-amber-700 dark:text-amber-400">待批改</span>
+                        ) : (
+                          scoreText(s.score, g.score)
+                        )}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {pending ? (
+                          <Badge
+                            variant="outline"
+                            className="border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
+                          >
+                            批改中
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">已批改</Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button asChild size="sm" variant="ghost">
-                          <Link href={`/question/${g.id}/review/1`}>查看回顾</Link>
+                          {inPaper ? (
+                            <Link href={`/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`}>查看结果</Link>
+                          ) : (
+                            <Link href={`/question/${g.id}/review/1`}>查看回顾</Link>
+                          )}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -183,8 +201,10 @@ export default async function RecordsPage({ searchParams }: PageProps) {
               </TableBody>
             </Table>
           </div>
-        )}
-      </section>
+
+          <RecordsPager page={safePage} pageCount={pageCount} query={pageQuery} />
+        </>
+      )}
     </div>
   )
 }
