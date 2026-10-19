@@ -28,12 +28,20 @@ interface ChoiceQuestionProps {
 }
 
 /**
- * 选项排版不用再按字数猜列数：
- * 用一个自适应网格 —— 每列至少 14rem，能排几列就排几列，
- * 长选项自然换行（不再溢出边框），窄屏自动变一列。
+ * 选项排版按标准试卷样式：
+ * - 四个「短选项」（纯数字/符号/短词，无图片）→ 宽屏一行 4 个
+ * - 其余（长句、含公式、含图片）→ 每行 2 个（A B / C D），手机上 1 个
+ * 固定列数（1 / 2 / 4），不再出现「一行三个」这种不整齐的情况。
  */
-const OPTION_GRID =
-  "grid gap-x-6 gap-y-2.5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr))]"
+function gridClass(options: Option[]): string {
+  const plain = (t: string) => t.replace(/\$[^$]*\$/g, "XX").replace(/!\[[^\]]*\]\([^)]*\)/g, "IMG")
+  const compact =
+    options.length === 4 &&
+    options.every((o) => !/!\[/.test(o.label) && plain(o.label).length <= 12)
+  return compact
+    ? "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4"
+    : "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2"
+}
 
 export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestionProps) {
   const [selected, setSelected] = useState<string[]>(value ?? [])
@@ -66,7 +74,7 @@ export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestio
   }
 
   const renderOptions = (control: (option: Option) => React.ReactNode) => (
-    <div className={OPTION_GRID}>
+    <div className={gridClass(options)}>
       {options.map((option) => (
         <FieldLabel key={option.id} className="min-w-0">
           <Field orientation="horizontal" className="!items-start">
