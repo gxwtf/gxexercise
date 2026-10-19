@@ -5,6 +5,13 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import BaseHeader from '@/components/layout/BaseHeader';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { subjects, subjectToRoute, subjectNavItems, categoryToRoute } from '@/constants/subjects';
 
 export default function SubHeader({
@@ -44,25 +51,27 @@ export default function SubHeader({
         <span className="whitespace-nowrap text-xl font-bold text-foreground">广学题库</span>
       </Link>
 
-      {/* 学科选择：原生下拉，只能手动选，不支持输入筛选 */}
+      {/* 学科选择：shadcn Select，只能手动选择 */}
       <div className="ml-4 shrink-0">
-        <select
-          aria-label="选择学科"
+        <Select
           value={subject}
-          onChange={(e) => {
-            const value = e.target.value
+          onValueChange={(value) => {
             if (value && subjectToRoute[value]) {
               router.push(`/questions/${subjectToRoute[value]}`)
             }
           }}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
         >
-          {subjects.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger size="sm" className="w-[104px]" aria-label="选择学科">
+            <SelectValue placeholder="选择学科" />
+          </SelectTrigger>
+          <SelectContent>
+            {subjects.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <nav className="ml-4 hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap lg:flex">

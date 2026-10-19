@@ -6,6 +6,7 @@ import { sessionOptions, type SessionData } from "@/lib/iron"
 import { prisma } from "@/lib/prisma"
 import { subjects } from "@/constants/subjects"
 import { Button } from "@/components/ui/button"
+import { RecordsFilter } from "@/components/records/RecordsFilter"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -98,35 +99,7 @@ export default async function RecordsPage({ searchParams }: PageProps) {
         </Button>
       </div>
 
-      {/* 筛选：学科只能手动选，关键词可搜索 */}
-      <form method="get" className="mb-6 flex flex-wrap items-center gap-2">
-        <select
-          name="subject"
-          defaultValue={subject}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-        >
-          <option value="all">全部学科</option>
-          {subjects.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <Input
-          name="q"
-          defaultValue={keyword}
-          placeholder="搜索试卷 / 题组名称"
-          className="h-9 w-full sm:w-64"
-        />
-        <Button type="submit" size="sm">
-          查询
-        </Button>
-        {hasFilter && (
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/records">重置</Link>
-          </Button>
-        )}
-      </form>
+      <RecordsFilter subject={subject} keyword={keyword} subjects={subjects} />
 
       <section className="mb-8">
         <h2 className="mb-3 text-base font-semibold">套卷提交</h2>
