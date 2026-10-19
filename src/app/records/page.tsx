@@ -118,6 +118,8 @@ export default async function RecordsPage({ searchParams }: PageProps) {
         ? `/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`
         : `/question/${g.id}/review/1`,
       practiceHref: inPaper ? `/test-paper/${inPaper.testPaperId}/practice` : `/question/${g.id}`,
+      deleteKind: (inPaper ? "paper" : "group") as "paper" | "group",
+      deleteId: inPaper ? inPaper.id : s.id,
     }
   })
 
