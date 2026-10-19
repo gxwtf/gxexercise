@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   other: {
     "apple-mobile-web-app-capable": "yes",
     "format-detection": "telephone=no",
-    "msapplication-TileColor": "#A31F24",
+    "msapplication-TileColor": "#ffffff",
   },
   icons: {
     icon: [
@@ -46,9 +46,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
+  // 与主屏相关（状态栏/标题栏）统一用白/黑，不用品牌红
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#A31F24" },
-    { media: "(prefers-color-scheme: dark)", color: "#8a1010" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
 };
 

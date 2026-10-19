@@ -106,7 +106,7 @@ export function WebAppManager() {
     <div className="fixed inset-x-3 bottom-3 z-50 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-96">
       <div className="rounded-xl border border-border bg-card text-card-foreground shadow-lg">
         <div className="flex items-start gap-3 p-3 sm:p-4">
-          <div className="mt-0.5 shrink-0 rounded-lg bg-primary/10 p-2 text-primary">
+          <div className="mt-0.5 shrink-0 rounded-lg bg-muted p-2 text-foreground">
             <Download className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
