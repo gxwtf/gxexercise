@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -51,6 +52,43 @@ export interface RecordsRow {
 export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
   const router = useRouter()
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
+  const [selected, setSelected] = React.useState<string[]>([])
+  const [batchDeleting, setBatchDeleting] = React.useState(false)
+
+  const allSelected = rows.length > 0 && selected.length === rows.length
+  const someSelected = selected.length > 0 && !allSelected
+
+  const toggleAll = () => {
+    setSelected(allSelected ? [] : rows.map((r) => r.id))
+  }
+  const toggleOne = (id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  const removeBatch = async () => {
+    const targets = rows.filter((r) => selected.includes(r.id))
+    if (targets.length === 0) return
+    setBatchDeleting(true)
+    try {
+      const res = await fetch("/api/submissions/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: targets.map((r) => ({ kind: r.deleteKind, id: r.deleteId })) }),
+      })
+      const json = await res.json()
+      if (json.success) {
+        toast.success(`已删除 ${targets.length} 条作答记录`)
+        setSelected([])
+        router.refresh()
+      } else {
+        toast.error(json.error || "删除失败")
+      }
+    } catch {
+      toast.error("删除失败，请稍后重试")
+    } finally {
+      setBatchDeleting(false)
+    }
+  }
 
   const remove = async (row: RecordsRow) => {
     setDeletingId(row.deleteId)
@@ -75,10 +113,50 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
   }
 
   return (
+    <div>
+      {selected.length > 0 && (
+        <div className="mb-2 flex flex-wrap items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm">
+          <span>已选 {selected.length} 条</span>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="outline" className="h-7 text-destructive hover:text-destructive" disabled={batchDeleting}>
+                批量删除
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>删除选中的 {selected.length} 条作答记录？</AlertDialogTitle>
+                <AlertDialogDescription>
+                  删除后无法恢复，相关的得分与批改结果也会一并清除。属于套卷提交的记录会连同整份套卷一起删除。
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>取消</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => void removeBatch()}
+                  className="bg-destructive text-white hover:bg-destructive/90"
+                >
+                  确认删除
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button size="sm" variant="ghost" className="h-7" onClick={() => setSelected([])}>
+            取消选择
+          </Button>
+        </div>
+      )}
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[40px] text-center">
+              <Checkbox
+                aria-label="全选"
+                checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                onCheckedChange={toggleAll}
+              />
+            </TableHead>
             <TableHead className="w-[80px]">序号</TableHead>
             <TableHead className="w-[140px]">答题时间</TableHead>
             <TableHead className="w-[70px]">学科</TableHead>
@@ -95,6 +173,13 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
               onClick={() => router.push(row.detailHref)}
               className="cursor-pointer transition-colors hover:bg-muted/50"
             >
+              <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  aria-label={`选择第 ${index + 1} 行`}
+                  checked={selected.includes(row.id)}
+                  onCheckedChange={() => toggleOne(row.id)}
+                />
+              </TableCell>
               <TableCell className="font-medium">{index + 1}</TableCell>
               <TableCell className="whitespace-nowrap text-muted-foreground">{row.time}</TableCell>
               <TableCell className="whitespace-nowrap">{row.subject}</TableCell>
@@ -175,6 +260,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
           ))}
         </TableBody>
       </Table>
+    </div>
     </div>
   )
 }
