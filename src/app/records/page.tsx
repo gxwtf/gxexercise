@@ -6,17 +6,9 @@ import { sessionOptions, type SessionData } from "@/lib/iron"
 import { prisma } from "@/lib/prisma"
 import { subjects } from "@/constants/subjects"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { RecordsFilter } from "@/components/records/RecordsFilter"
 import { RecordsPager } from "@/components/records/RecordsPager"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { RecordsTable } from "@/components/records/RecordsTable"
 
 export const dynamic = "force-dynamic"
 
@@ -54,7 +46,8 @@ export default async function RecordsPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const pick = (k: string) => {
     const v = sp[k]
-    return (Array.isArray(v) ? v[0] : v) ?? ""
+
+  return (Array.isArray(v) ? v[0] : v) ?? ""
   }
   const subject = pick("subject") || "all"
   const keyword = pick("q").trim()
@@ -108,6 +101,26 @@ export default async function RecordsPage({ searchParams }: PageProps) {
   if (sort !== "time_desc") pageQuery.sort = sort
   if (pendingOnly) pageQuery.pending = "1"
 
+    // 组装给客户端表格的数据（全部可序列化）
+  const tableRows = rows.map((s) => {
+    const g = s.questionGroup
+    const pending = s.submissions.some((x) => x.gradingStatus === "pending")
+    const inPaper = s.testSubmission
+    return {
+      id: s.id,
+      time: fmt(s.createdAt),
+      subject: g.subject,
+      title: inPaper?.testPaper?.title ?? g.title,
+      subtitle: inPaper ? `套卷小节 · ${g.title}` : `单节练习 · ${g.category}`,
+      score: scoreText(s.score, g.score),
+      pending,
+      detailHref: inPaper
+        ? `/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`
+        : `/question/${g.id}/review/1`,
+      practiceHref: inPaper ? `/test-paper/${inPaper.testPaperId}/practice` : `/question/${g.id}`,
+    }
+  })
+
   return (
     <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
@@ -138,79 +151,7 @@ export default async function RecordsPage({ searchParams }: PageProps) {
         </p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="whitespace-nowrap">提交时间</TableHead>
-                  <TableHead className="whitespace-nowrap">学科</TableHead>
-                  <TableHead>内容</TableHead>
-                  <TableHead className="whitespace-nowrap">得分 / 总分</TableHead>
-                  <TableHead className="whitespace-nowrap">状态</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((s) => {
-                  const g = s.questionGroup
-                  const pending = s.submissions.some((x) => x.gradingStatus === "pending")
-                  const inPaper = s.testSubmission
-                  return (
-                    <TableRow key={s.id}>
-                      <TableCell className="whitespace-nowrap text-muted-foreground">{fmt(s.createdAt)}</TableCell>
-                      <TableCell className="whitespace-nowrap">{g.subject}</TableCell>
-                      <TableCell className="min-w-[12rem]">
-                        <div className="flex flex-col gap-0.5">
-                          <span>{inPaper?.testPaper?.title ?? g.title}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {inPaper ? `套卷小节 · ${g.title}` : `单节练习 · ${g.category}`}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap font-medium">
-                        {pending ? (
-                          <span className="text-amber-700 dark:text-amber-400">待批改</span>
-                        ) : (
-                          scoreText(s.score, g.score)
-                        )}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {pending ? (
-                          <Badge
-                            variant="outline"
-                            className="border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300"
-                          >
-                            批改中
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline">已批改</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button asChild size="sm" variant="ghost">
-                            {inPaper ? (
-                              <Link href={`/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`}>查看结果</Link>
-                            ) : (
-                              <Link href={`/question/${g.id}/review/1`}>查看回顾</Link>
-                            )}
-                          </Button>
-                          <Button asChild size="sm" variant="outline">
-                            {inPaper ? (
-                              <Link href={`/test-paper/${inPaper.testPaperId}/practice`}>重新练习</Link>
-                            ) : (
-                              <Link href={`/question/${g.id}`}>重新练习</Link>
-                            )}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
-
+          <RecordsTable rows={tableRows} />
           <RecordsPager page={safePage} pageCount={pageCount} query={pageQuery} />
         </>
       )}
