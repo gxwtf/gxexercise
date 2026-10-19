@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
@@ -27,35 +27,57 @@ interface ChoiceQuestionProps {
   value?: string[]
 }
 
-/**
- * 选项排版按标准试卷样式：
- * - 四个「短选项」（纯数字/符号/短词，无图片）→ 宽屏一行 4 个
- * - 其余（长句、含公式、含图片）→ 每行 2 个（A B / C D），手机上 1 个
- * 固定列数（1 / 2 / 4），不再出现「一行三个」这种不整齐的情况。
- */
-function gridClass(options: Option[]): string {
-  // 公式/图片按一个占位符计长度，避免 LaTeX 源码过长被误判
-  const plain = (t: string) =>
-    t.replace(/\$[^$]*\$/g, "X").replace(/!\[[^\]]*\]\([^)]*\)/g, "X").trim()
-  const hasImage = options.some((o) => /!\[/.test(o.label))
-  const lens = options.map((o) => plain(o.label).length)
-  const longest = Math.max(...lens, 0)
+/** 控件（单选圆圈/多选框）加间距约占的宽度 */
+const CONTROL_W = 24
+/** 列间距，对应 gap-x-8 */
+const GAP = 32
+/** 只允许 4 / 2 / 1 列，避免出现「一行三个」的不整齐排版 */
+const CANDIDATES = [4, 2, 1]
 
-  // ① 短选项（纯数字/符号/短词）→ 宽屏一行 4 个
-  if (!hasImage && options.length === 4 && longest <= 12) {
-    return "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4"
-  }
-  // ② 长选项（整句话/长公式）→ 一个选项独占一行，放不下再自动换行
-  if (longest > 28 || hasImage) {
-    return "grid grid-cols-1 gap-y-2.5"
-  }
-  // ③ 中等长度 → 每行两个（A B / C D）
-  return "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2"
+/**
+ * 参考 exam-zh 的 choices 环境：它用 \settowidth 实测每个选项的宽度再决定列数，
+ * 这里同样用真实渲染宽度测量（而不是数汉字/字符）：
+ *   1. 用一个隐藏的 nowrap 副本量出每个选项的自然宽度
+ *   2. 从 4 列往下试，取「最宽选项也能放下」的最大列数
+ *   3. 只取 4 / 2 / 1 三档；长选项自然落到 1 列（独占一行，放不下才换行）
+ */
+function useOptionColumns(options: Option[], deps: unknown[]) {
+  const wrapRef = useRef<HTMLDivElement | null>(null)
+  const measureRef = useRef<HTMLDivElement | null>(null)
+  const [cols, setCols] = useState(1)
+
+  const compute = useCallback(() => {
+    const wrap = wrapRef.current
+    const box = measureRef.current
+    if (!wrap || !box) return
+    const avail = wrap.clientWidth
+    if (!avail) return
+    const items = Array.from(box.querySelectorAll<HTMLElement>("[data-measure-item]"))
+    if (!items.length) return
+    const widest = Math.max(...items.map((el) => el.offsetWidth)) + CONTROL_W
+    const fits = CANDIDATES.find(
+      (n) => n <= options.length && n * widest + (n - 1) * GAP <= avail
+    )
+    setCols(fits ?? 1)
+  }, [options.length])
+
+  useLayoutEffect(() => { compute() }, [compute, ...deps])
+
+  useEffect(() => {
+    const wrap = wrapRef.current
+    if (!wrap || typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(() => compute())
+    ro.observe(wrap)
+    return () => ro.disconnect()
+  }, [compute])
+
+  return { wrapRef, measureRef, cols }
 }
 
 export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestionProps) {
   const [selected, setSelected] = useState<string[]>(value ?? [])
   const components = useMDXComponents()
+  const { wrapRef, measureRef, cols } = useOptionColumns(options, [type])
 
   const handleMultipleChange = (id: string, checked: boolean) => {
     const newSelected = checked ? [...selected, id] : selected.filter(s => s !== id)
@@ -68,7 +90,7 @@ export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestio
     onChange([value])
   }
 
-  // 选项内容：允许换行、允许长公式/长单词断行，图片限高
+  // 选项内容：允许换行、长公式/长单词可断行，图片限高
   const renderOptionLabel = (option: Option) => {
     const cls =
       "block min-w-0 text-base leading-relaxed whitespace-normal break-words " +
@@ -84,17 +106,37 @@ export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestio
   }
 
   const renderOptions = (control: (option: Option) => React.ReactNode) => (
-    <div className={gridClass(options)}>
-      {options.map((option) => (
-        <FieldLabel key={option.id} className="min-w-0">
-          <Field orientation="horizontal" className="!items-start">
-            <span className="mt-[0.3rem] shrink-0">{control(option)}</span>
-            <FieldContent className="min-w-0">
-              {renderOptionLabel(option)}
-            </FieldContent>
-          </Field>
-        </FieldLabel>
-      ))}
+    <div ref={wrapRef} className="relative min-w-0">
+      {/* 隐藏的测量层：nowrap 量出每个选项的自然宽度 */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-0 -z-10 h-0 overflow-hidden opacity-0"
+      >
+        {options.map((option) => (
+          <span
+            key={option.id}
+            data-measure-item
+            className="inline-block whitespace-nowrap px-0 text-base"
+          >
+            {option.labelMdx ? <MDXRemote {...option.labelMdx} components={components} /> : option.label}
+          </span>
+        ))}
+      </div>
+
+      <div
+        className="grid min-w-0 gap-x-8 gap-y-2.5"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+      >
+        {options.map((option) => (
+          <FieldLabel key={option.id} className="min-w-0">
+            <Field orientation="horizontal" className="!items-start">
+              <span className="mt-[0.3rem] shrink-0">{control(option)}</span>
+              <FieldContent className="min-w-0">{renderOptionLabel(option)}</FieldContent>
+            </Field>
+          </FieldLabel>
+        ))}
+      </div>
     </div>
   )
 
