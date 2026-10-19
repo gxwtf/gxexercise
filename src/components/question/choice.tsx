@@ -66,7 +66,9 @@ function useOptionColumns(options: Option[], deps: unknown[]) {
     if (!box) return 0
     const items = Array.from(box.querySelectorAll<HTMLElement>("[data-measure-item]"))
     if (!items.length) return 0
-    return Math.max(...items.map((el) => el.offsetWidth)) + CONTROL_W
+    // +10px 余量：FieldLabel 的 padding/gap、字距等都会吃掉几个像素，
+    // 不留余量会出现「差一点点就换行」甚至单词溢出选框
+    return Math.max(...items.map((el) => el.offsetWidth)) + CONTROL_W + 10
   }, [])
 
   const widestByWidth = useCallback(() => {
@@ -88,7 +90,9 @@ function useOptionColumns(options: Option[], deps: unknown[]) {
     const wrap = wrapRef.current
     if (!wrap || cols <= 1) return
     const labels = Array.from(wrap.querySelectorAll<HTMLElement>("[data-opt-label]"))
-    const wrapped = labels.some((el) => isWrapped(el))
+    const wrapped = labels.some(
+      (el) => isWrapped(el) || el.scrollWidth > el.clientWidth + 1   // 换行 或 单词溢出选框
+    )
     if (wrapped) {
       setCols((prev) => (prev >= 4 ? 2 : 1))
     }
