@@ -1,0 +1,45 @@
+{
+  "id": "/",
+  "name": "广学题库",
+  "short_name": "广学题库",
+  "description": "以题会友，广学天下 —— 北京高考真题、一模、二模、期末试卷在线练习",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#ffffff",
+  "theme_color": "#A31F24",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "数学套卷",
+      "short_name": "数学",
+      "description": "浏览数学真题与各区模拟卷",
+      "url": "/questions/math/test-paper",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "英语套卷",
+      "short_name": "英语",
+      "description": "浏览英语真题与各区模拟卷",
+      "url": "/questions/english/test-paper",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "物理套卷",
+      "short_name": "物理",
+      "description": "浏览物理真题与各区模拟卷",
+      "url": "/questions/physics/test-paper",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
