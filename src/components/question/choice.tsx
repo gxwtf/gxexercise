@@ -34,13 +34,23 @@ interface ChoiceQuestionProps {
  * 固定列数（1 / 2 / 4），不再出现「一行三个」这种不整齐的情况。
  */
 function gridClass(options: Option[]): string {
-  const plain = (t: string) => t.replace(/\$[^$]*\$/g, "XX").replace(/!\[[^\]]*\]\([^)]*\)/g, "IMG")
-  const compact =
-    options.length === 4 &&
-    options.every((o) => !/!\[/.test(o.label) && plain(o.label).length <= 12)
-  return compact
-    ? "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4"
-    : "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2"
+  // 公式/图片按一个占位符计长度，避免 LaTeX 源码过长被误判
+  const plain = (t: string) =>
+    t.replace(/\$[^$]*\$/g, "X").replace(/!\[[^\]]*\]\([^)]*\)/g, "X").trim()
+  const hasImage = options.some((o) => /!\[/.test(o.label))
+  const lens = options.map((o) => plain(o.label).length)
+  const longest = Math.max(...lens, 0)
+
+  // ① 短选项（纯数字/符号/短词）→ 宽屏一行 4 个
+  if (!hasImage && options.length === 4 && longest <= 12) {
+    return "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4"
+  }
+  // ② 长选项（整句话/长公式）→ 一个选项独占一行，放不下再自动换行
+  if (longest > 28 || hasImage) {
+    return "grid grid-cols-1 gap-y-2.5"
+  }
+  // ③ 中等长度 → 每行两个（A B / C D）
+  return "grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2"
 }
 
 export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestionProps) {
