@@ -276,6 +276,24 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         </div>
                     ) : (
                         <div className="mt-6 mb-6 p-4 rounded-lg bg-muted/50">
+                            {isSubjective ? (
+                                <p className="text-base">
+                                    我的作答：
+                                    <span className="font-medium text-foreground">{displayUserAnswer ?? "未作答"}</span>
+                                    {"  "}得分：
+                                    <span className="font-medium">
+                                        {isPending || userScore == null ? (
+                                            <span className="text-amber-700 dark:text-amber-400">评阅中</span>
+                                        ) : (
+                                            <>{userScore} / {questionScore}</>
+                                        )}
+                                    </span>
+                                    {"  "}平均得分：
+                                    <span className="font-medium">
+                                        {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
+                                    </span>
+                                </p>
+                            ) : (
                             <p className="text-base">
                                 我的作答：
                                 <span className={isCorrect === null ? "text-muted-foreground font-medium" : isCorrect ? "text-green-700 dark:text-green-400 font-medium" : "text-red-700 dark:text-red-400 font-medium"}>
@@ -290,6 +308,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
                                 </span>
                             </p>
+                            )}
                         </div>
                     )}
 

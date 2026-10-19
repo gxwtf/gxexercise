@@ -75,6 +75,9 @@ export default function UserMenu() {
                     <DropdownMenuLabel>我的账户</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
+                        <Link href="/records">我的作答记录</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
                         <Link href="https://account.gxwtf.cn/">账号中心</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>

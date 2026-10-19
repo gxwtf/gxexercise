@@ -3,14 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from '@/components/ui/combobox';
 import { useRouter } from 'next/navigation';
 import BaseHeader from '@/components/layout/BaseHeader';
 import { subjects, subjectToRoute, subjectNavItems, categoryToRoute } from '@/constants/subjects';
@@ -52,25 +44,25 @@ export default function SubHeader({
         <span className="whitespace-nowrap text-xl font-bold text-foreground">广学题库</span>
       </Link>
 
-      <div className="ml-4 w-[160px] shrink-0">
-        <Combobox items={subjects} value={subject} onValueChange={(value) => {
-          if (value && subjectToRoute[value]) {
-            // 跳转到学科首页，默认显示第一个题型
-            router.push(`/questions/${subjectToRoute[value]}`);
-          }
-        }}>
-          <ComboboxInput placeholder="选择学科" />
-          <ComboboxContent>
-            <ComboboxEmpty>暂无匹配学科。</ComboboxEmpty>
-            <ComboboxList>
-              {(item) => (
-                <ComboboxItem key={item} value={item}>
-                  {item}
-                </ComboboxItem>
-              )}
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+      {/* 学科选择：原生下拉，只能手动选，不支持输入筛选 */}
+      <div className="ml-4 shrink-0">
+        <select
+          aria-label="选择学科"
+          value={subject}
+          onChange={(e) => {
+            const value = e.target.value
+            if (value && subjectToRoute[value]) {
+              router.push(`/questions/${subjectToRoute[value]}`)
+            }
+          }}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+        >
+          {subjects.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
       </div>
 
       <nav className="ml-4 hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap lg:flex">
