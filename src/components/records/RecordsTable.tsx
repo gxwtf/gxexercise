@@ -37,7 +37,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
   const router = useRouter()
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>

@@ -183,7 +183,7 @@ export function TestPaperResult({
         {submissionHistory.length > 0 && (
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-3">练习记录</h2>
-            <div className="overflow-x-auto rounded-lg border">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
