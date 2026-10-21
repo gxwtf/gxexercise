@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
+import { ChevronLeft } from "lucide-react"
 import { MDXRemote, type MDXRemoteSerializeResult } from "next-mdx-remote"
 import { useMDXComponents, MathInput2Provider } from "@/mdx-components"
 import { Separator } from "@/components/ui/separator"
@@ -61,6 +63,15 @@ interface ReviewContentProps {
     basePath: string
 }
 
+/** 返回上一页；没有历史记录时回首页 */
+function useGoBack() {
+    const router = useRouter()
+    return React.useCallback(() => {
+        if (typeof window !== "undefined" && window.history.length > 1) router.back()
+        else router.push("/")
+    }, [router])
+}
+
 function getQuestionCategory(questionType: string, groupType: string): "choice" | "fill" | "essay" {
     if (questionType === "single" || questionType === "multiple" || questionType === "choice") return "choice"
     const combined = `${questionType} ${groupType}`
@@ -76,6 +87,7 @@ function getQuestionCategory(questionType: string, groupType: string): "choice" 
 
 export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const components = useMDXComponents()
+    const goBack = useGoBack()
     const {
         questionGroup,
         articleMdx,
@@ -128,8 +140,17 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     return (
         <div className="h-screen overflow-hidden bg-background">
             <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-                <div className="flex items-center h-14 px-6">
-                    <h1 className="text-lg font-semibold text-foreground truncate">
+                <div className="flex h-14 items-center gap-2 px-3 sm:px-6">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 shrink-0 gap-1 px-2"
+                        onClick={() => goBack()}
+                    >
+                        <ChevronLeft className="size-4" />
+                        返回
+                    </Button>
+                    <h1 className="truncate text-lg font-semibold text-foreground">
                         {questionGroup.title} - 学习回顾
                     </h1>
                 </div>

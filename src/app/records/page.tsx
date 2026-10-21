@@ -35,6 +35,10 @@ const scoreText = (score: number | null | undefined, max: number | null | undefi
   return max ? `${round1(score)} / ${max}` : `${round1(score)}`
 }
 
+/** 需要 AI 批改的题型（其余客观题提交即完成批改） */
+const AI_GRADEABLE = ["en-writing", "reading-expression", "作文", "英文写作", "英语作文", "阅读表达"]
+const needsAiGrading = (questionType: string) => AI_GRADEABLE.includes(questionType)
+
 const ORDER_MAP: Record<string, Record<string, "asc" | "desc">[]> = {
   time_desc: [{ createdAt: "desc" }],
   time_asc: [{ createdAt: "asc" }],
@@ -69,7 +73,17 @@ export default async function RecordsPage({ searchParams }: PageProps) {
       ...(subject !== "all" ? { subject } : {}),
       ...(keyword ? { title: { contains: keyword, mode: "insensitive" as const } } : {}),
     },
-    ...(pendingOnly ? { submissions: { some: { gradingStatus: "pending" } } } : {}),
+    // 只看未批改：仅统计需要 AI 批改的题型（客观题提交时已判分，状态就是 graded）
+    ...(pendingOnly
+      ? {
+          questionGroup: {
+            ...(subject !== "all" ? { subject } : {}),
+            ...(keyword ? { title: { contains: keyword, mode: "insensitive" as const } } : {}),
+            questionType: { in: AI_GRADEABLE },
+          },
+          submissions: { some: { gradingStatus: "pending" } },
+        }
+      : {}),
   }
 
   const [total, rows] = await Promise.all([
@@ -104,7 +118,7 @@ export default async function RecordsPage({ searchParams }: PageProps) {
     // 组装给客户端表格的数据（全部可序列化）
   const tableRows = rows.map((s) => {
     const g = s.questionGroup
-    const pending = s.submissions.some((x) => x.gradingStatus === "pending")
+    const pending = needsAiGrading(g.questionType) && s.submissions.some((x) => x.gradingStatus === "pending")
     const inPaper = s.testSubmission
     return {
       id: s.id,
