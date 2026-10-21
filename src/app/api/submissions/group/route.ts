@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { isAnswerCorrect } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
 
@@ -97,9 +98,7 @@ export async function POST(request: Request) {
           };
         }
 
-        const isCorrect = correctAnswer.includes("##")
-          ? correctAnswer.split("##").some((ans: string) => ans.trim() === userAnswer.trim())
-          : userAnswer === correctAnswer;
+        const isCorrect = isAnswerCorrect(userAnswer, correctAnswer);
         const score = isCorrect ? questionScore : 0;
 
         if (isCorrect) {
