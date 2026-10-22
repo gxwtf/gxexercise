@@ -30,6 +30,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
     return new NextResponse(new Uint8Array(buf), {
       headers: {
         "Content-Type": "application/pdf",
+        "Content-Length": String(buf.byteLength),
         "Content-Disposition": `attachment; filename="paper.pdf"; filename*=UTF-8''${encodeURIComponent(filename)}`,
         "Cache-Control": "private, max-age=3600",
       },
