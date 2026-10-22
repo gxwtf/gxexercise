@@ -9,7 +9,8 @@ import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import Grammar from "@/components/question-group/grammar";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
-import Problem from "@/components/question-group/Problem";
+import Problem from "@/components/question-group/Problem"
+import { PracticeEntryTracker } from "@/components/PracticeEntryTracker";
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
 import { QuestionSection } from "@/components/QuestionSection";
 
@@ -138,6 +139,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     const mdxSource = contentMdx;
     return (
       <>
+        <PracticeEntryTracker groupIds={[questionGroup.id]} />
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 

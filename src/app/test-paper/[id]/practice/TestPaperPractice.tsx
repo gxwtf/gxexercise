@@ -15,6 +15,7 @@ import Problem from "@/components/question-group/Problem"
 import Grammar from "@/components/question-group/grammar"
 import SevenChooseFive from "@/components/question-group/seven-choose-five"
 import { PageBar } from "@/components/PageBar"
+import { PracticeEntryTracker } from "@/components/PracticeEntryTracker"
 
 const STORAGE_KEY = (id: string) => `exam_state_${id}`
 const ANSWERS_KEY = (id: string) => `exam_answers_test-paper-${id}`
@@ -392,6 +393,7 @@ export function TestPaperPractice({
 
   return (
     <div className="h-screen flex flex-col overflow-y-auto bg-background">
+      <PracticeEntryTracker groupIds={groupsData.map((g) => g.id)} />
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-6">
           <h1 className="flex min-w-0 items-center gap-2 text-base font-semibold text-foreground sm:gap-3 sm:text-xl">

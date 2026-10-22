@@ -64,13 +64,27 @@ interface ReviewContentProps {
     basePath: string
 }
 
-/** 返回上一页；没有历史记录时回首页 */
-function useGoBack() {
+/** 返回：优先回到「进入做题页之前的那一页」（做题页会记在 sessionStorage 里），否则退回上一页 */
+function useGoBack(groupId?: string) {
     const router = useRouter()
     return React.useCallback(() => {
-        if (typeof window !== "undefined" && window.history.length > 1) router.back()
-        else router.push("/")
-    }, [router])
+        if (typeof window !== "undefined") {
+            try {
+                const saved = groupId ? sessionStorage.getItem(`practice_entry_${groupId}`) : null
+                if (saved) {
+                    router.push(saved)
+                    return
+                }
+            } catch {
+                /* 忽略 */
+            }
+            if (window.history.length > 1) {
+                router.back()
+                return
+            }
+        }
+        router.push("/")
+    }, [router, groupId])
 }
 
 function getQuestionCategory(questionType: string, groupType: string): "choice" | "fill" | "essay" {
@@ -88,7 +102,7 @@ function getQuestionCategory(questionType: string, groupType: string): "choice" 
 
 export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const components = useMDXComponents()
-    const goBack = useGoBack()
+    const goBack = useGoBack(data.questionGroup.id)
     const {
         questionGroup,
         articleMdx,
