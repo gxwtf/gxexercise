@@ -41,6 +41,8 @@ export interface RecordsRow {
   detailHref: string
   /** 重新练习的地址 */
   practiceHref: string
+  /** 回顾 PDF 下载地址 */
+  pdfHref: string
   /** 删除用：group=单节练习记录，paper=整份套卷提交 */
   deleteKind: "group" | "paper"
   deleteId: string
@@ -246,6 +248,9 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Link href={row.practiceHref}>重新练习</Link>
+                    </Button>
+                    <Button asChild size="sm" variant="ghost" className="h-7 px-2" onClick={(e) => e.stopPropagation()}>
+                      <a href={row.pdfHref}>PDF</a>
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

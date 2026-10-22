@@ -153,6 +153,13 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                     <h1 className="truncate text-lg font-semibold text-foreground">
                         {questionGroup.title} - 学习回顾
                     </h1>
+                    <a
+                        href={`${basePath}/${currentIndex}/pdf`}
+                        className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-md border border-input px-2.5 py-1 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <FileDown className="size-4" />
+                        下载 PDF
+                    </a>
                 </div>
             </header>
             <div className="flex" style={{ height: "calc(100vh - 56px)" }}>
@@ -247,16 +254,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             <MDXRemote {...userAnswerMdx} components={components} />
                                         </div>
                                     </QuestionSection>
-                                    {isEnWriting && enWritingFeedback && !isPending && (
-                                        <div className="mt-4 flex justify-end print:hidden">
-                                            <Button asChild variant="outline" size="sm" className="gap-1.5">
-                                                <Link href={`${basePath}/${data.currentIndex}/report?q=${data.currentQuestion.id}`} target="_blank" rel="noopener">
-                                                    <FileDown className="size-4" />
-                                                    导出 PDF
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    )}
+                                    
                                     {isEnWriting && enWritingFeedback && !isPending ? (
                                         <EnWritingFeedbackSection
                                           feedback={enWritingFeedback}
