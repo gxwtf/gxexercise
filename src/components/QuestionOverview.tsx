@@ -93,6 +93,13 @@ export function QuestionOverview({
     setSearchDraft(filters.q);
   }, [filters.q]);
 
+  // 记录列表页地址：从列表点进做题页时，回顾页的「返回」要回到这里
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("list_url", window.location.pathname + window.location.search);
+    } catch {}
+  }, []);
+
   // 练习次数 / 最近一次提交（仅当前页）
   useEffect(() => {
     const groupIds = groups.map((g) => g.id).join(",");

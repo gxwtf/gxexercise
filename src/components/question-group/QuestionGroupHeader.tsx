@@ -30,6 +30,22 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
     return () => clearInterval(timer);
   }, []);
 
+  // 记录「进入做题页之前的那一页」：回顾页的返回按钮会直接回到它
+  useEffect(() => {
+    try {
+      const cur = window.location.pathname + window.location.search;
+      let entry = "";
+      const from = document.referrer || "";
+      if (from) {
+        const u = new URL(from);
+        const p = u.pathname + u.search;
+        if (u.origin === window.location.origin && !u.pathname.includes("/review") && p !== cur) entry = p;
+      }
+      if (!entry) entry = sessionStorage.getItem("list_url") || "";
+      if (entry && entry !== cur) sessionStorage.setItem(`practice_entry_${questionGroupId}`, entry);
+    } catch {}
+  }, [questionGroupId]);
+
   const formatTime = (totalSeconds: number) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
