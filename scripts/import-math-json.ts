@@ -103,7 +103,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
   const stem = path.basename(file, ".json");
   const title = raw.paper.title || stem;
 
-  const exists = await prisma.testPaper.findFirst({ where: { title, subject: "数学" }, select: { id: true } });
+  const exists = await prisma.testPaper.findFirst({ where: { title, subject }, select: { id: true } });
   if (exists) {
     if (!force) { console.log(`跳过（已存在）：${title}`); return { skipped: true, questions: 0 }; }
     await deletePaper(exists.id, title);
@@ -111,7 +111,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
 
   const imgSrcDirs = [path.join(path.dirname(file), "images"), path.join(JSON_ROOT, "images")];
   const mapping = dryRun ? new Map<string, string>() : materializeImages(raw, stem, typeDir, imgSrcDirs, subject);
-  const tags = Array.from(new Set([...(raw.paper.tags || []), "数学"]));
+  const tags = Array.from(new Set([...(raw.paper.tags || []), subject]));
   const sectionCount = raw.sections.length;
   const totalQ = raw.sections.reduce((n, s) => n + s.questions.length, 0);
 
@@ -124,7 +124,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
     const paper = await tx.testPaper.create({
       data: {
         title,
-        description: `${raw.paper.source}（数学 · 选择+填空）`,
+        description: `${raw.paper.source}（${subject} · ${raw.sections.map((s) => s.category).join("+")}）`,
         subject,
         source: raw.paper.source || title,
         grade: raw.paper.grade || "高三",
