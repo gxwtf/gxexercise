@@ -7,6 +7,7 @@ function isSubjectiveQuestion(questionType: string, groupType: string): boolean 
   const combined = `${questionType} ${groupType}`
   if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return true
   if (groupType === "chinese-reading" && questionType === "text") return true
+  if (groupType === "politics" && questionType === "text") return true
   return false
 }
 

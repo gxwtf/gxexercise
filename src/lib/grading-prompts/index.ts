@@ -3,6 +3,7 @@ import path from "path"
 import readingExpression from "./reading-expression/config.json"
 import enWriting from "./en-writing/config.json"
 import chineseText from "./chinese-reading/config.json"
+import politicsText from "./politics/config.json"
 
 export interface GradingPromptConfig {
   questionType: string
@@ -34,6 +35,7 @@ function loadPrompts(): GradingPromptConfig[] {
     readingExpression,
     enWriting,
     chineseText,
+    politicsText,
   ]
 
   return jsonFiles.flatMap((entry) =>

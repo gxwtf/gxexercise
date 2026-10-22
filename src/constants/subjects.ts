@@ -36,7 +36,7 @@ export const categoriesBySubject: Record<string, string[]> = {
   // 不锁定「题号—考点」映射，入库时按实际题目内容归到对应板块即可。
   '生物': ['选择', '遗传与进化', '稳态与调节', '生物技术与工程', '实验探究', '套卷'],
   '历史': ['选择', '观点论证', '史料分析', '修改补写', '套卷'],
-  '政治': ['选择', '材料分析', '开放性试题', '套卷'],
+  '政治': ['选择', '中特', '经济社会', '政治法治', '哲学文化', '国政国经', '法律生活', '逻辑思维', '套卷'],
   '地理': ['选择', '自然地理', '人文地理', '区域发展', '图表判读', '套卷'],
 };
 
@@ -109,8 +109,13 @@ export const categoryToRoute: Record<string, Record<string, string>> = {
   },
   '政治': {
     '选择': 'select',
-    '材料分析': 'material-analysis',
-    '开放性试题': 'open-ended',
+    '中特': 'socialism',
+    '经济社会': 'economy',
+    '政治法治': 'politics-law',
+    '哲学文化': 'philosophy-culture',
+    '国政国经': 'intl-politics',
+    '法律生活': 'law-life',
+    '逻辑思维': 'logic',
     '套卷': 'test-paper',
   },
   '地理': {
