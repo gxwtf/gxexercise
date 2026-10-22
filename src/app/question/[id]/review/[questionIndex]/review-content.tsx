@@ -75,7 +75,7 @@ function useGoBack() {
 function getQuestionCategory(questionType: string, groupType: string): "choice" | "fill" | "essay" {
     if (questionType === "single" || questionType === "multiple" || questionType === "choice") return "choice"
     const combined = `${questionType} ${groupType}`
-    if (combined.includes("选择") || combined.includes("七选五") || (groupType === "math-choice" || groupType === "physics-choice")) return "choice"
+    if (combined.includes("选择") || combined.includes("七选五") || (groupType === "math-choice" || groupType === "physics-choice" || groupType === "chemistry-choice")) return "choice"
     if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || combined.includes("input2") || groupType === "word-choice" || groupType === "math-fill") return "fill"
     if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
     if (groupType === "chinese-reading") {
@@ -124,7 +124,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
     const isChoiceType = category === "choice"
     const isEnWriting = questionGroup.questionType === "en-writing"
-    const isMathType = ["math-fill", "math-choice", "physics-choice"].includes(questionGroup.questionType)
+    const isMathType = ["math-fill", "math-choice", "physics-choice", "chemistry-choice"].includes(questionGroup.questionType)
     const isWordChoice = questionGroup.questionType === "word-choice"
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"

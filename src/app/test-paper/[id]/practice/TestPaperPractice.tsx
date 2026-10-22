@@ -357,7 +357,7 @@ export function TestPaperPractice({
       )
     }
 
-    if (questionType === "math-choice" || questionType === "physics-choice") {
+    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice") {
       return (
         <Problem
           questions={questions as any}

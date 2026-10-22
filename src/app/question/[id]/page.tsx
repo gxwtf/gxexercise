@@ -287,7 +287,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
-  if (questionGroup.questionType === 'math-choice' || questionGroup.questionType === 'physics-choice') {
+  if (questionGroup.questionType === 'math-choice' || questionGroup.questionType === 'physics-choice' || questionGroup.questionType === 'chemistry-choice') {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
