@@ -430,6 +430,16 @@ function Superscript({ children, className, ...props }: React.HTMLAttributes<HTM
 
 Superscript.displayName = 'Superscript';
 
+// Dot - 语文「加点字」：渲染着重号（点在下），字本身不变
+function Dot({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+    return (
+        <span className={cn('dot-em', className)} {...props}>
+            {children}
+        </span>
+    )
+}
+Dot.displayName = 'Dot';
+
 const components: MDXComponents = {
     ...Typography,
     p: Typography.P,
@@ -455,6 +465,7 @@ const components: MDXComponents = {
     RightAlign,
     Center,
     Superscript,
+    Dot,
 }
 
 export function useMDXComponents(): MDXComponents {

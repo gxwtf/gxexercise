@@ -126,7 +126,7 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
         data: {
           questionType: q.questionType,
           content: q.content || "",
-          options: q.options && q.options.length ? q.options : undefined,
+          options: q.options && q.options.length ? (q.options as unknown as object) : undefined,
           answer: q.answer || "",
           analysis: q.analysis || "",
           score: q.score ?? 0,
