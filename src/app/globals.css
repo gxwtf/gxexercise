@@ -245,12 +245,17 @@
   object-fit: contain;
 }
 
-/* 语文「加点字」：着重号（点在下、字不变） */
+/* 语文「加点字」：每个汉字下方一个小点（着重号）。
+   用 background 画点而不是 text-emphasis，原因是浏览器对 text-emphasis 的距离
+   没有可调参数；这里 --dot-gap 控制点与文字的间距，--dot-size 控制点的直径。 */
 .dot-em {
-  text-emphasis: dot;
-  -webkit-text-emphasis: dot;
-  text-emphasis-position: under right;
-  -webkit-text-emphasis-position: under right;
-  text-emphasis-color: currentColor;
-  -webkit-text-emphasis-color: currentColor;
+  --dot-size: 0.10em;
+  --dot-gap: 0.06em;
+  background-image: radial-gradient(circle, currentColor calc(var(--dot-size) / 2 - 0.01em), transparent calc(var(--dot-size) / 2));
+  background-size: 1em var(--dot-size);
+  background-position: 0 calc(100% - var(--dot-gap));
+  background-repeat: repeat-x;
+  padding-bottom: calc(var(--dot-size) + var(--dot-gap));
+  text-emphasis: none;
+  -webkit-text-emphasis: none;
 }
