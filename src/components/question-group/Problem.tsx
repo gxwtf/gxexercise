@@ -26,6 +26,8 @@ interface ProblemProps {
   indentParagraphs?: boolean
   startQuestionNumber?: number
   showWordCount?: boolean
+  /** side=左右两栏（左文章右题目）；inline=材料与题目同在主区域，不设阅读区 */
+  articleLayout?: 'side' | 'inline'
 }
 
 export default function Problem({
@@ -36,6 +38,7 @@ export default function Problem({
   indentParagraphs = true,
   startQuestionNumber,
   showWordCount = false,
+  articleLayout = 'side',
 }: ProblemProps) {
   const { setAnswer, answers } = useAnswer()
   const components = useMDXComponents()
@@ -137,6 +140,24 @@ export default function Problem({
       })}
     </>
   )
+
+  if (hasArticle && articleLayout === 'inline') {
+    // 材料与题目都在主区域：不设左右两栏的阅读区（名著等题型）
+    return (
+      <div className="bg-background font-question lg:h-full lg:overflow-hidden">
+        <div className="flex flex-col lg:h-full lg:flex-row">
+          <div className="flex-1 p-6 overflow-y-auto max-w-4xl mx-auto">
+            <QuestionSection>
+              <div className="prose max-w-none dark:prose-invert">
+                <MDXRemote {...mdxSource!} components={components} />
+              </div>
+              {body}
+            </QuestionSection>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (hasArticle) {
     return (

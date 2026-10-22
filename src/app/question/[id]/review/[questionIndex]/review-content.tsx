@@ -22,6 +22,7 @@ interface ReviewContentData {
         id: string
         title: string
         questionType: string
+        category: string
     }
     articleMdx: MDXRemoteSerializeResult | null
     stemMdx: MDXRemoteSerializeResult | null
@@ -126,6 +127,9 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const isEnWriting = questionGroup.questionType === "en-writing"
     const isMathType = ["math-fill", "math-choice", "physics-choice", "chemistry-choice"].includes(questionGroup.questionType)
     const isWordChoice = questionGroup.questionType === "word-choice"
+    // 名著阅读：没有阅读区，材料直接排在题目上方
+    const isNamedBook = questionGroup.category === "名著"
+    const showArticlePanel = !isEnWriting && !isMathType && !isWordChoice && !isNamedBook && !!articleMdx
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
     const isPending = gradingStatus === "pending"
@@ -163,7 +167,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                 </div>
             </header>
             <div className="flex" style={{ height: "calc(100vh - 56px)" }}>
-                {!isEnWriting && !isMathType && !isWordChoice && (
+                {showArticlePanel && (
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
                             <EnglishReading
@@ -196,6 +200,11 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                     )}
 
                     <QuestionSection>
+                        {isNamedBook && articleMdx ? (
+                            <div className="mb-2">
+                                <MDXRemote {...articleMdx} components={components} />
+                            </div>
+                        ) : null}
                         {stemMdx ? (
                             <div className="flex items-baseline gap-1">
                                 {hasMultipleQuestions && <span className="text-lg font-medium">{currentIndex}.</span>}

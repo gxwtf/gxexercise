@@ -145,6 +145,7 @@ export default async function TestPaperPracticePage({ params }: PageProps) {
         id: group.id,
         title: group.title,
         questionType: group.questionType,
+        category: group.category,
         content: group.content,
         contentMdx,
         questions,

@@ -129,8 +129,13 @@ async function QuestionPageContent({ id }: { id: string }) {
     }
   }));
 
+  // 题组正文（阅读材料）：为空时不给 MDX，前端就不会再画出空的「阅读区域」
+  const contentMdx = (questionGroup.content || '').trim()
+    ? await serialize(questionGroup.content, { mdxOptions })
+    : null;
+
   if (questionGroup.questionType === 'cloze') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = contentMdx;
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
@@ -146,13 +151,13 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'grammar') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = contentMdx;
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Grammar 
           questions={questions as any} 
-          mdxSource={mdxSource}
+          mdxSource={mdxSource!}
         />
       </>
     );
@@ -180,20 +185,20 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'chinese-dictation') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = contentMdx;
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Grammar 
           questions={questions as any} 
-          mdxSource={mdxSource}
+          mdxSource={mdxSource!}
         />
       </>
     );
   }
 
   if (questionGroup.questionType === 'en-reading') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = contentMdx;
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
@@ -207,20 +212,20 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'seven-choose-five') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = contentMdx;
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <SevenChooseFive 
           questions={questions as any} 
-          mdxSource={mdxSource}
+          mdxSource={mdxSource!}
         />
       </>
     );
   }
 
   if (questionGroup.questionType === 'reading-expression') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    const mdxSource = contentMdx;
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
@@ -300,14 +305,16 @@ async function QuestionPageContent({ id }: { id: string }) {
   }
 
   if (questionGroup.questionType === 'chinese-reading') {
-    const mdxSource = await serialize(questionGroup.content || '', { mdxOptions });
+    // 名著阅读：不设阅读区，材料与小题同在主区域，每小题一个答题框
+    const isNamedBook = questionGroup.category === '名著';
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 
-          mdxSource={mdxSource}
+          mdxSource={contentMdx}
           language="zh"
+          articleLayout={isNamedBook ? 'inline' : 'side'}
         />
       </>
     );

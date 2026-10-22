@@ -54,7 +54,10 @@ export async function GET(_request: Request, { params }: RouteContext) {
     title: group.title,
     questionIndex: index,
     questionType: group.questionType,
-    content: question.content ?? "",
+    content:
+      group.category === "名著" && group.content
+        ? `${group.content}\n\n${question.content ?? ""}`
+        : question.content ?? "",
     userAnswer,
     correctAnswer: question.answer ?? "",
     analysis: question.analysis ?? "",

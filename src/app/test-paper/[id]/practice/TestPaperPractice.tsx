@@ -32,6 +32,7 @@ interface GroupPracticeData {
   id: string
   title: string
   questionType: string
+  category: string
   content: string | null
   contentMdx: MDXRemoteSerializeResult | null
   questions: QuestionPracticeData[]
@@ -226,7 +227,7 @@ export function TestPaperPractice({
   const renderGroup = () => {
     if (!currentGroup) return null
 
-    const { questionType, contentMdx, questions, startQuestionNumber, content } = currentGroup
+    const { questionType, category, contentMdx, questions, startQuestionNumber, content } = currentGroup
 
     if (questionType === "cloze") {
       return (
@@ -368,12 +369,14 @@ export function TestPaperPractice({
     }
 
     if (questionType === "chinese-reading") {
+      // 名著阅读：不设阅读区，材料与小题同在主区域，每小题一个答题框
       return (
         <Problem
           questions={questions as any}
           mdxSource={contentMdx}
           language="zh"
           startQuestionNumber={startQuestionNumber}
+          articleLayout={category === "名著" ? "inline" : "side"}
         />
       )
     }

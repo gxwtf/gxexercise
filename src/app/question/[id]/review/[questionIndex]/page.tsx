@@ -267,6 +267,7 @@ async function buildReviewData(
       id: questionGroup.id,
       title: questionGroup.title,
       questionType: questionGroup.questionType,
+      category: questionGroup.category,
     },
     articleMdx,
     stemMdx,
