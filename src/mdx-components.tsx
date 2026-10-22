@@ -440,6 +440,16 @@ function Dot({ children, className, ...props }: React.HTMLAttributes<HTMLSpanEle
 }
 Dot.displayName = 'Dot';
 
+// U - 语文「下划线」：卷面原文的下划线（与 <Dot> 可叠加）
+function U({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) {
+    return (
+        <u className={cn('underline underline-offset-[3px] decoration-[1.5px]', className)} {...props}>
+            {children}
+        </u>
+    )
+}
+U.displayName = 'U';
+
 const components: MDXComponents = {
     ...Typography,
     p: Typography.P,
@@ -466,6 +476,8 @@ const components: MDXComponents = {
     Center,
     Superscript,
     Dot,
+    U,
+    u: U,
 }
 
 export function useMDXComponents(): MDXComponents {
