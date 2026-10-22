@@ -121,6 +121,11 @@ export function TestCard({
                             练习报告
                         </Button>
                     )}
+                    <Button variant="outline" asChild onClick={(e) => e.stopPropagation()}>
+                        <a href={`/api/test-paper/${id}/pdf`} download>
+                            下载试卷
+                        </a>
+                    </Button>
                     <Button
                         variant="default"
                         onClick={(e) => {
