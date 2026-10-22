@@ -83,7 +83,8 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
 
       if (response.ok) {
         await response.json();
-        router.push(`/question/${questionGroupId}/review`);
+        // 用 replace 覆盖做题页的历史记录：这样在回顾页按返回（浏览器或按钮）都直接回到列表页
+        router.replace(`/question/${questionGroupId}/review/1`);
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to submit');

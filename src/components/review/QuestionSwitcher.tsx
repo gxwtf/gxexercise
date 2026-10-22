@@ -55,7 +55,7 @@ export function QuestionSwitcher({ questions, currentIndex, basePath }: Question
           <button
             key={q.questionId}
             className={buttonStyle}
-            onClick={() => router.push(`${basePath}/${q.index}`)}
+            onClick={() => router.replace(`${basePath}/${q.index}`)}
           >
             {q.index}
           </button>
