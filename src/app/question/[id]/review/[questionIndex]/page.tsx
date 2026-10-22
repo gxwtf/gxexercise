@@ -179,6 +179,7 @@ async function buildReviewData(
       answer,
       answerMdx,
       isCorrect: sub.isCorrect,
+      gradingStatus: sub.gradingStatus,
       score: sub.score,
       createdAt: sub.createdAt,
     }

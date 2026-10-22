@@ -133,10 +133,13 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
     const isPending = gradingStatus === "pending"
+    // 微写作/大作文暂时不判分；没作答的主观题也不该显示「评阅中」
+    const isSkipped = gradingStatus === "skipped"
 
     const displayUserAnswer = userAnswer
         ? (isChoiceType ? userAnswer.toUpperCase() : userAnswer)
         : null
+    const hasAnswer = !!(displayUserAnswer && displayUserAnswer.trim())
     const displayCorrectAnswer = isChoiceType ? correctAnswer.toUpperCase() : correctAnswer
 
     const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice"].includes(questionGroup.questionType)
@@ -234,9 +237,11 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     <p className="text-base">
                                         得分：
                                         <span className="font-medium">
-                                            {isPending ? (
-                                                <span className="text-amber-700 dark:text-amber-400">评阅中</span>
-                                            ) : isCorrect === null ? (
+                                            {isSkipped ? (
+                                                <span className="text-muted-foreground">不判分</span>
+                                            ) : !hasAnswer ? (
+                                                <span className="text-muted-foreground">未作答</span>
+                                            ) : isPending || isCorrect === null ? (
                                                 <span className="text-amber-700 dark:text-amber-400">评阅中</span>
                                             ) : (
                                                 <>{userScore ?? "-"} / {questionScore}</>
@@ -310,7 +315,11 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     <span className="font-medium text-foreground">{displayUserAnswer ?? "未作答"}</span>
                                     {"  "}得分：
                                     <span className="font-medium">
-                                        {isPending || userScore == null ? (
+                                        {isSkipped ? (
+                                            <span className="text-muted-foreground">不判分</span>
+                                        ) : !hasAnswer ? (
+                                            <span className="text-muted-foreground">未作答</span>
+                                        ) : isPending || userScore == null ? (
                                             <span className="text-amber-700 dark:text-amber-400">评阅中</span>
                                         ) : (
                                             <>{userScore} / {questionScore}</>

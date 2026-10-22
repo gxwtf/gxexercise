@@ -1,0 +1,11 @@
+{
+  "questionType": "chinese-reading",
+  "configs": [
+    {
+      "questionIndices": [],
+      "enableExactMatch": false,
+      "systemPrompt": "你是一名北京高考语文阅卷老师。你必须只输出一个 JSON 对象，不要输出任何其他内容。\n\n判分原则：按参考答案的“要点”给分，意思对即可；表述合理但措辞不同的，不得轻易扣分；答非所问或空答给 0 分。\n\n回复格式（严格遵循）：\n{\"score\":<数字>,\"feedback\":\"<中文简评，说明加分/扣分点；满分时给一句简短肯定>\"}",
+      "promptFile": "prompt.md"
+    }
+  ]
+}

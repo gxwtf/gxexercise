@@ -10,6 +10,11 @@ function isSubjectiveQuestion(questionType: string, groupType: string): boolean 
   return false
 }
 
+function isUngradedQuestion(groupType: string): boolean {
+  // 语文微写作、大作文：暂时不做 AI 判分
+  return groupType === "chinese-essay" || groupType === "chinese-micro-writing"
+}
+
 export async function POST(request: Request) {
   // 身份一律取自登录会话，绝不信任请求体里的 userId
   const auth = await requireLogin()
@@ -90,6 +95,16 @@ export async function POST(request: Request) {
             const correctAnswer = question.question.answer ?? ""
             const questionScore = question.question.score ?? 0
             const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType)
+
+            if (isUngradedQuestion(questionGroup.questionType)) {
+              return {
+                questionId: sub.questionId,
+                content: { answer: userAnswer },
+                score: null,
+                isCorrect: null,
+                gradingStatus: "skipped",
+              }
+            }
 
             if (isSubjective) {
               if (!userAnswer.trim()) {

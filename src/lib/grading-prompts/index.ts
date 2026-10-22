@@ -2,6 +2,7 @@ import { readFileSync } from "fs"
 import path from "path"
 import readingExpression from "./reading-expression/config.json"
 import enWriting from "./en-writing/config.json"
+import chineseText from "./chinese-reading/config.json"
 
 export interface GradingPromptConfig {
   questionType: string
@@ -32,6 +33,7 @@ function loadPrompts(): GradingPromptConfig[] {
   const jsonFiles: JsonEntry[] = [
     readingExpression,
     enWriting,
+    chineseText,
   ]
 
   return jsonFiles.flatMap((entry) =>
@@ -57,7 +59,8 @@ function normalizeType(t: string): string {
 export function getGradingPrompt(questionType: string, questionIndex: number): GradingPromptConfig | null {
   const normalized = normalizeType(questionType)
   return GRADING_PROMPT_REGISTRY.find(
-    p => p.questionType === normalized && p.questionIndices.includes(questionIndex)
+    p => p.questionType === normalized &&
+      (p.questionIndices.length === 0 || p.questionIndices.includes(questionIndex))
   ) ?? null
 }
 
