@@ -368,7 +368,7 @@ export function TestPaperPractice({
       )
     }
 
-    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "politics") {
+    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "chemistry-image" || questionType === "politics") {
       return (
         <Problem
           questions={questions as any}
