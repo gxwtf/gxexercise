@@ -10,6 +10,10 @@
   - 组题（QuestionGroup）：完形填空、语法填空、阅读理解、七选五、选词填空等共享题干的题组
   - 套卷（TestPaper）：整卷计时练习，交卷后查看成绩与逐题解析
 - **答题与回顾**：客观题自动判分，主观题支持 AI 评分与反馈，可查看历史提交记录
+- **PDF 导出**：
+  - 题组 / 套卷可导出「纸质作答卷」PDF：无答案、按考试卷版式排版并留出作答空间，可直接打印后手写作答
+  - 单题回顾可导出 PDF（含作答、正确答案 / AI 反馈与解析）
+  - 套卷还可下载入库时抓到的原始试卷 PDF
 - **AI 批改**：通过 OpenAI 兼容接口调用大模型，提示词按题型可配置；应用内内置轮询 Worker，异步批改 `pending` 状态的提交
 - **SSO 登录**：基于 iron-session 维护会话，对接广学统一账号中心（GX Account）完成单点登录
 - **内容渲染**：题目与文章使用 MDX 渲染，支持 GFM、数学公式（KaTeX）与图片
@@ -110,7 +114,11 @@ src/
     (root)/              # 首页、登录页
     questions/[subject]/[category]/   # 题库浏览
     question/[id]/                    # 单题作答与回顾
+    question/[id]/review/[i]/pdf/     # 单题回顾 PDF
+    question/[id]/paper/pdf/          # 题组「纸质作答卷」PDF
     test-paper/[id]/                  # 套卷详情 / 练习 / 结果
+    test-paper/[id]/paper/pdf/        # 套卷「纸质作答卷」PDF
+    api/test-paper/[id]/pdf/          # 下载套卷的原始 PDF（素材目录）
     sso/                              # SSO 登录跳转与回调
     api/                              # 会话、统计、提交、AI 批改等接口
   components/            # UI 组件、题目 / 题组作答组件、回顾组件
@@ -122,6 +130,14 @@ src/
     grading-worker.ts    # AI 批改后台轮询任务
     grading-prompts/     # 各题型批改提示词（en-writing、reading-expression）
     transformers.ts      # 数据转换
+    pdf/
+      soffice.ts         # HTML → PDF（LibreOffice headless）
+      markdown.ts        # 轻量 Markdown → HTML（题库私有标签、KaTeX、插图尺寸）
+      review-doc.ts      # 单题回顾 PDF 正文
+      paper-doc.ts       # 纸质作答卷版式（题组 / 整卷）
+      paper-source.ts    # Prisma 数据 → 卷面结构（连续题号）
+      image-size.ts      # 读图片像素尺寸，供打印稿算显示宽高
+      attachment.ts      # PDF 附件下载响应
   instrumentation.ts     # 启动批改 Worker
 ```
 
@@ -139,6 +155,35 @@ src/
 - 服务启动时通过 `instrumentation.ts` 运行 [grading-worker.ts](src/lib/grading-worker.ts)，每 10 秒轮询待批改记录，按题型匹配提示词并调用大模型
 - 提示词配置位于 [src/lib/grading-prompts](src/lib/grading-prompts)，包含系统提示词、用户提示词模板及 `config.json`；模板支持 `{stem}`、`{userAnswer}`、`{correctAnswer}`、`{maxScore}` 占位符
 - 也可调用 `/api/ai/retry-pending` 手动触发重试
+
+## 题目 PDF 导出
+
+题库的 PDF 全部由**服务端生成**（`src/lib/pdf/`，HTML → LibreOffice headless 转 PDF），前端只放下载链接。
+
+| 场景 | 路由 | 内容 |
+| --- | --- | --- |
+| 单题回顾 | `/question/<题组 id>/review/<题号>/pdf` | 题目 + 我的作答 + 正确答案 / AI 反馈 + 解析 |
+| 题组纸质作答卷 | `/question/<题组 id>/paper/pdf` | 只印题组材料与小题，按考试卷版式留白（无答案） |
+| 套卷纸质作答卷 | `/test-paper/<套卷 id>/paper/pdf` | 整卷：封面信息（满分 / 时长 / 姓名班级栏）+ 按类别分大题 + 连续题号 |
+| 套卷原始 PDF | `/api/test-paper/<id>/pdf` | 入库时抓到的原卷 PDF（`find-source-pdf.ts` 按标题模糊匹配素材目录） |
+
+「纸质作答卷」的版式约定（改 `src/lib/pdf/paper-doc.ts` 前先看）：
+
+- 选择题：题干后留「（　　）」作答括号，选项一行排开；题干里已带括号的不重复补
+- 填空题：题干里的 `<Input2>` / `<Input>` / `<ClozeBlank>` / `<Blank>` 统一印成 `___3___`（题号与前缀对齐）
+- 主观题：按题型和分值给带横线的作答区（作文 22 行、英语写作 14–16 行、阅读表达 3–6 行）
+- 图片版题目（化学 `<QImg>`）：按 300dpi 原始像素换算宽度、铺满版心
+- 整卷按 `category` 把连续题组合并成「一、完形填空（第 1-20 题，共 20 小题，共 30 分）」，作文类另起一页
+
+**LibreOffice 排版踩坑（务必遵守）**：它的 HTML 导入能力有限，以下写法才会真正生效，否则会出现
+「图片铺满整页 / 横线消失 / 只剩数字」的问题：
+
+1. `img` 的 CSS `width` / `max-width` / `max-height` **全部被忽略**，只有 HTML 属性 `width` + `height`（单位 pt）生效，
+   所以打印前要用 `image-size.ts` 读出图片像素尺寸再折算；
+2. 空 `div` / `td` 的 `border-bottom` 不渲染 —— 作答横线用真实下划线字符（`___`）画；
+3. `page-break-inside: avoid` 基本无效，分页交给正文自然流动；
+4. 中文字体依赖服务器安装的 SimSun（`~/.fonts/simsun.ttf`），图片素材目录由 `MD_IMAGES_ROOT` 指定
+   （默认 `/home/gxwtf/jingshibang/output_docx_to_md`）。
 
 ## 试卷导入
 
