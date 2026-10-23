@@ -62,9 +62,9 @@ export function AnswerQuestion({
 
   return (
     <div className="space-y-3">
-      <div className={isImageOnlyStem(question.stem) ? "flex items-start space-x-2" : "flex items-baseline space-x-2"}>
-        {showIndex && <span className="shrink-0 text-lg font-medium leading-7">{index}.</span>}
-        <div className={isImageOnlyStem(question.stem) ? "min-w-0 flex-1" : "flex-1"}>
+      <div className={isImageOnlyStem(question.stem) ? "space-y-2" : "flex items-baseline space-x-2"}>
+        {showIndex && <div className="text-lg font-medium leading-7">{index}.</div>}
+        <div className={isImageOnlyStem(question.stem) ? "w-full" : "flex-1"}>
           {question.stemMdx ? (
             <div className="text-lg font-medium text-foreground">
               <MDXRemote {...question.stemMdx} components={components} />

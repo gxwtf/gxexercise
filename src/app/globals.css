@@ -292,3 +292,12 @@
   margin-top: 0;
   margin-bottom: 0;
 }
+
+/* 图片版题干：序号单独一行，图片铺满内容列 */
+.qimage-shot {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto;
+  margin: 0;
+}
