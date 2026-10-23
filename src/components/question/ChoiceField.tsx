@@ -46,11 +46,9 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
           <div key={question.id} className="space-y-4">
             {question.stem?.trim() ? (
               <>
-                <div className={isImageOnlyStem(question.stem) ? "block" : "flex items-baseline gap-1"}>
-                  {!isImageOnlyStem(question.stem) && (
-                    <span className="shrink-0 text-lg font-medium">{startIndex + index + 1}.</span>
-                  )}
-                  <div className={isImageOnlyStem(question.stem) ? "block w-full text-lg font-medium" : "text-lg font-medium"}>
+                <div className={isImageOnlyStem(question.stem) ? "flex items-start gap-1" : "flex items-baseline gap-1"}>
+                  <span className="shrink-0 text-lg font-medium">{startIndex + index + 1}.</span>
+                  <div className={isImageOnlyStem(question.stem) ? "min-w-0 flex-1 text-lg font-medium" : "text-lg font-medium"}>
                     {question.stemMdx ? (
                       <MDXRemote {...question.stemMdx} components={components} />
                     ) : (
