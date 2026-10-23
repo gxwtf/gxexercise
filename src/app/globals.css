@@ -301,3 +301,20 @@
   height: auto;
   margin: 0;
 }
+
+/* 图片版题干：无论外层是 .prose 还是别的容器，都靠左、铺满 */
+.qimage-full .prose p,
+.qimage-full .prose figure {
+  text-align: left !important;
+  margin: 0 !important;
+}
+.qimage-full .prose img,
+.qimage-full p > img,
+.qimage-full figure > img {
+  display: block !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
