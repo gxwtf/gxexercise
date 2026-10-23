@@ -363,7 +363,7 @@ export function TestPaperPractice({
     if (questionType === "chemistry-image") {
       return (
         <div className="qimage-full">
-          <Problem questions={questions as any} mdxSource={contentMdx} indentParagraphs={false} />
+          <Problem questions={questions as any} mdxSource={contentMdx} alignLeft indentParagraphs={false} />
         </div>
       )
     }

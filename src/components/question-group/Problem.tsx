@@ -30,6 +30,8 @@ interface ProblemProps {
   articleLayout?: 'side' | 'inline'
   /** 图片版题目：内容列铺满有效宽度（不限制 max-w-4xl、内边距更小） */
   fullWidth?: boolean
+  /** 内容列靠左（去掉 mx-auto 居中），宽度限制保持不变 */
+  alignLeft?: boolean
 }
 
 export default function Problem({
@@ -42,6 +44,7 @@ export default function Problem({
   showWordCount = false,
   articleLayout = 'side',
   fullWidth = false,
+  alignLeft = false,
 }: ProblemProps) {
   const { setAnswer, answers } = useAnswer()
   const components = useMDXComponents()
@@ -177,7 +180,15 @@ export default function Problem({
   return (
     <div className="bg-background font-question lg:h-full lg:overflow-hidden">
       <div className="flex flex-col lg:h-full lg:flex-row">
-        <div className={fullWidth ? "flex-1 w-full p-3 sm:p-4 overflow-y-auto max-w-none" : "flex-1 p-6 overflow-y-auto max-w-4xl mx-auto"}>
+        <div
+          className={
+            fullWidth
+              ? "flex-1 w-full p-3 sm:p-4 overflow-y-auto max-w-none"
+              : alignLeft
+                ? "flex-1 p-6 overflow-y-auto max-w-4xl"
+                : "flex-1 p-6 overflow-y-auto max-w-4xl mx-auto"
+          }
+        >
           <QuestionSection>
             {body}
           </QuestionSection>
