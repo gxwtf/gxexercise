@@ -6,6 +6,12 @@ import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
 import { useAnswer } from '@/components/question-group/AnswerContext'
 
+/** 题干只有一张图（图片版题目）：题号与图片顶端对齐，图片占满内容宽度 */
+function isImageOnlyStem(text?: string) {
+  return !!text && /^!\[[^\]]*\]\([^)]*\)\s*$/.test(text.trim())
+}
+
+
 export interface AnswerQuestionProps {
   question: {
     id: string
@@ -54,9 +60,9 @@ export function AnswerQuestion({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-baseline space-x-2">
+      <div className={isImageOnlyStem(question.stem) ? "flex items-start space-x-2" : "flex items-baseline space-x-2"}>
         {showIndex && <span className="shrink-0 text-lg font-medium leading-7">{index}.</span>}
-        <div className="flex-1">
+        <div className={isImageOnlyStem(question.stem) ? "min-w-0 flex-1" : "flex-1"}>
           {question.stemMdx ? (
             <div className="text-lg font-medium text-foreground">
               <MDXRemote {...question.stemMdx} components={components} />

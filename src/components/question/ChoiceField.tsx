@@ -5,6 +5,12 @@ import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
 import { useAnswer } from '@/components/question-group/AnswerContext'
 
+/** 题干只有一张图（图片版题目）：题号与图片顶端对齐，图片占满内容宽度 */
+function isImageOnlyStem(text?: string) {
+  return !!text && /^!\[[^\]]*\]\([^)]*\)\s*$/.test(text.trim())
+}
+
+
 type Option = {
   id: string
   label: string
@@ -40,9 +46,9 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
           <div key={question.id} className="space-y-4">
             {question.stem?.trim() ? (
               <>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-lg font-medium">{startIndex + index + 1}.</span>
-                  <div className="text-lg font-medium">
+                <div className={isImageOnlyStem(question.stem) ? "flex items-start gap-1" : "flex items-baseline gap-1"}>
+                  <span className="shrink-0 text-lg font-medium">{startIndex + index + 1}.</span>
+                  <div className={isImageOnlyStem(question.stem) ? "min-w-0 flex-1 text-lg font-medium" : "text-lg font-medium"}>
                     {question.stemMdx ? (
                       <MDXRemote {...question.stemMdx} components={components} />
                     ) : (
