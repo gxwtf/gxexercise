@@ -483,7 +483,7 @@ const components: MDXComponents = {
 
 /** 图片版题目：按原始像素与 300dpi 的固定比例显示（96/300），保证不同宽度题目字号一致 */
 function QImg({ src, px, alt }: { src: string; px?: string | number; alt?: string }) {
-  const w = px ? Math.round(Number(px) * (96 / 230)) : undefined
+  const w = px ? Math.round(Number(px) * (96 / 200)) : undefined
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt || ""} className="qimage-shot" style={w ? { width: `${w}px`, maxWidth: "100%" } : undefined} />

@@ -282,3 +282,13 @@
   height: auto;
   margin: 0;
 }
+
+/* 图片版题干：Tailwind Typography 的 .prose img 会 margin:auto 居中，这里强制靠左 */
+.prose img.qimage-shot,
+.qimage-full img.qimage-shot {
+  display: block;
+  margin-left: 0;
+  margin-right: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+}
