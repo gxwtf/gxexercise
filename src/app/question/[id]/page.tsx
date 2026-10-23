@@ -10,6 +10,7 @@ import rehypeKatex from 'rehype-katex';
 import Grammar from "@/components/question-group/grammar";
 import SevenChooseFive from "@/components/question-group/seven-choose-five";
 import Problem from "@/components/question-group/Problem"
+import { ReadingPassageSelect } from "@/components/ReadingPassageSelect"
 import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader";
 import { QuestionSection } from "@/components/QuestionSection";
 
@@ -197,10 +198,39 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
+  // 英语阅读：同卷的其它阅读篇组（A/B/C/D 篇），供题组练习页切换
+  let readingSiblings: { id: string; title: string }[] = []
+  if (questionGroup.category === "阅读") {
+    try {
+      const item = await prisma.paperItem.findFirst({ where: { itemId: id }, select: { paperId: true } })
+      if (item) {
+        const items = await prisma.paperItem.findMany({
+          where: { paperId: item.paperId, itemType: "questionGroup" },
+          orderBy: { orderIndex: "asc" },
+          select: { itemId: true },
+        })
+        const groups = await prisma.questionGroup.findMany({
+          where: { id: { in: items.map((i) => i.itemId) } },
+          select: { id: true, title: true, category: true },
+        })
+        const byId = new Map(groups.map((g) => [g.id, g]))
+        readingSiblings = items
+          .map((i) => byId.get(i.itemId))
+          .filter((g): g is { id: string; title: string; category: string } => !!g && g.category === "阅读")
+          .map((g) => ({ id: g.id, title: g.title }))
+      }
+    } catch {}
+  }
+
   if (questionGroup.questionType === 'en-reading') {
     const mdxSource = contentMdx;
     return (
       <>
+        {readingSiblings.length > 1 && (
+          <div className="flex justify-end px-3 pt-2">
+            <ReadingPassageSelect currentId={questionGroup.id} siblings={readingSiblings} />
+          </div>
+        )}
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any} 
