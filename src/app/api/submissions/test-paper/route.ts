@@ -2,19 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { isAnswerCorrect } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
-
-function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
-  const combined = `${questionType} ${groupType}`
-  if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return true
-  if (groupType === "chinese-reading" && questionType === "text") return true
-  if (groupType === "politics" && questionType === "text") return true
-  return false
-}
-
-function isUngradedQuestion(groupType: string): boolean {
-  // 语文微写作、大作文：暂时不做 AI 判分
-  return groupType === "chinese-essay" || groupType === "chinese-micro-writing"
-}
+import { isSubjectiveQuestion, isUngradedQuestion } from "@/lib/excellent-answer-rules"
 
 export async function POST(request: Request) {
   // 身份一律取自登录会话，绝不信任请求体里的 userId
@@ -41,6 +29,13 @@ export async function POST(request: Request) {
     if (!testPaperId || !groupSubmissions) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
+
+    const userName = auth.session.username?.trim() || null
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: userName ? { userName } : {},
+      create: { id: userId, userName },
+    })
 
     const testPaper = await prisma.testPaper.findUnique({
       where: { id: testPaperId },
@@ -182,6 +177,8 @@ export async function POST(request: Request) {
                 score: s.score,
                 isCorrect: s.isCorrect,
                 gradingStatus: (s as any).gradingStatus || "graded",
+                // 提交时默认允许计入优秀解答，回顾页可逐次修改
+                shareAsExcellent: true,
               })),
             },
           },

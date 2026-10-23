@@ -14,6 +14,9 @@ import { EnglishReading, ClozeContext } from "@/components/article/english-readi
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { QueueStatus } from "@/components/review/QueueStatus"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
+import { excellentCriteriaText } from "@/lib/excellent-answer-rules"
 import Link from "next/link"
 import { FileDown } from "lucide-react"
 
@@ -49,6 +52,8 @@ interface ReviewContentData {
     userScore: number | null
     questionScore: number
     avgScore: number | null
+    excellentAnswers: ExcellentAnswerView[]
+    shareAsExcellent: boolean | null
     aiFeedback: string | null
     enWritingFeedback: Record<string, unknown> | null
     enWritingSubMaxes: { contentMax: number; languageMax: number; structureMax: number } | null
@@ -57,6 +62,17 @@ interface ReviewContentData {
     correctionsMdx: MDXRemoteSerializeResult | null
     betterExpressionsMdx: MDXRemoteSerializeResult | null
     modelEssayMdx: MDXRemoteSerializeResult | null
+}
+
+interface ExcellentAnswerView {
+    id: string
+    userId: number
+    userName: string
+    score: number
+    maxScore: number
+    answer: string
+    answerMdx: MDXRemoteSerializeResult | null
+    isMine: boolean
 }
 
 interface ReviewContentProps {
@@ -97,6 +113,8 @@ function getQuestionCategory(questionType: string, groupType: string): "choice" 
         if (questionType === "input" || questionType === "input2") return "fill"
         if (questionType === "text") return "essay"
     }
+    if (groupType === "politics" && questionType === "text") return "essay"
+    if (groupType === "chinese-essay" || groupType === "chinese-micro-writing") return "essay"
     return "choice"
 }
 
@@ -126,6 +144,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         userScore,
         questionScore,
         avgScore,
+        excellentAnswers,
+        shareAsExcellent,
         aiFeedback,
         enWritingFeedback,
         enWritingSubMaxes,
@@ -266,6 +286,14 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
                                         </span>
                                     </p>
+                                    {shareAsExcellent != null && data.currentSubmissionId && hasAnswer && (
+                                        <div className="mt-3 border-t border-border pt-3">
+                                            <ExcellentShareToggle
+                                                submissionId={data.currentSubmissionId}
+                                                initialAllowed={shareAsExcellent}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             )}
                             <Tabs defaultValue={userAnswerMdx ? "my-answer" : "reference-answer"}>
@@ -274,6 +302,11 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     <TabsTrigger value="my-answer">我的作答</TabsTrigger>
                                 )}
                                 <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
+                                {isSubjective && (
+                                    <TabsTrigger value="excellent-answers">
+                                        优秀解答{excellentAnswers.length > 0 ? `（${excellentAnswers.length}）` : ""}
+                                    </TabsTrigger>
+                                )}
                             </TabsList>
                             {userAnswerMdx && (
                                 <TabsContent value="my-answer">
@@ -319,11 +352,20 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         </div>
                                     </QuestionSection>
                                 </TabsContent>
+                                {isSubjective && (
+                                    <TabsContent value="excellent-answers">
+                                        <ExcellentAnswersPanel
+                                            answers={excellentAnswers}
+                                            groupType={questionGroup.questionType}
+                                        />
+                                    </TabsContent>
+                                )}
                             </Tabs>
                         </div>
                     ) : (
                         <div className="mt-6 mb-6 p-4 rounded-lg bg-muted/50">
                             {isSubjective ? (
+                                <>
                                 <p className="text-base">
                                     我的作答：
                                     <span className="font-medium text-foreground">{displayUserAnswer ?? "未作答"}</span>
@@ -344,6 +386,15 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
                                     </span>
                                 </p>
+                                {shareAsExcellent != null && data.currentSubmissionId && hasAnswer && (
+                                    <div className="mt-3 border-t border-border pt-3">
+                                        <ExcellentShareToggle
+                                            submissionId={data.currentSubmissionId}
+                                            initialAllowed={shareAsExcellent}
+                                        />
+                                    </div>
+                                )}
+                                </>
                             ) : (
                             <p className="text-base">
                                 我的作答：
@@ -360,6 +411,16 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                 </span>
                             </p>
                             )}
+                        </div>
+                    )}
+
+                    {isSubjective && category !== "essay" && (
+                        <div className="mb-6">
+                            <h3 className="text-lg font-semibold mb-3">优秀解答</h3>
+                            <ExcellentAnswersPanel
+                                answers={excellentAnswers}
+                                groupType={questionGroup.questionType}
+                            />
                         </div>
                     )}
 
@@ -492,4 +553,117 @@ function EnWritingFeedbackSection({
       )}
     </div>
   )
+}
+
+/** 每条优秀解答：作者、得分、作答内容 */
+function ExcellentAnswersPanel({
+    answers,
+    groupType,
+}: {
+    answers: ExcellentAnswerView[]
+    groupType: string
+}) {
+    const components = useMDXComponents()
+
+    if (answers.length === 0) {
+        return (
+            <QuestionSection>
+                <p className="text-sm text-muted-foreground">
+                    暂无优秀解答。达到优秀标准（{excellentCriteriaText(groupType)}）且同学允许展示的作答会出现在这里。
+                </p>
+            </QuestionSection>
+        )
+    }
+
+    const formatScore = (value: number) => Math.round(value * 10) / 10
+
+    return (
+        <div className="space-y-4">
+            {answers.map((answer, index) => (
+                <QuestionSection key={answer.id}>
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                            <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
+                                {index + 1}
+                            </span>
+                            <span className="truncate text-base font-medium text-foreground">{answer.userName}</span>
+                            {answer.isMine && <Badge variant="secondary">我的</Badge>}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                            得分 <span className="font-semibold text-foreground">{formatScore(answer.score)}</span>
+                            <span> / {formatScore(answer.maxScore)}</span>
+                        </span>
+                    </div>
+                    <div className="prose dark:prose-invert max-w-none">
+                        {answer.answerMdx ? (
+                            <MDXRemote {...answer.answerMdx} components={components} />
+                        ) : (
+                            <p className="whitespace-pre-wrap">{answer.answer}</p>
+                        )}
+                    </div>
+                </QuestionSection>
+            ))}
+        </div>
+    )
+}
+
+/** 是否允许本次作答以「优秀解答」展示给其他同学 */
+function ExcellentShareToggle({
+    submissionId,
+    initialAllowed,
+}: {
+    submissionId: string
+    initialAllowed: boolean
+}) {
+    const router = useRouter()
+    const [allowed, setAllowed] = React.useState(initialAllowed)
+    const [saving, setSaving] = React.useState(false)
+    const [error, setError] = React.useState<string | null>(null)
+
+    React.useEffect(() => {
+        setAllowed(initialAllowed)
+        setError(null)
+    }, [initialAllowed, submissionId])
+
+    const handleChange = React.useCallback(async (checked: boolean) => {
+        const previous = allowed
+        setAllowed(checked)
+        setSaving(true)
+        setError(null)
+        try {
+            const res = await fetch(`/api/submissions/${submissionId}/excellent`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ allowed: checked }),
+            })
+            if (!res.ok) throw new Error("保存失败")
+            // 让「优秀解答」列表按最新设置刷新
+            router.refresh()
+        } catch {
+            setAllowed(previous)
+            setError("保存失败，请稍后重试")
+        } finally {
+            setSaving(false)
+        }
+    }, [allowed, submissionId, router])
+
+    return (
+        <div className="space-y-1">
+            <label className="flex cursor-pointer items-start gap-2 text-sm">
+                <Checkbox
+                    checked={allowed}
+                    disabled={saving}
+                    onCheckedChange={(value) => handleChange(value === true)}
+                    className="mt-0.5"
+                />
+                <span>
+                    <span className="font-medium text-foreground">允许本次作答作为「优秀解答」展示给其他同学</span>
+                    <span className="block text-xs text-muted-foreground">
+                        默认允许。达到优秀标准的作答会按得分从高到低展示在本题回顾页，最多 3 条；可随时关闭。
+                    </span>
+                </span>
+            </label>
+            {error && <p className="text-xs text-destructive">{error}</p>}
+        </div>
+    )
 }

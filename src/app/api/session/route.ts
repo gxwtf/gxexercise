@@ -24,18 +24,11 @@ export async function POST(request: NextRequest) {
         });
 
         if (res.status === 200) {
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: res.data.userId
-                }
+            await prisma.user.upsert({
+                where: { id: res.data.userId },
+                update: res.data.userName ? { userName: res.data.userName } : {},
+                create: { id: res.data.userId, userName: res.data.userName ?? null },
             });
-            if(!user){
-                await prisma.user.create({
-                    data: {
-                        id: res.data.userId,
-                    }
-                });
-            }
             session.isLoggedIn = true;
             session.username = res.data.userName;
             session.userid = res.data.userId;

@@ -116,6 +116,8 @@ model QuestionSubmission {
   isCorrect       Boolean?
   aiFeedback      Json?
   gradingStatus   String    @default("pending")
+  /// 是否允许本次作答作为「优秀解答」展示给其他同学（提交时默认允许，回顾页可改）
+  shareAsExcellent Boolean  @default(true)
   createdAt       DateTime  @default(now())
 
   user            User      @relation(fields: [userId], references: [id])
@@ -174,6 +176,8 @@ model TestPaperSubmission {
 
 model User {
   id       Int       @id
+  /// 广学账号用户名，登录时同步；用于「优秀解答」显示作者
+  userName String?   @db.VarChar(100)
 
   questionSubmissions      QuestionSubmission[]
   groupSubmissions         QuestionGroupSubmission[]

@@ -11,6 +11,8 @@ import rehypeKatex from 'rehype-katex'
 import type { QuestionSwitcherItem } from "@/components/review/QuestionSwitcher"
 import type { SubmissionHistoryItem } from "@/components/review/SubmissionHistoryTable"
 import { ReviewContent } from "./review-content"
+import { isSubjectiveQuestion } from "@/lib/excellent-answer-rules"
+import { findExcellentAnswers } from "@/lib/excellent-answers"
 
 interface PageProps {
   params: Promise<{
@@ -43,13 +45,6 @@ function escapeLatexBraces(content: string): string {
     }
   }
   return result
-}
-
-function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
-  const combined = `${questionType} ${groupType}`
-  if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return true
-  if (groupType === "chinese-reading" && questionType === "text") return true
-  return false
 }
 
 async function buildReviewData(
@@ -213,6 +208,31 @@ async function buildReviewData(
 
   const isSubjective = isSubjectiveQuestion(currentQuestion.questionType, questionGroup.questionType)
 
+  // 优秀解答：仅主观题、且只有登录用户能看到
+  const excellentAnswerRecords = isSubjective && userId > 0
+    ? await findExcellentAnswers(currentQuestion.id, questionGroup.questionType, currentQuestion.score ?? 0)
+    : []
+  const excellentAnswers = await Promise.all(
+    excellentAnswerRecords.map(async (item) => {
+      let answerMdx: MDXRemoteSerializeResult | null = null
+      try {
+        answerMdx = await serialize(escapeLatexBraces(item.answer).replace(/\n/g, '\n\n'), { mdxOptions })
+      } catch {
+        answerMdx = null
+      }
+      return {
+        id: item.id,
+        userId: item.userId,
+        userName: item.userName || `同学${item.userId}`,
+        score: item.score,
+        maxScore: item.maxScore,
+        answer: item.answer,
+        answerMdx,
+        isMine: item.userId === userId,
+      }
+    })
+  )
+
   let avgScore: number | null = null
   let correctRate: number | null = null
   const allSubmissionsWithScore = await prisma.questionSubmission.findMany({
@@ -292,6 +312,8 @@ async function buildReviewData(
     userScore,
     questionScore,
     avgScore,
+    excellentAnswers,
+    shareAsExcellent: selectedSubmission ? selectedSubmission.shareAsExcellent : null,
     aiFeedback,
     enWritingFeedback,
     enWritingSubMaxes,
