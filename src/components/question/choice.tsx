@@ -25,6 +25,8 @@ interface ChoiceQuestionProps {
   options: Option[]
   onChange: (selected: string[]) => void
   value?: string[]
+  /** 指定列数（图片题：四个选项固定排一行） */
+  columns?: number
 }
 
 /** 控件（单选圆圈/多选框）加间距约占的宽度 */
@@ -109,10 +111,12 @@ function useOptionColumns(options: Option[], deps: unknown[]) {
   return { wrapRef, measureRef, cols }
 }
 
-export function ChoiceQuestion({ type, options, onChange, value }: ChoiceQuestionProps) {
+export function ChoiceQuestion({ type, options, onChange, value, columns }: ChoiceQuestionProps) {
   const [selected, setSelected] = useState<string[]>(value ?? [])
   const components = useMDXComponents()
-  const { wrapRef, measureRef, cols } = useOptionColumns(options, [type])
+  const auto = useOptionColumns(options, [type])
+  const { wrapRef, measureRef } = auto
+  const cols = columns && columns > 0 ? Math.min(columns, options.length || columns) : auto.cols
 
   const handleMultipleChange = (id: string, checked: boolean) => {
     const newSelected = checked ? [...selected, id] : selected.filter(s => s !== id)

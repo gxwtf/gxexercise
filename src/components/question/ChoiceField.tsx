@@ -77,6 +77,7 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
                     options={question.options}
                     onChange={(selected) => onChange(question.id, selected)}
                     value={value}
+                    columns={isImageOnlyStem(question.stem) ? 4 : undefined}
                   />
                 </div>
               </div>
