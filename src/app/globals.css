@@ -260,3 +260,13 @@
   text-emphasis: none;
   -webkit-text-emphasis: none;
 }
+
+
+/* 图片版题目（化学图片题）：整页宽度裁图，按容器宽度铺满，保证各题字号视觉一致 */
+.qimage-full img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin: 0;
+}

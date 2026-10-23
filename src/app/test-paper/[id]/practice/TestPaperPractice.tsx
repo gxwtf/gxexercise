@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { MDXRemoteSerializeResult } from "next-mdx-remote"
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,6 @@ import Grammar from "@/components/question-group/grammar"
 import SevenChooseFive from "@/components/question-group/seven-choose-five"
 import { PageBar } from "@/components/PageBar"
 import { PracticeEntryTracker } from "@/components/PracticeEntryTracker"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const STORAGE_KEY = (id: string) => `exam_state_${id}`
 const ANSWERS_KEY = (id: string) => `exam_answers_test-paper-${id}`
@@ -90,13 +89,6 @@ export function TestPaperPractice({
   const totalGroups = groupsData.length
   const currentGroup = groupsData[currentGroupIndex]
 
-  // 英语阅读：本篇/其它篇（A/B/C/D 篇）下拉跳转
-  const readingGroups = useMemo(
-    () => groupsData.map((g, i) => ({ group: g, index: i })).filter(({ group }) => group.category === "阅读"),
-    [groupsData]
-  )
-  const readingPos = readingGroups.findIndex(({ index }) => index === currentGroupIndex)
-  const readingLabel = (pos: number) => `${String.fromCharCode(65 + pos)}篇`
   const isFirstGroup = currentGroupIndex === 0
   const isLastGroup = currentGroupIndex === totalGroups - 1
 
@@ -368,6 +360,13 @@ export function TestPaperPractice({
       )
     }
 
+    if (questionType === "chemistry-image") {
+      return (
+        <div className="qimage-full">
+          <Problem questions={questions as any} mdxSource={contentMdx} />
+        </div>
+      )
+    }
     if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "chemistry-image" || questionType === "politics") {
       return (
         <Problem
@@ -415,23 +414,6 @@ export function TestPaperPractice({
           </h1>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            {readingPos >= 0 && readingGroups.length > 1 && (
-              <div className="flex items-center gap-1.5">
-                <span className="hidden text-xs text-muted-foreground sm:inline">阅读篇目</span>
-                <Select value={String(currentGroupIndex)} onValueChange={(v) => handleJumpToGroup(Number(v))}>
-                  <SelectTrigger className="h-8 w-[168px] text-xs" aria-label="选择阅读篇目">
-                    <SelectValue placeholder="选择篇目" />
-                  </SelectTrigger>
-                  <SelectContent align="end">
-                    {readingGroups.map(({ group, index }, pos) => (
-                      <SelectItem key={group.id} value={String(index)} className="text-xs">
-                        {readingLabel(pos)} · {group.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             <div className="flex items-center gap-1.5 rounded-lg bg-muted/50 px-2 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <span className="font-mono text-sm font-medium">{formatTime(seconds)}</span>
