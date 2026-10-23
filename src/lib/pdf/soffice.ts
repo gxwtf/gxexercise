@@ -13,7 +13,7 @@ function run(cmd: string, args: string[], timeout = 90_000): Promise<void> {
   })
 }
 
-export async function htmlToPdf(html: string): Promise<Buffer> {
+export async function htmlToPdf(html: string, timeout = 90_000): Promise<Buffer> {
   const dir = await mkdtemp(path.join(tmpdir(), "gxpdf-"))
   const profile = await mkdtemp(path.join(tmpdir(), "gxlo-"))
   try {
@@ -27,7 +27,7 @@ export async function htmlToPdf(html: string): Promise<Buffer> {
       "--outdir",
       dir,
       src,
-    ])
+    ], timeout)
     return await readFile(path.join(dir, "doc.pdf"))
   } finally {
     await rm(dir, { recursive: true, force: true }).catch(() => {})

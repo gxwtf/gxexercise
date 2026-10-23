@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Clock, Send } from 'lucide-react';
+import { Clock, FileDown, Send } from 'lucide-react';
 import useSession from '@/lib/use-session';
 import { useRouter } from 'next/navigation';
 import { useAlertContext } from '@/components/alert-provider';
@@ -109,6 +109,14 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
             <Clock className="w-4 h-4 text-muted-foreground" />
             <span className="font-mono text-sm font-medium">{formatTime(seconds)}</span>
           </div>
+
+          {/* 导出「纸质作答卷」PDF：无答案、按考试卷版式留白 */}
+          <Button variant="outline" asChild className="flex items-center gap-2">
+            <a href={`/question/${questionGroupId}/paper/pdf`} download>
+              <FileDown className="w-4 h-4" />
+              <span className="hidden sm:inline">导出 PDF</span>
+            </a>
+          </Button>
 
           <Button
             onClick={handleSubmit}
