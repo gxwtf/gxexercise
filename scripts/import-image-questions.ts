@@ -26,6 +26,7 @@ const has = (n: string) => process.argv.includes(`--${n}`);
 
 interface Q {
   no: number;
+  content?: string;
   type: "single" | "text";
   image: string;
   options?: { id: string; label: string }[];
@@ -123,7 +124,7 @@ async function main() {
       const created = await prisma.question.create({
         data: {
           questionType: q.type,
-          content: `![](${q.image})`,
+          content: q.content || `![](${q.image})`,
           options: q.options && q.options.length ? (q.options as unknown as object) : undefined,
           answer: q.answer || "",
           analysis: "",

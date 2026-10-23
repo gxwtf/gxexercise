@@ -275,3 +275,10 @@
   height: auto;
   margin: 0;
 }
+
+/* 图片版题目：靠左、按固定比例显示（配合 QImg 的 px→CSS 缩放） */
+.qimage-shot {
+  display: block;
+  height: auto;
+  margin: 0;
+}

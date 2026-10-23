@@ -8,7 +8,9 @@ import { useAnswer } from '@/components/question-group/AnswerContext'
 
 /** 题干只有一张图（图片版题目）：题号与图片顶端对齐，图片占满内容宽度 */
 function isImageOnlyStem(text?: string) {
-  return !!text && /^!\[[^\]]*\]\([^)]*\)\s*$/.test(text.trim())
+  if (!text) return false
+  const t = text.trim()
+  return /^!\[[^\]]*\]\([^)]*\)$/.test(t) || /^<QImg\b[^>]*\/>$/.test(t)
 }
 
 
