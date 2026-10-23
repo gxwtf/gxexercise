@@ -253,7 +253,8 @@
   --dot-gap: 0.06em;
   background-image: radial-gradient(circle, currentColor calc(var(--dot-size) / 2 - 0.01em), transparent calc(var(--dot-size) / 2));
   background-size: 1em var(--dot-size);
-  background-position: 0 calc(100% - var(--dot-gap));
+  /* 注意：不要用 calc() 放在 background-position 里（Safari 不支持会退回左上角，点会跑到字上方） */
+  background-position: left bottom;
   background-repeat: repeat-x;
   padding-bottom: calc(var(--dot-size) + var(--dot-gap));
   text-emphasis: none;
