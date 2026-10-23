@@ -270,9 +270,11 @@
 
 .qimage-full img {
   display: block;
-  width: 100%;
-  max-width: none;
-  height: auto;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: none !important;   /* 覆盖 .font-question img 的 18rem 限高（否则图被缩得很小） */
+  height: auto !important;
+  margin: 0 !important;
   margin: 0;
 }
 
@@ -316,5 +318,6 @@
   margin-right: auto !important;
   width: 100% !important;
   max-width: 100% !important;
+  max-height: none !important;
   height: auto !important;
 }
