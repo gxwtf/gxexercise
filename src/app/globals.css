@@ -263,6 +263,11 @@
 
 
 /* 图片版题目（化学图片题）：整页宽度裁图，按容器宽度铺满，保证各题字号视觉一致 */
+.qimage-full p {
+  text-indent: 0 !important;
+  margin: 0;
+}
+
 .qimage-full img {
   display: block;
   width: 100%;

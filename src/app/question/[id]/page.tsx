@@ -299,7 +299,7 @@ async function QuestionPageContent({ id }: { id: string }) {
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <div className="qimage-full">
-          <Problem questions={questions as any} mdxSource={contentMdx} />
+          <Problem questions={questions as any} mdxSource={contentMdx} fullWidth indentParagraphs={false} />
         </div>
       </>
     );
