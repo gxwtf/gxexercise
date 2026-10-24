@@ -81,7 +81,18 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
                 {index + 1}
               </TableCell>
               <TableCell>
-                <span className="block max-w-[300px] truncate">
+                <span
+                  className={cn(
+                    "block max-w-[300px] truncate",
+                    submission.gradingStatus === "skipped" || !submission.answer || submission.answer === "-"
+                      ? "text-muted-foreground"
+                      : submission.isCorrect === null
+                        ? "text-amber-700 dark:text-amber-400 font-medium"
+                        : submission.isCorrect
+                          ? "text-green-700 dark:text-green-400 font-medium"
+                          : "text-red-700 dark:text-red-400 font-medium"
+                  )}
+                >
                   {isChoiceType ? submission.answer.toUpperCase() : submission.answer}
                 </span>
               </TableCell>
