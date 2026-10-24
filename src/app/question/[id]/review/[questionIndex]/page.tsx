@@ -31,11 +31,20 @@ function escapeLatexBraces(content: string): string {
       inMath = !inMath
       result += ch
     } else if (ch === '<') {
-      inTag++
-      result += ch
+      // 只有能构成完整标签（<tag ...> / </tag>）才当标签，其它（如 "Q<Ksp"）转义，否则 MDX 报错崩溃
+      if (/^<\/?[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?\/?>/.test(content.slice(i))) {
+        inTag++
+        result += ch
+      } else {
+        result += '&lt;'
+      }
     } else if (ch === '>') {
-      inTag = Math.max(0, inTag - 1)
-      result += ch
+      if (inTag > 0) {
+        inTag = Math.max(0, inTag - 1)
+        result += ch
+      } else {
+        result += '&gt;'
+      }
     } else if (ch === '{' && inTag === 0 && !inMath) {
       result += '\\{'
     } else if (ch === '}' && inTag === 0 && !inMath) {

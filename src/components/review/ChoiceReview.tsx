@@ -35,8 +35,10 @@ function getLayoutType(options: Option[]): LayoutType {
 
 export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceReviewProps) {
   const components = useMDXComponents()
-  const userAnswers = userAnswer ? userAnswer.split(',').map(s => s.trim()) : []
-  const correctAnswers = correctAnswer.split(',').map(s => s.trim())
+  // 答案大小写可能不一致（选项 id 是小写 a/b/c/d，正确答案常见大写 A/B/C/D）——统一按小写比较
+  const norm = (v: string) => v.trim().toLowerCase()
+  const userAnswers = userAnswer ? userAnswer.split(',').map(norm) : []
+  const correctAnswers = correctAnswer.split(',').map(norm)
   const sortedUser = [...userAnswers].sort().join(',')
   const sortedCorrect = [...correctAnswers].sort().join(',')
   const isCorrect = userAnswer !== null && sortedUser === sortedCorrect
