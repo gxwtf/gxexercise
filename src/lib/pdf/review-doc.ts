@@ -1,7 +1,14 @@
 /** 把「一次作答的回顾」组织成 PDF 用的 HTML 片段 */
 import { markdownToHtml } from "./markdown"
 
-const esc = (s: string) => String(s ?? "").replace(/[<>&]/g, (m) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[m] as string))
+const esc = (s: unknown) => String(s ?? "").replace(/[<>&]/g, (m) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[m] as string))
+
+/** markdown 表格补 HTML 属性：LibreOffice 不认 CSS border，否则表格没边框 */
+function mdWithTables(text: string | null | undefined): string {
+  const src = String(text ?? "").trim()
+  if (!src) return ""
+  return markdownToHtml(src).replace(/<table>/g, '<table border="1" cellpadding="5" cellspacing="0" width="100%">')
+}
 
 export interface ReviewDocInput {
   title: string
@@ -34,27 +41,48 @@ export function reviewDocHtml(input: ReviewDocInput): string {
     generatedAt,
   } = input
 
+  const CN = ["一", "二", "三", "四", "五", "六", "七", "八"]
+  let sectionIndex = 0
+  const heading = (text: string) => `<h2>${CN[sectionIndex++] ?? sectionIndex}、${esc(text)}</h2>`
+
   const parts: string[] = []
   parts.push(`<h1>${esc(title)}</h1>`)
   parts.push(
     `<p class="meta">第 ${questionIndex} 题${scoreText ? ` · 得分 ${esc(scoreText)}` : ""} · 生成于 ${esc(generatedAt)}</p>`
   )
 
-  parts.push(`<h2>题目</h2>${markdownToHtml(content)}`)
-  parts.push(`<h2>我的作答</h2>${userAnswer?.trim() ? markdownToHtml(userAnswer) : "<p>（未作答）</p>"}`)
+  parts.push(`${heading("题目")}${mdWithTables(content)}`)
+  parts.push(
+    `${heading("我的作答")}${userAnswer?.trim() ? `<div class="ai-md">${mdWithTables(userAnswer)}</div>` : "<p>（未作答）</p>"}`
+  )
 
   if (isEssay(questionType) && aiFeedback) {
     const sub = aiFeedback.subScores as Record<string, number> | undefined
     if (sub) {
+      const parsedMax = scoreText ? Number(String(scoreText).split("/")[1]) : NaN
+      const maxScore = Number.isFinite(parsedMax) ? parsedMax : 0
+      const contentMax = Math.round(maxScore * 0.4)
+      const languageMax = Math.round(maxScore * 0.4)
+      const structureMax = Math.max(0, maxScore - contentMax - languageMax)
+      const maxes: Record<string, number> = { 内容: contentMax, 语言: languageMax, 结构: structureMax }
       const keys = ["内容", "语言", "结构"].filter((k) => typeof sub[k] === "number")
       if (keys.length) {
+        const total = keys.reduce((n, k) => n + (sub[k] ?? 0), 0)
+        parts.push(heading("评分明细"))
         parts.push(
-          `<h2>评分明细</h2><table><thead><tr><th>维度</th>${keys.map((k) => `<th>${k}</th>`).join("")}</tr></thead>` +
-            `<tbody><tr><td>得分</td>${keys.map((k) => `<td>${sub[k]}</td>`).join("")}</tr></tbody></table>`
+          `<table border="1" cellpadding="5" cellspacing="0" width="100%">` +
+            `<thead><tr><th>评分维度</th>${keys.map((k) => `<th>${k}</th>`).join("")}<th>合计</th></tr></thead>` +
+            `<tbody>` +
+            `<tr><td>得分</td>${keys.map((k) => `<td class="c strong">${sub[k]}</td>`).join("")}<td class="c strong">${Math.round(total * 10) / 10}</td></tr>` +
+            `<tr><td>满分</td>${keys.map((k) => `<td class="c">${maxes[k] || "-"}</td>`).join("")}<td class="c">${maxScore || "-"}</td></tr>` +
+            `<tr><td>得分率</td>${keys
+              .map((k) => `<td class="c">${maxes[k] ? `${Math.round(((sub[k] ?? 0) / maxes[k]) * 100)}%` : "-"}</td>`)
+              .join("")}<td class="c">${maxScore ? `${Math.round((total / maxScore) * 100)}%` : "-"}</td></tr>` +
+            `</tbody></table>`
         )
       }
     }
-    for (const [key, heading] of [
+    for (const [key, label] of [
       ["overallComment", "整体评价"],
       ["lineCorrections", "逐句修改"],
       ["corrections", "修改"],
@@ -63,16 +91,16 @@ export function reviewDocHtml(input: ReviewDocInput): string {
     ] as const) {
       const val = aiFeedback[key]
       if (typeof val === "string" && val.trim()) {
-        parts.push(`<h2>${heading}</h2>${markdownToHtml(val)}`)
+        parts.push(`${heading(label)}<div class="ai-md">${mdWithTables(val)}</div>`)
       }
     }
   } else {
-    if (correctAnswer) parts.push(`<h2>正确答案</h2>${markdownToHtml(correctAnswer)}`)
-    if (analysis) parts.push(`<h2>题目解析</h2>${markdownToHtml(analysis)}`)
+    if (correctAnswer) parts.push(`${heading("正确答案")}${mdWithTables(correctAnswer)}`)
+    if (analysis) parts.push(`${heading("题目解析")}${mdWithTables(analysis)}`)
   }
 
   for (const s of extraSections) {
-    if (s.markdown?.trim()) parts.push(`<h2>${esc(s.heading)}</h2>${markdownToHtml(s.markdown)}`)
+    if (s.markdown?.trim()) parts.push(`${heading(s.heading)}${mdWithTables(s.markdown)}`)
   }
 
   parts.push(`<p class="foot">广学题库 · ${esc(title)}</p>`)

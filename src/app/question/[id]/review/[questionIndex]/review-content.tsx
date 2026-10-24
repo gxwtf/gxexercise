@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, FileDown, FileText } from "lucide-react"
 import { MDXRemote, type MDXRemoteSerializeResult } from "next-mdx-remote"
 import { useMDXComponents, MathInput2Provider } from "@/mdx-components"
 import { Separator } from "@/components/ui/separator"
@@ -18,7 +18,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { excellentCriteriaText } from "@/lib/excellent-answer-rules"
 import Link from "next/link"
-import { FileDown } from "lucide-react"
 
 interface ReviewContentData {
     questionGroup: {
@@ -191,16 +190,31 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         <ChevronLeft className="size-4" />
                         返回
                     </Button>
-                    <h1 className="truncate text-lg font-semibold text-foreground">
+                    <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-foreground">
                         {questionGroup.title} - 学习回顾
                     </h1>
-                    <a
-                        href={`${basePath}/${currentIndex}/pdf`}
-                        className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-md border border-input px-2.5 py-1 text-sm text-foreground transition-colors hover:bg-muted"
+                    {/* 主入口：整组分析报告（全部小题 + 我的作答 + 正确答案 + 解析 + AI 批改） */}
+                    <Button asChild size="sm" className="shrink-0" title="导出本题组的整份分析报告 PDF">
+                        <a href={`/question/${questionGroup.id}/review/pdf`}>
+                            <FileDown className="size-4" />
+                            <span className="hidden sm:inline">导出题组分析报告</span>
+                            <span className="sm:hidden">整组报告</span>
+                        </a>
+                    </Button>
+                    {/* 次要入口：单题分析报告（只含当前这道题），功能保留 */}
+                    <Button
+                        asChild
+                        size="sm"
+                        variant="ghost"
+                        className="shrink-0 gap-1 text-muted-foreground"
+                        title="仅导出当前这道题的分析报告 PDF"
+                        aria-label="导出当前这道题的分析报告 PDF"
                     >
-                        <FileDown className="size-4" />
-                        下载 PDF
-                    </a>
+                        <a href={`${basePath}/${currentIndex}/pdf`}>
+                            <FileText className="size-4" />
+                            <span className="hidden md:inline">单题 PDF</span>
+                        </a>
+                    </Button>
                 </div>
             </header>
             <div className="flex" style={{ height: "calc(100vh - 56px)" }}>

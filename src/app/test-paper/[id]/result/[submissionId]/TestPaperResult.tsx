@@ -11,7 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowLeft, Clock } from "lucide-react"
+import { ArrowLeft, Clock, FileDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface QuestionSubResult {
   questionId: string
@@ -95,7 +96,19 @@ export function TestPaperResult({
     <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-6">{testPaperTitle}</h1>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-2xl font-bold">{testPaperTitle}</h1>
+            {/* 整卷分析报告：全部大题 + 各小题作答/答案/解析（套卷版） */}
+            {currentSubmissionId && (
+              <Button asChild size="sm" className="ml-auto shrink-0" title="导出整份试卷的分析报告 PDF">
+                <a href={`/test-paper/${testPaperId}/result/${currentSubmissionId}/pdf`}>
+                  <FileDown className="size-4" />
+                  <span className="hidden sm:inline">导出整卷分析报告</span>
+                  <span className="sm:hidden">整卷报告</span>
+                </a>
+              </Button>
+            )}
+          </div>
 
           <div className="mb-6 flex flex-wrap items-center justify-center gap-6 sm:gap-12">
             <div className="flex flex-col items-center gap-2">

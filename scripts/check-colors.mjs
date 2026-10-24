@@ -31,7 +31,15 @@ const BANNED_ABSOLUTE = [
   { re: /\bborder-black\b/g, hint: '深色模式下边框不可见 → 用 border-border / border-foreground/20' },
   { re: /\bborder-1\b/g, hint: 'Tailwind 里 1px 就是 border，写 border-1 容易和 border-<color> 混淆' },
 ]
-const DARK_ONLY_HEX_ALLOW = new Set(['src/app/globals.css'])
+// 打印稿 / PDF 文档自带独立的浅色配色（AGENTS.md §5：白纸黑字，不参与深色模式），
+// 这些文件里的 #hex 是打印样式，不是界面颜色。
+const DARK_ONLY_HEX_ALLOW = new Set([
+  'src/app/globals.css',
+  'src/lib/pdf/report-doc.ts',
+  'src/lib/pdf/paper-doc.ts',
+  'src/lib/pdf/review-doc.ts',
+  'src/lib/pdf/soffice.ts',
+])
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {

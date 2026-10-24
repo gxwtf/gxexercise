@@ -92,11 +92,11 @@ export function TestPaperInfo({
             >
               开始练习
             </Button>
-            {/* 导出「纸质作答卷」PDF：无答案、按考试卷版式留白，可打印后手写作答 */}
+            {/* 导出「纸质作答卷」PDF：无答案、按考试卷版式留白，可打印后手写作答（不是分析报告） */}
             <Button size="lg" variant="outline" className="flex-1" asChild>
-              <a href={`/test-paper/${id}/paper/pdf`} download>
+              <a href={`/test-paper/${id}/paper/pdf`} download title="导出空白作答卷 PDF（无答案，可打印后手写作答）">
                 <FileDown className="w-4 h-4" />
-                导出 PDF（纸质作答）
+                导出空白卷
               </a>
             </Button>
           </div>

@@ -41,7 +41,7 @@ export interface RecordsRow {
   detailHref: string
   /** 重新练习的地址 */
   practiceHref: string
-  /** 回顾 PDF 下载地址 */
+  /** 整份分析报告 PDF：套卷小节=整卷报告，单节练习=该次作答的题组报告 */
   pdfHref: string
   /** 删除用：group=单节练习记录，paper=整份套卷提交 */
   deleteKind: "group" | "paper"
@@ -188,7 +188,7 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
               <TableHead>试卷 / 题组</TableHead>
               <TableHead className="w-[120px]">得分 / 总分</TableHead>
               <TableHead className="w-[100px] text-center">状态</TableHead>
-              <TableHead className="w-[160px] text-center">操作</TableHead>
+              <TableHead className="w-[230px] text-center">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -250,7 +250,9 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                       <Link href={row.practiceHref}>重新练习</Link>
                     </Button>
                     <Button asChild size="sm" variant="ghost" className="h-7 px-2" onClick={(e) => e.stopPropagation()}>
-                      <a href={row.pdfHref}>PDF</a>
+                      <a href={row.pdfHref} title="导出整份分析报告 PDF">
+                        分析报告
+                      </a>
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

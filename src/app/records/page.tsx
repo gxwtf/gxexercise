@@ -132,7 +132,11 @@ export default async function RecordsPage({ searchParams }: PageProps) {
         ? `/test-paper/${inPaper.testPaperId}/result/${inPaper.id}`
         : `/question/${g.id}/review/1`,
       practiceHref: inPaper ? `/test-paper/${inPaper.testPaperId}/practice` : `/question/${g.id}`,
-      pdfHref: `/question/${g.id}/review/1/pdf`,
+      pdfHref: inPaper
+        ? // 套卷小节：导整卷分析报告
+          `/test-paper/${inPaper.testPaperId}/result/${inPaper.id}/pdf`
+        : // 单节练习：导这一次作答的题组分析报告
+          `/question/${g.id}/review/pdf?submission=${s.id}`,
       deleteKind: (inPaper ? "paper" : "group") as "paper" | "group",
       deleteId: inPaper ? inPaper.id : s.id,
     }

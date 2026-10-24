@@ -110,11 +110,11 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
             <span className="font-mono text-sm font-medium">{formatTime(seconds)}</span>
           </div>
 
-          {/* 导出「纸质作答卷」PDF：无答案、按考试卷版式留白 */}
+          {/* 导出「纸质作答卷」PDF：无答案、按考试卷版式留白（不是分析报告） */}
           <Button variant="outline" asChild className="flex items-center gap-2">
-            <a href={`/question/${questionGroupId}/paper/pdf`} download>
+            <a href={`/question/${questionGroupId}/paper/pdf`} download title="导出空白作答卷 PDF（无答案，可打印后手写作答）" aria-label="导出空白作答卷 PDF">
               <FileDown className="w-4 h-4" />
-              <span className="hidden sm:inline">导出 PDF</span>
+              <span className="hidden sm:inline">导出空白卷</span>
             </a>
           </Button>
 
