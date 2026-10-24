@@ -22,6 +22,8 @@ interface PageProps {
 }
 
 function escapeLatexBraces(content: string): string {
+  // <br> 必须自闭合（MDX 会报 “Expected a closing tag for <br>”，常见于语文表格里）
+  content = content.replace(/<br\s*\/?>/gi, '<br />')
   let result = ''
   let inTag = 0
   let inMath = false
