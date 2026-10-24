@@ -50,7 +50,7 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
               <>
                 <div className={isImageOnlyStem(question.stem) ? "flex items-start gap-1" : "flex items-baseline gap-1"}>
                   <span className={isImageOnlyStem(question.stem) ? "shrink-0 text-lg font-medium leading-none pt-[2px]" : "shrink-0 text-lg font-medium"}>{startIndex + index + 1}.</span>
-                  <div className={isImageOnlyStem(question.stem) ? "mt-5 min-w-0 flex-1 text-lg font-medium" : "text-lg font-medium"}>
+                  <div className={isImageOnlyStem(question.stem) ? "mt-[5px] min-w-0 flex-1 text-lg font-medium" : "text-lg font-medium"}>
                     {question.stemMdx ? (
                       <MDXRemote {...question.stemMdx} components={components} />
                     ) : (

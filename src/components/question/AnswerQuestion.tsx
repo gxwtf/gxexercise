@@ -68,7 +68,7 @@ export function AnswerQuestion({
             {index}.
           </span>
         )}
-        <div className={isImageOnlyStem(question.stem) ? "mt-5 min-w-0 flex-1" : "flex-1"}>
+        <div className={isImageOnlyStem(question.stem) ? "mt-[5px] min-w-0 flex-1" : "flex-1"}>
           {question.stemMdx ? (
             <div className="text-lg font-medium text-foreground">
               <MDXRemote {...question.stemMdx} components={components} />
