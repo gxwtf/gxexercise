@@ -23,7 +23,7 @@ export function ReadingLayout({
   const components = useMDXComponents()
 
   return (
-    <div className="bg-background lg:h-full lg:overflow-hidden">
+    <div className="bg-background font-question lg:h-full lg:overflow-hidden">
       <div className="flex flex-col lg:h-full lg:flex-row">
         {/* 移动端：文章在上、题目在下，整页连续滚动 */}
         <div className="w-full p-3 sm:p-6 lg:flex-1 lg:overflow-y-auto">

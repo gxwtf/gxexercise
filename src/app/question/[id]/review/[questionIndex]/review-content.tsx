@@ -179,7 +179,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice"].includes(questionGroup.questionType)
 
     return (
-        <div className="h-screen overflow-hidden bg-background">
+        <div className="h-screen overflow-hidden bg-background font-question">
             <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
                 <div className="flex h-14 items-center gap-2 px-3 sm:px-6">
                     <Button
