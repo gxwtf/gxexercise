@@ -12,7 +12,7 @@
  * - `line`（默认）：一条下划线，用于回顾 PDF 这类不要求题号的场景
  * - `number`：带题号的短横线（____3____），用于题组 / 套卷的纸质作答卷
  */
-import katex from "katex"
+import { latexToHtml } from "./latex"
 import { readImageSize } from "./image-size"
 
 const escapeHtml = (s: string) =>
@@ -51,9 +51,11 @@ function createContext(options: MarkdownOptions = {}): RenderContext {
   }
 }
 
+/** 公式：翻译成 sup/sub + Unicode（LibreOffice 的 HTML 导入不认 KaTeX 的 CSS 布局） */
 function renderMath(tex: string, display: boolean): string {
   try {
-    return katex.renderToString(tex, { throwOnError: false, displayMode: display, output: "html" })
+    const html = latexToHtml(tex, display)
+    return display ? `<span class="math-disp">${html}</span>` : html
   } catch {
     return `<code>${escapeHtml(tex)}</code>`
   }
@@ -73,11 +75,17 @@ function blankHtml(ctx: RenderContext): string {
 
 /** 图片地址：/exam-images/... → 供 LibreOffice 读取的本地绝对路径 */
 export function resolveImageSrc(src: string): string {
+  // 题库图片 src 带 ?v=<时间戳> 缓存参数，落到文件系统前必须去掉，
+  // 否则 LibreOffice 拿到 "xxx.png?v=1792817624" 找不到文件 → 图片整片空白
+  const clean = String(src ?? "")
+    .trim()
+    .split("?")[0]
+    .split("#")[0]
   const mdRoot = process.env.MD_IMAGES_ROOT || "/home/gxwtf/jingshibang/output_docx_to_md"
-  if (src.startsWith("/exam-images/")) {
-    return `file://${mdRoot}/${src.slice("/exam-images/".length)}`
+  if (clean.startsWith("/exam-images/")) {
+    return `file://${mdRoot}/${clean.slice("/exam-images/".length)}`
   }
-  return src
+  return clean
 }
 
 /**
@@ -142,6 +150,9 @@ function qimgHtml(src: string, px: number, alt: string, ctx: RenderContext): str
   return imageHtml(src, alt, ctx)
 }
 
+/** 打印用表格外壳：LibreOffice 只认 HTML 属性里的边框/宽度，CSS 的 border/width 一律无效 */
+const TABLE_OPEN = '<table border="1" cellpadding="6" cellspacing="0" width="100%">'
+
 /** 行内渲染 */
 export function inline(text: string, ctx: RenderContext = createContext()): string {
   const protect = (html: string): string => {
@@ -190,6 +201,9 @@ export function inline(text: string, ctx: RenderContext = createContext()): stri
   rest = rest.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
   rest = rest.replace(/~~([^~]+)~~/g, "<del>$1</del>")
   rest = rest.replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>")
+  // 题库材料里英文常用 _word_ 表示斜体（如 _Journal of Science_）；两侧必须是词边界，
+  // 避免把 snake_case / __init__ 这类标识符误伤
+  rest = rest.replace(/(^|[^A-Za-z0-9_])_([^_\s](?:[^_]*?[^_\s])?)_(?![A-Za-z0-9_])/g, "$1<em>$2</em>")
   rest = rest.replace(/`([^`]+)`/g, "<code>$1</code>")
 
   // 6. 还原受保护片段
@@ -251,7 +265,7 @@ export function markdownToHtml(md: string, options: MarkdownOptions = {}): strin
         i++
       }
       out.push(
-        `<table><thead><tr>${header.map((h) => `<th>${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
+        `${TABLE_OPEN}<thead><tr>${header.map((h) => `<th>${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
           `<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${inline(c, ctx)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
       )
       continue
@@ -270,7 +284,7 @@ export function markdownToHtml(md: string, options: MarkdownOptions = {}): strin
       if (rows.length >= 2) {
         const [head, ...body] = rows.map(pad)
         out.push(
-          `<table><thead><tr>${head.map((h) => `<th>${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
+          `${TABLE_OPEN}<thead><tr>${head.map((h) => `<th>${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
             `<tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${inline(c, ctx)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
         )
       } else {
