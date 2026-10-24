@@ -63,7 +63,7 @@ export default function SevenChooseFive({ questions, mdxSource, startQuestionNum
   const components = useMDXComponents()
 
   return (
-    <div className="bg-background lg:h-full lg:overflow-hidden">
+    <div className="font-question bg-background lg:h-full lg:overflow-hidden">
       <div className="flex flex-col lg:h-full lg:flex-row">
         {/* 文章区域（移动端在上方） */}
         <div className="w-full p-3 sm:p-6 lg:flex-1 lg:overflow-y-auto">
