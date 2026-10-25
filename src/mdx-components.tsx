@@ -78,7 +78,7 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
         return <span {...props}>{children}</span>
     }
 
-    const { blanks, options, onBlankClick, onRemove, getNextBlankId, getNextBlankQuestionNum, reviewMode, correctBlanks } = context
+    const { blanks, options, onBlankClick, onRemove, getNextBlankId, getNextBlankQuestionNum, reviewMode, correctBlanks, blankCorrectness } = context
 
     const blankIdRef = React.useRef<string | null>(null)
     if (blankIdRef.current === null) {
@@ -87,7 +87,9 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
     const blankId = blankIdRef.current
 
     const filledOptionId = blanks[blankId]
-    const filledOption = filledOptionId ? options.find(o => o.id === filledOptionId) : null
+    const filledOption = filledOptionId
+      ? options.find((o) => String(o.id).toLowerCase() === String(filledOptionId).toLowerCase())
+      : null
 
     const questionNumRef = React.useRef<number | null>(null)
     if (getNextBlankQuestionNum && questionNumRef.current === null) {
@@ -96,7 +98,11 @@ function Blank({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
 
     if (reviewMode) {
       if (filledOption) {
-        const isCorrect = correctBlanks && filledOptionId === correctBlanks[blankId]
+        // 优先用阅卷结果；否则按答案字符串（忽略大小写）比较
+        const graded = blankCorrectness?.[blankId]
+        const answerNorm = String(correctBlanks?.[blankId] ?? '').trim().toLowerCase()
+        const filledNorm = String(filledOptionId ?? '').trim().toLowerCase()
+        const isCorrect = typeof graded === 'boolean' ? graded : !!answerNorm && filledNorm === answerNorm
         return (
           <span
             className={cn(

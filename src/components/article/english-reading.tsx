@@ -219,8 +219,9 @@ export function EnglishReading({
       getNextBlankQuestionNum: startQuestionNumber != null ? getNextBlankQuestionNum : undefined,
       reviewMode,
       correctBlanks,
+      blankCorrectness,
     }),
-    [blanks, options, onBlankClick, onRemove, getNextBlankId, getNextBlankQuestionNum, startQuestionNumber, reviewMode, correctBlanks]
+    [blanks, options, onBlankClick, onRemove, getNextBlankId, getNextBlankQuestionNum, startQuestionNumber, reviewMode, correctBlanks, blankCorrectness]
   );
 
   const clozeContextValue = React.useMemo(
