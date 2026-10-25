@@ -129,6 +129,9 @@ model QuestionSubmission {
   @@index([userId, questionId])
   @@index([groupSubmissionId])
   @@index([gradingStatus])
+  /// 广学榜：按时间范围统计（周榜/月榜）
+  @@index([createdAt])
+  @@index([createdAt, userId])
 }
 
 model QuestionGroupSubmission {

@@ -42,6 +42,9 @@ export default function Header() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
+          广学榜
+        </Link>
         <Link href="https://gxwtf.cn/game" className="text-sm font-medium hover:text-primary">
           游戏中心
         </Link>
@@ -64,6 +67,9 @@ export default function Header() {
         className="text-sm font-medium hover:text-primary"
       >
         首页
+      </Link>
+      <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
+        广学榜
       </Link>
       <div className="flex flex-col space-y-3">
         <span className="text-sm font-medium text-muted-foreground">题库</span>
