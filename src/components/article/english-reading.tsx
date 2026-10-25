@@ -85,11 +85,16 @@ function replaceBlankTokens(
         if (part === '[■]') {
           const blankId = getNextBlankId();
           const filledOptionId = blanks[blankId];
-          const filledOption = filledOptionId ? options.find((o) => o.id === filledOptionId) : null;
+          const filledOption = filledOptionId
+            ? options.find((o) => String(o.id).toLowerCase() === String(filledOptionId).toLowerCase())
+            : null;
 
           if (reviewMode) {
             if (filledOption) {
-              const isCorrect = correctBlanks && filledOptionId === correctBlanks[blankId];
+              // 答案大小写/空格都可能不一致（选项 id 与小写、正确答案大写），统一比较
+              const answerNorm = String(correctBlanks?.[blankId] ?? '').trim().toLowerCase();
+              const filledNorm = String(filledOptionId ?? '').trim().toLowerCase();
+              const isCorrect = !!answerNorm && filledNorm === answerNorm;
               return (
                 <span
                   key={`blank-${blankId}-${index}`}
