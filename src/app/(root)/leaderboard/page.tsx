@@ -67,38 +67,30 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
         <LeaderboardControls period={period} subject={subject} subjects={options} />
       </div>
 
-      {/* 我的排名（仅登录用户可见） */}
-      {userId > 0 && (
-        <Card className="mb-6">
-          <CardContent className="flex flex-wrap items-center gap-x-10 gap-y-3 px-5 py-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground">我的排名</span>
-              {!myRank && <span className="text-xs text-muted-foreground">本期还没有作答记录，快去做题上榜</span>}
-            </div>
-            {myRank && (
-              <>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs text-muted-foreground">勤学榜</span>
-                  <span className="text-xl font-semibold tabular-nums text-foreground">第 {myRank.rankCount} 名</span>
-                  <span className="text-xs text-muted-foreground">/ 共 {myRank.totalUsers} 人</span>
-                  <span className="ml-1 text-xs text-muted-foreground">（{myRank.questions} 题）</span>
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs text-muted-foreground">卓越榜</span>
-                  <span className="text-xl font-semibold tabular-nums text-foreground">第 {myRank.rankScore} 名</span>
-                  <span className="text-xs text-muted-foreground">/ 共 {myRank.totalUsers} 人</span>
-                  <span className="ml-1 text-xs text-muted-foreground">（{Math.round(myRank.score * 10) / 10} 分）</span>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
       {/* 两个榜单 */}
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-        <LeaderboardList title="勤学榜" subtitle="按周期内做题数量排名" rows={studyRows} metric="count" />
-        <LeaderboardList title="卓越榜" subtitle="按周期内做题得分排名（同题取最高分）" rows={scoreRows} metric="score" />
+        <LeaderboardList
+          title="勤学榜"
+          subtitle="按周期内做题数量排名"
+          rows={studyRows}
+          metric="count"
+          myRank={myRank?.rankCount ?? null}
+          myTotalUsers={myRank?.totalUsers ?? null}
+          myName={myRank?.name ?? null}
+          myQuestions={myRank?.questions ?? null}
+          myScore={myRank?.score ?? null}
+        />
+        <LeaderboardList
+          title="卓越榜"
+          subtitle="按周期内做题得分排名（同题取最高分）"
+          rows={scoreRows}
+          metric="score"
+          myRank={myRank?.rankScore ?? null}
+          myTotalUsers={myRank?.totalUsers ?? null}
+          myName={myRank?.name ?? null}
+          myQuestions={myRank?.questions ?? null}
+          myScore={myRank?.score ?? null}
+        />
       </div>
 
       {/* 统计规则 */}

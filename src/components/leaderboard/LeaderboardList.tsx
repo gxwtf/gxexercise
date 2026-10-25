@@ -15,6 +15,12 @@ export interface LeaderboardListProps {
   /** 首页紧凑模式：不显示表头 */
   compact?: boolean
   href?: string
+  /** 登录用户在本榜的名次（有作答才传） */
+  myRank?: number | null
+  myTotalUsers?: number | null
+  myName?: string | null
+  myQuestions?: number | null
+  myScore?: number | null
 }
 
 function initials(name: string) {
@@ -41,6 +47,11 @@ export function LeaderboardList({
   highlightUserId,
   compact = false,
   href,
+  myRank,
+  myTotalUsers,
+  myName,
+  myQuestions,
+  myScore,
 }: LeaderboardListProps) {
 
   return (
@@ -74,6 +85,55 @@ export function LeaderboardList({
               </TableHeader>
             )}
             <TableBody>
+              {myRank != null && (
+                <>
+                  <TableRow className="bg-brand/5 hover:bg-brand/10">
+                    <TableCell className="pl-5">
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span
+                          className={cn(
+                            "inline-flex size-6 items-center justify-center rounded-md text-xs font-semibold tabular-nums",
+                            rankTone(myRank)
+                          )}
+                        >
+                          {myRank}
+                        </span>
+                        <span className="whitespace-nowrap text-[10px] text-muted-foreground">
+                          共 {myTotalUsers ?? "-"} 人
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
+                        <Avatar className="size-8">
+                          <AvatarFallback className="bg-brand/10 text-brand">
+                            {initials(myName || "我")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="truncate text-sm font-medium text-foreground">
+                          {myName || "我"}
+                          <span className="ml-1 text-xs text-brand">（我）</span>
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-sm text-muted-foreground">
+                      {myQuestions ?? 0}
+                      <span className="ml-0.5 text-xs">题</span>
+                    </TableCell>
+                    <TableCell className="pr-5 text-right tabular-nums text-sm font-medium text-foreground">
+                      {Math.round(Number(myScore ?? 0) * 10) / 10}
+                      <span className="ml-0.5 text-xs font-normal text-muted-foreground">分</span>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={4} className="p-0">
+                      <div className="flex items-center gap-2 border-y border-border bg-muted/40 px-5 py-1 text-[11px] text-muted-foreground">
+                        以下为前 {rows.length} 名
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </>
+              )}
               {rows.map((row, idx) => {
                 const rank = idx + 1
                 const mine = highlightUserId != null && row.userId === highlightUserId

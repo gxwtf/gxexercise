@@ -99,6 +99,7 @@ export async function getLeaderboardSubjects(): Promise<string[]> {
 }
 
 export interface MyRank {
+  name: string
   questions: number
   score: number
   rankCount: number
@@ -122,7 +123,7 @@ export async function getMyRank(opts: {
   const subj = subject && subject !== "全部" ? subject : ""
 
   const rows = await prisma.$queryRawUnsafe<
-    { questions: number; score: number; rank_count: number; rank_score: number; total: number }[]
+    { name: string | null; questions: number; score: number; rank_count: number; rank_score: number; total: number }[]
   >(
     `
     WITH best AS (
@@ -144,8 +145,11 @@ export async function getMyRank(opts: {
              RANK() OVER (ORDER BY score DESC, questions DESC)::int AS rank_score
       FROM agg
     ), totals AS (SELECT COUNT(*)::int AS total FROM agg)
-    SELECT r.questions, r.score, r.rank_count, r.rank_score, t.total
-    FROM ranked r CROSS JOIN totals t
+    SELECT COALESCE(u."userName", CONCAT('用户', r.uid)) AS name,
+           r.questions, r.score, r.rank_count, r.rank_score, t.total
+    FROM ranked r
+    CROSS JOIN totals t
+    LEFT JOIN "User" u ON u.id = r.uid
     WHERE r.uid = $4
     `,
     start,
@@ -156,6 +160,7 @@ export async function getMyRank(opts: {
   if (!rows.length) return null
   const r = rows[0]
   return {
+    name: r.name || `用户${userId}`,
     questions: r.questions,
     score: r.score,
     rankCount: r.rank_count,
