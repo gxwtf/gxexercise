@@ -51,6 +51,26 @@ export default async function RootPage() {
         </p>
       </div>
 
+      {/* 广学榜：本周前 5 名 */}
+      <section className="mb-12">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-2xl font-bold text-foreground">广学榜</h2>
+          <Link href="/leaderboard" className="text-sm font-medium text-brand hover:underline">
+            查看完整榜单（周榜 / 月榜）→
+          </Link>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <LeaderboardList title="勤学榜" subtitle="本周做题数量 Top 5" rows={studyTop} metric="count" compact href="/leaderboard?period=week" />
+          <LeaderboardList title="卓越榜" subtitle="本周得分合计 Top 5" rows={scoreTop} metric="score" compact href="/leaderboard?period=week" />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          统计规则：周期内同一道题只算一次（多次作答取最高分）；周榜为本周一至周日，月榜为本月 1 日至月末（北京时间）。
+          <Link href="/leaderboard" className="ml-1 text-brand hover:underline">
+            查看详细规则
+          </Link>
+        </p>
+      </section>
+
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {subjects.map((subject) => {
           const subjectRoute = subjectToRoute[subject];
@@ -87,25 +107,6 @@ export default async function RootPage() {
         })}
       </div>
 
-      {/* 广学榜：本周前 5 名 */}
-      <section className="mt-12">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-2xl font-bold text-foreground">广学榜</h2>
-          <Link href="/leaderboard" className="text-sm font-medium text-brand hover:underline">
-            查看完整榜单（周榜 / 月榜）→
-          </Link>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <LeaderboardList title="勤学榜" subtitle="本周做题数量 Top 5" rows={studyTop} metric="count" compact href="/leaderboard?period=week" />
-          <LeaderboardList title="卓越榜" subtitle="本周得分合计 Top 5" rows={scoreTop} metric="score" compact href="/leaderboard?period=week" />
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          统计规则：周期内同一道题只算一次（多次作答取最高分）；周榜为本周一至周日，月榜为本月 1 日至月末（北京时间）。
-          <Link href="/leaderboard" className="ml-1 text-brand hover:underline">
-            查看详细规则
-          </Link>
-        </p>
-      </section>
     </div>
   );
 }
