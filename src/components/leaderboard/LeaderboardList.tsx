@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
@@ -112,13 +111,6 @@ export function LeaderboardList({
               })}
             </TableBody>
           </Table>
-        )}
-        {compact && (
-          <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-2.5">
-            <Badge variant="outline" className="text-[11px] font-normal">
-              周期内同题只计一次
-            </Badge>
-          </div>
         )}
       </CardContent>
     </Card>
