@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { getLeaderboard, getLeaderboardSubjects, type LeaderboardPeriod } from "@/lib/leaderboard"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
-import { LeaderboardControls } from "@/components/leaderboard/LeaderboardControls"
+import { LeaderboardControls, subjectLabel } from "@/components/leaderboard/LeaderboardControls"
 
 export const dynamic = "force-dynamic"
 
@@ -49,7 +49,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
             {periodLabel}
           </Badge>
           <Badge variant="outline" className="font-normal">
-            {subject === "全部" ? "全部学科" : subject}
+            {subjectLabel(subject)}
           </Badge>
           <span className="text-sm text-muted-foreground">
             {fmt(start)} ~ {fmt(new Date(end.getTime() - 86400000))}
@@ -86,7 +86,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
           <p>
             <span className="font-medium text-foreground">排序：</span>
             主指标相同的情况下，依次比较另一项指标、用户 ID。支持按学科单独统计，
-            「全部学科」为所有学科合计。
+            「总榜」为所有学科合计。
           </p>
           <p>榜单实时计算，刷新页面即为最新结果。</p>
         </CardContent>

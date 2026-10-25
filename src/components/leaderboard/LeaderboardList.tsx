@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import type { LeaderboardRow } from "@/lib/leaderboard"
@@ -40,8 +39,6 @@ export function LeaderboardList({
   compact = false,
   href,
 }: LeaderboardListProps) {
-  const valueOf = (row: LeaderboardRow) => (metric === "count" ? row.questions : Math.round(row.score * 10) / 10)
-  const max = rows.length ? Math.max(...rows.map((r) => Number(valueOf(r)))) : 0
 
   return (
     <Card className="gap-0 overflow-hidden py-0">
@@ -69,16 +66,13 @@ export function LeaderboardList({
                   <TableHead className="w-16 pl-5">名次</TableHead>
                   <TableHead>用户</TableHead>
                   <TableHead className="w-24 text-right">题数</TableHead>
-                  <TableHead className="w-24 text-right">得分</TableHead>
-                  <TableHead className="w-40 pr-5">占比</TableHead>
+                  <TableHead className="w-28 pr-5 text-right">得分</TableHead>
                 </TableRow>
               </TableHeader>
             )}
             <TableBody>
               {rows.map((row, idx) => {
                 const rank = idx + 1
-                const value = valueOf(row)
-                const pct = max > 0 ? (Number(value) / max) * 100 : 0
                 const mine = highlightUserId != null && row.userId === highlightUserId
                 return (
                   <TableRow key={row.userId} className={cn(mine && "bg-brand/5")}>
@@ -109,12 +103,9 @@ export function LeaderboardList({
                       {row.questions}
                       <span className="ml-0.5 text-xs">题</span>
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-sm font-medium text-foreground">
+                    <TableCell className="pr-5 text-right tabular-nums text-sm font-medium text-foreground">
                       {Math.round(row.score * 10) / 10}
                       <span className="ml-0.5 text-xs font-normal text-muted-foreground">分</span>
-                    </TableCell>
-                    <TableCell className="pr-5">
-                      <Progress value={pct} className="h-1.5" />
                     </TableCell>
                   </TableRow>
                 )
