@@ -4,16 +4,12 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { subjectLabel } from "@/lib/leaderboard-shared"
 
 export interface LeaderboardControlsProps {
   period: "week" | "month"
   subject: string
   subjects: string[]
-}
-
-/** 学科展示名：全部 → 总榜，数学 → 数学榜 */
-export function subjectLabel(s: string) {
-  return s === "全部" ? "总榜" : `${s}榜`
 }
 
 /** 周榜/月榜切换 + 学科筛选（shadcn Tabs / Select） */

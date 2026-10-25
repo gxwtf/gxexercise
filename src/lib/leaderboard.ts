@@ -1,14 +1,9 @@
 import { prisma } from "@/lib/prisma"
 
-export type LeaderboardMetric = "count" | "score"
-export type LeaderboardPeriod = "week" | "month"
+import type { LeaderboardMetric, LeaderboardPeriod, LeaderboardRow } from "./leaderboard-shared"
 
-export interface LeaderboardRow {
-  userId: number
-  name: string
-  questions: number
-  score: number
-}
+export type { LeaderboardMetric, LeaderboardPeriod, LeaderboardRow }
+export { subjectLabel } from "./leaderboard-shared"
 
 /** 北京时间（UTC+8，无夏令时） */
 const TZ_OFFSET_MS = 8 * 60 * 60 * 1000

@@ -3,9 +3,10 @@ import { ChevronLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { getLeaderboard, getLeaderboardSubjects, type LeaderboardPeriod } from "@/lib/leaderboard"
+import { getLeaderboard, getLeaderboardSubjects } from "@/lib/leaderboard"
+import { subjectLabel, type LeaderboardPeriod } from "@/lib/leaderboard-shared"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
-import { LeaderboardControls, subjectLabel } from "@/components/leaderboard/LeaderboardControls"
+import { LeaderboardControls } from "@/components/leaderboard/LeaderboardControls"
 
 export const dynamic = "force-dynamic"
 
