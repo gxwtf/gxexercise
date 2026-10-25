@@ -316,7 +316,8 @@ export function QuestionOverview({
                           source={group.source}
                           tags={group.tags}
                           score={group.score}
-                          submissionCount={submissionCounts.groups[group.id] || 0}
+                          totalScore={group.score}
+                          completedCount={submissionCounts.groups[group.id] || 0}
                         />
                       ) : (
                       <QuestionCard
