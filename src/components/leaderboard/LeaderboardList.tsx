@@ -72,6 +72,51 @@ export function LeaderboardList({
         {rows.length === 0 ? (
           <p className="px-5 py-12 text-center text-sm text-muted-foreground">本期暂无上榜记录</p>
         ) : (
+          <>
+          {/* 移动端：竖向列表（不横向滚动） */}
+          <div className="divide-y divide-border md:hidden">
+            {myRank != null && (
+              <div className="flex items-center gap-3 bg-brand/5 px-4 py-2.5">
+                <span className={cn("inline-flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold tabular-nums", rankTone(myRank))}>
+                  {myRank}
+                </span>
+                <Avatar className="size-8 shrink-0">
+                  <AvatarFallback className="bg-brand/10 text-brand">{initials(myName || "我")}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {myName || "我"}
+                    <span className="ml-1 text-xs text-brand">（我）</span>
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {myQuestions ?? 0} 题 · {Math.round(Number(myScore ?? 0) * 10) / 10} 分
+                  </p>
+                </div>
+              </div>
+            )}
+            {rows.map((row, idx) => {
+              const mine = highlightUserId != null && row.userId === highlightUserId
+              return (
+                <div key={row.userId} className={cn("flex items-center gap-3 px-4 py-2.5", mine && "bg-brand/5")}>
+                  <span className={cn("inline-flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold tabular-nums", rankTone(idx + 1))}>
+                    {idx + 1}
+                  </span>
+                  <Avatar className="size-8 shrink-0">
+                    <AvatarFallback className={idx < 3 ? "bg-brand/10 text-brand" : undefined}>{initials(row.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-foreground">{row.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {row.questions} 题 · {Math.round(row.score * 10) / 10} 分
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* 桌面端：表格 */}
+          <div className="hidden md:block">
           <Table>
             {!compact && (
               <TableHeader>
@@ -164,6 +209,8 @@ export function LeaderboardList({
               })}
             </TableBody>
           </Table>
+          </div>
+          </>
         )}
       </CardContent>
     </Card>
