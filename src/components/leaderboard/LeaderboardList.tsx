@@ -23,9 +23,13 @@ function initials(name: string) {
 }
 
 function rankTone(rank: number) {
-  if (rank === 1) return "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-  if (rank === 2) return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-  if (rank === 3) return "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300"
+  // 前三名：浅色用浅底深字，深色用「半透明亮色底 + 亮字 + 描边」，避免深底发闷、彼此难区分
+  if (rank === 1)
+    return "bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-300 dark:bg-amber-400/20 dark:text-amber-200 dark:ring-amber-400/45"
+  if (rank === 2)
+    return "bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-300 dark:bg-slate-300/20 dark:text-slate-100 dark:ring-slate-300/45"
+  if (rank === 3)
+    return "bg-orange-100 text-orange-800 ring-1 ring-inset ring-orange-300 dark:bg-orange-400/20 dark:text-orange-100 dark:ring-orange-400/45"
   return "bg-muted text-muted-foreground"
 }
 
