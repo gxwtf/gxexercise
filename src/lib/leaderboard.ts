@@ -88,15 +88,12 @@ export async function getLeaderboard(opts: {
   return { rows, start, end }
 }
 
-/** 有作答记录的学科（用于筛选下拉） */
+/** 题库里存在的学科（用于筛选下拉；不依赖是否有作答记录） */
 export async function getLeaderboardSubjects(): Promise<string[]> {
-  const rows = await prisma.$queryRawUnsafe<{ subject: string }[]>(
-    `
-    SELECT DISTINCT q."subject" AS subject
-    FROM "QuestionSubmission" s
-    JOIN "Question" q ON q.id = s."questionId"
-    ORDER BY 1
-    `
-  )
+  const rows = await prisma.question.findMany({
+    distinct: ["subject"],
+    select: { subject: true },
+    orderBy: { subject: "asc" },
+  })
   return rows.map((r) => r.subject).filter(Boolean)
 }
