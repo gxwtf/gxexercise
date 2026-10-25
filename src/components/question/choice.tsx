@@ -58,10 +58,27 @@ function isWrapped(el: HTMLElement): boolean {
  *    4 → 2 → 1，最终保证「不留零碎换行」
  * 3. ResizeObserver 跟随容器宽度重算
  */
+/** 首帧（SSR / 水合前）按选项文字长度先给个合理列数，避免一律 1 列 */
+function estimateCols(options: Option[]): number {
+  if (options.length < 2) return 1
+  const lens = options.map((o) => String(o.label || "").replace(/\s+/g, "").length)
+  const maxLen = Math.max(...lens)
+  const avgLen = lens.reduce((a, b) => a + b, 0) / lens.length
+  const widest = Math.max(maxLen, avgLen * 1.2)
+  if (options.length === 4) {
+    if (widest <= 10) return 4
+    if (widest <= 24) return 2
+    return 1
+  }
+  if (widest <= 8) return Math.min(options.length, 4)
+  if (widest <= 20) return Math.min(options.length, 2)
+  return 1
+}
+
 function useOptionColumns(options: Option[], deps: unknown[]) {
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const measureRef = useRef<HTMLDivElement | null>(null)
-  const [cols, setCols] = useState(1)
+  const [cols, setCols] = useState(() => estimateCols(options))
 
   const measureWidest = useCallback(() => {
     const box = measureRef.current
