@@ -6,12 +6,16 @@ import Link from "next/link";
 import { Search, FileText, SlidersHorizontal } from "lucide-react";
 import { QuestionCard } from "./QuestionCard";
 import { TestCard } from "./TestCard";
+import { GroupRowCard } from "./GroupRowCard";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PageBar } from "@/components/PageBar";
 import useSession from "@/lib/use-session";
+
+/** 这些学科用「套卷样式」的单行卡片（不带封面图） */
+const ROW_CARD_SUBJECTS = ["数学", "物理", "化学", "政治"];
 
 type ListGroup = {
   id: string;
@@ -295,9 +299,26 @@ export function QuestionOverview({
               </div>
             ) : groups.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                <div
+                  className={
+                    ROW_CARD_SUBJECTS.includes(subject)
+                      ? "grid grid-cols-1 gap-4"
+                      : "grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
+                  }
+                >
                   {groups.map((group) => (
                     <div key={group.id}>
+                      {ROW_CARD_SUBJECTS.includes(subject) ? (
+                        <GroupRowCard
+                          id={group.id}
+                          title={group.title}
+                          questionType={group.questionType}
+                          source={group.source}
+                          tags={group.tags}
+                          score={group.score}
+                          submissionCount={submissionCounts.groups[group.id] || 0}
+                        />
+                      ) : (
                       <QuestionCard
                         id={group.id}
                         title={group.title.length > 100 ? group.title.substring(0, 100) + "..." : group.title}
@@ -309,6 +330,7 @@ export function QuestionOverview({
                         totalScore={group.score}
                         completedCount={submissionCounts.groups[group.id] || 0}
                       />
+                      )}
                     </div>
                   ))}
                 </div>
