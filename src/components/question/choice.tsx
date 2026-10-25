@@ -48,7 +48,7 @@ function isWrapped(el: HTMLElement): boolean {
   if (!Number.isFinite(lineH)) lineH = parseFloat(cs.fontSize) * 1.6 || 24
   const h = el.getBoundingClientRect().height
   if (!h || !lineH) return false
-  return h / lineH > 1.6   // 明显超过一行（含 KaTeX 撑高的余量）
+  return h / lineH > 2.2   // 明显超过两行才认为换行（KaTeX/段落边距会把单行撑高，阈值太敏感会误降列数）
 }
 
 /**
