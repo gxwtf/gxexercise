@@ -48,7 +48,6 @@ export function LeaderboardList({
   compact = false,
   href,
   myRank,
-  myTotalUsers,
   myName,
   myQuestions,
   myScore,
@@ -89,7 +88,7 @@ export function LeaderboardList({
                 <>
                   <TableRow className="bg-brand/5 hover:bg-brand/10">
                     <TableCell className="pl-5">
-                      <div className="flex flex-col items-start gap-0.5">
+                      <div className="flex items-center">
                         <span
                           className={cn(
                             "inline-flex size-6 items-center justify-center rounded-md text-xs font-semibold tabular-nums",
@@ -97,9 +96,6 @@ export function LeaderboardList({
                           )}
                         >
                           {myRank}
-                        </span>
-                        <span className="whitespace-nowrap text-[10px] text-muted-foreground">
-                          共 {myTotalUsers ?? "-"} 人
                         </span>
                       </div>
                     </TableCell>
@@ -123,13 +119,6 @@ export function LeaderboardList({
                     <TableCell className="pr-5 text-right tabular-nums text-sm font-medium text-foreground">
                       {Math.round(Number(myScore ?? 0) * 10) / 10}
                       <span className="ml-0.5 text-xs font-normal text-muted-foreground">分</span>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={4} className="p-0">
-                      <div className="flex items-center gap-2 border-y border-border bg-muted/40 px-5 py-1 text-[11px] text-muted-foreground">
-                        以下为前 {rows.length} 名
-                      </div>
                     </TableCell>
                   </TableRow>
                 </>
