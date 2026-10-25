@@ -180,6 +180,7 @@ export function EnglishReading({
   startQuestionNumber = 1,
   reviewMode = false,
   correctBlanks,
+  blankCorrectness,
   indentParagraphs = false,
 }: EnglishReadingProps) {
   const blankIndexRef = React.useRef(0);
@@ -263,6 +264,7 @@ export function EnglishReading({
       onRemove,
       reviewMode,
       correctBlanks,
+      blankCorrectness,
     );
   };
 
