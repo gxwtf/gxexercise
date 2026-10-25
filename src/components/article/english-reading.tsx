@@ -79,6 +79,7 @@ function replaceBlankTokens(
   onRemove?: (blankId: string) => void,
   reviewMode?: boolean,
   correctBlanks?: Record<string, string>,
+  blankCorrectness?: Record<string, boolean>,
 ): React.ReactNode {
   if (typeof node === 'string') {
     return node
@@ -148,7 +149,7 @@ function replaceBlankTokens(
   if (Array.isArray(node)) {
     return node.map((child, index) => (
       <React.Fragment key={index}>
-        {replaceBlankTokens(child, getNextBlankId, blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks)}
+        {replaceBlankTokens(child, getNextBlankId, blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks, blankCorrectness)}
       </React.Fragment>
     ));
   }
@@ -159,7 +160,7 @@ function replaceBlankTokens(
     return React.cloneElement(
       node,
       node.props,
-      children ? replaceBlankTokens(children, getNextBlankId, blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks) : children
+      children ? replaceBlankTokens(children, getNextBlankId, blanks, options, onBlankClick, onRemove, reviewMode, correctBlanks, blankCorrectness) : children
     );
   }
 
