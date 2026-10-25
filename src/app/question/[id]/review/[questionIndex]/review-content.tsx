@@ -257,9 +257,31 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             </div>
                         ) : null}
                         {stemMdx ? (
-                            <div className="flex items-baseline gap-1">
-                                {hasMultipleQuestions && <span className="text-lg font-medium">{currentIndex}.</span>}
-                                <div className="text-lg font-medium">
+                            <div
+                                className={
+                                    questionGroup.questionType === "chemistry-image"
+                                        ? "qimage-full flex items-start gap-1"
+                                        : "flex items-baseline gap-1"
+                                }
+                            >
+                                {hasMultipleQuestions && (
+                                    <span
+                                        className={
+                                            questionGroup.questionType === "chemistry-image"
+                                                ? "shrink-0 text-lg font-medium leading-none pt-[2px]"
+                                                : "text-lg font-medium"
+                                        }
+                                    >
+                                        {currentIndex}.
+                                    </span>
+                                )}
+                                <div
+                                    className={
+                                        questionGroup.questionType === "chemistry-image"
+                                            ? "mt-[3px] min-w-0 flex-1 text-lg font-medium"
+                                            : "text-lg font-medium"
+                                    }
+                                >
                                     <ClozeContext.Provider value={{ getNextQuestionNumber: () => 1, reviewMode: true }}>
                                         <MathInput2Provider disabled>
                                             <MDXRemote {...stemMdx} components={components} />
