@@ -10,9 +10,9 @@ import rehypeKatex from 'rehype-katex'
 import { TestPaperPractice } from "./TestPaperPractice"
 import { AnswerProvider } from "@/components/question-group/AnswerContext"
 
-function escapeLatexBraces(content: string): string {
-  // <br> 必须自闭合（MDX 会报 “Expected a closing tag for <br>”，常见于语文表格里）
-  content = content.replace(/<br\s*\/?>/gi, '<br />')
+function escapeLatexBraces(input: string): string {
+  // <br> 必须自闭合（MDX 会报 "Expected a closing tag for <br>"，语文表格里常见）
+  const content = input.replace(/<br\s*\/?>/gi, '<br />')
   let result = ''
   let inTag = 0
   let inMath = false
@@ -22,15 +22,18 @@ function escapeLatexBraces(content: string): string {
       inMath = !inMath
       result += ch
     } else if (ch === '<') {
-      // 只有能构成完整标签（<tag ...> / </tag>）才当标签，其它（如 "Q<Ksp"）转义，否则 MDX 报错崩溃
-      if (/^<\/?[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?\/?>/.test(content.slice(i))) {
+      if (inMath) {
+        result += ch // 公式里的 < 是关系符
+      } else if (/^<\/?[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?\/?>/.test(content.slice(i))) {
         inTag++
         result += ch
       } else {
         result += '&lt;'
       }
     } else if (ch === '>') {
-      if (inTag > 0) {
+      if (inMath) {
+        result += ch
+      } else if (inTag > 0) {
         inTag = Math.max(0, inTag - 1)
         result += ch
       } else {
