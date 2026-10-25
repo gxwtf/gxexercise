@@ -1,0 +1,52 @@
+"use client"
+
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+export interface LeaderboardControlsProps {
+  period: "week" | "month"
+  subject: string
+  subjects: string[]
+}
+
+/** 周榜/月榜切换 + 学科筛选（shadcn Tabs / Select） */
+export function LeaderboardControls({ period, subject, subjects }: LeaderboardControlsProps) {
+  const router = useRouter()
+  const hrefFor = (p: string, s: string) =>
+    `/leaderboard?period=${p}${s && s !== "全部" ? `&subject=${encodeURIComponent(s)}` : ""}`
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <Tabs value={period}>
+        <TabsList>
+          {(["week", "month"] as const).map((p) => (
+            <TabsTrigger key={p} value={p} asChild>
+              <Link href={hrefFor(p, subject)}>{p === "week" ? "周榜" : "月榜"}</Link>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted-foreground">学科</span>
+        <Select
+          value={subject}
+          onValueChange={(v) => router.push(hrefFor(period, v))}
+        >
+          <SelectTrigger className="h-8 w-32 text-sm">
+            <SelectValue placeholder="全部学科" />
+          </SelectTrigger>
+          <SelectContent align="end">
+            {subjects.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s === "全部" ? "全部学科" : s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  )
+}

@@ -96,8 +96,8 @@ export default async function RootPage() {
           </Link>
         </div>
         <div className="grid gap-6 lg:grid-cols-2">
-          <LeaderboardList title="勤学榜" subtitle="本周做题数量 Top 5" rows={studyTop} metric="count" />
-          <LeaderboardList title="卓越榜" subtitle="本周得分合计 Top 5" rows={scoreTop} metric="score" />
+          <LeaderboardList title="勤学榜" subtitle="本周做题数量 Top 5" rows={studyTop} metric="count" compact href="/leaderboard?period=week" />
+          <LeaderboardList title="卓越榜" subtitle="本周得分合计 Top 5" rows={scoreTop} metric="score" compact href="/leaderboard?period=week" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
           统计规则：周期内同一道题只算一次（多次作答取最高分）；周榜为本周一至周日，月榜为本月 1 日至月末（北京时间）。

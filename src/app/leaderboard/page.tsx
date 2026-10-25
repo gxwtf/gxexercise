@@ -1,114 +1,96 @@
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { getLeaderboard, getLeaderboardSubjects, periodRange, type LeaderboardPeriod } from "@/lib/leaderboard"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { getLeaderboard, getLeaderboardSubjects, type LeaderboardPeriod } from "@/lib/leaderboard"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
+import { LeaderboardControls } from "@/components/leaderboard/LeaderboardControls"
 
 export const dynamic = "force-dynamic"
-
-const SUBJECT_TABS = ["全部"]
 
 interface PageProps {
   searchParams: Promise<{ period?: string; subject?: string }>
 }
 
 function fmt(d: Date) {
-  return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, "/")
+  return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, ".")
 }
 
 export default async function LeaderboardPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const period: LeaderboardPeriod = sp.period === "month" ? "month" : "week"
   const subjects = await getLeaderboardSubjects()
-  const subjectOptions = [...SUBJECT_TABS, ...subjects.filter((s) => !SUBJECT_TABS.includes(s))]
-  const subject = sp.subject && subjectOptions.includes(sp.subject) ? sp.subject : "全部"
+  const options = ["全部", ...subjects.filter((s) => s !== "全部")]
+  const subject = sp.subject && options.includes(sp.subject) ? sp.subject : "全部"
 
   const [{ rows: studyRows, start, end }, { rows: scoreRows }] = await Promise.all([
     getLeaderboard({ period, metric: "count", subject, limit: 50 }),
     getLeaderboard({ period, metric: "score", subject, limit: 50 }),
   ])
 
-  const periodLabel = period === "week" ? "本周榜" : "本月榜"
+  const periodLabel = period === "week" ? "周榜" : "月榜"
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-12">
+      {/* 头部 */}
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
             <ChevronLeft className="size-4" />
-            返回首页
+            首页
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">广学榜</h1>
+          <Separator orientation="vertical" className="h-4" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">广学榜</h1>
+          <Badge variant="secondary" className="font-normal">
+            {periodLabel}
+          </Badge>
+          <Badge variant="outline" className="font-normal">
+            {subject === "全部" ? "全部学科" : subject}
+          </Badge>
+          <span className="text-sm text-muted-foreground">
+            {fmt(start)} ~ {fmt(new Date(end.getTime() - 86400000))}
+          </span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {periodLabel} · {fmt(start)} ~ {fmt(new Date(end.getTime() - 86400000))} · {subject === "全部" ? "全部学科" : subject}
-        </p>
+
+        <LeaderboardControls period={period} subject={subject} subjects={options} />
       </div>
 
-      {/* 周期切换 */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        {(["week", "month"] as LeaderboardPeriod[]).map((p) => (
-          <Link
-            key={p}
-            href={`/leaderboard?period=${p}${subject !== "全部" ? `&subject=${encodeURIComponent(subject)}` : ""}`}
-            className={cn(
-              "rounded-full border px-4 py-1.5 text-sm transition-colors",
-              period === p
-                ? "border-brand bg-brand text-primary-foreground dark:bg-brand"
-                : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            )}
-          >
-            {p === "week" ? "周榜" : "月榜"}
-          </Link>
-        ))}
-      </div>
-
-      {/* 学科筛选 */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-muted-foreground">学科：</span>
-        {subjectOptions.map((s) => (
-          <Link
-            key={s}
-            href={`/leaderboard?period=${period}${s !== "全部" ? `&subject=${encodeURIComponent(s)}` : ""}`}
-            className={cn(
-              "rounded-md border px-2.5 py-1 text-xs transition-colors",
-              subject === s
-                ? "border-brand/60 bg-brand/10 text-brand"
-                : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            )}
-          >
-            {s}
-          </Link>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <LeaderboardList
-          title="勤学榜"
-          subtitle="按做题数量"
-          rows={studyRows}
-          metric="count"
-        />
-        <LeaderboardList
-          title="卓越榜"
-          subtitle="按得分合计"
-          rows={scoreRows}
-          metric="score"
-        />
+      {/* 两个榜单 */}
+      <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+        <LeaderboardList title="勤学榜" subtitle="按周期内做题数量排名" rows={studyRows} metric="count" />
+        <LeaderboardList title="卓越榜" subtitle="按周期内做题得分排名（同题取最高分）" rows={scoreRows} metric="score" />
       </div>
 
       {/* 统计规则 */}
-      <section className="mt-8 rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-        <h2 className="mb-2 text-sm font-semibold text-foreground">统计规则</h2>
-        <ul className="list-inside list-disc space-y-1">
-          <li>周期：周榜为<b>本周一 00:00 至周日 24:00</b>；月榜为<b>本月 1 日 00:00 至月末</b>（北京时间）。</li>
-          <li><b>勤学榜</b>按「做题数量」排序：周期内作答过的<b>题目数</b>（同一道题多次作答只计 1 道）。</li>
-          <li><b>卓越榜</b>按「做题总分」排序：周期内每道题<b>只取最高一次得分</b>累加（未判分的题目不计分）。</li>
-          <li>同一题多次提交不重复计数；分数相同则按另一项指标、再按用户 ID 排序。</li>
-          <li>可按学科单独统计；「全部」为所有学科合计。</li>
-          <li>数据实时更新，刷新页面即可看到最新排名。</li>
-        </ul>
-      </section>
+      <Card className="mt-8">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">统计规则</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+          <p>
+            <span className="font-medium text-foreground">周期：</span>
+            周榜为本周一 00:00 至周日 24:00；月榜为本月 1 日 00:00 至月末（北京时间）。
+          </p>
+          <p>
+            <span className="font-medium text-foreground">勤学榜：</span>
+            按周期内作答过的题目数排名，同一道题无论作答多少次只计 1 道。
+          </p>
+          <p>
+            <span className="font-medium text-foreground">卓越榜：</span>
+            按周期内每道题的最高得分累加排名；未判分（评阅中）的题目暂不计分。
+          </p>
+          <p>
+            <span className="font-medium text-foreground">排序：</span>
+            主指标相同的情况下，依次比较另一项指标、用户 ID。支持按学科单独统计，
+            「全部学科」为所有学科合计。
+          </p>
+          <p>榜单实时计算，刷新页面即为最新结果。</p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
