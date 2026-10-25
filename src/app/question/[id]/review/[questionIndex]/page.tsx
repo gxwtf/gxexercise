@@ -210,6 +210,7 @@ async function buildReviewData(
 
   const allUserBlanks: Record<string, string> = {}
   const allCorrectBlanks: Record<string, string> = {}
+  const allBlankCorrect: Record<string, boolean> = {}
   questions.forEach((item, idx) => {
     const sub = questionSubmissions.find((s) => s.questionId === item.question.id)
     const blankId = String(idx + 1)
@@ -218,6 +219,7 @@ async function buildReviewData(
       if (answer) allUserBlanks[blankId] = answer
     }
     allCorrectBlanks[blankId] = item.question.answer || ''
+    if (sub && typeof sub.isCorrect === 'boolean') allBlankCorrect[blankId] = sub.isCorrect
   })
 
   const isSubjective = isSubjectiveQuestion(currentQuestion.questionType, questionGroup.questionType)
@@ -321,6 +323,7 @@ async function buildReviewData(
     correctRate,
     allUserBlanks,
     allCorrectBlanks,
+    allBlankCorrect,
     currentSubmissionId: selectedSubmission?.id ?? null,
     isSubjective,
     userScore,

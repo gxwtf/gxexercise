@@ -46,6 +46,7 @@ interface ReviewContentData {
     correctRate: number | null
     allUserBlanks: Record<string, string>
     allCorrectBlanks: Record<string, string>
+    allBlankCorrect?: Record<string, boolean>
     currentSubmissionId: string | null
     isSubjective: boolean
     userScore: number | null
@@ -139,6 +140,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         correctRate,
         allUserBlanks,
         allCorrectBlanks,
+        allBlankCorrect,
         isSubjective,
         userScore,
         questionScore,
@@ -227,6 +229,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                 blanks={allUserBlanks}
                                 options={options}
                                 correctBlanks={allCorrectBlanks}
+                                blankCorrectness={allBlankCorrect}
                                 reviewMode={usesBlanks}
                             >
                                 {articleMdx ? (

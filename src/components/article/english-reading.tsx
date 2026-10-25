@@ -18,6 +18,7 @@ export interface BlankContextValue {
   getNextBlankQuestionNum?: () => number;
   reviewMode?: boolean;
   correctBlanks?: Record<string, string>;
+  blankCorrectness?: Record<string, boolean>;
 }
 
 export const BlankContext = React.createContext<BlankContextValue | null>(null);
@@ -65,6 +66,7 @@ export interface EnglishReadingProps {
   startQuestionNumber?: number;
   reviewMode?: boolean;
   correctBlanks?: Record<string, string>;
+  blankCorrectness?: Record<string, boolean>;
   indentParagraphs?: boolean;
 }
 
@@ -92,9 +94,12 @@ function replaceBlankTokens(
           if (reviewMode) {
             if (filledOption) {
               // 答案大小写/空格都可能不一致（选项 id 与小写、正确答案大写），统一比较
+              // 优先用「阅卷结果」（后端算好的 isCorrect），没有再按答案字符串比较
               const answerNorm = String(correctBlanks?.[blankId] ?? '').trim().toLowerCase();
               const filledNorm = String(filledOptionId ?? '').trim().toLowerCase();
-              const isCorrect = !!answerNorm && filledNorm === answerNorm;
+              const graded = blankCorrectness?.[blankId];
+              const isCorrect =
+                typeof graded === 'boolean' ? graded : !!answerNorm && filledNorm === answerNorm;
               return (
                 <span
                   key={`blank-${blankId}-${index}`}
