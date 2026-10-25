@@ -3,7 +3,10 @@ import { ChevronLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { getLeaderboard, getLeaderboardSubjects } from "@/lib/leaderboard"
+import { cookies } from "next/headers"
+import { getIronSession } from "iron-session"
+import { sessionOptions, type SessionData } from "@/lib/iron"
+import { getLeaderboard, getLeaderboardSubjects, getMyRank } from "@/lib/leaderboard"
 import { subjectLabel, type LeaderboardPeriod } from "@/lib/leaderboard-shared"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
 import { LeaderboardControls } from "@/components/leaderboard/LeaderboardControls"
@@ -25,9 +28,13 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
   const options = ["全部", ...subjects.filter((s) => s !== "全部")]
   const subject = sp.subject && options.includes(sp.subject) ? sp.subject : "全部"
 
-  const [{ rows: studyRows, start, end }, { rows: scoreRows }] = await Promise.all([
+  const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
+  const userId = session.userid || 0
+
+  const [{ rows: studyRows, start, end }, { rows: scoreRows }, myRank] = await Promise.all([
     getLeaderboard({ period, metric: "count", subject, limit: 50 }),
     getLeaderboard({ period, metric: "score", subject, limit: 50 }),
+    getMyRank({ period, subject, userId }),
   ])
 
   const periodLabel = period === "week" ? "周榜" : "月榜"
@@ -59,6 +66,34 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
 
         <LeaderboardControls period={period} subject={subject} subjects={options} />
       </div>
+
+      {/* 我的排名（仅登录用户可见） */}
+      {userId > 0 && (
+        <Card className="mb-6">
+          <CardContent className="flex flex-wrap items-center gap-x-10 gap-y-3 px-5 py-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-foreground">我的排名</span>
+              {!myRank && <span className="text-xs text-muted-foreground">本期还没有作答记录，快去做题上榜</span>}
+            </div>
+            {myRank && (
+              <>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xs text-muted-foreground">勤学榜</span>
+                  <span className="text-xl font-semibold tabular-nums text-foreground">第 {myRank.rankCount} 名</span>
+                  <span className="text-xs text-muted-foreground">/ 共 {myRank.totalUsers} 人</span>
+                  <span className="ml-1 text-xs text-muted-foreground">（{myRank.questions} 题）</span>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xs text-muted-foreground">卓越榜</span>
+                  <span className="text-xl font-semibold tabular-nums text-foreground">第 {myRank.rankScore} 名</span>
+                  <span className="text-xs text-muted-foreground">/ 共 {myRank.totalUsers} 人</span>
+                  <span className="ml-1 text-xs text-muted-foreground">（{Math.round(myRank.score * 10) / 10} 分）</span>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* 两个榜单 */}
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">

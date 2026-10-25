@@ -97,3 +97,69 @@ export async function getLeaderboardSubjects(): Promise<string[]> {
   })
   return rows.map((r) => r.subject).filter(Boolean)
 }
+
+export interface MyRank {
+  questions: number
+  score: number
+  rankCount: number
+  rankScore: number
+  totalUsers: number
+}
+
+/**
+ * 当前用户在某个周期内的排名（两项指标一次查询算出）。
+ * 用窗口函数在聚合结果上算 RANK，避免再扫一次全表。
+ */
+export async function getMyRank(opts: {
+  period: LeaderboardPeriod
+  subject?: string | null
+  userId: number
+  now?: Date
+}): Promise<MyRank | null> {
+  const { period, subject, userId } = opts
+  if (!userId) return null
+  const { start, end } = periodRange(period, opts.now ?? new Date())
+  const subj = subject && subject !== "全部" ? subject : ""
+
+  const rows = await prisma.$queryRawUnsafe<
+    { questions: number; score: number; rank_count: number; rank_score: number; total: number }[]
+  >(
+    `
+    WITH best AS (
+      SELECT s."userId" AS uid,
+             s."questionId" AS qid,
+             MAX(COALESCE(s."score", 0))::float8 AS sc
+      FROM "QuestionSubmission" s
+      JOIN "Question" q ON q.id = s."questionId"
+      WHERE s."createdAt" >= $1
+        AND s."createdAt" < $2
+        AND ($3 = '' OR q."subject" = $3)
+      GROUP BY s."userId", s."questionId"
+    ), agg AS (
+      SELECT uid, COUNT(*)::int AS questions, SUM(sc)::float8 AS score
+      FROM best GROUP BY uid
+    ), ranked AS (
+      SELECT uid, questions, score,
+             RANK() OVER (ORDER BY questions DESC, score DESC)::int AS rank_count,
+             RANK() OVER (ORDER BY score DESC, questions DESC)::int AS rank_score
+      FROM agg
+    ), totals AS (SELECT COUNT(*)::int AS total FROM agg)
+    SELECT r.questions, r.score, r.rank_count, r.rank_score, t.total
+    FROM ranked r CROSS JOIN totals t
+    WHERE r.uid = $4
+    `,
+    start,
+    end,
+    subj,
+    userId
+  )
+  if (!rows.length) return null
+  const r = rows[0]
+  return {
+    questions: r.questions,
+    score: r.score,
+    rankCount: r.rank_count,
+    rankScore: r.rank_score,
+    totalUsers: r.total,
+  }
+}
