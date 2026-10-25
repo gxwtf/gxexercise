@@ -27,6 +27,7 @@ const has = (n: string) => process.argv.includes(`--${n}`);
 interface Q {
   no: number;
   content?: string;
+  analysis?: string;
   type: "single" | "text";
   image: string;
   options?: { id: string; label: string }[];
@@ -65,9 +66,76 @@ async function deletePaper(paperId: string, title: string) {
   console.log(`  已删除旧数据：${title}`);
 }
 
+async function importOne(dirArg: string, force: boolean) {
+  const paper = JSON.parse(fs.readFileSync(path.join(dirArg, "paper.json"), "utf-8")) as Paper;
+  const subject = paper.subject || "化学";
+  const exists = await prisma.testPaper.findFirst({ where: { title: paper.title, subject }, select: { id: true } });
+  if (exists) {
+    if (!force) { console.log(`跳过（已存在）：${paper.title}`); return; }
+    await deletePaper(exists.id, paper.title);
+  }
+  const tags = Array.from(new Set([...(paper.tags || []), subject]));
+  const testPaper = await prisma.testPaper.create({
+    data: {
+      title: paper.title,
+      description: `${paper.source}（${subject}）`,
+      subject, source: paper.source, grade: paper.grade, year: paper.year ?? null,
+      totalScore: paper.questions.reduce((n, q) => n + (q.score || 0), 0) || null,
+      duration: 90, tags,
+    },
+  });
+  const groups = [
+    { category: "选择", type: "chemistry-image", qs: paper.questions.filter((q) => q.type === "single") },
+    { category: "非选择", type: "chemistry-image", qs: paper.questions.filter((q) => q.type === "text") },
+  ];
+  let order = 0;
+  for (const g of groups) {
+    if (!g.qs.length) continue;
+    const group = await prisma.questionGroup.create({
+      data: {
+        title: `${paper.title}·${g.category}`, content: "", questionType: g.type,
+        score: g.qs.reduce((n, q) => n + (q.score || 0), 0),
+        subject, source: paper.source, grade: paper.grade, category: g.category,
+        tags: [...tags, g.category],
+      },
+    });
+    await prisma.paperItem.create({ data: { paperId: testPaper.id, itemId: group.id, itemType: "questionGroup", orderIndex: order++ } });
+    let gi = 0;
+    for (const q of g.qs) {
+      const created = await prisma.question.create({
+        data: {
+          questionType: q.type,
+          content: q.content || `![](${q.image})`,
+          options: q.options && q.options.length ? (q.options as unknown as object) : undefined,
+          answer: q.answer || "", analysis: q.analysis || "",
+          score: q.score ?? (q.type === "single" ? 3 : 0),
+          subject, source: paper.source, grade: paper.grade, category: g.category,
+          year: paper.year ?? null, tags: [...tags, g.category],
+        },
+      });
+      await prisma.groupItem.create({ data: { groupId: group.id, questionId: created.id, orderIndex: gi++ } });
+    }
+  }
+  console.log(`✓ ${paper.title}：${paper.questions.length} 题（选择 ${groups[0].qs.length}，非选择 ${groups[1].qs.length}）`);
+}
+
 async function main() {
+  const all = arg("all");
+  if (all) {
+    const dirs = fs.readdirSync(all).filter((d) => fs.existsSync(path.join(all, d, "paper.json")));
+    console.log(`批量导入 ${dirs.length} 份：${all}`);
+    for (const d of dirs) {
+      try {
+        await importOne(path.join(all, d), has("force"));
+      } catch (e) {
+        console.error(`✗ ${d}:`, String(e).slice(0, 160));
+      }
+    }
+    await prisma.$disconnect();
+    return;
+  }
   const dir = arg("dir");
-  if (!dir) throw new Error("--dir 必填");
+  if (!dir) throw new Error("--dir 或 --all 必填");
   const paper = JSON.parse(fs.readFileSync(path.join(dir, "paper.json"), "utf-8")) as Paper;
   const force = has("force");
   const subject = paper.subject || "化学";
@@ -86,7 +154,7 @@ async function main() {
   const testPaper = await prisma.testPaper.create({
     data: {
       title: paper.title,
-      description: `${paper.source}（${subject} · 图片版）`,
+      description: `${paper.source}（${subject}）`,
       subject,
       source: paper.source,
       grade: paper.grade,
