@@ -28,9 +28,11 @@ interface SubmissionHistoryTableProps {
   questionIndex: number
   questionType: string
   currentSubmissionId?: string
+  /** 满分（主观题显示「得分 / 满分」用） */
+  maxScore?: number | null
 }
 
-export function SubmissionHistoryTable({ submissions, questionIndex, questionType, currentSubmissionId }: SubmissionHistoryTableProps) {
+export function SubmissionHistoryTable({ submissions, questionIndex, questionType, currentSubmissionId, maxScore }: SubmissionHistoryTableProps) {
   const router = useRouter()
   if (submissions.length === 0) {
     return (
@@ -60,7 +62,7 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
         <TableRow>
           <TableHead className="w-[80px]">序号</TableHead>
           <TableHead className="w-[45%]">我的答案</TableHead>
-          <TableHead className="w-[100px]">是否正确</TableHead>
+          <TableHead className="w-[120px]">{isChoiceType ? "是否正确" : "得分"}</TableHead>
           <TableHead className="text-right">答题时间</TableHead>
         </TableRow>
       </TableHeader>
@@ -97,26 +99,39 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
                 </span>
               </TableCell>
               <TableCell>
-                <span
-                  className={cn(
-                    "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                    submission.gradingStatus === "skipped" || !submission.answer || submission.answer === "-"
-                      ? "bg-muted text-muted-foreground"
-                      : submission.isCorrect === null
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
-                      : submission.isCorrect
-                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                        : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                  )}
-                >
-                  {submission.gradingStatus === "skipped"
-                    ? "不判分"
-                    : !submission.answer || submission.answer === "-"
-                      ? "未作答"
-                      : submission.isCorrect === null
-                        ? "评阅中"
-                        : submission.isCorrect ? "正确" : "错误"}
-                </span>
+                {isChoiceType ? (
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                      submission.gradingStatus === "skipped" || !submission.answer || submission.answer === "-"
+                        ? "bg-muted text-muted-foreground"
+                        : submission.isCorrect === null
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                        : submission.isCorrect
+                          ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                          : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                    )}
+                  >
+                    {submission.gradingStatus === "skipped"
+                      ? "不判分"
+                      : !submission.answer || submission.answer === "-"
+                        ? "未作答"
+                        : submission.isCorrect === null
+                          ? "评阅中"
+                          : submission.isCorrect ? "正确" : "错误"}
+                  </span>
+                ) : (
+                  // 主观题：不显示对错，显示 得分 / 满分
+                  <span className="text-sm font-medium text-foreground">
+                    {submission.gradingStatus === "skipped"
+                      ? "不判分"
+                      : !submission.answer || submission.answer === "-"
+                        ? "未作答"
+                        : submission.score == null
+                          ? "评阅中"
+                          : `${Math.round(submission.score * 10) / 10} / ${maxScore ?? "-"}`}
+                  </span>
+                )}
               </TableCell>
               <TableCell className="text-right">
                 {formatDate(submission.createdAt)}

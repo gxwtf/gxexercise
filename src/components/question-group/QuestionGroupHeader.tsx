@@ -2,7 +2,18 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Clock, FileDown, Send } from 'lucide-react';
+import { Clock, FileDown, Send, ChevronLeft } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import useSession from '@/lib/use-session';
 import { useRouter } from 'next/navigation';
 import { useAlertContext } from '@/components/alert-provider';
@@ -56,6 +67,19 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
     return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // 放弃作答并返回：优先回到「进入做题页之前的那一页」
+  const handleQuit = useCallback(() => {
+    try {
+      const entry = sessionStorage.getItem(`practice_entry_${questionGroupId}`)
+      if (entry) {
+        router.push(entry)
+        return
+      }
+    } catch {}
+    if (typeof window !== 'undefined' && window.history.length > 1) router.back()
+    else router.push('/')
+  }, [router, questionGroupId])
+
   const handleSubmit = useCallback(async () => {
     if (!session.userid) {
       showAlert({ type: 'destructive', title: '请先登录' })
@@ -100,9 +124,31 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
   return (
     <header className="sticky top-0 z-50 bg-background border-b">
       <div className="flex items-center justify-between h-16 px-6">
-        <h1 className="text-xl font-semibold text-foreground truncate">
-          {title}{questionCount != null ? `（共${questionCount}小题${score != null ? `；共${score}分` : ""}）` : ""}
-        </h1>
+        <div className="flex min-w-0 items-center gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="放弃作答并返回">
+                <ChevronLeft className="size-4" />
+                返回
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>确定放弃本次作答？</AlertDialogTitle>
+                <AlertDialogDescription>
+                  返回后，当前未提交的作答不会保存。已提交的记录不受影响。
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>继续作答</AlertDialogCancel>
+                <AlertDialogAction onClick={handleQuit}>放弃并返回</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <h1 className="truncate text-xl font-semibold text-foreground">
+            {title}{questionCount != null ? `（共${questionCount}小题${score != null ? `；共${score}分` : ""}）` : ""}
+          </h1>
+        </div>
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50">

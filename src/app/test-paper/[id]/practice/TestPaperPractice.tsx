@@ -16,6 +16,10 @@ import Grammar from "@/components/question-group/grammar"
 import SevenChooseFive from "@/components/question-group/seven-choose-five"
 import { PageBar } from "@/components/PageBar"
 import { PracticeEntryTracker } from "@/components/PracticeEntryTracker"
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const STORAGE_KEY = (id: string) => `exam_state_${id}`
 const ANSWERS_KEY = (id: string) => `exam_answers_test-paper-${id}`
@@ -88,6 +92,20 @@ export function TestPaperPractice({
 
   const totalGroups = groupsData.length
   const currentGroup = groupsData[currentGroupIndex]
+
+  // 放弃作答并返回：回到进入这套卷之前的那一页
+  const handleQuit = useCallback(() => {
+    try {
+      const first = groupsData[0]?.id
+      const entry = first ? sessionStorage.getItem(`practice_entry_${first}`) : null
+      if (entry) {
+        router.push(entry)
+        return
+      }
+    } catch {}
+    if (typeof window !== "undefined" && window.history.length > 1) router.back()
+    else router.push("/")
+  }, [groupsData, router])
 
   const isFirstGroup = currentGroupIndex === 0
   const isLastGroup = currentGroupIndex === totalGroups - 1
@@ -404,6 +422,25 @@ export function TestPaperPractice({
       <PracticeEntryTracker groupIds={groupsData.map((g) => g.id)} />
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="放弃作答并返回">
+                <ChevronLeft className="size-4" />
+                返回
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>确定放弃本次作答？</AlertDialogTitle>
+                <AlertDialogDescription>返回后，当前未提交的作答不会保存。已提交的记录不受影响。</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>继续作答</AlertDialogCancel>
+                <AlertDialogAction onClick={handleQuit}>放弃并返回</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <h1 className="flex min-w-0 items-center gap-2 text-base font-semibold text-foreground sm:gap-3 sm:text-xl">
             <span className="truncate">{testPaperTitle}</span>
             {currentGroup && (
@@ -412,6 +449,7 @@ export function TestPaperPractice({
               </span>
             )}
           </h1>
+          </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1.5 rounded-lg bg-muted/50 px-2 py-1.5 sm:gap-2 sm:px-4 sm:py-2">

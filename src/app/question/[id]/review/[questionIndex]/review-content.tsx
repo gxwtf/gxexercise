@@ -483,6 +483,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             questionIndex={currentIndex}
                             questionType={currentQuestion.questionType}
                             currentSubmissionId={data.currentSubmissionId ?? undefined}
+                            maxScore={questionScore}
                         />
                     </div>
                 </div>
