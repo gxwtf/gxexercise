@@ -180,7 +180,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice"].includes(questionGroup.questionType)
 
     return (
-        <div className="h-screen overflow-hidden bg-background font-question">
+        <div className="h-screen overflow-hidden bg-background">
             <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
                 <div className="flex h-14 items-center gap-2 px-3 sm:px-6">
                     <Button
@@ -281,8 +281,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                 <div
                                     className={
                                         questionGroup.questionType === "chemistry-image"
-                                            ? "mt-[3px] min-w-0 flex-1 text-lg font-medium"
-                                            : "text-lg font-medium"
+                                            ? "mt-[3px] min-w-0 flex-1 text-lg font-medium font-question"
+                                            : "text-lg font-medium font-question"
                                     }
                                 >
                                     <ClozeContext.Provider value={{ getNextQuestionNumber: () => 1, reviewMode: true }}>
@@ -467,7 +467,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         <>
                             <h3 className="text-lg font-semibold mb-3">题目解析</h3>
                             <QuestionSection>
-                                <div className="prose dark:prose-invert max-w-none">
+                                <div className="prose dark:prose-invert max-w-none font-question">
                                     <MDXRemote {...analysisMdx} components={components} />
                                 </div>
                             </QuestionSection>
@@ -633,7 +633,7 @@ function ExcellentAnswersPanel({
                             <span> / {formatScore(answer.maxScore)}</span>
                         </span>
                     </div>
-                    <div className="prose dark:prose-invert max-w-none">
+                    <div className="prose dark:prose-invert max-w-none font-question">
                         {answer.answerMdx ? (
                             <MDXRemote {...answer.answerMdx} components={components} />
                         ) : (
