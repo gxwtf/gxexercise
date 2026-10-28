@@ -23,9 +23,12 @@ interface ExcellentRatio {
   denominator: number
 }
 
-/** 作文类题型的优秀得分率（按最新 20 分 / 50 分 / 10 分满分标定） */
+/**
+ * 作文类题型的优秀得分率（按 20 分 / 50 分 / 10 分满分标定）
+ * 英语作文：得分率 90%（20 分制 = 18 分）；语文大作文 / 微写作：得分率 90%
+ */
 const EXCELLENT_RATIOS: Record<string, ExcellentRatio> = {
-  "en-writing": { numerator: 19, denominator: 20 },
+  "en-writing": { numerator: 18, denominator: 20 },
   "chinese-essay": { numerator: 45, denominator: 50 },
   "chinese-micro-writing": { numerator: 9, denominator: 10 },
 }
@@ -46,7 +49,7 @@ export function meetsExcellentStandard(groupType: string, score: number | null |
 export function excellentCriteriaText(groupType: string): string {
   switch (groupType) {
     case "en-writing":
-      return "英语作文得分率达到 95%（新题相当于 19/20）"
+      return "英语作文得分率达到 90%（新题相当于 18/20）"
     case "chinese-essay":
       return "语文大作文得分率达到 90%（新题相当于 45/50）"
     case "chinese-micro-writing":

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { RecordsFilter } from "@/components/records/RecordsFilter"
 import { RecordsPager } from "@/components/records/RecordsPager"
 import { RecordsTable } from "@/components/records/RecordsTable"
+import { AI_GRADEABLE, ORDER_MAP, formatDateTime, needsAiGrading, scoreText } from "@/lib/submission-records"
 
 export const dynamic = "force-dynamic"
 
@@ -16,34 +17,6 @@ const PAGE_SIZE = 20
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
-}
-
-function fmt(date: Date | null | undefined) {
-  if (!date) return "-"
-  return new Date(date).toLocaleString("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
-
-const round1 = (n: number) => Math.round(n * 10) / 10
-const scoreText = (score: number | null | undefined, max: number | null | undefined) => {
-  if (score == null) return "-"
-  return max ? `${round1(score)} / ${max}` : `${round1(score)}`
-}
-
-/** 需要 AI 批改的题型（其余客观题提交即完成批改） */
-const AI_GRADEABLE = ["en-writing", "reading-expression", "作文", "英文写作", "英语作文", "阅读表达"]
-const needsAiGrading = (questionType: string) => AI_GRADEABLE.includes(questionType)
-
-const ORDER_MAP: Record<string, Record<string, "asc" | "desc">[]> = {
-  time_desc: [{ createdAt: "desc" }],
-  time_asc: [{ createdAt: "asc" }],
-  score_desc: [{ score: "desc" }, { createdAt: "desc" }],
-  score_asc: [{ score: "asc" }, { createdAt: "desc" }],
 }
 
 export default async function RecordsPage({ searchParams }: PageProps) {
@@ -122,7 +95,7 @@ export default async function RecordsPage({ searchParams }: PageProps) {
     const inPaper = s.testSubmission
     return {
       id: s.id,
-      time: fmt(s.createdAt),
+      time: formatDateTime(s.createdAt),
       subject: g.subject,
       title: inPaper?.testPaper?.title ?? g.title,
       subtitle: inPaper ? `套卷小节 · ${g.title}` : `单节练习 · ${g.category}`,
@@ -153,9 +126,16 @@ export default async function RecordsPage({ searchParams }: PageProps) {
             {total > PAGE_SIZE && `，第 ${safePage} / ${pageCount} 页`}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/questions/math/math-choice">去练习</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {session.admin && (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/admin/submissions">全部作答记录</Link>
+            </Button>
+          )}
+          <Button asChild variant="outline" size="sm">
+            <Link href="/questions/math/math-choice">去练习</Link>
+          </Button>
+        </div>
       </div>
 
       <RecordsFilter

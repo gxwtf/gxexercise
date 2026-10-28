@@ -49,9 +49,22 @@ export default function Header() {
           游戏中心
         </Link>
         {session.isLoggedIn && session.admin && (
-          <Link href="https://account.gxwtf.cn/admin/users" className="text-sm font-medium hover:text-primary">
-            用户管理
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-auto p-0 text-sm font-medium hover:text-primary flex items-center gap-1">
+                管理
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem asChild>
+                <Link href="/admin/submissions">全部作答记录</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="https://account.gxwtf.cn/admin/users">用户管理</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
         <Link href="https://gxwtf.cn/home" className="text-sm font-medium hover:text-primary">
           返回旧版主站
@@ -90,12 +103,20 @@ export default function Header() {
         游戏中心
       </Link>
       {session.isLoggedIn && session.admin && (
-        <Link
-          href="https://account.gxwtf.cn/admin/users"
-          className="text-sm font-medium hover:text-primary"
-        >
-          用户管理
-        </Link>
+        <>
+          <Link
+            href="/admin/submissions"
+            className="text-sm font-medium hover:text-primary"
+          >
+            全部作答记录
+          </Link>
+          <Link
+            href="https://account.gxwtf.cn/admin/users"
+            className="text-sm font-medium hover:text-primary"
+          >
+            用户管理
+          </Link>
+        </>
       )}
       <Link
         href="https://gxwtf.cn/home"
