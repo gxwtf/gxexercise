@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getAdminViewer } from "@/lib/admin-guard"
 import { Button } from "@/components/ui/button"
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton"
 import { cn } from "@/lib/utils"
 import {
   answerText,
@@ -109,17 +110,28 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   const group = submission.questionGroup
   const inPaper = submission.testSubmission
   const byQuestionId = new Map(submission.submissions.map((s) => [s.questionId, s]))
+  const displayTitle = inPaper?.testPaper?.title ?? group.title
+  const displayUser = submission.user.userName || `同学${submission.user.id}`
 
   return (
     <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
       <div className="mb-5">
-        <Button asChild variant="ghost" size="sm" className="mb-2 -ml-2 h-7 px-2">
-          <Link href="/admin/submissions">← 返回全部作答记录</Link>
-        </Button>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <Button asChild variant="ghost" size="sm" className="-ml-2 h-7 px-2">
+            <Link href="/admin/submissions">← 返回全部作答记录</Link>
+          </Button>
+          <AdminDeleteButton
+            kind={inPaper ? "paper" : "group"}
+            id={inPaper ? inPaper.id : submission.id}
+            title={displayTitle}
+            userName={displayUser}
+            afterDelete="back"
+          />
+        </div>
 
         <h1 className="text-xl font-bold sm:text-2xl">作答详情</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {submission.user.userName || `同学${submission.user.id}`}（#{submission.user.id}）
+          {displayUser}（#{submission.user.id}）
           {" · "}
           {formatDateTime(submission.createdAt)}
           {" · "}

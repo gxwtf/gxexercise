@@ -149,8 +149,9 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                 <AlertDialogFooter>
                   <AlertDialogCancel>取消</AlertDialogCancel>
                   <AlertDialogAction
+                    variant="destructive"
+                    className="text-red-800 dark:text-red-300"
                     onClick={() => void removeBatch()}
-                    className="bg-destructive text-white hover:bg-destructive/90"
                   >
                     确认删除
                   </AlertDialogAction>
@@ -278,11 +279,12 @@ export function RecordsTable({ rows }: { rows: RecordsRow[] }) {
                         <AlertDialogFooter>
                           <AlertDialogCancel>取消</AlertDialogCancel>
                           <AlertDialogAction
+                            variant="destructive"
+                            className="text-red-800 dark:text-red-300"
                             onClick={(e) => {
                               e.stopPropagation()
                               void removeOne(row)
                             }}
-                            className="bg-destructive text-white hover:bg-destructive/90"
                           >
                             确认删除
                           </AlertDialogAction>

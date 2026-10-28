@@ -114,6 +114,9 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
       score: scoreText(s.score, g.score),
       pending: needsAiGrading(g.questionType) && s.submissions.some((x) => x.gradingStatus === "pending"),
       detailHref: `/admin/submissions/${s.id}`,
+      // 套卷小节：删除会连同整份套卷；单节练习：只删这一条
+      deleteKind: (inPaper ? "paper" : "group") as "paper" | "group",
+      deleteId: inPaper ? inPaper.id : s.id,
     }
   })
 
@@ -157,7 +160,8 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
       )}
 
       <p className="mt-6 text-xs text-muted-foreground">
-        该页面汇集所有用户的作答记录，仅供管理员查看；记录的删除请由同学本人在「我的作答记录」中操作。
+        该页面汇集所有用户的作答记录：管理员可查看详情或删除指定记录（删除不可恢复，套卷小节会连同整份套卷一起删除）；
+        同学本人仍可在「我的作答记录」中自助删除。
       </p>
     </div>
   )

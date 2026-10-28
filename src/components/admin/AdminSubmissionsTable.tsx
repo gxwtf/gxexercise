@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton"
 import {
   Table,
   TableBody,
@@ -23,9 +24,12 @@ export interface AdminSubmissionRow {
   score: string
   pending: boolean
   detailHref: string
+  /** 删除用：group=单节练习记录，paper=整份套卷提交 */
+  deleteKind: "group" | "paper"
+  deleteId: string
 }
 
-/** 管理员提交记录表格：只读，点整行进入作答详情 */
+/** 管理员提交记录表格：可查看详情、删除指定记录 */
 export function AdminSubmissionsTable({ rows }: { rows: AdminSubmissionRow[] }) {
   return (
     <div className="overflow-x-auto">
@@ -39,7 +43,7 @@ export function AdminSubmissionsTable({ rows }: { rows: AdminSubmissionRow[] }) 
             <TableHead>试卷 / 题组</TableHead>
             <TableHead className="w-[110px]">得分 / 总分</TableHead>
             <TableHead className="w-[90px] text-center">状态</TableHead>
-            <TableHead className="w-[80px] text-center">操作</TableHead>
+            <TableHead className="w-[130px] text-center">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -80,9 +84,17 @@ export function AdminSubmissionsTable({ rows }: { rows: AdminSubmissionRow[] }) 
                 </span>
               </TableCell>
               <TableCell className="text-center">
-                <Button asChild size="sm" variant="ghost" className="h-7 px-2">
-                  <Link href={row.detailHref}>查看</Link>
-                </Button>
+                <div className="flex items-center justify-center gap-1">
+                  <Button asChild size="sm" variant="ghost" className="h-7 px-2">
+                    <Link href={row.detailHref}>查看</Link>
+                  </Button>
+                  <AdminDeleteButton
+                    kind={row.deleteKind}
+                    id={row.deleteId}
+                    title={row.title}
+                    userName={row.userName}
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}
