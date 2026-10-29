@@ -148,8 +148,10 @@ async function buildReviewData(
     ? await serialize(escapeLatexBraces(currentQuestion.analysis), { mdxOptions })
     : null
 
-  const correctAnswerMdx = currentQuestion.answer
-    ? await serialize(escapeLatexBraces(currentQuestion.answer).replace(/\n/g, '\n\n'), { mdxOptions })
+  // 参考答案里的 `##` 表示「多个可接受答案」（判分端按任一命中处理），展示时换成「或」
+  const answerForDisplay = (currentQuestion.answer || '').replace(/\s*##\s*/g, ' 或 ')
+  const correctAnswerMdx = answerForDisplay
+    ? await serialize(escapeLatexBraces(answerForDisplay).replace(/\n/g, '\n\n'), { mdxOptions })
     : null
 
   const userAnswerMdx = userAnswer

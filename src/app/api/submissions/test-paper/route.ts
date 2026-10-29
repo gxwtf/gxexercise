@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { isAnswerCorrect, isCaseSensitiveAnswer } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
-import { isSubjectiveQuestion, isUngradedQuestion } from "@/lib/excellent-answer-rules"
+import { isSubjectiveQuestion, isUngradedQuestion, isImageAnswer } from "@/lib/excellent-answer-rules"
 
 export async function POST(request: Request) {
   // 身份一律取自登录会话，绝不信任请求体里的 userId
@@ -92,7 +92,19 @@ export async function POST(request: Request) {
             const questionScore = question.question.score ?? 0
             const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType)
 
-            if (isUngradedQuestion(questionGroup.questionType)) {
+            // 画图/补图题：参考答案是图片，无法按文字判分
+        if (isImageAnswer(correctAnswer)) {
+          return {
+            userId,
+            questionId: sub.questionId,
+            content: { answer: userAnswer },
+            score: null,
+            isCorrect: null,
+            gradingStatus: "skipped",
+          };
+        }
+
+        if (isUngradedQuestion(questionGroup.questionType)) {
               return {
                 questionId: sub.questionId,
                 content: { answer: userAnswer },
@@ -157,12 +169,17 @@ export async function POST(request: Request) {
 
         const unansweredSubmissions = questionGroup.groupItems
           .filter((item) => !submittedIds.has(item.question.id))
-          .map((item) => ({
-            questionId: item.question.id,
-            content: { answer: "" },
-            score: 0,
-            isCorrect: false,
-          }))
+          .map((item) => {
+            // 未作答里，参考答案是图片的画图题不判分（避免 worker 拿图片当文字答案去批）
+            const skip = isUngradedQuestion(questionGroup.questionType) || isImageAnswer(item.question.answer ?? "");
+            return {
+              questionId: item.question.id,
+              content: { answer: "" },
+              score: skip ? null : 0,
+              isCorrect: skip ? null : false,
+              ...(skip ? { gradingStatus: "skipped" as const } : {}),
+            };
+          })
 
         const validSubmissions = [...processedSubmissions.filter(Boolean), ...unansweredSubmissions] as NonNullable<typeof processedSubmissions[0]>[]
 

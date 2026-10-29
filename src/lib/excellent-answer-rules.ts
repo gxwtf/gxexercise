@@ -60,3 +60,8 @@ export function excellentCriteriaText(groupType: string): string {
       return "主观题拿到满分"
   }
 }
+
+/** 参考答案是图片（画图/补图/机制图题）：学生无法用文字对上，一律不判分，回顾页只展示参考答案图 */
+export function isImageAnswer(correctAnswer: string): boolean {
+  return /!\[[^\]]*\]\([^)]*\.(png|jpe?g|gif|webp)/i.test(correctAnswer || "")
+}

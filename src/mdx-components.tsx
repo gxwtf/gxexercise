@@ -520,6 +520,22 @@ const components: MDXComponents = {
             {children}
         </sup>
     ),
+    // markdown 表格（生物大题的实验数据表等）：走语义 token，浅深色都可读
+    table: ({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) => (
+        // 宽表（生物实验设计表常有 8-9 列）按内容撑开并横向滚动，不要压成「单字竖排」
+        <div className="my-4 w-full overflow-x-auto">
+            <table className={cn("w-max min-w-full border-collapse text-base", className)} {...props} />
+        </div>
+    ),
+    thead: ({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+        <thead className={cn("bg-muted/60", className)} {...props} />
+    ),
+    th: ({ className, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+        <th className={cn("border border-border px-3 py-1.5 text-left font-semibold text-foreground", className)} {...props} />
+    ),
+    td: ({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+        <td className={cn("border border-border px-3 py-1.5 align-top text-foreground", className)} {...props} />
+    ),
     img: "img",
     QImg,
     Blank,

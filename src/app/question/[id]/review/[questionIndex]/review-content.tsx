@@ -454,6 +454,21 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         </div>
                     )}
 
+                    {questionGroup.questionType === "biology-fill" && (
+                        <div className="mb-6">
+                            <h3 className="mb-3 text-lg font-semibold">参考答案</h3>
+                            <QuestionSection>
+                                <div className="prose max-w-none font-question dark:prose-invert">
+                                    {correctAnswerMdx ? (
+                                        <MDXRemote {...correctAnswerMdx} components={components} />
+                                    ) : (
+                                        <span className="text-muted-foreground">暂无参考答案</span>
+                                    )}
+                                </div>
+                            </QuestionSection>
+                        </div>
+                    )}
+
                     {isSubjective && category !== "essay" && aiFeedback && (
                         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
                             <p className="mb-1 text-sm font-medium text-amber-800 dark:text-amber-200">AI 批改</p>
