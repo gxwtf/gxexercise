@@ -211,6 +211,20 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
+  // 生物大题（材料内联填空，长句空用 <InputLong>）
+  if (questionGroup.questionType === 'biology-fill') {
+    const mdxSource = contentMdx;
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
+        <Grammar
+          questions={questions as any}
+          mdxSource={mdxSource!}
+        />
+      </>
+    );
+  }
+
   // 英语阅读：不再提供同卷 A/B/C/D 篇切换
 
   if (questionGroup.questionType === 'en-reading') {
@@ -319,7 +333,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
-  if (questionGroup.questionType === 'math-choice' || questionGroup.questionType === 'physics-choice' || questionGroup.questionType === 'chemistry-choice' || questionGroup.questionType === 'chemistry-image' || questionGroup.questionType === 'politics') {
+  if (questionGroup.questionType === 'math-choice' || questionGroup.questionType === 'physics-choice' || questionGroup.questionType === 'chemistry-choice' || questionGroup.questionType === 'chemistry-image' || questionGroup.questionType === 'biology-choice' || questionGroup.questionType === 'politics') {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />

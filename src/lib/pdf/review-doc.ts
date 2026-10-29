@@ -56,7 +56,7 @@ export function reviewDocHtml(input: ReviewDocInput): string {
     `${heading("我的作答")}${userAnswer?.trim() ? `<div class="ai-md">${mdWithTables(userAnswer)}</div>` : "<p>（未作答）</p>"}`
   )
 
-  if (isEssay(questionType) && aiFeedback) {
+  if (aiFeedback) {  // 有 AI 批改结果就展示（作文类走下面的分项，生物填空等走通用简评）
     const sub = aiFeedback.subScores as Record<string, number> | undefined
     if (sub) {
       const parsedMax = scoreText ? Number(String(scoreText).split("/")[1]) : NaN

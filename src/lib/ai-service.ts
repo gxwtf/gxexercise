@@ -70,9 +70,13 @@ function clampScore(score: unknown, maxScore: number): number {
   return 0;
 }
 
-async function callModel(systemPrompt: string, userPrompt: string, maxScore: number, maxTokens = 200): Promise<GradeResult> {
+/** 本机 vLLM 默认会「先思考再答」，思考 token 会把 max_tokens 吃光导致 content 为空（判分报 AI response not JSON）。
+ *  默认关掉思考；换成不支持该参数的第三方网关时自动回退。 */
+const REASONING_EFFORT = process.env.GRADING_REASONING_EFFORT ?? "none";
+
+async function callModel(systemPrompt: string, userPrompt: string, maxScore: number, maxTokens = 600): Promise<GradeResult> {
   // console.log("[AI Prompt]", JSON.stringify({ system: systemPrompt, user: userPrompt }, null, 2))
-  const completion = await openai.chat.completions.create({
+  const base = {
     model: MODEL,
     messages: [
       { role: "system", content: systemPrompt },
@@ -80,8 +84,17 @@ async function callModel(systemPrompt: string, userPrompt: string, maxScore: num
     ],
     temperature: 0,
     max_tokens: maxTokens,
-    response_format: { type: "json_object" },
-  });
+    response_format: { type: "json_object" as const },
+  };
+
+  let completion
+  try {
+    completion = await openai.chat.completions.create({ ...base, reasoning_effort: REASONING_EFFORT } as never)
+  } catch (err) {
+    const msg = String((err as Error)?.message || err)
+    if (!/reasoning|unsupported|unknown|invalid/i.test(msg)) throw err
+    completion = await openai.chat.completions.create(base as never)
+  }
 
   const text = completion.choices[0]?.message?.content || "";
   return parseResponse(text, maxScore);
@@ -119,7 +132,7 @@ export async function gradeWithConfig(
 ): Promise<GradeResult> {
   const prompt = buildPrompt(config.promptTemplate, stem, userAnswer, correctAnswer, maxScore);
   const isEnWriting = config.questionType === "en-writing";
-  const maxTokens = isEnWriting ? 4096 : 200;
+  const maxTokens = isEnWriting ? 4096 : 600;
   return await callModel(config.systemPrompt, prompt, maxScore, maxTokens);
 }
 

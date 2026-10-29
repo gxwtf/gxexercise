@@ -300,6 +300,17 @@ export function TestPaperPractice({
       )
     }
 
+    // 生物大题（材料内联填空题，长句空用 <InputLong>）
+    if (questionType === "biology-fill") {
+      return (
+        <Grammar
+          questions={questions as any}
+          mdxSource={contentMdx!}
+          startQuestionNumber={startQuestionNumber}
+        />
+      )
+    }
+
     if (questionType === "en-reading") {
       return (
         <Problem
@@ -385,7 +396,7 @@ export function TestPaperPractice({
         </div>
       )
     }
-    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "chemistry-image" || questionType === "politics") {
+    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "chemistry-image" || questionType === "biology-choice" || questionType === "politics") {
       return (
         <Problem
           questions={questions as any}

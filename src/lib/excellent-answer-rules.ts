@@ -10,6 +10,8 @@ export function isSubjectiveQuestion(questionType: string, groupType: string): b
   if (groupType === "chinese-essay" || groupType === "chinese-micro-writing") return true
   if (groupType === "chinese-reading" && questionType === "text") return true
   if (groupType === "politics" && questionType === "text") return true
+  // 生物大题：每个空都交 AI 判分（填空可能是长句表达）
+  if (groupType === "biology-fill") return true
   return false
 }
 

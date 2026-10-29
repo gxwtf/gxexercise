@@ -72,7 +72,7 @@ const CHINESE_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "�
 const isChoice = (t: string) => t === "single" || t === "multiple" || t === "choice"
 const isWriting = (t: string) => t === "en-writing" || t === "chinese-essay" || t === "chinese-micro-writing"
 /** 只靠材料里的填空作答、小题本身没有题干 */
-const isContentOnly = (t: string) => t === "grammar" || t === "chinese-dictation"
+const isContentOnly = (t: string) => t === "grammar" || t === "chinese-dictation" || t === "biology-fill"
 
 /** 输入类题型的小题上限行数：按分值估一个够写的空间 */
 function answerLineCount(groupType: string, score: number): number {

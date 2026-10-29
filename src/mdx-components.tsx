@@ -3,6 +3,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { useBlankContext, ClozeContext, useInputChangeContext } from '@/components/article/english-reading'
 import { Input as ShadcnInput } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 // ---- Input default values context (for restoring input values on navigation) ----
 export const InputDefaultValuesContext = React.createContext<Record<string, string>>({})
@@ -225,6 +226,52 @@ function Input({
 }
 
 Input.displayName = 'Input'
+
+/** InputLong —— 长填空（生物大题里的长句表达）：独占一行的多行文本框，编号与 Input 共用同一套计数 */
+function InputLong({ rows = 2, ...props }: { rows?: number } & React.HTMLAttributes<HTMLSpanElement>) {
+    const clozeContext = React.useContext(ClozeContext);
+    const inputChangeContext = useInputChangeContext();
+    const defaultValues = React.useContext(InputDefaultValuesContext);
+    const questionNumberRef = React.useRef<number | undefined>(undefined);
+    const isReviewMode = clozeContext?.reviewMode ?? false;
+
+    if (questionNumberRef.current === undefined) {
+        if (!clozeContext) {
+            return (
+                <span className="my-2 block" style={{ textIndent: 0 }} {...props}>
+                    <Textarea rows={rows} className="min-h-16" />
+                </span>
+            );
+        }
+        questionNumberRef.current = clozeContext.getNextQuestionNumber();
+    }
+
+    const defaultValue = questionNumberRef.current != null ? defaultValues[String(questionNumberRef.current)] : undefined;
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        if (inputChangeContext?.onInputChange && questionNumberRef.current) {
+            inputChangeContext.onInputChange(String(questionNumberRef.current), e.target.value);
+        }
+    };
+
+    return (
+        <span className="my-2 flex items-start gap-2" style={{ textIndent: 0 }} {...props}>
+            <span className="mt-1 shrink-0 rounded-lg border border-input bg-muted/40 px-2 py-1 text-base font-medium text-foreground">
+                {questionNumberRef.current}
+            </span>
+            <Textarea
+                rows={rows}
+                className="min-h-16 flex-1 text-base"
+                disabled={isReviewMode}
+                defaultValue={defaultValue}
+                placeholder={isReviewMode ? undefined : "请作答"}
+                onChange={handleChange}
+            />
+        </span>
+    );
+}
+
+InputLong.displayName = 'InputLong'
 
 const Typography = {
     H1: React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
@@ -478,6 +525,7 @@ const components: MDXComponents = {
     Blank,
     ClozeBlank,
     Input,
+    InputLong,
     Input2,
     RightAlign,
     Center,

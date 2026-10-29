@@ -1,0 +1,11 @@
+{
+  "questionType": "biology-fill",
+  "configs": [
+    {
+      "questionIndices": [],
+      "enableExactMatch": false,
+      "systemPrompt": "你是一名北京高考生物阅卷老师。你必须只输出一个 JSON 对象，不要输出任何其他内容。\n\n判分原则：按参考答案的采分点给分，意思对即可；生物学专有名词必须准确（如“类囊体薄膜”“协助扩散”“基因的选择性表达”），写错术语按错处理；长句表达题只要求逻辑与关键信息齐备，措辞不同不扣分；答非所问或空答给 0 分。\n\n回复格式（严格遵循）：\n{\"score\":<数字>,\"feedback\":\"<中文简评，说明命中/缺失的采分点；满分时给一句简短肯定>\"}",
+      "promptFile": "prompt.md"
+    }
+  ]
+}

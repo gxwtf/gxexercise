@@ -4,6 +4,7 @@ import readingExpression from "./reading-expression/config.json"
 import enWriting from "./en-writing/config.json"
 import chineseText from "./chinese-reading/config.json"
 import politicsText from "./politics/config.json"
+import biologyFill from "./biology-fill/config.json"
 
 export interface GradingPromptConfig {
   questionType: string
@@ -36,6 +37,7 @@ function loadPrompts(): GradingPromptConfig[] {
     enWriting,
     chineseText,
     politicsText,
+    biologyFill,
   ]
 
   return jsonFiles.flatMap((entry) =>
@@ -55,6 +57,7 @@ function normalizeType(t: string): string {
   if (t === "阅读表达") return "reading-expression"
   if (t === "英文写作" || t === "英语作文" || t === "作文") return "en-writing"
   if (t === "语文作文" || t === "中文写作") return "chinese-essay"
+  if (t === "生物" || t === "biology" || t === "生物大题") return "biology-fill"
   return t
 }
 
