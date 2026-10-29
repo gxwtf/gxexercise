@@ -454,6 +454,13 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         </div>
                     )}
 
+                    {isSubjective && category !== "essay" && aiFeedback && (
+                        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
+                            <p className="mb-1 text-sm font-medium text-amber-800 dark:text-amber-200">AI 批改</p>
+                            <p className="whitespace-pre-wrap text-sm text-amber-700 dark:text-amber-300">{aiFeedback}</p>
+                        </div>
+                    )}
+
                     {isSubjective && category !== "essay" && (
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold mb-3">优秀解答</h3>
