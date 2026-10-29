@@ -1,15 +1,18 @@
 /**
- * 把 exam-parser 生成的数学 JSON 导入题库
+ * 把 exam-parser 生成的选择题 JSON（数学 / 物理 / 化学）导入题库
  *
- * 数据来源：~/jingshibang/output_json_math/<类型>/数学/<试卷>.json
- * 图片：复制到 ~/jingshibang/output_docx_to_md/<类型>/数学/<试卷>/images/
- *       并把 ![](images/x.png) 改写成 /exam-images/<类型>/数学/<试卷>/images/x.png
+ * 数据来源：~/jingshibang/output_json_math/<类型>/<学科>/<试卷>.json
+ * 图片：复制到 ~/jingshibang/output_docx_to_md/<类型>/<学科>/<试卷>/images/
+ *       并把 ![](images/x.png) 改写成 /exam-images/<类型>/<学科>/<试卷>/images/x.png
+ *       源图依次在这些目录里找：JSON 同级 images/ → output_json_math/images/ →
+ *       output_docx_to_md/<类型>/<学科>/<试卷>/images/（物理等由 docx 直接导出的图片只在这里）
  *
  * 用法：
- *   npx tsx scripts/import-math-json.ts --type 二模            # 导入全部
- *   npx tsx scripts/import-math-json.ts --type 二模 --limit 3  # 只导 3 份（试水）
- *   npx tsx scripts/import-math-json.ts --file xxx.json        # 导单个
- *   npx tsx scripts/import-math-json.ts --type 二模 --dry-run  # 只看不写
+ *   npx tsx scripts/import-math-json.ts --type 二模                     # 导入全部（数学）
+ *   npx tsx scripts/import-math-json.ts --type 二模 --subject 物理       # 导入物理
+ *   npx tsx scripts/import-math-json.ts --type 二模 --limit 3           # 只导 3 份（试水）
+ *   npx tsx scripts/import-math-json.ts --file xxx.json                 # 导单个
+ *   npx tsx scripts/import-math-json.ts --type 二模 --dry-run           # 只看不写
  */
 import "dotenv/config";
 import fs from "node:fs";
@@ -48,7 +51,7 @@ interface MathPaper {
 function materializeImages(paper: MathPaper, stem: string, typeDir: string, imgSrcDirs: string[], subject: string): Map<string, string> {
   const mapping = new Map<string, string>();
   const missing: string[] = [];
-  const imgDstDir = path.join(MD_ROOT, typeDir, "数学", stem, "images");
+  const imgDstDir = path.join(MD_ROOT, typeDir, subject, stem, "images");
   const refs = new Set<string>();
   for (const s of paper.sections) {
     for (const q of s.questions) {
@@ -62,8 +65,11 @@ function materializeImages(paper: MathPaper, stem: string, typeDir: string, imgS
     const file = path.basename(ref);
     const src = imgSrcDirs.map((d) => path.join(d, file)).find((p) => fs.existsSync(p));
     if (!src) { missing.push(file); continue; }
-    fs.mkdirSync(imgDstDir, { recursive: true });
-    fs.copyFileSync(src, path.join(imgDstDir, file));
+    const dst = path.join(imgDstDir, file);
+    if (path.resolve(src) !== path.resolve(dst)) {
+      fs.mkdirSync(imgDstDir, { recursive: true });
+      fs.copyFileSync(src, dst);
+    }
     mapping.set(ref, `/exam-images/${typeDir}/${subject}/${stem}/images/${file}`);
   }
   if (missing.length) console.log(`  ⚠ ${stem}: ${missing.length} 张图片找不到（${missing.slice(0,2).join(", ")}）`);
@@ -109,7 +115,11 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
     await deletePaper(exists.id, title);
   }
 
-  const imgSrcDirs = [path.join(path.dirname(file), "images"), path.join(JSON_ROOT, "images")];
+  const imgSrcDirs = [
+    path.join(path.dirname(file), "images"),
+    path.join(JSON_ROOT, "images"),
+    path.join(MD_ROOT, typeDir, subject, stem, "images"),
+  ];
   const mapping = dryRun ? new Map<string, string>() : materializeImages(raw, stem, typeDir, imgSrcDirs, subject);
   const tags = Array.from(new Set([...(raw.paper.tags || []), subject]));
   const sectionCount = raw.sections.length;
