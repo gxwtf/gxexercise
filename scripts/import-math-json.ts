@@ -82,6 +82,21 @@ function rewrite(text: string, mapping: Map<string, string>): string {
   return out;
 }
 
+/** 重导护栏：卷子上已有作答时，--force 会把作答一起删掉，必须显式加 --drop-submissions 才允许 */
+async function assertNoSubmissions(paperId: string, title: string) {
+  const items = await prisma.paperItem.findMany({ where: { paperId }, select: { itemId: true } });
+  const gids = items.map((i) => i.itemId);
+  const [ts, gs] = await Promise.all([
+    prisma.testPaperSubmission.count({ where: { testPaperId: paperId } }),
+    gids.length ? prisma.questionGroupSubmission.count({ where: { questionGroupId: { in: gids } } }) : Promise.resolve(0),
+  ]);
+  if (ts + gs > 0 && !process.argv.includes("--drop-submissions")) {
+    throw new Error(
+      `${title}：已有 ${ts} 份试卷作答 / ${gs} 份题组作答，--force 会连作答一起删掉；确认要删请加 --drop-submissions`,
+    );
+  }
+}
+
 async function deletePaper(paperId: string, title: string) {
   const items = await prisma.paperItem.findMany({ where: { paperId }, select: { itemId: true } });
   const groupIds = items.map((i) => i.itemId);
@@ -112,6 +127,7 @@ async function importPaper(file: string, typeDir: string, dryRun: boolean, force
   const exists = await prisma.testPaper.findFirst({ where: { title, subject }, select: { id: true } });
   if (exists) {
     if (!force) { console.log(`跳过（已存在）：${title}`); return { skipped: true, questions: 0 }; }
+    await assertNoSubmissions(exists.id, title);
     await deletePaper(exists.id, title);
   }
 
