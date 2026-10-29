@@ -93,10 +93,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ```bash
 pnpm check:colors      # 颜色约定自检（改前端必跑，必须 0 问题）
+pnpm check:answers     # 判题口径自检（动 answer-check / 判题接口 / 题型大小写规则必跑，必须 PASS）
 pnpm build             # 生产构建（线上用 next start，务必本地先过）
 # pnpm lint 目前会因 eslint-plugin-react 与 ESLint 10 不兼容而直接崩（与本约定无关），
 # 修好之前以 check:colors + build 作为颜色相关的准入门槛。
 ```
+
+**判题大小写的口径**（`src/lib/answer-check.ts`，改之前先读）：
+选择题（choice / single / multiple，含完形、阅读、七选五、数学 / 物理 / 化学 / 语文选择题）的答案是
+选项字母，大小写 / 分隔符 / 全角一律忽略；**语法填空 grammar、选词填空 word-choice 的答案是单词，
+判分必须区分大小写**（由 `isCaseSensitiveAnswer()` 按题型判定，两个提交接口都要传）。
+注意答案只是字母（含选词填空语料框 A–K）时仍按不敏感处理。
 
 **并肉眼过一遍浅色和深色**：`ThemeToggle` 切换，或浏览器 DevTools → Rendering →
 `prefers-color-scheme: dark`。重点看：文字是否发灰看不清、白块、隐形边框、图表/圆环/进度条、

@@ -12,6 +12,29 @@ function isImageOnlyStem(text?: string) {
   return /^!\[[^\]]*\]\([^)]*\)$/.test(t) || /^<QImg\b[^>]*\/>$/.test(t)
 }
 
+/**
+ * 回填已选答案：答案字母与选项 id 的大小写可能不一致
+ * （数学 / 语文选择题答案常录成大写 "D"、选项 id 却是小写 "d"），
+ * 直接比较会让 RadioGroup / Checkbox 找不到对应选项、刷新后看不清已选项。
+ * 这里按大小写不敏感匹配回选项 id。
+ */
+function restoreSelectedIds(
+  saved: string | undefined | null,
+  options: Option[],
+  type: ChoiceType,
+): string[] | undefined {
+  if (!saved) return undefined
+  const keys = type === 'single' ? [saved] : saved.split(',')
+  const ids = keys
+    .map((key) => {
+      const target = key.trim().toLowerCase()
+      if (!target) return ''
+      return options.find((option) => String(option.id).trim().toLowerCase() === target)?.id ?? ''
+    })
+    .filter(Boolean)
+  return ids.length > 0 ? ids : undefined
+}
+
 
 type Option = {
   id: string
@@ -43,7 +66,7 @@ export function ChoiceField({ questions, onChange, startIndex = 0 }: ChoiceField
     <div className="space-y-6">
       {questions.map((question, index) => {
         const saved = answers[question.id]?.content.answer as string | undefined
-        const value = saved ? (question.type === 'single' ? [saved] : saved.split(',')) : undefined
+        const value = restoreSelectedIds(saved, question.options, question.type)
         return (
           <div key={question.id} className="space-y-4">
             {question.stem?.trim() ? (

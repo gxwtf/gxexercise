@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { normalizeChoiceAnswer } from "@/lib/answer-check"
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { useMDXComponents } from '@/mdx-components'
 
@@ -35,13 +36,14 @@ function getLayoutType(options: Option[]): LayoutType {
 
 export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceReviewProps) {
   const components = useMDXComponents()
-  // 答案大小写可能不一致（选项 id 是小写 a/b/c/d，正确答案常见大写 A/B/C/D）——统一按小写比较
-  const norm = (v: string) => v.trim().toLowerCase()
-  const userAnswers = userAnswer ? userAnswer.split(',').map(norm) : []
-  const correctAnswers = correctAnswer.split(',').map(norm)
-  const sortedUser = [...userAnswers].sort().join(',')
-  const sortedCorrect = [...correctAnswers].sort().join(',')
-  const isCorrect = userAnswer !== null && sortedUser === sortedCorrect
+  // 选项 id 与答案字母的大小写可能不一致（七选五选项 id 常是大写 A-G、答案却录成小写 a-g；
+  // 数学 / 语文则相反：选项 id 小写、答案大写），统一规范化后再比较，否则正确选项不会标绿。
+  // 同时兼容 "B,D" / "B D" / "bd" 等写法（去分隔符、压空格、全角转半角）。
+  const userLetters = [...normalizeChoiceAnswer(userAnswer ?? "")]
+  const correctLetters = [...normalizeChoiceAnswer(correctAnswer)]
+  const userLettersKey = [...userLetters].sort().join("")
+  const correctLettersKey = [...correctLetters].sort().join("")
+  const isCorrect = userLettersKey.length > 0 && userLettersKey === correctLettersKey
   const layoutType = getLayoutType(options)
 
   const gridClass =
@@ -54,8 +56,9 @@ export function ChoiceReview({ options, correctAnswer, userAnswer }: ChoiceRevie
   return (
     <div className={cn(gridClass, "font-question")}>
       {options.map((option) => {
-        const isSelected = userAnswers.includes(option.id)
-        const isCorrectOption = correctAnswers.includes(option.id)
+        const optionKey = normalizeChoiceAnswer(option.id)
+        const isSelected = userLetters.includes(optionKey)
+        const isCorrectOption = correctLetters.includes(optionKey)
 
         let style: string
 

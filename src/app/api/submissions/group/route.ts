@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { isAnswerCorrect } from "@/lib/answer-check"
+import { isAnswerCorrect, isCaseSensitiveAnswer } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
 import { isSubjectiveQuestion, isUngradedQuestion } from "@/lib/excellent-answer-rules"
@@ -103,7 +103,14 @@ export async function POST(request: Request) {
           };
         }
 
-        const isCorrect = isAnswerCorrect(userAnswer, correctAnswer);
+        // 语法填空 / 选词填空的答案是单词，大小写有意义，判分不能忽略大小写
+        const isCorrect = isAnswerCorrect(userAnswer, correctAnswer, {
+          caseSensitive: isCaseSensitiveAnswer(
+            question.question.questionType,
+            questionGroup.questionType,
+            correctAnswer,
+          ),
+        });
         const score = isCorrect ? questionScore : 0;
 
         if (isCorrect) {

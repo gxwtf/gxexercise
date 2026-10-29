@@ -673,16 +673,17 @@ function parseCloze(lines, startIndex, referenceAnswers, paper, txtContent) {
     if (match) {
       const originalNum = parseInt(match[1]);
       const options = [
-        { id: "a", label: match[2].trim() },
-        { id: "b", label: match[3].trim() },
-        { id: "c", label: match[4].trim() },
-        { id: "d", label: match[5].trim() },
+        { id: "A", label: match[2].trim() },
+        { id: "B", label: match[3].trim() },
+        { id: "C", label: match[4].trim() },
+        { id: "D", label: match[5].trim() },
       ];
 
       let answer = "";
       const refAns = referenceAnswers[originalNum];
       if (refAns && refAns[0]) {
-        answer = refAns[0].toLowerCase();
+        // 选项 id 与答案统一用大写字母（全站约定），避免答案小写导致回顾页选项无法标绿
+        answer = refAns[0].toUpperCase();
       }
 
       questions.push({
@@ -832,7 +833,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
         if (currentLabel) {
           const labelText = text.slice(start, match.index).trim();
           if (labelText) {
-            segments.push({ id: currentLabel.toLowerCase(), label: labelText });
+            segments.push({ id: currentLabel, label: labelText });
           }
         }
         currentLabel = match[1];
@@ -842,7 +843,7 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
       if (currentLabel) {
         const labelText = text.slice(start).trim();
         if (labelText) {
-          segments.push({ id: currentLabel.toLowerCase(), label: labelText });
+          segments.push({ id: currentLabel, label: labelText });
         }
       }
 
@@ -934,7 +935,8 @@ function parseReadingArticle(lines, startIndex, articleLabel, referenceAnswers, 
       questionType: "choice",
       content: q.content,
       options: q.options,
-      answer: referenceAnswers[q.id]?.[0]?.toLowerCase() || "",
+      // 选项 id 与答案统一大写字母（全站约定）
+      answer: referenceAnswers[q.id]?.[0]?.toUpperCase() || "",
       analysis: paper.analyses[q.id] || `第${q.id}题解析: 根据文章内容选择正确答案。`,
       score: 2,
     }));

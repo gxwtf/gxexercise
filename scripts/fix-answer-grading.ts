@@ -1,6 +1,10 @@
 /**
- * 修正历史客观题判分：用新的 isAnswerCorrect（忽略空格/大小写/全角/选择题分隔符）
+ * 修正历史客观题判分：用新的 isAnswerCorrect（忽略空格/全角/选择题分隔符；
+ * 大小写按题型区分：语法填空、选词填空严格区分，选择题字母忽略）
  * 重新判定每条客观题提交，并回算小节得分与整卷得分。
+ *
+ * 注意：这是「重判历史」的工具，默认只做 --dry-run 预览，不会自动执行；
+ * 上线判题规则调整时**不要**顺手跑它，否则历史成绩会变。
  *
  * 用法：npx tsx scripts/fix-answer-grading.ts [--dry-run]
  */
@@ -8,7 +12,7 @@ import "dotenv/config"
 import { PrismaClient } from "../src/generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
-import { isAnswerCorrect } from "../src/lib/answer-check"
+import { isAnswerCorrect, isCaseSensitiveAnswer } from "../src/lib/answer-check"
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) })
@@ -45,7 +49,9 @@ async function main() {
     const groupType = s.groupSubmission?.questionGroup?.questionType ?? ""
     if (isSubjective(s.question.questionType, groupType)) continue
     const answer = (s.content as { answer?: string } | null)?.answer ?? ""
-    const shouldBeCorrect = isAnswerCorrect(answer, s.question.answer)
+    const shouldBeCorrect = isAnswerCorrect(answer, s.question.answer, {
+      caseSensitive: isCaseSensitiveAnswer(s.question.questionType, groupType, s.question.answer),
+    })
     const expectedScore = shouldBeCorrect ? s.question.score ?? 0 : 0
     if (s.isCorrect === shouldBeCorrect && s.score === expectedScore) continue
 
