@@ -168,7 +168,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const showArticlePanel = !isEnWriting && !isMathType && !isWordChoice && !isNamedBook && !!articleMdx
     const hasMultipleQuestions = questionSwitcherItems.length > 1
     const correctRateDisplay = correctRate != null ? `${Math.round(correctRate * 100)}%` : "-"
-    const isPending = gradingStatus === "pending"
+    // 只有「主观题待批改」才算 pending；客观题历史脏数据里 pending 但已有分数的，按已判分显示
+    const isPending = gradingStatus === "pending" && userScore == null
     // 微写作/大作文暂时不判分；没作答的主观题也不该显示「评阅中」
     const isSkipped = gradingStatus === "skipped"
 

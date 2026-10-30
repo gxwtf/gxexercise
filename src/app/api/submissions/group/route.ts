@@ -135,7 +135,10 @@ export async function POST(request: Request) {
           questionId: sub.questionId,
           content: { answer: userAnswer },
           score,
-          isCorrect
+          isCorrect,
+          // 客观题在提交时已判完分：必须显式标 graded，否则 Prisma 默认 pending，
+          // 前端会一直显示「评阅中」，而 Worker 只捞有提示词的题型 → 永远卡住
+          gradingStatus: "graded",
         };
       })
     );

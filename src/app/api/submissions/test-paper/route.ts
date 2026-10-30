@@ -163,6 +163,8 @@ export async function POST(request: Request) {
               content: { answer: userAnswer },
               score,
               isCorrect,
+              // 客观题提交即判分（同 group 接口：不显式标 graded 会默认 pending）
+              gradingStatus: "graded" as const,
             }
           })
         )
