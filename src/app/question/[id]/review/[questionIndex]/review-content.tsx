@@ -317,7 +317,12 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             ) : !hasAnswer ? (
                                                 <span className="text-muted-foreground">未作答</span>
                                             ) : isPending || isCorrect === null ? (
-                                                <span className="text-amber-700 dark:text-amber-400">评阅中</span>
+                                                <>
+                                                    <span className="text-amber-700 dark:text-amber-400">评阅中</span>
+                                                    {data.currentSubmissionId && (
+                                                        <QueueStatus submissionIds={[data.currentSubmissionId]} variant="inline" />
+                                                    )}
+                                                </>
                                             ) : (
                                                 <>{userScore ?? "-"} / {questionScore}</>
                                             )}
@@ -377,9 +382,6 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             )}
                                         </>
                                     )}
-                                    {isPending && data.currentSubmissionId && (
-                                        <QueueStatus submissionIds={[data.currentSubmissionId]} />
-                                    )}
                                 </TabsContent>
                             )}
                                 <TabsContent value="reference-answer">
@@ -417,7 +419,12 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         ) : !hasAnswer ? (
                                             <span className="text-muted-foreground">未作答</span>
                                         ) : isPending || userScore == null ? (
-                                            <span className="text-amber-700 dark:text-amber-400">评阅中</span>
+                                            <>
+                                                <span className="text-amber-700 dark:text-amber-400">评阅中</span>
+                                                {data.currentSubmissionId && (
+                                                    <QueueStatus submissionIds={[data.currentSubmissionId]} variant="inline" />
+                                                )}
+                                            </>
                                         ) : (
                                             <>{userScore} / {questionScore}</>
                                         )}

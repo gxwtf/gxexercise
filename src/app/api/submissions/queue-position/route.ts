@@ -50,11 +50,16 @@ export async function GET(request: Request) {
         continue;
       }
 
+      // 同一次提交里的多个空 createdAt 可能相同，用 id 做二级排序（cuid 近似时间有序），
+      // 否则同一批提交会全部显示「正在批改」（position=0）
       const ahead = await prisma.questionSubmission.count({
         where: {
           gradingStatus: "pending",
-          createdAt: { lt: sub.createdAt },
           groupSubmission: { questionGroup: { questionType: { in: gradeableTypes } } },
+          OR: [
+            { createdAt: { lt: sub.createdAt } },
+            { createdAt: sub.createdAt, id: { lt: sub.id } },
+          ],
         },
       });
 
