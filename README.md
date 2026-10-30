@@ -216,3 +216,37 @@ npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部
 | `jingshibang/check_missing.py` | 仅爬取线上新增的卷子（只下载缺失部分） |
 | `jingshibang/update_bank.py` | 按卷子跑 md → JSON → 校验 → 入库（`--list` 可看进度，`--replace` 覆盖同名套卷） |
 | `jingshibang/exam-parser/backfill_re_stems.py` | 用 md 重算「阅读表达」题干并回填 `Question.content`（不调 AI） |
+
+### JSON 修好之后：原地回灌生产库（`scripts/sync-json-to-db.ts`）
+
+上游 `exam-parser/qa_scaffold.py --repair --apply` 修完 JSON（空答案、答案不在选项内、图片路径、
+分值兜底等，逐卷留痕 `<卷>.review.txt`）之后，生产库里的相应题目**还是旧数据**。
+用 `scripts/sync-json-to-db.ts` 把 JSON 原地同步进去——**只 update，不 delete / create**，
+题目与题组的 ID 都不变，所以作答记录（`QuestionSubmission` / `QuestionGroupSubmission`）原样保留。
+
+```bash
+npx tsx scripts/sync-json-to-db.ts --subject 语文 --type 二模 --dry-run     # 先看「将变更条数」
+npx tsx scripts/sync-json-to-db.ts --subject 语文 --type 二模 --apply       # 真正写库
+npx tsx scripts/sync-json-to-db.ts --subject 英语 --type 一模 --file <json> --apply
+npx tsx scripts/sync-json-to-db.ts --subject 数学 --type 二模 --apply --report /tmp/sync-数学.md
+```
+
+- **JSON 根**（按学科自动选）：英语 → `output_json/<类型>/英语/`；语文 → `output_json_chinese/<类型>/`；
+  政治 → `output_json_politics/<类型>/`；数学 / 物理 / 化学 → `output_json_math/<类型>/<学科>/`。
+- **结构自动识别**：`sections`（英语 / 数学 / 物理 / 化学）与 `groups`（语文 / 政治）都支持。
+- **匹配口径**（与 `sync-math-json.ts` 一致，找不到就跳过，**绝不用「新建」兜底**）：
+  1. `TestPaper`：`title = paper.title`（或文件名去 `.json`）且 `subject` 一致，找不到记「库中缺卷」；
+  2. 题组：`PaperItem.orderIndex` 顺序对 JSON 的 section / group 顺序，**两边数量不等就跳过整卷**（顺序不可信时不冒错位的险）；
+  3. 小题：`GroupItem.orderIndex` 顺序对 JSON questions 顺序，数量不等则跳过该题组。
+- **写哪些字段**：`Question.content / options / answer / analysis / score`；
+  `QuestionGroup.title / content / category / score`（题组标题沿用该卷既有命名法：
+  「卷名·分类」的继续用分类，英语那种「节标题」的继续用节标题，**试卷名一律不改**）。
+- **图片**：JSON 里若是相对 `images/x.png` → 改写为 `/exam-images/<类型>/<学科>/<卷>/images/x.png`；
+  链接目标里的空格与 ASCII 括号做百分号编码（否则 CommonMark 会把图片链接截断）。
+- 几个保守约定：JSON 里为空的字段**不覆盖**库里的值（防抹掉人工补充内容）；选项 ID 大小写沿用库里的
+  （英语 / 语文 / 数学是 `a/b/c`，物理是 `A/B/C`），只换 label，避免动到学生作答里存的 ID；
+  题组分值优先取 JSON `score`，缺失时才用小题合计；库中该卷若是**图片版**（题面 `<QImg>`，化学就是这种情况）
+  而 JSON 是文本版，不同源，直接跳过并记警告。
+- 跑完 `--dry-run` 应显示「需变更 0」（幂等），可据此确认库与 JSON 已一致。
+- 化学注意：库里 108 份化学卷都是**图片版**（`output_image_questions`，题面 `<QImg>`），
+  `output_json_math/<类型>/化学` 是文本版，两者不同源，本脚本会全部跳过。
