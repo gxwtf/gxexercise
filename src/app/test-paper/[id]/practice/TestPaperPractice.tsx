@@ -300,13 +300,14 @@ export function TestPaperPractice({
       )
     }
 
-    // 生物大题（材料内联填空题，长句空用 <InputLong>）
+    // 生物大题（材料内联填空题，长句空用 <InputLong>）；理科材料不缩进
     if (questionType === "biology-fill") {
       return (
         <Grammar
           questions={questions as any}
           mdxSource={contentMdx!}
           startQuestionNumber={startQuestionNumber}
+          indentParagraphs={false}
         />
       )
     }
@@ -401,6 +402,7 @@ export function TestPaperPractice({
         <Problem
           questions={questions as any}
           language="zh"
+          indentParagraphs={questionType !== "biology-choice"}
           startQuestionNumber={startQuestionNumber}
         />
       )

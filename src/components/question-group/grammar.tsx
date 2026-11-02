@@ -17,9 +17,11 @@ interface GrammarProps {
   questions: GrammarQuestion[]
   mdxSource: MDXRemoteSerializeResult
   startQuestionNumber?: number
+  /** 段落首行缩进 2 字符（中文试卷用）；生物等理科材料不需要 */
+  indentParagraphs?: boolean
 }
 
-export default function Grammar({ questions, mdxSource, startQuestionNumber = 1 }: GrammarProps) {
+export default function Grammar({ questions, mdxSource, startQuestionNumber = 1, indentParagraphs = true }: GrammarProps) {
   const { setAnswer, answers } = useAnswer()
 
   const inputDefaultValues = React.useMemo(() => {
@@ -59,10 +61,10 @@ export default function Grammar({ questions, mdxSource, startQuestionNumber = 1 
     <div className="bg-background font-question lg:h-full lg:overflow-hidden">
       <div className="flex flex-col lg:h-full lg:flex-row">
         <div className="flex-1 p-6 overflow-y-auto max-w-4xl mx-auto">
-          <EnglishReading 
+          <EnglishReading
             startQuestionNumber={startQuestionNumber}
             onInputChange={handleInputChange}
-            indentParagraphs
+            indentParagraphs={indentParagraphs}
           >
             <InputDefaultValuesContext.Provider value={inputDefaultValues}>
               <MathInput2Provider onInputChange={handleInput2Change}>

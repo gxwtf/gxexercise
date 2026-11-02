@@ -226,7 +226,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
                             <EnglishReading
-                                indentParagraphs
+                                indentParagraphs={questionGroup.questionType !== "biology-fill" && questionGroup.questionType !== "biology-choice"}
                                 startQuestionNumber={1}
                                 blanks={allUserBlanks}
                                 options={options}

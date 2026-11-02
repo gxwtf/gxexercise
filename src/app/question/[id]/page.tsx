@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { normalizeQuestionMdx } from "@/lib/mdx-text"
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
@@ -14,6 +15,7 @@ import QuestionGroupHeader from "@/components/question-group/QuestionGroupHeader
 import { QuestionSection } from "@/components/QuestionSection";
 
 function escapeLatexBraces(input: string): string {
+  input = normalizeQuestionMdx(input)
   // <br> 必须自闭合（MDX 会报 "Expected a closing tag for <br>"，语文表格里常见）
   const content = input.replace(/<br\s*\/?>/gi, '<br />')
   let result = ''
@@ -145,7 +147,7 @@ async function QuestionPageContent({ id }: { id: string }) {
 
   // 题组正文（阅读材料）：为空时不给 MDX，前端就不会再画出空的「阅读区域」
   const contentMdx = (questionGroup.content || '').trim()
-    ? await serialize(questionGroup.content, { mdxOptions })
+    ? await serialize(normalizeQuestionMdx(questionGroup.content), { mdxOptions })
     : null;
 
   if (questionGroup.questionType === 'cloze') {
@@ -217,9 +219,11 @@ async function QuestionPageContent({ id }: { id: string }) {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
+        {/* 生物材料不缩进（理科卷排版） */}
         <Grammar
           questions={questions as any}
           mdxSource={mdxSource!}
+          indentParagraphs={false}
         />
       </>
     );
@@ -340,6 +344,7 @@ async function QuestionPageContent({ id }: { id: string }) {
         <Problem
           questions={questions as any}
           language="zh"
+          indentParagraphs={questionGroup.questionType !== 'biology-choice'}
         />
       </>
     );
