@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { normalizeQuestionMdx } from "@/lib/mdx-text"
 import { notFound, redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { getIronSession } from "iron-session"
@@ -22,6 +23,7 @@ interface PageProps {
 }
 
 function escapeLatexBraces(input: string): string {
+  input = normalizeQuestionMdx(input)
   // <br> 必须自闭合（MDX 会报 "Expected a closing tag for <br>"，语文表格里常见）
   const content = input.replace(/<br\s*\/?>/gi, '<br />')
   let result = ''

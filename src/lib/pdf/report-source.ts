@@ -28,6 +28,15 @@ const GROUP_TYPE_LABELS: Record<string, string> = {
   "chinese-micro-writing": "微写作",
   "chinese-reading": "语文阅读",
   "chemistry-image": "化学图片题",
+  // 生物 / 历史 / 地理 / 政治：整卷一个大题一个 section（材料 + 小问），选择与大题分开标
+  "biology-choice": "生物选择题",
+  "biology-fill": "生物大题",
+  "history-choice": "历史选择题",
+  "history-fill": "历史大题",
+  "geography-choice": "地理选择题",
+  "geography-fill": "地理大题",
+  "politics-choice": "政治选择题",
+  "politics-fill": "政治大题",
 }
 
 /** 一次作答里单题的原始数据（QuestionSubmission） */

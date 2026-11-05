@@ -227,19 +227,60 @@ function Input({
 
 Input.displayName = 'Input'
 
-/** InputLong —— 长填空（生物大题里的长句表达）：独占一行的多行文本框，编号与 Input 共用同一套计数 */
-function InputLong({ rows = 2, ...props }: { rows?: number } & React.HTMLAttributes<HTMLSpanElement>) {
+/**
+ * 长答框的起步高度：rows 由分值换算（≤4 分 → 2 行、5–9 分 → 4 行、≥10 分 → 6 行）。
+ *
+ * 为什么要内联 minHeight：Textarea 自带 `field-sizing-content`（field-sizing: content），
+ * 空内容时高度只由 `min-h-16`（64px）决定，`rows` 属性对**视觉高度完全无效**——
+ * 实测 rows=2/4/6 三个空框一样高。给一个和 rows 成正比的 min-height 起步高度，
+ * 既让长答框按分值变高，又保留 field-sizing: content 的「越写越高」。
+ * rows=2（生物默认）→ 66px，与原来的 min-h-16(64px) 基本一致，老题组视觉不变。
+ */
+function inputLongMinHeight(rows: number | string | undefined): string {
+    const n = Math.max(Number(rows) || 2, 2)
+    // text-base 行高 24px + 上下 padding 8+8 + 边框 2 ≈ 每行 24px
+    return `${n * 24 + 18}px`
+}
+
+/**
+ * 长答框的公共实现（`InputLong` 与三科大题的 `AnswerBox` 共用）：
+ * 一个整宽的多行文本框，编号走同一套 ClozeContext 计数（只用于回填/索引，不渲染），
+ * 回顾/只读态沿用同一个 InputChangeContext 回填逻辑。
+ *
+ * `heightByRows`：InputLong 按 rows 折算起步高度（生物题组的老行为）；
+ * AnswerBox 不按 rows，直接用「阅读表达」那款固定起步高度（7rem ≈ 112px，够写 4–12 分）。
+ * 两者都保留 Textarea 的 `field-sizing: content`，所以越写越高。
+ *
+ * 2026-11 起**不再显示左侧数字徽章**（用户要求）：题面本身已有「（1）（2）…」编号，
+ * 徽章与之重复且会把句子/版面切碎。计数仍然照常递增（`getNextQuestionNumber()`），
+ * 因为作答回填、回顾索引、`<Input>` 短空的编号都依赖它，只是不再渲染出来。
+ */
+function LongAnswerField({
+    rows = 2,
+    placeholder = "请作答",
+    minHeightClass = "min-h-16",
+    heightByRows = true,
+    ...props
+}: {
+    rows?: number
+    placeholder?: string
+    minHeightClass?: string
+    heightByRows?: boolean
+} & React.HTMLAttributes<HTMLSpanElement>) {
     const clozeContext = React.useContext(ClozeContext);
     const inputChangeContext = useInputChangeContext();
     const defaultValues = React.useContext(InputDefaultValuesContext);
     const questionNumberRef = React.useRef<number | undefined>(undefined);
     const isReviewMode = clozeContext?.reviewMode ?? false;
+    const heightStyle: React.CSSProperties = heightByRows
+        ? { minHeight: inputLongMinHeight(rows) }
+        : { minHeight: "7rem" };
 
     if (questionNumberRef.current === undefined) {
         if (!clozeContext) {
             return (
                 <span className="my-2 block" style={{ textIndent: 0 }} {...props}>
-                    <Textarea rows={rows} className="min-h-16" />
+                    <Textarea rows={rows} className={minHeightClass} style={heightStyle} />
                 </span>
             );
         }
@@ -255,23 +296,38 @@ function InputLong({ rows = 2, ...props }: { rows?: number } & React.HTMLAttribu
     };
 
     return (
-        <span className="my-2 flex items-start gap-2" style={{ textIndent: 0 }} {...props}>
-            <span className="mt-1 shrink-0 rounded-lg border border-input bg-muted/40 px-2 py-1 text-base font-medium text-foreground">
-                {questionNumberRef.current}
-            </span>
+        <span className="my-2 block" style={{ textIndent: 0 }} {...props}>
             <Textarea
                 rows={rows}
-                className="min-h-16 flex-1 text-base"
+                className={cn(minHeightClass, "w-full text-base")}
+                style={heightStyle}
                 disabled={isReviewMode}
                 defaultValue={defaultValue}
-                placeholder={isReviewMode ? undefined : "请作答"}
+                placeholder={isReviewMode ? undefined : placeholder}
                 onChange={handleChange}
             />
         </span>
     );
 }
 
+/** InputLong —— 长填空（生物大题里的长句表达）：独占一行的多行文本框，编号与 Input 共用同一套计数 */
+function InputLong({ rows = 2, ...props }: { rows?: number } & React.HTMLAttributes<HTMLSpanElement>) {
+    // 默认值（rows=2 / min-h-16 / placeholder「请作答」）不要动：生物题组的视觉必须与改动前一致
+    return <LongAnswerField rows={rows} placeholder="请作答" minHeightClass="min-h-16" heightByRows {...props} />;
+}
+
 InputLong.displayName = 'InputLong'
+
+/**
+ * AnswerBox —— 历史 / 地理 / 政治大题的答题框：外观对齐英语「阅读表达」那一款
+ * （高一些的起步高度 min-h-28 ≈ 112px、placeholder「请在此作答...」、可随内容增高），
+ * 其余（编号顺序、作答回填、回顾只读态）与 InputLong 完全一致；两者都不再显示数字徽章。
+ */
+function AnswerBox(props: React.HTMLAttributes<HTMLSpanElement>) {
+    return <LongAnswerField placeholder="请在此作答..." minHeightClass="min-h-28" heightByRows={false} {...props} />;
+}
+
+AnswerBox.displayName = 'AnswerBox'
 
 const Typography = {
     H1: React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
@@ -542,6 +598,7 @@ const components: MDXComponents = {
     ClozeBlank,
     Input,
     InputLong,
+    AnswerBox,
     Input2,
     RightAlign,
     Center,

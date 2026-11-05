@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { normalizeQuestionMdx } from "@/lib/mdx-text"
 import { notFound, redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { getIronSession } from "iron-session"
@@ -9,8 +10,10 @@ import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import { TestPaperPractice } from "./TestPaperPractice"
 import { AnswerProvider } from "@/components/question-group/AnswerContext"
+import { trimSharedMaterialContents, usesSharedMaterial } from "@/lib/shared-material"
 
 function escapeLatexBraces(input: string): string {
+  input = normalizeQuestionMdx(input)
   // <br> 必须自闭合（MDX 会报 "Expected a closing tag for <br>"，语文表格里常见）
   const content = input.replace(/<br\s*\/?>/gi, '<br />')
   let result = ''
@@ -112,12 +115,18 @@ export default async function TestPaperPracticePage({ params }: PageProps) {
         } catch {}
       }
 
+      // 同材料选择题：后续题里重复的材料前缀只在显示时裁掉
+      const displayStems = usesSharedMaterial(group.questionType)
+        ? trimSharedMaterialContents(group.groupItems.map((item) => item.question.content))
+        : group.groupItems.map((item) => item.question.content ?? "")
+
       const questions = await Promise.all(
-        group.groupItems.map(async (item) => {
+        group.groupItems.map(async (item, qi) => {
+          const displayStem: string = displayStems[qi] ?? (item.question.content ?? "")
           let stemMdx = null
-          if (item.question.content) {
+          if (displayStem) {
             try {
-              const escaped = escapeLatexBraces(item.question.content)
+              const escaped = escapeLatexBraces(displayStem)
               stemMdx = await serialize(escaped, { mdxOptions })
             } catch {}
           }
@@ -146,7 +155,7 @@ export default async function TestPaperPracticePage({ params }: PageProps) {
 
           return {
             id: item.question.id,
-            stem: item.question.content,
+            stem: displayStem,
             stemMdx,
             type: type as 'single' | 'multiple' | 'input' | 'text',
             options: optionsWithMdx,

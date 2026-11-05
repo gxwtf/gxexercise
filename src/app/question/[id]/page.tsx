@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeQuestionMdx } from "@/lib/mdx-text"
+import { trimSharedMaterialContents, usesSharedMaterial } from "@/lib/shared-material"
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
@@ -84,11 +85,17 @@ async function QuestionPageContent({ id }: { id: string }) {
     notFound();
   }
 
-  const questions = await Promise.all(questionGroup.groupItems.map(async (item: any) => {
+  // 同材料选择题：整套练习时把后续题里重复的材料前缀裁掉（只影响显示，数据库不动）
+  const displayStems = usesSharedMaterial(questionGroup.questionType)
+    ? trimSharedMaterialContents(questionGroup.groupItems.map((item: any) => item.question.content))
+    : questionGroup.groupItems.map((item: any) => item.question.content ?? "");
+
+  const questions = await Promise.all(questionGroup.groupItems.map(async (item: any, qi: number) => {
+    const displayStem: string = displayStems[qi] ?? (item.question.content ?? "");
     let stemMdx = null;
-    if (item.question.content) {
+    if (displayStem) {
       try {
-        const escaped = escapeLatexBraces(item.question.content);
+        const escaped = escapeLatexBraces(displayStem);
         stemMdx = await serialize(escaped, { mdxOptions });
       } catch {
         stemMdx = null;
@@ -111,7 +118,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     if (item.question.questionType === 'input' || item.question.questionType === 'input2') {
       return {
         id: item.question.id,
-        stem: item.question.content,
+        stem: displayStem,
         stemMdx,
         type: 'input' as const,
         answer: item.question.answer || '',
@@ -120,7 +127,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     } else if (item.question.questionType === 'text') {
       return {
         id: item.question.id,
-        stem: item.question.content,
+        stem: displayStem,
         stemMdx,
         type: 'text' as const,
         answer: item.question.answer || '',
@@ -129,7 +136,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     } else if (item.question.questionType === 'multiple') {
       return {
         id: item.question.id,
-        stem: item.question.content,
+        stem: displayStem,
         stemMdx,
         type: 'multiple' as const,
         options: optionsWithMdx
@@ -137,7 +144,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     } else {
       return {
         id: item.question.id,
-        stem: item.question.content,
+        stem: displayStem,
         stemMdx,
         type: 'single' as const,
         options: optionsWithMdx
@@ -224,6 +231,22 @@ async function QuestionPageContent({ id }: { id: string }) {
           questions={questions as any}
           mdxSource={mdxSource!}
           indentParagraphs={false}
+        />
+      </>
+    );
+  }
+
+  // 历史 / 地理 / 政治大题（结构与生物同构：材料里内联设问 + 占位符；
+  // 占位符是 <AnswerBox>，长得像「阅读表达」那种大答题框；
+  // 中文文科材料，indentParagraphs 用 Grammar 默认的 true）
+  if (questionGroup.questionType === 'history-fill' || questionGroup.questionType === 'geography-fill' || questionGroup.questionType === 'politics-fill') {
+    const mdxSource = contentMdx;
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
+        <Grammar
+          questions={questions as any}
+          mdxSource={mdxSource!}
         />
       </>
     );
@@ -337,7 +360,7 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
-  if (questionGroup.questionType === 'math-choice' || questionGroup.questionType === 'physics-choice' || questionGroup.questionType === 'chemistry-choice' || questionGroup.questionType === 'chemistry-image' || questionGroup.questionType === 'biology-choice' || questionGroup.questionType === 'politics') {
+  if (questionGroup.questionType === 'math-choice' || questionGroup.questionType === 'physics-choice' || questionGroup.questionType === 'chemistry-choice' || questionGroup.questionType === 'chemistry-image' || questionGroup.questionType === 'biology-choice' || questionGroup.questionType === 'politics' || questionGroup.questionType === 'history-choice' || questionGroup.questionType === 'geography-choice' || questionGroup.questionType === 'politics-choice') {
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />

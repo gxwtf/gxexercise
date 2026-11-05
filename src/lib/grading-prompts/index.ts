@@ -5,6 +5,9 @@ import enWriting from "./en-writing/config.json"
 import chineseText from "./chinese-reading/config.json"
 import politicsText from "./politics/config.json"
 import biologyFill from "./biology-fill/config.json"
+import historyFill from "./history-fill/config.json"
+import geographyFill from "./geography-fill/config.json"
+import politicsFill from "./politics-fill/config.json"
 
 export interface GradingPromptConfig {
   questionType: string
@@ -38,6 +41,10 @@ function loadPrompts(): GradingPromptConfig[] {
     chineseText,
     politicsText,
     biologyFill,
+    // 历史 / 地理 / 政治 一模大题（结构与生物同构，questionType 与题组 questionType 一致）
+    historyFill,
+    geographyFill,
+    politicsFill,
   ]
 
   return jsonFiles.flatMap((entry) =>

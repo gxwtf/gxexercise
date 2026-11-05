@@ -29,7 +29,9 @@ interface GroupRowCardProps {
   totalScore?: number
 }
 
-const subjectiveTypes = ["reading-expression", "阅读表达", "en-writing", "chinese-essay", "chinese-micro-writing"]
+// 主观题（按得分率而不是「正确题数」统计）：作文/阅读表达，以及生物·历史·地理·政治的大题（*-fill）。
+// 三科文科大题与生物同构：小问都是主观题、按采分点判分，「正确题数」没有意义。
+const subjectiveTypes = ["reading-expression", "阅读表达", "en-writing", "chinese-essay", "chinese-micro-writing", "biology-fill", "history-fill", "geography-fill", "politics-fill"]
 function isSubjective(t: string) {
   return subjectiveTypes.includes(t)
 }

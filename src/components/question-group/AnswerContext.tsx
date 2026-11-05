@@ -74,6 +74,25 @@ export function AnswerProvider({ children, storageKey }: { children: ReactNode; 
   );
 }
 
+/** 单个作答值是否「空」（字符串/数组/对象递归判空） */
+function isEmptyAnswerValue(v: unknown): boolean {
+  if (v == null) return true
+  if (typeof v === 'string') return v.trim() === ''
+  if (Array.isArray(v)) return v.every(isEmptyAnswerValue)
+  if (typeof v === 'object') return Object.values(v as Record<string, unknown>).every(isEmptyAnswerValue)
+  return false
+}
+
+/**
+ * 用户是否**真的动过题**（有任何非空作答）。
+ *
+ * 用途：「返回」按钮要不要弹「确定放弃本次作答？」。
+ * 一进页面就点返回（没作答/只点开没填）不该拦人；填过东西才需要提醒。
+ */
+export function hasAnyAnswer(answers: Record<string, QuestionAnswer>): boolean {
+  return Object.values(answers).some((a) => !isEmptyAnswerValue(a?.content))
+}
+
 export function useAnswer() {
   const context = useContext(AnswerContext);
   if (!context) {

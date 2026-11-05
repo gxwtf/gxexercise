@@ -205,6 +205,26 @@ npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部
 ⚠ **导入不是幂等的**：同一份 JSON 导两次会得到两套同名套卷，`--delete "<标题>"` 会按标题
 删除（连同该卷的作答记录）。重复导入前请先删同名套卷。
 
+### 整卷学科（生物 / 历史 / 地理 / 政治）：`scripts/import-subject-json.ts`
+
+这四科是「选择题一组 + 一个大题一个 section」的同构结构（材料挂在题组 `content`，
+小问是 `<Input>/<InputLong>` 的「空」），统一用一个泛化入库脚本（`import-biology-json.ts` 的泛化版）：
+
+```bash
+npx tsx scripts/import-subject-json.ts --subject 历史 --type 一模 --dry-run    # 结构自检 + 缺图/分值/答案
+npx tsx scripts/import-subject-json.ts --subject 地理 --type 一模 --manifest ~/backups/imp.json
+npx tsx scripts/import-subject-json.ts --subject 政治 --file <json> --force    # 重导：作答快照→映射→重建
+npx tsx scripts/import-subject-json.ts --subject 政治 --delete "<套卷标题>"
+npx tsx scripts/import-subject-json.ts --rollback ~/backups/imp.json          # 按清单整批回退
+```
+
+- `--dry-run` 的自检会逐卷报：内联空个数≠小问数、小问无参考答案/分值≤0、选择题答案不在选项内、
+  题组小问合计≠大题分值、卷面总分≠题组合计、`/exam-images/**` 引用的图不在磁盘上（含「（教师版）」目录变体）。
+- `--force` 重导**不会丢作答**：先快照旧题组与作答，按「题组名 + 题干内容指纹」映射到新 id 重建
+  （没有作答的旧题组不参与映射，所以「按模块分组的老卷 → 按大题分组的新卷」也能过）；
+  映射不上直接中止，确实要丢弃才加 `--drop-submissions`。
+- `--manifest` 会记录本次导入的 `{subject,title,paperId}`，`--rollback` 按它整批删除（用于试跑回退）。
+
 ### 批量维护题库数据
 
 本仓库只负责「JSON → 数据库」这一步。上游（爬取菁师帮新卷、docx → md → JSON、校验、批量入库、

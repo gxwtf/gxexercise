@@ -106,9 +106,9 @@ function useGoBack(groupId?: string) {
 function getQuestionCategory(questionType: string, groupType: string): "choice" | "fill" | "essay" {
     if (questionType === "single" || questionType === "multiple" || questionType === "choice") return "choice"
     const combined = `${questionType} ${groupType}`
-    if (combined.includes("选择") || combined.includes("七选五") || (groupType === "math-choice" || groupType === "physics-choice" || groupType === "chemistry-choice" || groupType === "biology-choice")) return "choice"
+    if (combined.includes("选择") || combined.includes("七选五") || (groupType === "math-choice" || groupType === "physics-choice" || groupType === "chemistry-choice" || groupType === "biology-choice" || groupType === "history-choice" || groupType === "geography-choice" || groupType === "politics-choice")) return "choice"
     if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || combined.includes("input2") || groupType === "word-choice" || groupType === "math-fill") return "fill" 
-    if (groupType === "biology-fill") return "fill"
+    if (groupType === "biology-fill" || groupType === "history-fill" || groupType === "geography-fill" || groupType === "politics-fill") return "fill"
     if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
     if (groupType === "chinese-reading") {
         if (questionType === "input" || questionType === "input2") return "fill"
@@ -161,7 +161,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
     const isChoiceType = category === "choice"
     const isEnWriting = questionGroup.questionType === "en-writing"
-    const isMathType = ["math-fill", "math-choice", "physics-choice", "chemistry-choice", "biology-choice"].includes(questionGroup.questionType)
+    const isMathType = ["math-fill", "math-choice", "physics-choice", "chemistry-choice", "biology-choice", "history-choice", "geography-choice", "politics-choice"].includes(questionGroup.questionType)
     const isWordChoice = questionGroup.questionType === "word-choice"
     // 名著阅读：没有阅读区，材料直接排在题目上方
     const isNamedBook = questionGroup.category === "名著"
@@ -179,7 +179,12 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const hasAnswer = !!(displayUserAnswer && displayUserAnswer.trim())
     const displayCorrectAnswer = isChoiceType ? correctAnswer.toUpperCase() : correctAnswer
 
-    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice", "biology-fill"].includes(questionGroup.questionType)
+    // 左栏材料里是否有「空位」需要按对错着色：生物与历史/地理/政治大题都是「材料内联占位符」
+    // （历史/地理/政治的占位符是 <AnswerBox> 大答题框），所以这几个都在里面
+    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice", "biology-fill", "history-fill", "geography-fill", "politics-fill"].includes(questionGroup.questionType)
+
+    // 「参考答案」独立块：这几科的大题在回顾页没有「参考答案」Tab，所以单独补一块
+    const showFillAnswerBlock = questionGroup.questionType === "biology-fill" || questionGroup.questionType === "history-fill" || questionGroup.questionType === "geography-fill" || questionGroup.questionType === "politics-fill"
 
     return (
         <div className="h-screen overflow-hidden bg-background">
@@ -462,7 +467,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         </div>
                     )}
 
-                    {questionGroup.questionType === "biology-fill" && (
+                    {showFillAnswerBlock && (
                         <div className="mb-6">
                             <h3 className="mb-3 text-lg font-semibold">参考答案</h3>
                             <QuestionSection>

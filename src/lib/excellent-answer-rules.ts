@@ -12,6 +12,8 @@ export function isSubjectiveQuestion(questionType: string, groupType: string): b
   if (groupType === "politics" && questionType === "text") return true
   // 生物大题：每个空都交 AI 判分（填空可能是长句表达）
   if (groupType === "biology-fill") return true
+  // 历史 / 地理 / 政治大题：结构与生物同构（材料内联填空 + 小问是主观题），每个小问都交 AI 判分
+  if (groupType === "history-fill" || groupType === "geography-fill" || groupType === "politics-fill") return true
   return false
 }
 

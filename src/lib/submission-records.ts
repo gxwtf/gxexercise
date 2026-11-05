@@ -2,8 +2,13 @@
 //
 // 纯函数 + 常量，不依赖数据库；服务端组件与客户端组件都可安全引用。
 
-/** 需要 AI 批改的题型（其余客观题提交即完成批改） */
-export const AI_GRADEABLE = ["en-writing", "reading-expression", "作文", "英文写作", "英语作文", "阅读表达"]
+/** 需要 AI 批改的题型（其余客观题提交即完成批改）。
+ *  `*-fill` = 生物 / 历史 / 地理 / 政治的大题：每个小问都是主观题，提交后进 pending 等 Worker 判分，
+ *  这里补上之后 records / admin 才能筛到这些题型的「待 AI 批改」。 */
+export const AI_GRADEABLE = [
+  "en-writing", "reading-expression", "作文", "英文写作", "英语作文", "阅读表达",
+  "biology-fill", "history-fill", "geography-fill", "politics-fill",
+]
 
 export const needsAiGrading = (questionType: string) => AI_GRADEABLE.includes(questionType)
 

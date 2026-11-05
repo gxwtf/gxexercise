@@ -286,7 +286,7 @@ async function importOne(file: string, dryRun: boolean, force: boolean, dropSubs
     const isFill = sec.questionType === "biology-fill";
     array(sec.questions, `section「${sec.title || sec.category}」`);
     if (isFill) {
-      const blanks = (sec.content || "").match(/<Input(Long)?\s*>/g) || [];
+      const blanks = (sec.content || "").match(/<Input(Long)?\b[^<>]*>/g) || [];
       if (blanks.length !== sec.questions.length) {
         problems.push(`「${sec.title || sec.category}」内联空 ${blanks.length} 个 ≠ 题目 ${sec.questions.length} 道`);
       }

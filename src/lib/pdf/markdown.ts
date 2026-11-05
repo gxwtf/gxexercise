@@ -3,7 +3,8 @@
  * - 标题 / 段落 / 列表 / 表格（GFM）/ 图片 / 分隔线
  * - 行内：**加粗**、*斜体*、~~删除线~~、`代码`
  * - 数学公式 $...$ / $$...$$ 用 KaTeX 渲染
- * - 题库私有标签：<Input2></Input2>、<Input></Input>、<ClozeBlank></ClozeBlank>、<Blank></Blank>
+ * - 题库私有标签：<Input2></Input2>、<Input></Input>、<InputLong></InputLong>、
+ *   <ClozeBlank></ClozeBlank>、<Blank></Blank>
  *   以及 <Center>/<RightAlign>/<Superscript>/<Dot>/<U> 等语义标签 → 对应的打印样式
  * - 爬取内容里夹带的原始 HTML（表格 / div 等）按白名单原样保留
  * 目的：服务端生成 PDF 时不必走 React/MDX 渲染。
@@ -180,12 +181,21 @@ export function inline(text: string, ctx: RenderContext = createContext()): stri
   })
 
   // 3. 私有填空标签 → 横线（先匹配成对写法，再匹配自闭合/空标签写法）
-  for (const tag of ["Input2", "ClozeBlank", "Blank", "Input"]) {
-    const re = new RegExp(`<${tag}\\s*>[\\s\\S]*?<\\/${tag}\\s*>|<${tag}\\s*\\/?>`, "gi")
-    rest = rest.replace(re, () => protect(blankHtml(ctx)))
-  }
+  //    这些标签合成**一条交替正则**，按文档出现顺序一次性替换 —— 早先是「按标签类型分批 replace」，
+  //    同一段里混排 `<Input>` 与 `<InputLong>` 时空的编号会乱序（政治西城 19 题：(1) 用 <Input>、
+  //    (2)(3) 用 <InputLong>，纸质卷会印成 ___2___ ___3___ ___1___）。
+  //    - `InputLong` / `AnswerBox` 必须排在 `Input` 前面，且 `\b` 边界保证 Input 不会吃掉它们的前缀；
+  //    - 成对写法用 `\1` 反向引用，闭合标签必须与开标签同名（`<Input>…</InputLong>` 不会配错）；
+  //    - 标签允许带属性：生物按分值输出 `<InputLong rows={4}>` / `<InputLong rows={6}>`；
+  //      历史 / 地理 / 政治大题的答题框是 `<AnswerBox></AnswerBox>`（无属性）。
+  const BLANK_TAGS = "InputLong|AnswerBox|Input2|ClozeBlank|Blank|Input"
+  const blankTagRe = new RegExp(
+    `<(${BLANK_TAGS})\\b[^>]*>[\\s\\S]*?<\\/\\1\\s*>|<(${BLANK_TAGS})\\b[^>]*\\/?>`,
+    "gi"
+  )
+  rest = rest.replace(blankTagRe, () => protect(blankHtml(ctx)))
   // 兜底：清掉残留的孤立闭合标签（脏数据里出现过）
-  rest = rest.replace(/<\/(?:Input2|ClozeBlank|Blank|Input)\s*>/gi, "")
+  rest = rest.replace(/<\/(?:InputLong|AnswerBox|Input2|ClozeBlank|Blank|Input)\s*>/gi, "")
 
   // 3. 语义容器（可嵌套：内层交给递归的 inline 处理）
   for (const { tag, cls } of INLINE_CONTAINERS) {
@@ -265,8 +275,8 @@ export function markdownToHtml(md: string, options: MarkdownOptions = {}): strin
         i++
       }
       out.push(
-        `${TABLE_OPEN}<thead><tr>${header.map((h) => `<th>${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
-          `<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${inline(c, ctx)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
+        `${TABLE_OPEN}<thead><tr>${header.map((h) => `<th style="text-align:left">${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
+          `<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td style="text-align:left">${inline(c, ctx)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
       )
       continue
     }
@@ -284,8 +294,8 @@ export function markdownToHtml(md: string, options: MarkdownOptions = {}): strin
       if (rows.length >= 2) {
         const [head, ...body] = rows.map(pad)
         out.push(
-          `${TABLE_OPEN}<thead><tr>${head.map((h) => `<th>${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
-            `<tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${inline(c, ctx)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
+          `${TABLE_OPEN}<thead><tr>${head.map((h) => `<th style="text-align:left">${inline(h, ctx)}</th>`).join("")}</tr></thead>` +
+            `<tbody>${body.map((r) => `<tr>${r.map((c) => `<td style="text-align:left">${inline(c, ctx)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
         )
       } else {
         out.push(...rows.map((r) => `<p>${r.map((c) => inline(c, ctx)).join("　")}</p>`))

@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import useSession from "@/lib/use-session"
 import { useAlertContext } from "@/components/alert-provider"
-import { useAnswer } from "@/components/question-group/AnswerContext"
+import { useAnswer, hasAnyAnswer } from "@/components/question-group/AnswerContext"
 import { QuestionSection } from "@/components/QuestionSection"
 import Problem from "@/components/question-group/Problem"
 import Grammar from "@/components/question-group/grammar"
@@ -89,6 +89,8 @@ export function TestPaperPractice({
   const router = useRouter()
   const { showAlert } = useAlertContext()
   const { getAllAnswers, answers } = useAnswer()
+  // 只有真的填过东西才弹「放弃作答」确认；一进来就返回不拦人
+  const dirty = hasAnyAnswer(answers)
 
   const totalGroups = groupsData.length
   const currentGroup = groupsData[currentGroupIndex]
@@ -312,6 +314,18 @@ export function TestPaperPractice({
       )
     }
 
+    // 历史 / 地理 / 政治大题（结构与生物同构；材料里内联设问 + <AnswerBox> 大答题框；
+    // 中文文科材料，首行缩进用默认的 true）
+    if (questionType === "history-fill" || questionType === "geography-fill" || questionType === "politics-fill") {
+      return (
+        <Grammar
+          questions={questions as any}
+          mdxSource={contentMdx!}
+          startQuestionNumber={startQuestionNumber}
+        />
+      )
+    }
+
     if (questionType === "en-reading") {
       return (
         <Problem
@@ -397,7 +411,7 @@ export function TestPaperPractice({
         </div>
       )
     }
-    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "chemistry-image" || questionType === "biology-choice" || questionType === "politics") {
+    if (questionType === "math-choice" || questionType === "physics-choice" || questionType === "chemistry-choice" || questionType === "chemistry-image" || questionType === "biology-choice" || questionType === "politics" || questionType === "history-choice" || questionType === "geography-choice" || questionType === "politics-choice") {
       return (
         <Problem
           questions={questions as any}
@@ -436,24 +450,31 @@ export function TestPaperPractice({
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="放弃作答并返回">
-                <ChevronLeft className="size-4" />
-                返回
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>确定放弃本次作答？</AlertDialogTitle>
-                <AlertDialogDescription>返回后，当前未提交的作答不会保存。已提交的记录不受影响。</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>继续作答</AlertDialogCancel>
-                <AlertDialogAction onClick={handleQuit}>放弃并返回</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {dirty ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="放弃作答并返回">
+                  <ChevronLeft className="size-4" />
+                  返回
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确定放弃本次作答？</AlertDialogTitle>
+                  <AlertDialogDescription>返回后，当前未提交的作答不会保存。已提交的记录不受影响。</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>继续作答</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleQuit}>放弃并返回</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="返回" onClick={handleQuit}>
+              <ChevronLeft className="size-4" />
+              返回
+            </Button>
+          )}
           <h1 className="flex min-w-0 items-center gap-2 text-base font-semibold text-foreground sm:gap-3 sm:text-xl">
             <span className="truncate">{testPaperTitle}</span>
             {currentGroup && (

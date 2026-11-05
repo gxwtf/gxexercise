@@ -22,8 +22,46 @@ export function mergeAdjacentInlineMath(text: string): string {
   return out
 }
 
-/** 渲染前的统一归一（目前只有公式合并；后续可在此追加其它修补） */
+/**
+ * 私有填空标签的「数值表达式属性」→ 字符串属性：
+ *   `<InputLong rows={4}></InputLong>` → `<InputLong rows="4"></InputLong>`
+ *
+ * 背景：next-mdx-remote 的 `serialize()` 默认 `blockJS: true`，它内置的
+ * `removeJavaScriptExpressions` 插件会把 **所有 `{...}` 表达式属性静默删掉**（不是报错）：
+ * `<InputLong rows={4}>` 编出来是 `_jsxDEV(InputLong, {})`，`rows` 整个丢掉 →
+ * 组件退回默认 `rows=2`，长答框按分值给高度就白做了（实测 MDX 3.1.1 + next-mdx-remote 6.0.0）。
+ * 数值属性改成字符串写法既能过这道安全闸，又不用放开任意 JS。
+ *
+ * 只命中题库私有的填空标签 + 纯数字取值，正文里其它花括号（公式、示例）不动。
+ */
+const NUMERIC_TAG_ATTR_RE =
+  /<(InputLong|Input2|ClozeBlank|Blank|Input)(\b[^<>]*?)\b([A-Za-z][A-Za-z0-9-]*)=\{\s*(\d+(?:\.\d+)?)\s*\}/gi
+
+export function stringifyNumericTagAttrs(text: string): string {
+  if (!text || !text.includes("={")) return text
+  let out = text
+  // 反复替换，直到不再变化（一个标签上可能有多个数值属性）
+  for (let i = 0; i < 8; i += 1) {
+    const next = out.replace(NUMERIC_TAG_ATTR_RE, (_m, tag: string, before: string, name: string, value: string) =>
+      `<${tag}${before} ${name}="${value}"`)
+    if (next === out) break
+    out = next
+  }
+  return out
+}
+
+/**
+ * `<br>` → `<br />`：MDX 把裸 `<br>` 当成未闭合的 JSX 标签直接编译报错
+ * （`Expected a closing tag for <br>`），GFM 表格单元格里的 `<br><br>` 是最常见来源，
+ * 题组材料（QuestionGroup.content）走的是本函数而不是 escapeLatexBraces，所以必须在这里兜住。
+ */
+export function selfCloseBr(text: string): string {
+  if (!text || !/<br/i.test(text)) return text
+  return text.replace(/<br\s*\/?>/gi, '<br />')
+}
+
+/** 渲染前的统一归一（公式合并 + 填空标签数值属性改字符串写法 + br 自闭合；后续可在此追加其它修补） */
 export function normalizeQuestionMdx(text: string): string {
   if (!text) return text
-  return mergeAdjacentInlineMath(text)
+  return stringifyNumericTagAttrs(mergeAdjacentInlineMath(selfCloseBr(text)))
 }

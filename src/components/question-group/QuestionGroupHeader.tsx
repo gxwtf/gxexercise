@@ -17,7 +17,7 @@ import {
 import useSession from '@/lib/use-session';
 import { useRouter } from 'next/navigation';
 import { useAlertContext } from '@/components/alert-provider';
-import { useAnswer } from './AnswerContext';
+import { useAnswer, hasAnyAnswer } from './AnswerContext';
 
 interface QuestionGroupHeaderProps {
   title: string;
@@ -32,7 +32,9 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
   const { session } = useSession();
   const router = useRouter();
   const { showAlert } = useAlertContext();
-  const { getAllAnswers } = useAnswer();
+  const { getAllAnswers, answers } = useAnswer();
+  // 只有真的填过东西才弹「放弃作答」确认；一进来就返回不拦人
+  const dirty = hasAnyAnswer(answers);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -125,26 +127,33 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
     <header className="sticky top-0 z-50 bg-background border-b">
       <div className="flex items-center justify-between h-16 px-6">
         <div className="flex min-w-0 items-center gap-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="放弃作答并返回">
-                <ChevronLeft className="size-4" />
-                返回
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>确定放弃本次作答？</AlertDialogTitle>
-                <AlertDialogDescription>
-                  返回后，当前未提交的作答不会保存。已提交的记录不受影响。
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>继续作答</AlertDialogCancel>
-                <AlertDialogAction onClick={handleQuit}>放弃并返回</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {dirty ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="放弃作答并返回">
+                  <ChevronLeft className="size-4" />
+                  返回
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确定放弃本次作答？</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    返回后，当前未提交的作答不会保存。已提交的记录不受影响。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>继续作答</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleQuit}>放弃并返回</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button variant="ghost" size="sm" className="shrink-0 gap-1 px-2" title="返回" onClick={handleQuit}>
+              <ChevronLeft className="size-4" />
+              返回
+            </Button>
+          )}
           <h1 className="truncate text-xl font-semibold text-foreground">
             {title}{questionCount != null ? `（共${questionCount}小题${score != null ? `；共${score}分` : ""}）` : ""}
           </h1>
