@@ -3,6 +3,7 @@
  * （不直接依赖 Prisma 生成类型，方便单测 / 脚本复用）
  */
 import type { PaperGroupInput, PaperOption, PaperQuestionInput } from "./paper-doc"
+import { trimSharedMaterialContents, usesSharedMaterial } from "@/lib/shared-material"
 
 export interface QuestionSource {
   id: string
@@ -43,10 +44,15 @@ export function toPaperGroups(groups: GroupSource[], startNumber = 1): PaperGrou
   let offset = startNumber
   return groups.map((group) => {
     const start = offset
+    // 同材料选择题：纸质卷也只印一次材料（原卷就是这样排的），与屏幕上的去重同一套规则
+    const rawContents = group.groupItems.map((item) => item.question.content ?? "")
+    const displayContents = usesSharedMaterial(group.questionType)
+      ? trimSharedMaterialContents(rawContents)
+      : rawContents
     const questions: PaperQuestionInput[] = group.groupItems.map((item, index) => ({
       number: start + index,
       questionType: item.question.questionType,
-      content: item.question.content ?? "",
+      content: displayContents[index] ?? (item.question.content ?? ""),
       options: toOptions(item.question.options),
       score: item.question.score ?? 0,
     }))
