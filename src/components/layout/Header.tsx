@@ -67,7 +67,7 @@ export default function Header() {
           </DropdownMenu>
         )}
         <Link href="https://gxwtf.cn/home" className="text-sm font-medium hover:text-primary">
-          返回旧版主站
+          前往竞赛题库
         </Link>
       </nav>
     </div>
@@ -122,7 +122,7 @@ export default function Header() {
         href="https://gxwtf.cn/home"
         className="text-sm font-medium hover:text-primary"
       >
-        返回旧版主站
+        前往竞赛题库
       </Link>
     </nav>
   );
