@@ -60,6 +60,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        {/*
+          百度统计（hm.js）。按百度官方要求放在 </head> 之前，一处安装全站生效。
+          根布局渲染本应用全部路由，加这一次即可覆盖整个题库站（ti.gxwtf.cn）。
+          ID 是本项目专属的站点 ID，与主站 gxwtf.cn、古诗文站的 ID 都不同。
+        */}
+        <script
+          id="baidu-tongji"
+          dangerouslySetInnerHTML={{
+            __html: `var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?b6b891606d102524c218a10594ad7139";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
