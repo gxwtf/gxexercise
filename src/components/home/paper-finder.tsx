@@ -103,9 +103,6 @@ export default function PaperFinder({ defaultSubject = "历史" }: { defaultSubj
       >
         查看套卷
       </button>
-      <a href={href} className="text-sm font-medium text-brand hover:underline">
-        直接打开
-      </a>
       <p className="basis-full text-xs text-muted-foreground">
         也可以进列表后再用搜索框筛关键词（如「海淀」「西城一模」）。
       </p>

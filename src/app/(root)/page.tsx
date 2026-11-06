@@ -185,10 +185,10 @@ export default async function RootPage() {
 
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
-              href="#sample"
+              href={userId ? (recentSubs[0]?.href ?? "#subjects") : "#sample"}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground"
             >
-              不登录，先做一道
+              {userId ? (recentSubs[0] ? "继续上次练习" : "挑一套开始") : "不登录，先做一道"}
             </Link>
             <Link
               href="#subjects"
@@ -221,8 +221,8 @@ export default async function RootPage() {
         </div>
       </section>
 
-      {/* ── 免登录体验一道 ── */}
-      <SampleQuestion />
+      {/* ── 免登录体验一道（只给未登录访客；登录后改由「我的学习」承接） ── */}
+      {!userId ? <SampleQuestion /> : null}
 
       {/* ── 我的学习（仅登录后） ── */}
       {userId ? (

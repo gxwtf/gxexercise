@@ -17,6 +17,7 @@ interface Sample {
   topic: string
   prompt: string
   options: { id: string; label: string }[]
+  analysisAvailable: boolean
   continueHref: string
 }
 
@@ -125,7 +126,7 @@ export default function SampleQuestion() {
         </div>
         {sample && (
           <p className="text-sm text-muted-foreground">
-            取自{sample.subject} · {sample.topic}
+            取自北京高考真题 · {sample.subject}
           </p>
         )}
       </div>
@@ -188,6 +189,16 @@ export default function SampleQuestion() {
               {status !== "done" && !selected && (
                 <span className="text-sm text-muted-foreground">选一个选项，再点「看看答案」。</span>
               )}
+              {status !== "done" && (
+                <button
+                  type="button"
+                  onClick={() => void load()}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
+                >
+                  <RotateCcw className="size-4" aria-hidden="true" />
+                  换一道
+                </button>
+              )}
               {status === "done" && result && (
                 <>
                   <p
@@ -217,6 +228,14 @@ export default function SampleQuestion() {
                 </>
               )}
             </div>
+
+            {status === "done" && result && !result.analysis && (
+              <div className="mt-5 rounded-xl border border-border bg-muted/40 p-4">
+                <p className="text-sm text-muted-foreground">
+                  这道真题的原卷没有附解析，可以去题库里看答案与同类题。
+                </p>
+              </div>
+            )}
 
             {status === "done" && result?.analysis && (
               <div className="mt-5 rounded-xl border border-border bg-muted/40 p-4">
