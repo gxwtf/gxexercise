@@ -181,36 +181,6 @@ export function QuestionOverview({
               )}
             </div>
 
-            {/* 考区（产品指定顺序：北京真题 → 海淀 → 西城 → 东城 → 朝阳 → 丰台 → 石景山 → 郊区） */}
-            <div className="mb-5">
-              <Label className="mb-2 block text-sm font-medium text-muted-foreground">考区</Label>
-              <div className="flex flex-wrap gap-2">
-                {DISTRICT_OPTIONS.map((option) => {
-                  const active = filters.district === option.value;
-                  // 「北京真题」= 把分类切到高考真题；选具体区县时如果正停在高考真题上，自动回到「全部题型」
-                  const href =
-                    option.value === DISTRICT_ZHENTI
-                      ? hrefWith({ district: "all", cat: "高考真题", page: 1 })
-                      : hrefWith({
-                          district: option.value,
-                          cat: filters.cat === "高考真题" ? "all" : filters.cat,
-                          page: 1,
-                        });
-                  return (
-                    <Button
-                      key={option.value}
-                      asChild
-                      variant={active ? "default" : "outline"}
-                      size="sm"
-                      className="px-2.5 py-1 text-xs"
-                    >
-                      <Link href={href}>{option.label}</Link>
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* 题型分类 */}
             <div className="mb-5 grid grid-cols-2 gap-2 lg:mb-6 lg:flex lg:flex-col">
               {CATEGORY_OPTIONS.map((option) => (
@@ -265,6 +235,36 @@ export function QuestionOverview({
                     <Link href={hrefWith({ grade, page: 1 })}>{grade}</Link>
                   </Button>
                 ))}
+              </div>
+            </div>
+
+            {/* 考区（面板最底部；顺序：北京真题 → 海淀 → 西城 → 东城 → 朝阳 → 丰台 → 石景山 → 郊区） */}
+            <div className="mt-6">
+              <Label className="mb-3 block text-sm font-medium text-muted-foreground">考区</Label>
+              <div className="flex flex-wrap gap-2">
+                {DISTRICT_OPTIONS.map((option) => {
+                  const active = filters.district === option.value;
+                  // 「北京真题」= 把分类切到高考真题；选具体区县时如果正停在高考真题上，自动回到「全部题型」
+                  const href =
+                    option.value === DISTRICT_ZHENTI
+                      ? hrefWith({ district: "all", cat: "高考真题", page: 1 })
+                      : hrefWith({
+                          district: option.value,
+                          cat: filters.cat === "高考真题" ? "all" : filters.cat,
+                          page: 1,
+                        });
+                  return (
+                    <Button
+                      key={option.value}
+                      asChild
+                      variant={active ? "default" : "outline"}
+                      size="sm"
+                      className="px-2.5 py-1 text-xs"
+                    >
+                      <Link href={href}>{option.label}</Link>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           </Card>
