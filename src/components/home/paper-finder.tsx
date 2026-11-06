@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { subjects, subjectToRoute, categoriesBySubject, categoryToRoute } from "@/constants/subjects"
 import { Button } from "@/components/ui/button"
+import { DISTRICT_OPTIONS } from "@/constants/districts"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 /**
@@ -24,6 +25,7 @@ export default function PaperFinder({ defaultSubject = "历史" }: { defaultSubj
   const [subject, setSubject] = useState(defaultSubject)
   const [cat, setCat] = useState(PAPER_TYPES[1].cat)
   const [year, setYear] = useState<string>("2026")
+  const [district, setDistrict] = useState<string>("all")
 
   const go = () => {
     const subjectRoute = subjectToRoute[subject]
@@ -35,6 +37,7 @@ export default function PaperFinder({ defaultSubject = "历史" }: { defaultSubj
     }
     const params = new URLSearchParams({ cat })
     if (year !== "all") params.set("year", year)
+    if (district !== "all") params.set("district", district)
     router.push(`/questions/${subjectRoute}/${categoryRoute}?${params.toString()}`)
   }
 
@@ -82,6 +85,22 @@ export default function PaperFinder({ defaultSubject = "历史" }: { defaultSubj
             {YEARS.map((y) => (
               <SelectItem key={y} value={y}>
                 {y === "all" ? "全部" : y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <span className="text-xs text-muted-foreground">考区</span>
+        <Select value={district} onValueChange={setDistrict}>
+          <SelectTrigger className="w-28" aria-label="选择考区">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {DISTRICT_OPTIONS.map((d) => (
+              <SelectItem key={d.value} value={d.value}>
+                {d.label}
               </SelectItem>
             ))}
           </SelectContent>

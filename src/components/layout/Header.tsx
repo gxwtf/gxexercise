@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 import {
@@ -12,6 +14,43 @@ import {
 import BaseHeader from '@/components/layout/BaseHeader';
 import { subjects, subjectToRoute } from '@/constants/subjects';
 import useSession from '@/lib/use-session';
+
+function SubjectLinks({ mobile }: { mobile: boolean }) {
+  const pathname = usePathname();
+  // 换学科时保留当前筛选（考区 / 年份 / 年级 / 关键词）。
+  // 不用 useSearchParams：它在 SSR 阶段会让整块挂起（首屏菜单变空），这里用路由变化后读 window.location.search。
+  const [keep, setKeep] = useState("");
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams();
+    for (const key of ["cat", "district", "year", "grade", "q"]) {
+      const v = sp.get(key);
+      if (v) params.set(key, v);
+    }
+    const qs = params.toString();
+    setKeep(qs ? `?${qs}` : "");
+  }, [pathname]);
+
+  return (
+    <>
+      {subjects.map((subject) =>
+        mobile ? (
+          <Link
+            key={subject}
+            href={`/questions/${subjectToRoute[subject]}${keep}`}
+            className="text-sm font-medium hover:text-primary pl-4"
+          >
+            {subject}
+          </Link>
+        ) : (
+          <DropdownMenuItem key={subject} asChild>
+            <Link href={`/questions/${subjectToRoute[subject]}${keep}`}>{subject}</Link>
+          </DropdownMenuItem>
+        ),
+      )}
+    </>
+  );
+}
 
 export default function Header() {
   const { session } = useSession();
@@ -33,13 +72,7 @@ export default function Header() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            {subjects.map((subject) => (
-              <DropdownMenuItem key={subject} asChild>
-                <Link href={`/questions/${subjectToRoute[subject]}`}>
-                  {subject}
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            <SubjectLinks mobile={false} />
           </DropdownMenuContent>
         </DropdownMenu>
         <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
@@ -86,15 +119,7 @@ export default function Header() {
       </Link>
       <div className="flex flex-col space-y-3">
         <span className="text-sm font-medium text-muted-foreground">题库</span>
-        {subjects.map((subject) => (
-          <Link
-            key={subject}
-            href={`/questions/${subjectToRoute[subject]}`}
-            className="text-sm font-medium hover:text-primary pl-4"
-          >
-            {subject}
-          </Link>
-        ))}
+        <SubjectLinks mobile />
       </div>
       <Link
         href="https://gxwtf.cn/game"

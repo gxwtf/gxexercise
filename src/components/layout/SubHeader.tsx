@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import BaseHeader from '@/components/layout/BaseHeader';
@@ -22,6 +23,19 @@ export default function SubHeader({
   const router = useRouter();
   const pathname = usePathname();
   const currentNavItems = subjectNavItems[subject];
+
+  // 换学科 / 换题型时保留当前筛选（考区 / 年份 / 年级 / 关键词）；路由变化后从地址栏取最新值
+  const [keep, setKeep] = useState('');
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams();
+    for (const key of ['cat', 'district', 'year', 'grade', 'q']) {
+      const v = sp.get(key);
+      if (v) params.set(key, v);
+    }
+    const qs = params.toString();
+    setKeep(qs ? `?${qs}` : '');
+  }, [pathname]);
   
   // 获取当前选中的题型
   const getCurrentCategory = () => {
@@ -57,7 +71,7 @@ export default function SubHeader({
           value={subject}
           onValueChange={(value) => {
             if (value && subjectToRoute[value]) {
-              router.push(`/questions/${subjectToRoute[value]}`)
+              router.push(`/questions/${subjectToRoute[value]}${keep}`)
             }
           }}
         >
@@ -89,7 +103,7 @@ export default function SubHeader({
                   : 'text-foreground'
               }`}
             >
-              <Link href={item.href}>
+              <Link href={`${item.href}${keep}`}>
                 {item.label}
                 {isActive && (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand" />
@@ -109,10 +123,10 @@ export default function SubHeader({
         return (
           <Link
             key={index}
-            href={item.href}
+            href={`${item.href}${keep}`}
             className={`text-sm font-medium ${
-              isActive 
-                ? 'text-brand font-semibold underline underline-offset-4' 
+              isActive
+                ? 'text-brand font-semibold underline underline-offset-4'
                 : 'hover:text-primary'
             }`}
           >

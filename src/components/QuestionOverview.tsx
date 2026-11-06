@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PageBar } from "@/components/PageBar";
 import useSession from "@/lib/use-session";
+import { DISTRICT_OPTIONS, DISTRICT_ZHENTI } from "@/constants/districts";
 
 /** 这些学科用「套卷样式」的单行卡片（不带封面图） */
 const ROW_CARD_SUBJECTS = ["数学", "物理", "化学", "政治"];
@@ -40,6 +41,8 @@ type ListPaper = {
 
 interface Filters {
   cat: string;
+  /** 考区：all / 真题 / 海淀 / 西城 / … */
+  district: string;
   year: string;
   grade: string;
   q: string;
@@ -142,6 +145,7 @@ export function QuestionOverview({
     const next = { ...filters, ...over };
     const params = new URLSearchParams();
     if (next.cat && next.cat !== "all") params.set("cat", next.cat);
+    if (next.district && next.district !== "all") params.set("district", next.district);
     if (next.year && next.year !== "all") params.set("year", next.year);
     if (next.grade && next.grade !== "all") params.set("grade", next.grade);
     if (next.q) params.set("q", next.q);
@@ -153,6 +157,8 @@ export function QuestionOverview({
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const isTestPaperPage = mode === "papers";
+  const hasActiveFilters =
+    filters.cat !== "all" || filters.district !== "all" || filters.year !== "all" || filters.grade !== "all" || filters.q !== "";
 
   const submitSearch = () => {
     router.push(hrefWith({ q: searchDraft.trim(), page: 1 }));
@@ -164,7 +170,46 @@ export function QuestionOverview({
         <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
           {/* 左侧筛选面板（移动端默认折叠） */}
           <Card className={`${filtersOpen ? "block" : "hidden"} w-full shrink-0 bg-card rounded-xl p-4 sm:p-6 h-fit lg:block lg:w-72`}>
-            <h3 className="text-base font-semibold mb-4 border-l-4 border-primary pl-3 sm:text-lg sm:mb-5">筛选条件</h3>
+            <div className="mb-4 flex items-center justify-between gap-2 sm:mb-5">
+              <h3 className="border-l-4 border-primary pl-3 text-base font-semibold sm:text-lg">筛选条件</h3>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" asChild className="text-xs text-muted-foreground">
+                  <Link href={hrefWith({ cat: "all", district: "all", year: "all", grade: "all", q: "", page: 1 })}>
+                    清除
+                  </Link>
+                </Button>
+              )}
+            </div>
+
+            {/* 考区（产品指定顺序：北京真题 → 海淀 → 西城 → 东城 → 朝阳 → 丰台 → 石景山 → 郊区） */}
+            <div className="mb-5">
+              <Label className="mb-2 block text-sm font-medium text-muted-foreground">考区</Label>
+              <div className="flex flex-wrap gap-2">
+                {DISTRICT_OPTIONS.map((option) => {
+                  const active = filters.district === option.value;
+                  // 「北京真题」= 把分类切到高考真题；选具体区县时如果正停在高考真题上，自动回到「全部题型」
+                  const href =
+                    option.value === DISTRICT_ZHENTI
+                      ? hrefWith({ district: "all", cat: "高考真题", page: 1 })
+                      : hrefWith({
+                          district: option.value,
+                          cat: filters.cat === "高考真题" ? "all" : filters.cat,
+                          page: 1,
+                        });
+                  return (
+                    <Button
+                      key={option.value}
+                      asChild
+                      variant={active ? "default" : "outline"}
+                      size="sm"
+                      className="px-2.5 py-1 text-xs"
+                    >
+                      <Link href={href}>{option.label}</Link>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* 题型分类 */}
             <div className="mb-5 grid grid-cols-2 gap-2 lg:mb-6 lg:flex lg:flex-col">
