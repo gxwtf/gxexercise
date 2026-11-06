@@ -1,4 +1,5 @@
 import Link from "next/link"
+import pkg from "../../../package.json"
 import { cookies } from "next/headers"
 import { getIronSession } from "iron-session"
 import { ArrowUpRight, BookOpenCheck, CheckCircle2, ChevronRight, Clock, FileText, Trophy } from "lucide-react"
@@ -8,7 +9,6 @@ import { subjects, subjectToRoute, categoriesBySubject, categoryToRoute } from "
 import { getLeaderboard, getMyRank } from "@/lib/leaderboard"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
 import SampleQuestion from "@/components/home/sample-question"
-import { getAppVersion } from "@/lib/app-version"
 import PaperFinder from "@/components/home/paper-finder"
 
 export const dynamic = "force-dynamic"
@@ -32,7 +32,8 @@ const PAPER_TYPES = [
 const dayFmt = new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" })
 
 export default async function RootPage() {
-  const version = getAppVersion()
+  // 版本号直接取 package.json（构建期内联；发版本来就要重新 build）
+  const version = pkg.version
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   const userId = session.isLoggedIn && session.userid ? session.userid : 0
 
