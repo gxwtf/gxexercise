@@ -36,7 +36,10 @@ interface SampleQuestion {
 
 /** 去掉题干开头残留的「（4分）」、连续重复段落、题组提示 */
 function cleanPrompt(raw: string): string {
-  let text = raw.replace(/^[\s\u3000]*[（(]\s*\d+\s*分\s*[）)]\s*/g, "").trim()
+  let text = raw
+    .replace(/^\s*\*\*[^*\n]{0,16}(选择题|非选择题)[^*\n]{0,16}\*\*\s*/g, "")
+    .replace(/^[\s\u3000]*[（(]\s*\d*\s*分\s*[）)]\s*/g, "")
+    .trim()
   const paras = text.split(/\n{2,}/)
   const out: string[] = []
   for (const p of paras) {
@@ -137,6 +140,7 @@ async function pickQuestion(): Promise<SampleQuestion | null> {
       if (!content || content.length < 12 || content.length > 420) continue
       if (IMG_RE.test(content) || RICH_RE.test(content) || MATH_RE.test(content)) continue
       if (FIG_REF_RE.test(content) || GROUP_HINT_RE.test(content)) continue
+      if (content.includes("**") || content.includes("每小题")) continue
       const analysis = String(q.analysis || "").trim()
       return {
         id: q.id,

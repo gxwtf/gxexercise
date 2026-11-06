@@ -15,6 +15,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemGroup,
+  ItemSeparator,
+  ItemTitle,
+} from "@/components/ui/item"
 
 export const dynamic = "force-dynamic"
 
@@ -45,7 +53,6 @@ export default async function RootPage() {
     questionTotal,
     paperBySubject,
     groupBySubject,
-    recentPapers,
     { rows: studyTop },
     { rows: scoreTop },
   ] = await Promise.all([
@@ -53,11 +60,6 @@ export default async function RootPage() {
     prisma.question.count(),
     prisma.testPaper.groupBy({ by: ["subject"], _count: { id: true } }),
     prisma.questionGroup.groupBy({ by: ["subject"], _count: { id: true } }),
-    prisma.testPaper.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 3,
-      select: { id: true, title: true, subject: true, createdAt: true },
-    }),
     getLeaderboard({ period: "week", metric: "count", limit: 5 }),
     getLeaderboard({ period: "week", metric: "score", limit: 5 }),
   ])
@@ -73,13 +75,18 @@ export default async function RootPage() {
       prisma.testPaper.findFirst({
         where: { subject },
         orderBy: { createdAt: "desc" },
-        select: { id: true, title: true, subject: true },
+        select: { id: true, title: true, subject: true, createdAt: true },
       }),
     ),
   )
   for (const row of latestRows) {
     if (row) latestBySubject.set(row.subject, { id: row.id, title: row.title })
   }
+  // 最近入库：每个学科各取最新一卷，再按入库时间取前 3（避免同一批导入垄断整块）
+  const recentPapers = latestRows
+    .filter((r): r is NonNullable<typeof r> => Boolean(r))
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .slice(0, 3)
 
   // 已登录：我的待批改 / 最近练习（题组优卷优先） / 本周名次
   let pendingCount = 0
@@ -196,17 +203,34 @@ export default async function RootPage() {
         </div>
 
         {recentPapers.length > 0 && (
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span>最近入库</span>
-            {recentPapers.map((p) => (
-              <span key={p.id} className="inline-flex items-center gap-1">
-                <Link href={`/test-paper/${p.id}`} className="text-foreground hover:underline">
-                  {p.title}
-                </Link>
-                <span>{dayFmt.format(p.createdAt)}</span>
-              </span>
-            ))}
-          </p>
+          <Card size="sm">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle>最近入库</CardTitle>
+                <span className="text-xs text-muted-foreground">按入库时间</span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ItemGroup className="gap-0">
+                {recentPapers.map((p, i) => (
+                  <div key={p.id}>
+                    {i > 0 && <ItemSeparator />}
+                    <Item variant="default" size="xs" asChild>
+                      <Link href={`/test-paper/${p.id}`}>
+                        <Badge variant="secondary">{p.subject}</Badge>
+                        <ItemContent>
+                          <ItemTitle className="truncate">{p.title}</ItemTitle>
+                        </ItemContent>
+                        <ItemActions>
+                          <span className="text-xs text-muted-foreground">{dayFmt.format(p.createdAt)}</span>
+                        </ItemActions>
+                      </Link>
+                    </Item>
+                  </div>
+                ))}
+              </ItemGroup>
+            </CardContent>
+          </Card>
         )}
       </section>
 
