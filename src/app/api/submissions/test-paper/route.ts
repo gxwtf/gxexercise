@@ -93,7 +93,7 @@ export async function POST(request: Request) {
             const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType)
 
             // 画图/补图题：参考答案是图片，无法按文字判分
-        if (isImageAnswer(correctAnswer)) {
+        if (isImageAnswer(correctAnswer) || !correctAnswer.trim()) {
           return {
             userId,
             questionId: sub.questionId,
