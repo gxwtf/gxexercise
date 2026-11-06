@@ -174,20 +174,21 @@ export default async function RootPage() {
       <section className="space-y-4">
         <Badge variant="outline" className="gap-1">
           <BookOpenCheck aria-hidden="true" />
-          广学题库 · 公测期 · v{version}
+          广学题库 · 广学社旗下课内题库
         </Badge>
         <h1 className="text-2xl font-bold leading-snug text-foreground sm:text-4xl">
-          北京高中真题与各区模拟，<span className="text-brand">九科齐全</span>
+          北京高考真题与高三模拟题，<span className="text-brand">一处刷遍</span>
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          教师版带答案与解析。单题、题组、整卷三种练法；客观题提交即判，主观题按采分点 AI 批改，可导出纸质作答卷与回顾 PDF。
+          想怎么练就怎么练：一道小题、一组选择、一篇阅读、一套整卷都可以；客观题提交即判，主观题按高考标准 AI
+          批改；可导出纸质作答卷与回顾 PDF。
         </p>
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
           <span className="text-foreground">{paperTotal} 套卷</span>
           <span className="text-foreground">{questionTotal.toLocaleString("zh-CN")} 道题</span>
           <span className="text-foreground">{totalGroups} 个题组</span>
-          <span>2011–2026 北京真题 · 2021–2026 各区一模 / 二模 / 上期末</span>
+          <span>2011–2026 北京真题 · 2021–2026 各区高三上期末 / 一模 / 二模</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -501,7 +502,7 @@ export default async function RootPage() {
         <p className="text-xs text-muted-foreground">
           想一起出题、审解析或做工具？
           <a
-            href="https://gxwtf.cn/markdown/preview?file=uploads%2Frecruitment.md"
+            href="https://gxwtf.cn/markdown/preview?file=public%2Fannouncements%2Fclub.md"
             className="ml-1 text-brand hover:underline"
           >
             看看招新说明
