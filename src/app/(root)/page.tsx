@@ -28,13 +28,6 @@ const PARTIAL_SUBJECTS: Record<string, string> = {
   化学: "图片版选择",
 }
 
-const PAPER_TYPES = [
-  { label: "北京高考真题", cat: "高考真题" },
-  { label: "各区一模", cat: "各区一模" },
-  { label: "各区二模", cat: "各区二模" },
-  { label: "各区上期末", cat: "各区期末" },
-]
-
 const dayFmt = new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" })
 
 export default async function RootPage() {
@@ -455,27 +448,13 @@ export default async function RootPage() {
           <p>题目与答案来自菁师帮教师版试卷，图片与表格以原卷为准；AI 批改是参考意见，与教师评分可能存在差异。</p>
         </div>
 
-        <div className="grid gap-3 text-xs sm:grid-cols-3">
+        <div className="grid gap-3 text-xs sm:grid-cols-2">
           <div>
             <p className="mb-1 font-medium text-foreground">按学科</p>
             <div className="flex flex-wrap gap-x-3 gap-y-1 text-muted-foreground">
               {subjects.map((s) => (
                 <Link key={s} href={`/questions/${subjectToRoute[s]}`} className="hover:text-foreground hover:underline">
                   {s}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="mb-1 font-medium text-foreground">按考试</p>
-            <div className="flex flex-wrap gap-x-3 gap-y-1 text-muted-foreground">
-              {PAPER_TYPES.map((t) => (
-                <Link
-                  key={t.cat}
-                  href={`/questions/history/test-paper?cat=${encodeURIComponent(t.cat)}`}
-                  className="hover:text-foreground hover:underline"
-                >
-                  {t.label}
                 </Link>
               ))}
             </div>
