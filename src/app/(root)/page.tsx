@@ -8,6 +8,7 @@ import { subjects, subjectToRoute, categoriesBySubject, categoryToRoute } from "
 import { getLeaderboard, getMyRank } from "@/lib/leaderboard"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
 import SampleQuestion from "@/components/home/sample-question"
+import PaperFinder from "@/components/home/paper-finder"
 
 export const dynamic = "force-dynamic"
 
@@ -75,12 +76,63 @@ export default async function RootPage() {
 
   // 已登录：我的待批改 / 最近作答 / 本周名次
   let pendingCount = 0
-  let recentSubs: { id: string; title: string; score: number | null; max: number | null }[] = []
+  let recentSubs: { id: string; title: string; href: string; score: number | null; max: number | null }[] = []
   let myRank: Awaited<ReturnType<typeof getMyRank>> = null
   if (userId) {
-    const [pending, subs, rank] = await Promise.all([
+    const [pending, groupSubs, paperSubs, rank] = await Promise.all([
       prisma.questionSubmission.count({ where: { userId, gradingStatus: "pending" } }),
-      prisma.questionSubmission.findMany({
+      // 题组/套卷形态优先：一次练习（一个题组或一整卷）比单题更能说明「上次做到哪」
+      prisma.questionGroupSubmission.findMany({
+        where: { userId, testSubmissionId: null },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        select: {
+          id: true,
+          score: true,
+          correctNum: true,
+          totalNum: true,
+          createdAt: true,
+          questionGroup: { select: { id: true, title: true, score: true } },
+        },
+      }),
+      prisma.testPaperSubmission.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        select: { id: true, score: true, createdAt: true, testPaper: { select: { id: true, title: true, totalScore: true } } },
+      }),
+      getMyRank({ period: "week", userId }),
+    ])
+
+    pendingCount = pending
+
+    // 合并「题组练习」与「整卷练习」两类记录，按时间倒序取最近 3 条
+    const merged = [
+      ...groupSubs.map((g) => ({
+        id: g.id,
+        at: g.createdAt,
+        title: g.questionGroup.title,
+        href: `/question/${g.questionGroup.id}/review/1`,
+        score: g.score,
+        max: g.questionGroup.score ?? null,
+      })),
+      ...paperSubs.map((t) => ({
+        id: t.id,
+        at: t.createdAt,
+        title: t.testPaper.title,
+        href: `/test-paper/${t.testPaper.id}/result/${t.id}`,
+        score: t.score,
+        max: t.testPaper.totalScore ?? null,
+      })),
+    ]
+      .sort((a, b) => b.at.getTime() - a.at.getTime())
+      .slice(0, 3)
+
+    if (merged.length) {
+      recentSubs = merged.map(({ at: _at, ...rest }) => rest)
+    } else {
+      // 只有单题作答时兜底（比如只做过「体验题」之外的零散单题）
+      const single = await prisma.questionSubmission.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
         take: 3,
@@ -89,16 +141,15 @@ export default async function RootPage() {
           score: true,
           question: { select: { subject: true, source: true, score: true } },
         },
-      }),
-      getMyRank({ period: "week", userId }),
-    ])
-    pendingCount = pending
-    recentSubs = subs.map((s) => ({
-      id: s.id,
-      title: s.question?.source || s.question?.subject || "练习",
-      score: s.score,
-      max: s.question?.score ?? null,
-    }))
+      })
+      recentSubs = single.map((q) => ({
+        id: q.id,
+        title: `${q.question?.source || q.question?.subject || "练习"}（单题）`,
+        href: "/records",
+        score: q.score,
+        max: q.question?.score ?? null,
+      }))
+    }
     myRank = rank
   }
 
@@ -227,9 +278,13 @@ export default async function RootPage() {
                   <ul className="mt-2 space-y-1.5 text-sm">
                     {recentSubs.map((s) => (
                       <li key={s.id} className="flex items-baseline justify-between gap-2">
-                        <span className="truncate text-foreground">{s.title}</span>
+                        <Link href={s.href} className="min-w-0 truncate text-foreground hover:underline">
+                          {s.title}
+                        </Link>
                         <span className="shrink-0 text-xs text-muted-foreground">
-                          {s.score != null && s.max != null ? `${s.score}/${s.max} 分` : "待批改"}
+                          {s.score != null
+                            ? `${Math.round((s.score as number) * 10) / 10}${s.max != null ? `/${s.max}` : ""} 分`
+                            : "待批改"}
                         </span>
                       </li>
                     ))}
@@ -249,61 +304,7 @@ export default async function RootPage() {
             选学科 + 类型 + 年份，直接进这套卷子所在的列表（都是教师版，带答案与解析）。
           </p>
         </div>
-        <form
-          action="/api/go/papers"
-          method="get"
-          className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4"
-        >
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">学科</span>
-            <select
-              name="subject"
-              defaultValue="历史"
-              className="rounded-lg border border-input bg-background px-3 py-2 text-foreground"
-            >
-              {subjects.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">类型</span>
-            <select
-              name="cat"
-              defaultValue="各区一模"
-              className="rounded-lg border border-input bg-background px-3 py-2 text-foreground"
-            >
-              {PAPER_TYPES.map((t) => (
-                <option key={t.cat} value={t.cat}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">年份</span>
-            <select
-              name="year"
-              defaultValue="all"
-              className="rounded-lg border border-input bg-background px-3 py-2 text-foreground"
-            >
-              <option value="all">全部</option>
-              {[2026, 2025, 2024, 2023, 2022, 2021].map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
-            查看套卷
-          </button>
-          <p className="basis-full text-xs text-muted-foreground">
-            也可以进列表后再用搜索框筛关键词（如「海淀」「西城一模」）。
-          </p>
-        </form>
+        <PaperFinder />
       </section>
 
       {/* ── 学科区：主干（整卷）与枝干（部分题型） ── */}
