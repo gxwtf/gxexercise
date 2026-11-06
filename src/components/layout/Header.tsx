@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { withCurrentFilters } from '@/lib/keep-filters';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 import {
@@ -16,38 +16,31 @@ import { subjects, subjectToRoute } from '@/constants/subjects';
 import useSession from '@/lib/use-session';
 
 function SubjectLinks({ mobile }: { mobile: boolean }) {
-  const pathname = usePathname();
-  // 换学科时保留当前筛选（考区 / 年份 / 年级 / 关键词）。
-  // 不用 useSearchParams：它在 SSR 阶段会让整块挂起（首屏菜单变空），这里用路由变化后读 window.location.search。
-  const [keep, setKeep] = useState("");
-  useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    const params = new URLSearchParams();
-    for (const key of ["cat", "district", "year", "grade", "q"]) {
-      const v = sp.get(key);
-      if (v) params.set(key, v);
-    }
-    const qs = params.toString();
-    setKeep(qs ? `?${qs}` : "");
-  }, [pathname]);
+  const router = useRouter();
+  // 换学科时带上「点击这一刻」地址栏里的筛选；清除筛选后自然不再带
+  const go = (href: string) => router.push(withCurrentFilters(href));
+  const onClick = (href: string) => (e: React.MouseEvent) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    go(href);
+  };
 
   return (
     <>
-      {subjects.map((subject) =>
-        mobile ? (
-          <Link
-            key={subject}
-            href={`/questions/${subjectToRoute[subject]}${keep}`}
-            className="text-sm font-medium hover:text-primary pl-4"
-          >
+      {subjects.map((subject) => {
+        const href = `/questions/${subjectToRoute[subject]}`;
+        return mobile ? (
+          <Link key={subject} href={href} onClick={onClick(href)} className="text-sm font-medium hover:text-primary pl-4">
             {subject}
           </Link>
         ) : (
           <DropdownMenuItem key={subject} asChild>
-            <Link href={`/questions/${subjectToRoute[subject]}${keep}`}>{subject}</Link>
+            <Link href={href} onClick={onClick(href)}>
+              {subject}
+            </Link>
           </DropdownMenuItem>
-        ),
-      )}
+        );
+      })}
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { withCurrentFilters } from '@/lib/keep-filters';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import BaseHeader from '@/components/layout/BaseHeader';
@@ -24,18 +24,8 @@ export default function SubHeader({
   const pathname = usePathname();
   const currentNavItems = subjectNavItems[subject];
 
-  // 换学科 / 换题型时保留当前筛选（考区 / 年份 / 年级 / 关键词）；路由变化后从地址栏取最新值
-  const [keep, setKeep] = useState('');
-  useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    const params = new URLSearchParams();
-    for (const key of ['cat', 'district', 'year', 'grade', 'q']) {
-      const v = sp.get(key);
-      if (v) params.set(key, v);
-    }
-    const qs = params.toString();
-    setKeep(qs ? `?${qs}` : '');
-  }, [pathname]);
+  // 换学科 / 换题型时把「当前地址栏里的筛选」带过去（点清除之后地址栏干净，也就没有记忆了）
+  const go = (href: string) => router.push(withCurrentFilters(href));
   
   // 获取当前选中的题型
   const getCurrentCategory = () => {
@@ -71,7 +61,7 @@ export default function SubHeader({
           value={subject}
           onValueChange={(value) => {
             if (value && subjectToRoute[value]) {
-              router.push(`/questions/${subjectToRoute[value]}${keep}`)
+              go(`/questions/${subjectToRoute[value]}`)
             }
           }}
         >
@@ -103,7 +93,14 @@ export default function SubHeader({
                   : 'text-foreground'
               }`}
             >
-              <Link href={`${item.href}${keep}`}>
+              <Link
+                href={item.href}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                  e.preventDefault();
+                  go(item.href);
+                }}
+              >
                 {item.label}
                 {isActive && (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand" />
@@ -123,7 +120,12 @@ export default function SubHeader({
         return (
           <Link
             key={index}
-            href={`${item.href}${keep}`}
+            href={item.href}
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+              e.preventDefault();
+              go(item.href);
+            }}
             className={`text-sm font-medium ${
               isActive
                 ? 'text-brand font-semibold underline underline-offset-4'
