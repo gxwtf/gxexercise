@@ -15,14 +15,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-  ItemSeparator,
-  ItemTitle,
-} from "@/components/ui/item"
 
 export const dynamic = "force-dynamic"
 
@@ -203,34 +195,17 @@ export default async function RootPage() {
         </div>
 
         {recentPapers.length > 0 && (
-          <Card size="sm">
-            <CardHeader>
-              <div className="flex items-center justify-between gap-2">
-                <CardTitle>最近入库</CardTitle>
-                <span className="text-xs text-muted-foreground">按入库时间</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ItemGroup className="gap-0">
-                {recentPapers.map((p, i) => (
-                  <div key={p.id}>
-                    {i > 0 && <ItemSeparator />}
-                    <Item variant="default" size="xs" asChild>
-                      <Link href={`/test-paper/${p.id}`}>
-                        <Badge variant="secondary">{p.subject}</Badge>
-                        <ItemContent>
-                          <ItemTitle className="truncate">{p.title}</ItemTitle>
-                        </ItemContent>
-                        <ItemActions>
-                          <span className="text-xs text-muted-foreground">{dayFmt.format(p.createdAt)}</span>
-                        </ItemActions>
-                      </Link>
-                    </Item>
-                  </div>
-                ))}
-              </ItemGroup>
-            </CardContent>
-          </Card>
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span>最近入库</span>
+            {recentPapers.map((p) => (
+              <span key={p.id} className="inline-flex items-center gap-1">
+                <Link href={`/test-paper/${p.id}`} className="text-foreground hover:underline">
+                  {p.title}
+                </Link>
+                <span>{dayFmt.format(p.createdAt)}</span>
+              </span>
+            ))}
+          </p>
         )}
       </section>
 
