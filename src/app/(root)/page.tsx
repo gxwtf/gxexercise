@@ -59,14 +59,12 @@ export default async function RootPage() {
   ])
 
   // 最近谁练了什么（类似「谁又下了一单」）：已交卷/已交题组，同一用户只留最近一条
-  const activity = await getRecentActivity({ limit: 6, excludeUserId: userId })
+  const activity = await getRecentActivity({ limit: 6 })
   const activityView = activity.map((a) => ({
     id: a.id,
     userName: a.userName,
     title: a.title,
     href: a.href,
-    score: a.score,
-    max: a.max,
     atLabel: relativeTimeLabel(a.at),
     kindLabel: a.kind === "paper" ? "整卷" : "题组",
   }))

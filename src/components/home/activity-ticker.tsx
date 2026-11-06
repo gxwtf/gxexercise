@@ -15,8 +15,6 @@ export interface ActivityItemView {
   userName: string
   title: string
   href: string
-  score: number | null
-  max: number | null
   atLabel: string
   kindLabel: string
 }
@@ -44,8 +42,6 @@ export default function ActivityTicker({ items }: { items: ActivityItemView[] })
 
   if (!count) return null
   const item = items[index] ?? items[0]
-  const scoreText =
-    item.score != null ? `${Math.round(item.score * 10) / 10}${item.max != null ? `/${item.max}` : ""} 分` : ""
 
   return (
     <p
@@ -66,13 +62,7 @@ export default function ActivityTicker({ items }: { items: ActivityItemView[] })
         <span className="font-medium text-foreground">{item.userName}</span>
         <span>做完了一份{item.kindLabel}</span>
         <span className="max-w-[22rem] truncate text-foreground">{item.title}</span>
-        {scoreText && <span>{scoreText}</span>}
       </Link>
-      {count > 1 && (
-        <span className="text-muted-foreground/70">
-          · {index + 1}/{count}
-        </span>
-      )}
     </p>
   )
 }
