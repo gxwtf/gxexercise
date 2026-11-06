@@ -450,7 +450,7 @@ export default async function RootPage() {
 
         <div className="grid gap-3 text-xs sm:grid-cols-2">
           <div>
-            <p className="mb-1 font-medium text-foreground">按学科</p>
+            <p className="mb-1 font-medium text-foreground">题库</p>
             <div className="flex flex-wrap gap-x-3 gap-y-1 text-muted-foreground">
               {subjects.map((s) => (
                 <Link key={s} href={`/questions/${subjectToRoute[s]}`} className="hover:text-foreground hover:underline">

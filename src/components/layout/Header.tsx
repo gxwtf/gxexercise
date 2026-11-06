@@ -51,7 +51,7 @@ export default function Header() {
   const leftContent = (
     <div className="flex items-center space-x-8">
       <Link href="/" className="shrink-0 whitespace-nowrap text-xl font-bold">
-        广学五题坊
+        广学题库
       </Link>
       <nav className="hidden md:flex items-center space-x-6">
         <Link href="/" className="text-sm font-medium hover:text-primary">
@@ -70,9 +70,6 @@ export default function Header() {
         </DropdownMenu>
         <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
           广学榜
-        </Link>
-        <Link href="https://gxwtf.cn/game" className="text-sm font-medium hover:text-primary">
-          游戏中心
         </Link>
         {session.isLoggedIn && session.admin && (
           <DropdownMenu>
@@ -107,18 +104,12 @@ export default function Header() {
       >
         首页
       </Link>
-      <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
-        广学榜
-      </Link>
       <div className="flex flex-col space-y-3">
         <span className="text-sm font-medium text-muted-foreground">题库</span>
         <SubjectLinks mobile />
       </div>
-      <Link
-        href="https://gxwtf.cn/game"
-        className="text-sm font-medium hover:text-primary"
-      >
-        游戏中心
+      <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
+        广学榜
       </Link>
       {session.isLoggedIn && session.admin && (
         <>
