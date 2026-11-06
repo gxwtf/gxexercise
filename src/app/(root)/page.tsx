@@ -8,6 +8,7 @@ import { subjects, subjectToRoute, categoriesBySubject, categoryToRoute } from "
 import { getLeaderboard, getMyRank } from "@/lib/leaderboard"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
 import SampleQuestion from "@/components/home/sample-question"
+import { getAppVersion } from "@/lib/app-version"
 import PaperFinder from "@/components/home/paper-finder"
 
 export const dynamic = "force-dynamic"
@@ -31,6 +32,7 @@ const PAPER_TYPES = [
 const dayFmt = new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" })
 
 export default async function RootPage() {
+  const version = getAppVersion()
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   const userId = session.isLoggedIn && session.userid ? session.userid : 0
 
@@ -160,7 +162,7 @@ export default async function RootPage() {
         <div className="mx-auto w-full max-w-5xl px-6 pb-10 pt-10 sm:pt-14">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <BookOpenCheck className="size-3.5 text-brand" aria-hidden="true" />
-            广学题库 · 公测期
+            广学题库 · 公测期 · v{version}
           </p>
           <h1 className="text-3xl font-bold leading-tight text-foreground sm:text-5xl">
             北京高中真题与各区模拟，
@@ -454,7 +456,7 @@ export default async function RootPage() {
       <footer className="mx-auto w-full max-w-5xl px-6 py-12">
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-sm text-foreground">
-            公测期 <span className="font-medium">0.3.0-rc1</span> · 九科集齐 · {paperTotal} 套卷 /{" "}
+            公测期 <span className="font-medium">v{version}</span> · 九科集齐 · {paperTotal} 套卷 /{" "}
             {questionTotal.toLocaleString("zh-CN")} 道题
           </p>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
