@@ -10,6 +10,8 @@ import { getLeaderboard, getMyRank } from "@/lib/leaderboard"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
 import SampleQuestion from "@/components/home/sample-question"
 import PaperFinder from "@/components/home/paper-finder"
+import ActivityTicker from "@/components/home/activity-ticker"
+import { getRecentActivity, relativeTimeLabel } from "@/lib/activity"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -55,6 +57,19 @@ export default async function RootPage() {
     getLeaderboard({ period: "week", metric: "count", limit: 5 }),
     getLeaderboard({ period: "week", metric: "score", limit: 5 }),
   ])
+
+  // 最近谁练了什么（类似「谁又下了一单」）：已交卷/已交题组，同一用户只留最近一条
+  const activity = await getRecentActivity({ limit: 6, excludeUserId: userId })
+  const activityView = activity.map((a) => ({
+    id: a.id,
+    userName: a.userName,
+    title: a.title,
+    href: a.href,
+    score: a.score,
+    max: a.max,
+    atLabel: relativeTimeLabel(a.at),
+    kindLabel: a.kind === "paper" ? "整卷" : "题组",
+  }))
 
   const paperCountMap = new Map(paperBySubject.map((r) => [r.subject, r._count.id]))
   const groupCountMap = new Map(groupBySubject.map((r) => [r.subject, r._count.id]))
@@ -193,6 +208,12 @@ export default async function RootPage() {
             </Link>
           </Button>
         </div>
+
+        {activityView.length > 0 ? (
+          <ActivityTicker items={activityView} />
+        ) : (
+          <p className="text-xs text-muted-foreground">最近还没有人交卷，你可以开个头。</p>
+        )}
 
         {recentPapers.length > 0 && (
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
