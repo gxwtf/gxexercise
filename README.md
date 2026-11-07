@@ -285,8 +285,8 @@ npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部
 `src/constants/subjects.ts` 中 `categoryToRoute['化学']` 的键，题库导航可直接筛）。
 题型由流水线分类器 `exam-parser/chem_category.py` 给出（`paper.json` 每题带 `category` + `score`）：
 
-- 2021+ 听位置（15结构 16原理 17有机 18流程 19探究），仅当「位置类别强标记命中=0、另一类别≥2」时按内容覆盖
-  （例：2026 海淀期中 17 题是原理，不是有机）；
+- **2021+ 按题号**（15结构 16原理 17有机 18流程 19探究）；分类器里另有一张 `PAPER_OVERRIDES` 人工例外表
+  （例：2026 海淀期中第 17 题考的是原理，该卷没有有机题），改例外表即可，不要改判定逻辑；
 - 2020 及以前按关键词判（强标记权重 3），判不准再退位置表。
 
 ```bash
