@@ -19,6 +19,11 @@ import { DISTRICT_OPTIONS, DISTRICT_ZHENTI } from "@/constants/districts";
 /** 这些学科用「套卷样式」的单行卡片（不带封面图） */
 const ROW_CARD_SUBJECTS = ["数学", "物理", "化学", "政治"];
 
+// 英语的「语法填空」「选词填空」不需要封面，直接复用理科的行卡片样式（无图片区域）。
+const ROW_CARD_CATEGORIES = new Set(["语法填空", "选词填空"]);
+const usesRowCard = (subject: string, category: string) =>
+  ROW_CARD_SUBJECTS.includes(subject) || ROW_CARD_CATEGORIES.has(category);
+
 type ListGroup = {
   id: string;
   title: string;
@@ -70,7 +75,6 @@ const CATEGORY_OPTIONS = [
   { value: "各区一模", label: "各区一模" },
   { value: "各区二模", label: "各区二模" },
   { value: "各区期末", label: "各区期末" },
-  { value: "广学模拟", label: "广学模拟" },
 ];
 
 export function QuestionOverview({
@@ -91,6 +95,8 @@ export function QuestionOverview({
   const { session } = useSession();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchDraft, setSearchDraft] = useState(filters.q);
+  // 数学/物理/化学/政治整科用行卡片；英语的语法填空、选词填空也用行卡片（无封面）
+  const useRowCard = usesRowCard(subject, category);
   const [testSubmissions, setTestSubmissions] = useState<Record<string, string>>({});
   const [submissionCounts, setSubmissionCounts] = useState<{
     groups: Record<string, number>;
@@ -345,14 +351,14 @@ export function QuestionOverview({
               <>
                 <div
                   className={
-                    ROW_CARD_SUBJECTS.includes(subject)
+                    useRowCard
                       ? "grid grid-cols-1 gap-4"
                       : "grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
                   }
                 >
                   {groups.map((group) => (
                     <div key={group.id}>
-                      {ROW_CARD_SUBJECTS.includes(subject) ? (
+                      {useRowCard ? (
                         <GroupRowCard
                           id={group.id}
                           title={group.title}

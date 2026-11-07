@@ -1,8 +1,5 @@
-import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { cookies } from "next/headers"
 import { getIronSession } from "iron-session"
 import { sessionOptions, type SessionData } from "@/lib/iron"
@@ -44,14 +41,6 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
       {/* 头部 */}
       <div className="mb-6 flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ChevronLeft className="size-4" />
-            首页
-          </Link>
-          <Separator orientation="vertical" className="h-4" />
           <h1 className="text-2xl font-bold tracking-tight text-foreground">广学榜</h1>
           <Badge variant="secondary" className="font-normal">
             {periodLabel}
