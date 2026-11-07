@@ -11,7 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowLeft, Clock, FileDown } from "lucide-react"
+import { ArrowLeft, ClipboardList, Clock, FileDown } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { Button } from "@/components/ui/button"
 
 interface QuestionSubResult {
@@ -186,9 +187,11 @@ export function TestPaperResult({
               </div>
             ))}
             {groupResults.length === 0 && (
-              <div className="text-center text-muted-foreground py-8">
-                暂无记录
-              </div>
+              <EmptyState
+                icon={<ClipboardList />}
+                title="暂无记录"
+                description="这份套卷的各题结果会显示在这里。"
+              />
             )}
           </div>
         </div>

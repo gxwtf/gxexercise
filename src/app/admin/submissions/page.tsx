@@ -9,6 +9,8 @@ import { AdminSubmissionsPager } from "@/components/admin/AdminSubmissionsPager"
 import { AdminSubmissionsTable, type AdminSubmissionRow } from "@/components/admin/AdminSubmissionsTable"
 import type { Prisma } from "@/generated/prisma/client"
 import { AI_GRADEABLE, ORDER_MAP, formatDateTime, needsAiGrading, scoreText } from "@/lib/submission-records"
+import { Inbox } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 
 export const dynamic = "force-dynamic"
 
@@ -154,9 +156,11 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
       />
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-          没有符合条件的作答记录
-        </p>
+        <EmptyState
+          icon={<Inbox />}
+          title="没有符合条件的作答记录"
+          description="换个学科 / 用户 / 关键词试试，或者清除筛选。"
+        />
       ) : (
         <>
           <AdminSubmissionsTable rows={tableRows} />

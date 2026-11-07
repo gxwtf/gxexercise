@@ -11,7 +11,8 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Image as ImageIcon, Loader2, Maximize2, Upload, X } from "lucide-react"
+import { Image as ImageIcon, ImageOff, Loader2, Maximize2, Upload, X } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -373,10 +374,16 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
             </div>
           </>
         ) : (
-          <p className="rounded-lg border border-dashed border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            该题组还没有生成候选封面（<code>.cache/cover</code> 里没有记录）。可以用上面的方式上传，或让流水线跑一次
-            <code> scripts/cover-from-group.ts --group {groupId}</code>。
-          </p>
+          <EmptyState
+            icon={<ImageOff />}
+            title="还没有生成候选封面"
+            description={
+              <>
+                该题组在 <code>.cache/cover</code> 里没有候选记录；可以直接用上面的方式上传图片，或让流水线跑一次{" "}
+                <code>scripts/cover-from-group.ts --group {groupId}</code>。
+              </>
+            }
+          />
         )}
       </div>
 

@@ -9,6 +9,8 @@ import { QuestionBankPager } from "@/components/admin/question-bank/QuestionBank
 import type { Prisma } from "@/generated/prisma/client"
 import type { FieldChange } from "@/lib/admin-edit-log"
 import { formatDateTime } from "@/lib/submission-records"
+import { History } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 
 export const dynamic = "force-dynamic"
 
@@ -116,9 +118,11 @@ export default async function AdminQuestionEditLogsPage({ searchParams }: PagePr
       <EditLogFilter targetType={targetType} keyword={keyword} admin={admin} />
 
       {logs.length === 0 ? (
-        <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-          没有符合条件的修改记录
-        </p>
+        <EmptyState
+          icon={<History />}
+          title="没有符合条件的修改记录"
+          description="换个对象类型 / 关键词 / 管理员试试，或者清除筛选。"
+        />
       ) : (
         <>
           <EditLogTable rows={tableRows} />

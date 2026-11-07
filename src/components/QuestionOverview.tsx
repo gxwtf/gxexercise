@@ -8,7 +8,8 @@ import { QuestionCard } from "./QuestionCard";
 import { TestCard } from "./TestCard";
 import { GroupRowCard } from "./GroupRowCard";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui/card"
+import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PageBar } from "@/components/PageBar";
@@ -333,13 +334,11 @@ export function QuestionOverview({
                 />
 
                 {papers.length === 0 && (
-                  <div className="text-center py-16 bg-card rounded-xl">
-                    <div className="text-muted-foreground mb-2">
-                      <FileText className="w-12 h-12 mx-auto" />
-                    </div>
-                    <h3 className="text-lg font-medium text-foreground mb-1">暂无{subject}套卷</h3>
-                    <p className="text-muted-foreground">尝试调整筛选条件或搜索关键词</p>
-                  </div>
+                  <EmptyState
+                    icon={<FileText />}
+                    title={`暂无${subject}套卷`}
+                    description="尝试调整筛选条件或搜索关键词。"
+                  />
                 )}
               </div>
             ) : groups.length > 0 ? (
@@ -388,13 +387,11 @@ export function QuestionOverview({
                 />
               </>
             ) : (
-              <div className="text-center py-16 bg-card rounded-xl">
-                <div className="text-muted-foreground mb-2">
-                  <Search className="w-12 h-12 mx-auto" />
-                </div>
-                <h3 className="text-lg font-medium text-foreground mb-1">未找到匹配的题目</h3>
-                <p className="text-muted-foreground">尝试调整筛选条件或搜索关键词</p>
-              </div>
+              <EmptyState
+                icon={<Search />}
+                title="未找到匹配的题目"
+                description="尝试调整筛选条件或搜索关键词"
+              />
             )}
           </div>
         </div>

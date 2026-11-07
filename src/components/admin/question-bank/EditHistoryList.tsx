@@ -3,6 +3,8 @@
 // 既用在编辑页右侧的「最近修改」，也会被修改记录页复用（那边日志更多、筛选项在页面层）。
 
 import { Badge } from "@/components/ui/badge"
+import { History } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { formatDateTime } from "@/lib/submission-records"
 import {
   ADMIN_EDIT_ACTION_LABELS,
@@ -40,9 +42,12 @@ function lengthText(change: EditLogFieldChange, side: "before" | "after"): strin
 export function EditHistoryList({ logs, emptyText, showTarget = false }: EditHistoryListProps) {
   if (logs.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        {emptyText ?? "还没有修改记录；第一次保存后会在这里留下存档。"}
-      </p>
+      <EmptyState
+        compact
+        icon={<History />}
+        title="还没有修改记录"
+        description={emptyText ?? "第一次保存后会在这里留下存档。"}
+      />
     )
   }
 

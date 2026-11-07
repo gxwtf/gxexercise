@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma"
 import { subjects } from "@/constants/subjects"
 import { Button } from "@/components/ui/button"
 import { RecordsFilter } from "@/components/records/RecordsFilter"
+import { ClipboardList } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { RecordsPager } from "@/components/records/RecordsPager"
 import { RecordsTable } from "@/components/records/RecordsTable"
 import { AI_GRADEABLE, ORDER_MAP, formatDateTime, needsAiGrading, scoreText } from "@/lib/submission-records"
@@ -147,9 +149,11 @@ export default async function RecordsPage({ searchParams }: PageProps) {
       />
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-          暂无记录
-        </p>
+        <EmptyState
+          icon={<ClipboardList />}
+          title="暂无作答记录"
+          description="去题库挑一组题练一练，提交后会在这里留档。"
+        />
       ) : (
         <>
           <RecordsTable rows={tableRows} />

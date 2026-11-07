@@ -10,6 +10,8 @@ import { QuestionBankTable, type QuestionBankRow } from "@/components/admin/ques
 import type { Prisma } from "@/generated/prisma/client"
 import { questionTypeLabel } from "@/lib/question-bank-meta"
 import { formatDateTime } from "@/lib/submission-records"
+import { SearchX } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 
 export const dynamic = "force-dynamic"
 
@@ -139,9 +141,11 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
       />
 
       {groups.length === 0 ? (
-        <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-          没有符合条件的题组
-        </p>
+        <EmptyState
+          icon={<SearchX />}
+          title="没有符合条件的题组"
+          description="换个学科 / 类别 / 关键词试试，或者清除筛选。"
+        />
       ) : (
         <>
           <QuestionBankTable rows={tableRows} />

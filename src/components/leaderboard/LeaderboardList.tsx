@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { Trophy } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -70,7 +72,11 @@ export function LeaderboardList({
 
       <CardContent className="px-0">
         {rows.length === 0 ? (
-          <p className="px-5 py-12 text-center text-sm text-muted-foreground">本期暂无上榜记录</p>
+          <EmptyState
+            icon={<Trophy />}
+            title="本期暂无上榜记录"
+            description="完成练习就可以上榜，快去刷题吧。"
+          />
         ) : (
           <>
           {/* 移动端：竖向列表（不横向滚动） */}

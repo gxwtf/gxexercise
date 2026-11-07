@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { ClipboardList } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import {
   Table,
   TableBody,
@@ -36,9 +38,11 @@ export function SubmissionHistoryTable({ submissions, questionIndex, questionTyp
   const router = useRouter()
   if (submissions.length === 0) {
     return (
-      <div className="text-sm text-muted-foreground py-4">
-        暂无作答记录
-      </div>
+      <EmptyState
+        icon={<ClipboardList />}
+        title="暂无作答记录"
+        description="这道题的历次作答会显示在这里。"
+      />
     )
   }
 

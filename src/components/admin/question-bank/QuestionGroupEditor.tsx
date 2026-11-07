@@ -11,7 +11,8 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { ExternalLink, Info } from "lucide-react"
+import { ExternalLink, Info, ListChecks } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { EditorTabs } from "@/components/admin/question-bank/EditorTabs"
@@ -304,9 +305,11 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
             </div>
 
             {questions.length === 0 ? (
-              <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                该题组下还没有关联单题。单题的增删 / 排序由导入脚本负责，本页面只修改已有单题的内容。
-              </p>
+              <EmptyState
+                icon={<ListChecks />}
+                title="该题组下还没有单题"
+                description="单题的增删 / 排序由导入脚本负责，本页面只修改已有单题的内容。"
+              />
             ) : (
               <div>
                 {questions.map((question, index) => (

@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, FileDown, FileText } from "lucide-react"
+import { Award, ChevronLeft, FileDown, FileText } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { MDXRemote, type MDXRemoteSerializeResult } from "next-mdx-remote"
 import { useMDXComponents, MathInput2Provider } from "@/mdx-components"
 import { Separator } from "@/components/ui/separator"
@@ -680,9 +681,11 @@ function ExcellentAnswersPanel({
     if (answers.length === 0) {
         return (
             <QuestionSection>
-                <p className="text-sm text-muted-foreground">
-                    暂无优秀解答。达到优秀标准（{excellentCriteriaText(groupType)}）且同学允许展示的作答会出现在这里。
-                </p>
+                <EmptyState
+                    icon={<Award />}
+                    title="暂无优秀解答"
+                    description={`达到优秀标准（${excellentCriteriaText(groupType)}）且同学允许展示的作答会出现在这里。`}
+                />
             </QuestionSection>
         )
     }

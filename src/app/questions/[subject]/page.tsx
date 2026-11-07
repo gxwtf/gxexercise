@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
-import { routeToSubject, categoriesBySubject, categoryToRoute } from "@/constants/subjects";
+import { routeToSubject, categoriesBySubject, categoryToRoute } from "@/constants/subjects"
+import { Inbox } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState";
 
 interface PageProps {
   params: Promise<{
@@ -35,11 +37,8 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
   // 如果没有分类，显示错误页面
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4">页面未找到</h1>
-        <p className="text-muted-foreground">该学科暂无可用分类</p>
-      </div>
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <EmptyState icon={<Inbox />} title="页面未找到" description="该学科暂无可用的题目分类。" />
     </div>
   );
 }
