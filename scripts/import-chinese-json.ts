@@ -41,7 +41,10 @@ interface Q {
 }
 interface Group {
   category: string; questionType: string; title: string; intro?: string;
-  content: string; score?: number; questions: Q[];
+  content: string; score?: number;
+  /** 作答模式：pick-one = 任选一题（作文二选一 / 微写作三选一）；缺省 all */
+  answerMode?: "all" | "pick-one";
+  questions: Q[];
 }
 interface Paper {
   paper: { title: string; subject: string; source?: string; grade?: string; year?: number | null; totalScore?: number | null; duration?: number | null; tags?: string[] };
@@ -359,12 +362,18 @@ async function importOne(
   const createdGroups: { gid: string; qids: string[] }[] = [];
   for (const g of secs) {
     const tags = Array.from(new Set([...tags0, g.category]));
+    const pickOne = g.answerMode === "pick-one" || (["作文", "微写作"].includes(g.category) && g.questions.length > 1);
+    const fullScore = { 作文: 50, 微写作: 10 }[g.category as string];
+    const groupScore = pickOne && fullScore
+      ? fullScore
+      : Math.round(g.questions.reduce((n, q) => n + (q.score || 0), 0)) || (g.score || 0);
     const group = await prisma.questionGroup.create({
       data: {
         title: `${title}·${g.category}`,
         content: g.content || "",
         questionType: g.questionType,
-        score: Math.round(g.questions.reduce((n, q) => n + (q.score || 0), 0)) || (g.score || 0),
+        answerMode: pickOne ? "pick-one" : "all",
+        score: groupScore,
         subject,
         source: p.source || title,
         grade: p.grade || "高三",
@@ -385,7 +394,7 @@ async function importOne(
           options: q.options && q.options.length ? (q.options as unknown as object) : undefined,
           answer: q.answer || "",
           analysis: q.analysis || "",
-          score: q.score ?? 0,
+          score: pickOne && fullScore ? fullScore : (q.score ?? 0),
           subject,
           source: p.source || title,
           grade: p.grade || "高三",

@@ -43,6 +43,9 @@ model QuestionGroup {
   content      String      @db.Text
   questionType String      @db.VarChar(100)
   score        Int         @default(0)
+  /// 作答模式：all=全部作答（默认）；pick-one=任选一题（二选一/三选一，如语文作文、微写作）
+  /// pick-one 时：各小问都按满分计（如作文 50），提交只按用户作答的那一题计分，group.score == 单题满分
+  answerMode   String      @default("all") @db.VarChar(20)
   subject      String      @db.VarChar(100)
   source       String      @db.VarChar(200)
   grade        String?     @db.VarChar(50)
