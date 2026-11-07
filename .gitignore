@@ -43,3 +43,9 @@ next-env.d.ts
 
 /src/generated/prisma
 /prisma/migrations
+
+# 封面候选 / 审阅页的本地缓存：scripts/cover-from-group.ts 与 cover-gallery.ts 写这里，不进 git
+/.cache/
+
+# 旧构建备份（.next.bak-*）：留在树里会被 Tailwind 的 oxide 扫描器扫到，也不该进 git
+/.next.bak-*
