@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { CoverThumb } from "@/components/admin/question-bank/CoverThumb"
 import {
   Table,
   TableBody,
@@ -69,23 +70,7 @@ export function QuestionBankTable({ rows }: { rows: QuestionBankRow[] }) {
               <TableCell className="text-center tabular-nums">{row.itemCount}</TableCell>
               <TableCell className="text-center tabular-nums">{row.score}</TableCell>
               <TableCell>
-                {row.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- 缩略图用原生 img，见组件注释
-                  <img
-                    src={row.imageUrl}
-                    alt=""
-                    width={40}
-                    height={24}
-                    loading="lazy"
-                    className="h-6 w-10 rounded border border-border object-cover"
-                  />
-                ) : (
-                  <span
-                    aria-hidden
-                    title="未配封面"
-                    className="inline-block h-6 w-10 rounded border border-border bg-muted"
-                  />
-                )}
+                <CoverThumb src={row.imageUrl} title={row.title} />
               </TableCell>
               <TableCell className="whitespace-nowrap text-muted-foreground">{row.updatedAt}</TableCell>
               <TableCell className="text-center">

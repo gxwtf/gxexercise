@@ -49,6 +49,8 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
   const [pickedRank, setPickedRank] = React.useState<number | null>(null)
   // 封面文件名固定为 <groupId>.jpg，换图后地址不变 —— 用版本号把浏览器缓存顶掉
   const [previewVersion, setPreviewVersion] = React.useState(0)
+  // 预览图加载失败（封面文件被删 / 外链失效 / 环境里没有同步封面目录）时给明确提示
+  const [previewFailed, setPreviewFailed] = React.useState(false)
 
   // 选好文件先本地预览，确认后再上传
   React.useEffect(() => {
@@ -64,6 +66,10 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
   const previewBase = imageUrl.trim()
   const preview = localPreview
     ?? (previewBase ? `${previewBase}${previewBase.includes("?") ? "&" : "?"}v=${previewVersion}` : null)
+
+  React.useEffect(() => {
+    setPreviewFailed(false)
+  }, [preview])
 
   const upload = async () => {
     if (!file) return
@@ -141,14 +147,21 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
 
       <div className="grid gap-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
         <div className="overflow-hidden rounded-lg border border-border bg-muted/40">
-          {preview ? (
+          {preview && !previewFailed ? (
             // 封面来源有自托管文件、外链、本地预览对象三种，尺寸不固定，这里用原生 img
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="题组封面预览" className="aspect-video w-full object-cover" />
+            <img
+              src={preview}
+              alt="题组封面预览"
+              className="aspect-video w-full object-cover"
+              onError={() => setPreviewFailed(true)}
+            />
           ) : (
-            <div className="flex aspect-video w-full flex-col items-center justify-center gap-1 text-muted-foreground">
+            <div className="flex aspect-video w-full flex-col items-center justify-center gap-1 px-3 text-center text-muted-foreground">
               <ImageIcon className="size-6" />
-              <span className="text-xs">还没有封面</span>
+              <span className="text-xs">
+                {previewFailed ? "封面加载失败（文件缺失或外链失效）" : "还没有封面"}
+              </span>
             </div>
           )}
         </div>
