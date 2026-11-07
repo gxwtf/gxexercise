@@ -43,7 +43,8 @@ export function hasChanges<T extends object>(before: T, after: T, keys: readonly
   return Object.keys(pickChangedFields(before, after, keys)).length > 0
 }
 
-export const GROUP_FORM_KEYS = [
+/** 「基本信息」板块的字段（标题 / 学科 / 分类 / 题型 / 标签 / 封面等元信息） */
+export const GROUP_BASIC_KEYS = [
   "title",
   "subject",
   "category",
@@ -54,7 +55,15 @@ export const GROUP_FORM_KEYS = [
   "answerMode",
   "tags",
   "imageUrl",
-  "content",
+] as const satisfies readonly (keyof GroupFormValues)[]
+
+/** 「题组正文」板块的字段（阅读材料 / 语料，单独一个大编辑器） */
+export const GROUP_CONTENT_KEYS = ["content"] as const satisfies readonly (keyof GroupFormValues)[]
+
+/** 题组级字段全集：保存时按这个范围算 diff（两个板块共用同一个草稿） */
+export const GROUP_FORM_KEYS = [
+  ...GROUP_BASIC_KEYS,
+  ...GROUP_CONTENT_KEYS,
 ] as const satisfies readonly (keyof GroupFormValues)[]
 
 export const QUESTION_FORM_KEYS = [

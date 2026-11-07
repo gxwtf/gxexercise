@@ -1,9 +1,9 @@
 "use client"
 
-// 题组信息表单：标题 / 学科 / 类别 / 题型 / 年级 / 来源 / 分值 / 作答模式 / 标签 / 正文（Markdown）
+// 「基本信息」板块：标题 / 学科 / 类别 / 题型 / 作答模式 / 年级 / 来源 / 分值 / 标签
 //
-// 纯展示 + 受控组件：草稿状态、保存、重置都在 QuestionGroupEditor 里，
-// 这样页面标题、右侧概览都能跟着草稿实时变化。
+// 受控组件：草稿、保存、重置都在 QuestionGroupEditor 里（题组正文是同一份草稿的另一个板块），
+// 保存时按字段 diff 提交，所以任一板块点保存都会把本页所有未保存的题组字段一起存好。
 
 import * as React from "react"
 import { Loader2, RotateCcw, Save } from "lucide-react"
@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import { TagsInput } from "@/components/admin/question-bank/TagsInput"
 import type { GroupFormValues } from "@/components/admin/question-bank/types"
 import { ANSWER_MODE_META, questionTypeLabel, questionTypeOptionsFor } from "@/lib/question-bank-meta"
@@ -56,14 +55,10 @@ export function GroupMetaForm({
       <CardHeader>
         <CardTitle>题组信息</CardTitle>
         <CardDescription>
-          标题、标签、封面等元信息影响题库列表与筛选；正文是题组的阅读材料 / 语料（Markdown + 公式）。
+          标题、分类、标签等元信息决定题库列表与筛选里的展示；封面在右侧单独维护。
         </CardDescription>
         <CardAction>
-          {dirty ? (
-            <Badge variant="secondary">有未保存的改动</Badge>
-          ) : (
-            <Badge variant="outline">已同步</Badge>
-          )}
+          {dirty ? <Badge variant="secondary">有未保存的改动</Badge> : <Badge variant="outline">已同步</Badge>}
         </CardAction>
       </CardHeader>
 
@@ -216,31 +211,11 @@ export function GroupMetaForm({
             disabled={disabled}
           />
         </div>
-
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="group-content">题组正文（Markdown）</Label>
-            <span className="text-xs text-muted-foreground">{values.content.length} 字</span>
-          </div>
-          <Textarea
-            id="group-content"
-            value={values.content}
-            onChange={(event) => onChange({ content: event.target.value })}
-            rows={14}
-            className="min-h-[18rem] font-mono text-[13px] leading-6"
-            placeholder="阅读材料 / 语料 / 提示语…&#10;支持 Markdown、$公式$、<Input> 等题库私有标签。"
-            disabled={disabled}
-          />
-          <p className="text-xs text-muted-foreground">
-            直接编辑 Markdown 源码；填空占位用 &lt;Input&gt; / &lt;Input2&gt; / &lt;ClozeBlank&gt;，公式用 $...$。
-            保存后可在「前台预览」里核对渲染效果。
-          </p>
-        </div>
       </CardContent>
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">
-          {dirty ? "改动尚未保存；保存会记入修改记录（管理员 + 时间 + 字段改动）。" : "没有未保存的改动。"}
+          保存会一并提交本页其他板块里未保存的题组字段，并记入修改记录。
         </p>
         <div className="flex items-center gap-2">
           <Button type="button" variant="outline" size="sm" onClick={onReset} disabled={!dirty || saving || disabled}>
@@ -249,7 +224,7 @@ export function GroupMetaForm({
           </Button>
           <Button type="button" size="sm" onClick={onSave} disabled={!dirty || saving || disabled}>
             {saving ? <Loader2 className="animate-spin" /> : <Save />}
-            {saving ? "保存中…" : "保存题组信息"}
+            {saving ? "保存中…" : "保存基本信息"}
           </Button>
         </div>
       </CardFooter>

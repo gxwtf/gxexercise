@@ -1,9 +1,11 @@
 "use client"
 
-// 题组编辑页的客户端容器：题组信息草稿 + 小题列表 + 右侧（概览 / 封面 / 最近修改）
+// 题组编辑页的客户端容器：三个板块（基本信息 / 题组正文 / 小题）+ 右侧（概览 / 最近修改 / 须知）
 //
-// 设计上把「题组草稿」放在这里，是为了让页面标题、概览数字、封面预览都能跟着草稿实时变；
-// 小题各自独立保存（题组里 20 道完形填空不必一起提交）。
+// 板块切换只切显示、不卸载内容：小题卡片各自持有草稿，切板块不能把没保存的修改丢掉，
+// 所以三个面板都保持挂载，用 hidden 控制可见性。
+//
+// 题组级草稿（基本信息 + 正文）放在这里，统一算 diff / 统一保存；小题各自独立保存。
 
 import * as React from "react"
 import Link from "next/link"
@@ -14,7 +16,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { EditorTabs } from "@/components/admin/question-bank/EditorTabs"
 import { GroupMetaForm } from "@/components/admin/question-bank/GroupMetaForm"
+import { GroupContentForm } from "@/components/admin/question-bank/GroupContentForm"
 import { QuestionEditorCard } from "@/components/admin/question-bank/QuestionEditorCard"
 import { CoverUploader } from "@/components/admin/question-bank/CoverUploader"
 import { EditHistoryList } from "@/components/admin/question-bank/EditHistoryList"
@@ -25,8 +29,9 @@ import type {
   GroupFormValues,
 } from "@/components/admin/question-bank/types"
 import {
+  GROUP_BASIC_KEYS,
+  GROUP_CONTENT_KEYS,
   GROUP_FORM_KEYS,
-  hasChanges,
   pickChangedFields,
   validateGroupDraft,
 } from "@/components/admin/question-bank/form-utils"
@@ -38,6 +43,8 @@ interface QuestionGroupEditorProps {
   questions: GroupEditorQuestion[]
   logs: EditLogView[]
 }
+
+type EditorTabValue = "basic" | "content" | "questions"
 
 function toGroupValues(group: GroupEditorGroup): GroupFormValues {
   return {
@@ -72,18 +79,38 @@ function fromApiGroup(raw: Record<string, unknown>, fallback: GroupEditorGroup):
   }
 }
 
+/** 用基线值覆盖草稿里的指定字段（板块级「重置」） */
+function restoreFields(
+  before: GroupFormValues,
+  draft: GroupFormValues,
+  keys: readonly (keyof GroupFormValues)[],
+): GroupFormValues {
+  const next = { ...draft }
+  for (const key of keys) {
+    const value = before[key]
+    // @ts-expect-error 同一字段的基线值类型与草稿一致（字符串 / 数字 / 字符串数组）
+    next[key] = Array.isArray(value) ? [...value] : value
+  }
+  return next
+}
+
 export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEditorProps) {
   const router = useRouter()
   const [draft, setDraft] = React.useState<GroupFormValues>(() => toGroupValues(group))
   const [saving, setSaving] = React.useState(false)
   const [syncKey, setSyncKey] = React.useState(0)
+  const [activeTab, setActiveTab] = React.useState<EditorTabValue>("basic")
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(
     () => new Set(questions.length > 0 ? [questions[0].id] : []),
   )
   const [dirtyQuestionIds, setDirtyQuestionIds] = React.useState<Set<string>>(new Set())
 
-  const dirty = hasChanges(group, draft, GROUP_FORM_KEYS)
-  const anyDirty = dirty || dirtyQuestionIds.size > 0
+  const basicChanges = pickChangedFields(group, draft, GROUP_BASIC_KEYS)
+  const contentChanges = pickChangedFields(group, draft, GROUP_CONTENT_KEYS)
+  const basicDirty = Object.keys(basicChanges).length > 0
+  const contentDirty = Object.keys(contentChanges).length > 0
+  const groupDirty = basicDirty || contentDirty
+  const anyDirty = groupDirty || dirtyQuestionIds.size > 0
 
   // 有未保存改动时，关闭 / 刷新页面给浏览器一个确认（20 道小题手改一次不容易）
   React.useEffect(() => {
@@ -111,9 +138,13 @@ export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEdi
     setDraft((prev) => ({ ...prev, ...patch }))
   }
 
-  const resetDraft = () => {
-    setDraft(toGroupValues(group))
+  /** 板块级重置：只把本板块字段恢复成服务端基线，其他板块的草稿不动 */
+  const resetBasic = () => {
+    setDraft((prev) => restoreFields(group, prev, GROUP_BASIC_KEYS))
     setSyncKey((key) => key + 1)
+  }
+  const resetContent = () => {
+    setDraft((prev) => restoreFields(group, prev, GROUP_CONTENT_KEYS))
   }
 
   const saveGroup = async () => {
@@ -158,6 +189,7 @@ export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEdi
   const collapseAll = () => setExpandedIds(new Set())
 
   const totalSavedScore = questions.reduce((sum, question) => sum + question.values.score, 0)
+  const dirtyQuestionCount = dirtyQuestionIds.size
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_23rem]">
@@ -172,61 +204,111 @@ export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEdi
           {anyDirty ? <Badge variant="secondary">有未保存的改动</Badge> : null}
         </div>
 
-        <GroupMetaForm
-          values={draft}
-          onChange={updateDraft}
-          onSave={saveGroup}
-          onReset={resetDraft}
-          saving={saving}
-          dirty={dirty}
-          syncKey={syncKey}
+        <EditorTabs
+          value={activeTab}
+          onChange={(value) => setActiveTab(value as EditorTabValue)}
+          tabs={[
+            { value: "basic", label: "基本信息", dirty: basicDirty },
+            { value: "content", label: "题组正文", dirty: contentDirty },
+            {
+              value: "questions",
+              label: "小题",
+              badge: String(questions.length),
+              dirty: dirtyQuestionCount > 0,
+            },
+          ]}
         />
 
-        <section className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-semibold">
-              小题列表
-              <span className="ml-2 text-sm font-normal text-muted-foreground">共 {questions.length} 题</span>
-            </h2>
-            {questions.length > 0 ? (
-              <div className="flex items-center gap-2">
-                <Button type="button" size="sm" variant="outline" onClick={expandAll}>
-                  展开全部
-                </Button>
-                <Button type="button" size="sm" variant="ghost" onClick={collapseAll}>
-                  收起全部
-                </Button>
-              </div>
-            ) : null}
-          </div>
-
-          {questions.length === 0 ? (
-            <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-              该题组下还没有关联小题。小题的增删 / 排序由导入脚本负责，本页面只修改已有小题的内容。
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {questions.map((question, index) => (
-                <QuestionEditorCard
-                  key={question.id}
-                  question={question}
-                  index={index}
-                  subject={draft.subject}
-                  expanded={expandedIds.has(question.id)}
-                  onToggle={() =>
-                    setExpandedIds((prev) => {
-                      const next = new Set(prev)
-                      if (next.has(question.id)) next.delete(question.id)
-                      else next.add(question.id)
-                      return next
-                    })
-                  }
-                  onDirtyChange={handleQuestionDirty}
+        {/* 三个板块都保持挂载（hidden 切换），避免切走时丢掉小题卡片里的草稿 */}
+        <div className={activeTab === "basic" ? "block" : "hidden"} role="tabpanel" aria-label="基本信息">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_17rem] xl:items-start">
+            <GroupMetaForm
+              values={draft}
+              onChange={updateDraft}
+              onSave={saveGroup}
+              onReset={resetBasic}
+              saving={saving}
+              dirty={basicDirty}
+              syncKey={syncKey}
+            />
+            <Card>
+              <CardHeader>
+                <CardTitle>封面</CardTitle>
+                <CardDescription>题组卡片图，影响题库列表的展示。</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CoverUploader
+                  groupId={group.id}
+                  imageUrl={draft.imageUrl}
+                  onChange={(imageUrl) => updateDraft({ imageUrl })}
+                  disabled={saving}
                 />
-              ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className={activeTab === "content" ? "block" : "hidden"} role="tabpanel" aria-label="题组正文">
+          <GroupContentForm
+            content={draft.content}
+            onChange={(content) => updateDraft({ content })}
+            onSave={saveGroup}
+            onReset={resetContent}
+            saving={saving}
+            dirty={contentDirty}
+          />
+        </div>
+
+        <div className={activeTab === "questions" ? "block" : "hidden"} role="tabpanel" aria-label="小题">
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-base font-semibold">
+                小题列表
+                <span className="ml-2 text-sm font-normal text-muted-foreground">共 {questions.length} 题</span>
+                {dirtyQuestionCount > 0 ? (
+                  <span className="ml-2 text-xs font-normal text-brand">（{dirtyQuestionCount} 题未保存）</span>
+                ) : null}
+              </h2>
+              {questions.length > 0 ? (
+                <div className="flex items-center gap-2">
+                  <Button type="button" size="sm" variant="outline" onClick={expandAll}>
+                    展开全部
+                  </Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={collapseAll}>
+                    收起全部
+                  </Button>
+                </div>
+              ) : null}
             </div>
-          )}
-        </section>
+
+            {questions.length === 0 ? (
+              <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                该题组下还没有关联小题。小题的增删 / 排序由导入脚本负责，本页面只修改已有小题的内容。
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {questions.map((question, index) => (
+                  <QuestionEditorCard
+                    key={question.id}
+                    question={question}
+                    index={index}
+                    subject={draft.subject}
+                    expanded={expandedIds.has(question.id)}
+                    onToggle={() =>
+                      setExpandedIds((prev) => {
+                        const next = new Set(prev)
+                        if (next.has(question.id)) next.delete(question.id)
+                        else next.add(question.id)
+                        return next
+                      })
+                    }
+                    onDirtyChange={handleQuestionDirty}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
@@ -270,21 +352,6 @@ export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEdi
 
         <Card>
           <CardHeader>
-            <CardTitle>封面</CardTitle>
-            <CardDescription>题组卡片图，影响题库列表的展示。</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CoverUploader
-              groupId={group.id}
-              imageUrl={draft.imageUrl}
-              onChange={(imageUrl) => updateDraft({ imageUrl })}
-              disabled={saving}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
             <CardTitle>最近修改</CardTitle>
             <CardDescription>最近 15 条改动（题组 + 组内小题）。</CardDescription>
           </CardHeader>
@@ -302,8 +369,8 @@ export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEdi
           </CardHeader>
           <CardContent className="space-y-2 text-xs text-muted-foreground">
             <p>每次保存都会存档：管理员、时间、改了哪些字段、改动前后的内容。</p>
-            <p>题组正文与题干直接编辑 Markdown 源码；公式用 $...$，填空占位用 &lt;Input&gt; 等私有标签。</p>
-            <p>保存不会影响已有作答记录，但改答案 / 选项 ID 会让历史作答的判分口径发生变化，请谨慎。</p>
+            <p>正文与题干直接编辑 Markdown 源码；公式用 $...$，填空占位用 &lt;Input&gt; 等私有标签。</p>
+            <p>保存不影响已有作答记录，但改答案 / 选项 ID 会让历史作答的判分口径发生变化，请谨慎。</p>
             <p>改完建议点「前台预览」核对渲染效果。</p>
           </CardContent>
         </Card>
