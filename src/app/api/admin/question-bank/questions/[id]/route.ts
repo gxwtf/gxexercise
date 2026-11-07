@@ -21,6 +21,54 @@ import {
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
+interface GroupScoreUpdate {
+  groupId: string
+  title: string
+  before: number
+  after: number
+}
+
+/**
+ * 重算「包含这道小题」的所有题组的总分。
+ *
+ * 规则（与题库展示口径一致）：
+ *   - 普通题组：小题分值之和；
+ *   - answerMode = "pick-one"（作文二选一 / 微写作三选一）：取单题最高分（等于单题满分，不是翻倍）；
+ *   - QuestionGroup.score 是 Int 列，四舍五入取整（小题分值允许 .5，例如完形每题 1.5 分）。
+ */
+async function recalcGroupScores(
+  tx: Prisma.TransactionClient,
+  questionId: string,
+): Promise<GroupScoreUpdate[]> {
+  const memberships = await tx.groupItem.findMany({ where: { questionId }, select: { groupId: true } })
+  const updates: GroupScoreUpdate[] = []
+
+  for (const { groupId } of memberships) {
+    const group = await tx.questionGroup.findUnique({
+      where: { id: groupId },
+      select: { id: true, title: true, score: true, answerMode: true },
+    })
+    if (!group) continue
+
+    const items = await tx.groupItem.findMany({
+      where: { groupId },
+      select: { question: { select: { score: true } } },
+    })
+    const scores = items.map((item) => item.question.score)
+    if (scores.length === 0) continue
+
+    const total =
+      group.answerMode === "pick-one" ? Math.max(...scores) : scores.reduce((sum, score) => sum + score, 0)
+    const nextScore = Math.round(total)
+    if (nextScore === group.score) continue
+
+    await tx.questionGroup.update({ where: { id: groupId }, data: { score: nextScore } })
+    updates.push({ groupId, title: group.title, before: group.score, after: nextScore })
+  }
+
+  return updates
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -75,6 +123,8 @@ export async function PATCH(
     const ip = getRequestIp(request)
     const question = await prisma.$transaction(async (tx) => {
       const updated = await tx.question.update({ where: { id }, data })
+      // 题组分值 = 小题分值合计（pick-one 取单题满分），改小题分值后同步重算
+      const scoreUpdates = await recalcGroupScores(tx, id)
       await writeAdminEditLog(tx, {
         adminId: auth.userId,
         adminName: auth.session.username || null,
@@ -85,6 +135,11 @@ export async function PATCH(
         groupId: groupItem?.groupId ?? null,
         groupTitle: groupItem?.group.title ?? null,
         changes,
+        summary: scoreUpdates.length
+          ? `题组分值自动合计：${scoreUpdates
+              .map((item) => `${item.title} ${item.before} → ${item.after} 分`)
+              .join("；")}`
+          : null,
         ip,
       })
       return updated

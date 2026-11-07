@@ -51,7 +51,6 @@ export const GROUP_BASIC_KEYS = [
   "questionType",
   "grade",
   "source",
-  "score",
   "answerMode",
   "tags",
   "imageUrl",
@@ -88,7 +87,6 @@ export function validateGroupDraft(draft: GroupFormValues): string | null {
   if (!draft.questionType.trim()) return "请选择题型"
   if (!draft.category.trim()) return "类别不能为空"
   if (!draft.source.trim()) return "来源不能为空"
-  if (!Number.isFinite(draft.score) || draft.score < 0 || draft.score > 300) return "分值应在 0–300 之间"
   if (draft.tags.length > 40) return "标签最多 40 个"
   if (draft.tags.some((t) => t.length > 30)) return "单个标签不能超过 30 字"
   if (draft.content.length > 200_000) return "题组正文不能超过 20 万字"
@@ -100,7 +98,6 @@ export function validateGroupDraft(draft: GroupFormValues): string | null {
 export function validateQuestionDraft(draft: QuestionFormValues): string | null {
   if (!draft.questionType.trim()) return "请选择题型"
   if (draft.content.length > 200_000) return "题干不能超过 20 万字"
-  if (!Number.isFinite(draft.score) || draft.score < 0 || draft.score > 300) return "分值应在 0–300 之间"
   if (draft.answer.length > 5_000) return "答案不能超过 5000 字"
   if (draft.analysis.length > 200_000) return "解析不能超过 20 万字"
   if (draft.tags.length > 40) return "标签最多 40 个"

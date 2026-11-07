@@ -269,8 +269,9 @@ export function parseGroupPatch(body: Record<string, unknown>): ValidationResult
     if (has(body, "questionType")) patch.questionType = text(body.questionType, "题型", QUESTION_TYPE_MAX)
     if (has(body, "grade")) patch.grade = nullableText(body.grade, "年级", GRADE_MAX)
     if (has(body, "source")) patch.source = text(body.source, "来源", SOURCE_MAX, true)
-    // QuestionGroup.score 是 Int 列，只收整数；小数会被 prisma 直接报错，不如在这里挡住
-    if (has(body, "score")) patch.score = scoreValue(body.score, "分值", true)
+    // 题组分值不再允许直接改：它由小题分值自动合计（见 questions PATCH 的重算逻辑），
+    // 显式拒绝能让误传的前端/脚本立刻发现，而不是静默丢掉
+    if (has(body, "score")) throw new FieldError("题组分值由小题分值自动合计，不能直接修改")
     if (has(body, "answerMode")) patch.answerMode = enumValue(body.answerMode, "作答模式", ANSWER_MODES)
     if (has(body, "tags")) patch.tags = tagList(body.tags)
     if (has(body, "imageUrl")) patch.imageUrl = imageUrlValue(body.imageUrl)

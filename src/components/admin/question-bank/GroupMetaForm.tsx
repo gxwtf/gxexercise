@@ -36,6 +36,8 @@ interface GroupMetaFormProps {
   disabled?: boolean
   /** 封面区域（并进同一张卡片，放在标签之后） */
   coverSlot?: React.ReactNode
+  /** 题组分值：只读展示，由服务端从小题分值合计而来（取整） */
+  derivedScore: number
 }
 
 export function GroupMetaForm({
@@ -48,6 +50,7 @@ export function GroupMetaForm({
   syncKey,
   disabled,
   coverSlot,
+  derivedScore,
 }: GroupMetaFormProps) {
   const typeOptions = questionTypeOptionsFor("group", values.questionType)
   const categoryOptions = categoriesBySubject[values.subject] ?? []
@@ -190,17 +193,16 @@ export function GroupMetaForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="group-score">题组分值</Label>
-            <Input
-              id="group-score"
-              type="number"
-              min={0}
-              max={300}
-              step={0.5}
-              value={values.score}
-              onChange={(event) => onChange({ score: event.target.value === "" ? 0 : Number(event.target.value) })}
-              disabled={disabled}
-            />
+            <Label htmlFor="group-score-readonly">题组分值</Label>
+            {/* 只读：由小题分值自动合计（服务端在小题保存时重算），不在这里手改 */}
+            <div
+              id="group-score-readonly"
+              className="flex h-8 items-center gap-1.5 rounded-lg border border-input bg-muted/40 px-2.5 text-sm"
+            >
+              <span className="font-medium">{derivedScore} 分</span>
+              <span className="text-xs text-muted-foreground">自动合计</span>
+            </div>
+            <p className="text-xs text-muted-foreground">由各小题分值合计（取整）；改单题分值在「小题」板块。</p>
           </div>
         </div>
 

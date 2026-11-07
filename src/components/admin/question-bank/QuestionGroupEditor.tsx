@@ -259,6 +259,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
             saving={saving}
             dirty={basicDirty}
             syncKey={syncKey}
+            derivedScore={group.score}
             coverSlot={
               <CoverField
                 groupId={group.id}
@@ -348,6 +349,10 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
             <div className="flex items-center justify-between gap-2">
               <span className="text-muted-foreground">小题合计分</span>
               <span className="font-medium">{totalSavedScore} 分</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">题组分值（自动）</span>
+              <span className="font-medium">{group.score} 分</span>
             </div>
             <Separator />
             <div className="flex items-center justify-between gap-2 text-xs">
