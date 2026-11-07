@@ -22,24 +22,26 @@ export default function SubHeader({
 }>) {
   const router = useRouter();
   const pathname = usePathname();
+  // 学科 slug 认不出来时（比如手输 /questions/英语）不能直接崩：导航按钮为空即可
   const currentNavItems = subjectNavItems[subject];
+  const navButtons = currentNavItems?.navButtons ?? [];
 
   // 换学科 / 换题型时把「当前地址栏里的筛选」带过去（点清除之后地址栏干净，也就没有记忆了）
   const go = (href: string) => router.push(withCurrentFilters(href));
   
   // 获取当前选中的题型
   const getCurrentCategory = () => {
-    if (!currentNavItems?.navButtons?.length) return null;
+    if (!navButtons.length) return null;
     
     // 如果是学科首页，默认选中第一个题型
     if (pathname === `/questions/${subjectToRoute[subject]}`) {
-      return currentNavItems.navButtons[0].label;
+      return navButtons[0].label;
     }
     
     // 从当前路径中提取题型
-    for (const item of currentNavItems.navButtons) {
+    for (const item of navButtons) {
       const categoryRoute = categoryToRoute[subject]?.[item.label];
-      if (pathname.includes(categoryRoute)) {
+      if (categoryRoute && pathname.includes(categoryRoute)) {
         return item.label;
       }
     }
@@ -79,7 +81,7 @@ export default function SubHeader({
       </div>
 
       <nav className="ml-4 hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap lg:flex">
-        {currentNavItems.navButtons.map((item, index) => {
+        {navButtons.map((item, index) => {
           const isActive = item.label === currentCategory;
           return (
             <Button
@@ -115,7 +117,7 @@ export default function SubHeader({
 
   const mobileMenuContent = (
     <nav className="flex flex-col gap-3">
-      {currentNavItems.navButtons.map((item, index) => {
+      {navButtons.map((item, index) => {
         const isActive = item.label === currentCategory;
         return (
           <Link
