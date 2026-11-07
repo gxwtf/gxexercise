@@ -32,6 +32,7 @@ import {
   GROUP_BASIC_KEYS,
   GROUP_CONTENT_KEYS,
   GROUP_FORM_KEYS,
+  formatScoreValue,
   pickChangedFields,
   validateGroupDraft,
 } from "@/components/admin/question-bank/form-utils"
@@ -190,7 +191,6 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
   const expandAll = () => setExpandedIds(new Set(questions.map((question) => question.id)))
   const collapseAll = () => setExpandedIds(new Set())
 
-  const totalSavedScore = questions.reduce((sum, question) => sum + question.values.score, 0)
   const dirtyQuestionCount = dirtyQuestionIds.size
 
   return (
@@ -224,7 +224,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
         <Badge variant="secondary">{draft.category || "未分类"}</Badge>
         <Badge variant="outline">{questionTypeLabel(draft.questionType)}</Badge>
         <span className="text-xs text-muted-foreground">
-          {questions.length} 道单题 · 题组分值 {draft.score}
+          {questions.length} 道单题 · 题组分值 {formatScoreValue(group.score)}
         </span>
         {anyDirty ? <Badge variant="secondary">有未保存的改动</Badge> : null}
       </div>
@@ -342,13 +342,10 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
               <span className="text-muted-foreground">单题数</span>
               <span className="font-medium">{questions.length} 题</span>
             </div>
+            {/* 题组分值就是单题分值合计，不要再重复显示两行（见 6a33b80 之后的反馈） */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground">单题合计分</span>
-              <span className="font-medium">{totalSavedScore} 分</span>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground">题组分值（自动）</span>
-              <span className="font-medium">{group.score} 分</span>
+              <span className="text-muted-foreground">题组分值（按单题合计）</span>
+              <span className="font-medium">{formatScoreValue(group.score)} 分</span>
             </div>
             <div className="flex items-center justify-between gap-2 border-t border-border pt-2 text-xs">
               <span className="text-muted-foreground">创建时间</span>

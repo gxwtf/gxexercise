@@ -34,7 +34,8 @@ interface GroupScoreUpdate {
  * 规则（与题库展示口径一致）：
  *   - 普通题组：单题分值之和；
  *   - answerMode = "pick-one"（作文二选一 / 微写作三选一）：取单题最高分（等于单题满分，不是翻倍）；
- *   - QuestionGroup.score 是 Int 列，四舍五入取整（单题分值允许 .5，例如完形每题 1.5 分）。
+ *   - QuestionGroup.score 是 Float 列，保留小数（单题分值允许 .5，例如完形每题 1.5 分），
+ *     只按 0.01 精度收敛，避免浮点累加噪声（如 0.30000000000000004）。
  */
 async function recalcGroupScores(
   tx: Prisma.TransactionClient,
@@ -59,7 +60,7 @@ async function recalcGroupScores(
 
     const total =
       group.answerMode === "pick-one" ? Math.max(...scores) : scores.reduce((sum, score) => sum + score, 0)
-    const nextScore = Math.round(total)
+    const nextScore = Math.round(total * 100) / 100
     if (nextScore === group.score) continue
 
     await tx.questionGroup.update({ where: { id: groupId }, data: { score: nextScore } })

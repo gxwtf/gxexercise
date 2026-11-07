@@ -22,6 +22,7 @@ import { TagsInput } from "@/components/admin/question-bank/TagsInput"
 import type { GroupFormValues } from "@/components/admin/question-bank/types"
 import { ANSWER_MODE_META, questionTypeLabel, questionTypeOptionsFor } from "@/lib/question-bank-meta"
 import { categoriesBySubject, subjects } from "@/constants/subjects"
+import { formatScoreValue } from "@/components/admin/question-bank/form-utils"
 
 interface GroupMetaFormProps {
   values: GroupFormValues
@@ -196,10 +197,10 @@ export function GroupMetaForm({
               id="group-score-readonly"
               className="flex h-8 items-center gap-1.5 rounded-lg border border-input bg-muted/40 px-2.5 text-sm"
             >
-              <span className="font-medium">{derivedScore} 分</span>
+              <span className="font-medium">{formatScoreValue(derivedScore)} 分</span>
               <span className="text-xs text-muted-foreground">自动合计</span>
             </div>
-            <p className="text-xs text-muted-foreground">由各单题分值合计（取整）；改单题分值在「单题」板块。</p>
+            <p className="text-xs text-muted-foreground">由各单题分值自动合计（保留小数）；改单题分值在「单题」板块。</p>
           </div>
         </div>
 

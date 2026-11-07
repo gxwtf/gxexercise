@@ -79,6 +79,12 @@ export const QUESTION_FORM_KEYS = [
   "source",
 ] as const satisfies readonly (keyof QuestionFormValues)[]
 
+/** 分数展示：整数原样，小数最多两位（7.5 / 12.25），避免浮点噪声 */
+export function formatScoreValue(value: number): string {
+  if (!Number.isFinite(value)) return "0"
+  return String(Math.round(value * 100) / 100)
+}
+
 /** 保存题组前的校验：返回第一个错误文案（null = 通过） */
 export function validateGroupDraft(draft: GroupFormValues): string | null {
   if (!draft.title.trim()) return "标题不能为空"
