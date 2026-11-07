@@ -229,9 +229,13 @@ model AdminEditLog {
 model QuestionBankReviewer {
   id        String   @id @default(cuid())
   userName  String   @unique @db.VarChar(100)
+  /// 广学账号 userId（用于取头像：https://gxwtf.cn/avatar?userId=…；首次登录时自动补齐）
+  userId    Int?
+  /// 年级（广学账号的 7–13：初一…高三，登录时从 SSO 同步刷新）
+  grade     Int?
   /// 备注（如真实姓名 / 负责学科）
   note      String?  @db.VarChar(200)
-  /// 谁加的（管理员用户名）
+  /// 谁加的（管理员用户名；界面上不展示）
   createdBy String?  @db.VarChar(100)
   createdAt DateTime @default(now())
 

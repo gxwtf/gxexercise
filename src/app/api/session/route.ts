@@ -7,7 +7,7 @@ import { defaultSession, sessionOptions } from "@/lib/iron";
 import { SessionData } from "@/lib/iron";
 import axios from "axios";
 import { prisma } from "@/lib/prisma";
-import { isQuestionBankReviewer } from "@/lib/question-bank-auth";
+import { isQuestionBankReviewer, syncQuestionBankReviewerProfile } from "@/lib/question-bank-auth";
 
 // login
 export async function POST(request: NextRequest) {
@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
             session.grade = res.data.grade || 7;
             session.counter = 0;
             await session.save();
+
+            // 审核名单里如果已有这个用户名，顺手同步 userId / 年级（用于头像、年级展示）
+            await syncQuestionBankReviewerProfile(res.data.userId, res.data.userName, res.data.grade);
 
             // 题库审核名单是站内维护的，不在 SSO 里，这里顺带算一下（只用于显示入口）
             const questionBankEditor =

@@ -74,3 +74,24 @@ export async function requireQuestionBankEditor() {
   }
   return { ok: true as const, session, userId, isAdmin: false, isReviewer: true }
 }
+
+/** 登录后把广学账号里的 userId / 年级同步进审核名单（头像、年级用它展示） */
+export async function syncQuestionBankReviewerProfile(
+  userId: number,
+  userName: string | null | undefined,
+  grade: number | null | undefined,
+): Promise<void> {
+  const name = (userName ?? "").trim()
+  if (!name || !Number.isInteger(userId) || userId <= 0) return
+  try {
+    await prisma.questionBankReviewer.updateMany({
+      where: { userName: { equals: name, mode: "insensitive" } },
+      data: {
+        userId,
+        ...(typeof grade === "number" && Number.isInteger(grade) ? { grade } : {}),
+      },
+    })
+  } catch (error) {
+    console.error("同步题库审核名单用户信息失败:", error)
+  }
+}
