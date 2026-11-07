@@ -3,15 +3,13 @@
 // 题库审核名单：与广学账号衔接
 //
 // 添加：按用户名去账号中心（account.gxwtf.cn）搜人，带上头像 / 年级一起加入；
-// 展示：表格显示头像、用户名、年级（操作人不展示）；
-// 兜底：浏览器里没有账号中心管理员登录态时，仍可手动按用户名添加（对方登录后自动补齐头像和年级）。
+// 展示：表格显示头像、用户名、年级（不展示操作人 / 备注）。
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Loader2, Plus, Search, Trash2, Users } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,7 +40,6 @@ export interface ReviewerRow {
   userName: string
   userId: number | null
   grade: number | null
-  note: string | null
   createdAt: string
 }
 
@@ -84,9 +81,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
   const [searchError, setSearchError] = React.useState<string | null>(null)
   const [adding, setAdding] = React.useState<string | null>(null)
   const [removing, setRemoving] = React.useState<string | null>(null)
-  // 兜底：手动按用户名添加
-  const [manualName, setManualName] = React.useState("")
-  const [manualNote, setManualNote] = React.useState("")
 
   const existing = new Set(reviewers.map((reviewer) => reviewer.userName.toLowerCase()))
 
@@ -127,7 +121,7 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
     }
   }
 
-  const add = async (payload: { userName: string; userId?: number | null; grade?: number | null; note?: string | null }) => {
+  const add = async (payload: { userName: string; userId?: number | null; grade?: number | null }) => {
     setAdding(payload.userName)
     try {
       const response = await fetch("/api/admin/question-bank/reviewers", {
@@ -140,8 +134,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
       toast.success(`已把 ${payload.userName} 加入题库审核名单`)
       setResults(null)
       setQuery("")
-      setManualName("")
-      setManualNote("")
       router.refresh()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "添加失败，请稍后重试")
@@ -189,9 +181,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
             {searching ? <Loader2 className="animate-spin" /> : <Search />}
             {searching ? "查找中…" : "查找"}
           </Button>
-          <span className="text-xs text-muted-foreground">
-            头像和年级直接取广学账号的数据；加入前请确认是同一个人。
-          </span>
         </div>
 
         {searchError ? <p className="text-xs text-destructive">{searchError}</p> : null}
@@ -224,7 +213,7 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
                           variant="outline"
                           disabled={already || adding !== null}
                           onClick={() =>
-                            add({ userName: user.username, userId: user.id, grade: user.grade, note: null })
+                            add({ userName: user.username, userId: user.id, grade: user.grade })
                           }
                         >
                           {adding === user.username ? <Loader2 className="animate-spin" /> : <Plus />}
@@ -246,7 +235,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
             审核名单
             <span className="ml-2 text-sm font-normal text-muted-foreground">共 {reviewers.length} 人</span>
           </h2>
-          <p className="text-xs text-muted-foreground">没有账号中心登录态时，也可以用下面的方式手动添加。</p>
         </div>
 
         {reviewers.length === 0 ? (
@@ -263,7 +251,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
                   <TableHead className="w-[70px]">头像</TableHead>
                   <TableHead>用户名</TableHead>
                   <TableHead className="w-[90px]">年级</TableHead>
-                  <TableHead className="w-[160px]">备注</TableHead>
                   <TableHead className="w-[170px]">加入时间</TableHead>
                   <TableHead className="w-[100px] text-center">操作</TableHead>
                 </TableRow>
@@ -277,15 +264,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
                     <TableCell className="font-medium">{reviewer.userName}</TableCell>
                     <TableCell className="text-muted-foreground">
                       {gradeLabel(reviewer.grade) ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      {reviewer.note ? (
-                        <Badge variant="secondary" className="font-normal">
-                          {reviewer.note}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground">
                       {new Date(reviewer.createdAt).toLocaleString("zh-CN", {
@@ -338,51 +316,6 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
           </div>
         )}
 
-        <details className="rounded-lg border border-border p-3 text-sm">
-          <summary className="cursor-pointer select-none text-muted-foreground">
-            手动按用户名添加（头像 / 年级等对方登录后自动补齐）
-          </summary>
-          <div className="mt-3 flex flex-wrap items-end gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="reviewer-manual-name">广学账号用户名</Label>
-              <Input
-                id="reviewer-manual-name"
-                value={manualName}
-                onChange={(event) => setManualName(event.target.value)}
-                placeholder="如：Wangzehao2009"
-                maxLength={100}
-                className="w-64"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="reviewer-manual-note">备注（可选）</Label>
-              <Input
-                id="reviewer-manual-note"
-                value={manualNote}
-                onChange={(event) => setManualNote(event.target.value)}
-                placeholder="如：英语组审核"
-                maxLength={200}
-                className="w-64"
-              />
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={adding !== null}
-              onClick={() => {
-                const name = manualName.trim()
-                if (!name) {
-                  toast.error("请填写用户名")
-                  return
-                }
-                void add({ userName: name, note: manualNote.trim() || null })
-              }}
-            >
-              {adding !== null ? <Loader2 className="animate-spin" /> : <Plus />}
-              手动加入
-            </Button>
-          </div>
-        </details>
       </div>
     </div>
   )

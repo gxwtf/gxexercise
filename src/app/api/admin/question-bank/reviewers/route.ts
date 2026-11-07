@@ -28,7 +28,7 @@ export async function GET() {
 
   const reviewers = await prisma.questionBankReviewer.findMany({
     orderBy: { createdAt: "asc" },
-    select: { id: true, userName: true, userId: true, grade: true, note: true, createdBy: true, createdAt: true },
+    select: { id: true, userName: true, userId: true, grade: true, createdAt: true },
   })
   return NextResponse.json({ success: true, data: reviewers })
 }
@@ -46,7 +46,6 @@ export async function POST(request: Request) {
   }
   const userName = normalizeName(body.userName)
   if (!userName) return errorJson("请填写广学账号用户名（1–100 字）", 400)
-  const note = typeof body.note === "string" && body.note.trim() ? body.note.trim().slice(0, 200) : null
   // 从账号中心搜索结果带过来的 userId / 年级（可选；不传的话等对方登录时自动补齐）
   const userIdRaw = body.userId === undefined || body.userId === null ? null : Number(body.userId)
   if (userIdRaw !== null && (!Number.isInteger(userIdRaw) || userIdRaw <= 0)) {
@@ -64,7 +63,7 @@ export async function POST(request: Request) {
   if (exists) return errorJson("该用户名已经在审核名单里", 400)
 
   const reviewer = await prisma.questionBankReviewer.create({
-    data: { userName, userId: userIdRaw, grade: gradeRaw, note, createdBy: adminName },
+    data: { userName, userId: userIdRaw, grade: gradeRaw, createdBy: adminName },
   })
 
   try {
@@ -76,7 +75,7 @@ export async function POST(request: Request) {
       targetId: reviewer.id,
       targetLabel: userName,
       changes: { reviewer: { before: null, after: userName } },
-      summary: `加入题库审核名单${note ? `（备注：${note}）` : ""}`,
+      summary: "加入题库审核名单",
       ip: getRequestIp(request),
     })
   } catch (error) {
