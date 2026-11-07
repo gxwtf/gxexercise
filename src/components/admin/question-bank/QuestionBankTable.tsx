@@ -17,9 +17,10 @@ export interface QuestionBankRow {
   subject: string
   /** 题型中文名（questionTypeLabel 结果）——列表里只展示题型，类别与题型大多重复，不再单列 */
   typeLabel: string
-  /** 单题数（GroupItem 数量） */
-  itemCount: number
-  score: number
+  /** 试卷来源（导入时的卷名） */
+  source: string
+  /** 年级（可能为空） */
+  grade: string | null
   /** 更新时间（已格式化） */
   updatedAt: string
 }
@@ -38,8 +39,8 @@ export function QuestionBankTable({ rows }: { rows: QuestionBankRow[] }) {
             <TableHead>标题</TableHead>
             <TableHead className="w-[70px]">学科</TableHead>
             <TableHead className="w-[120px]">题型</TableHead>
-            <TableHead className="w-[70px] text-center">单题数</TableHead>
-            <TableHead className="w-[70px] text-center">分值</TableHead>
+            <TableHead className="w-[260px]">来源</TableHead>
+            <TableHead className="w-[80px]">年级</TableHead>
             <TableHead className="w-[140px]">更新时间</TableHead>
             <TableHead className="w-[180px] text-center">操作</TableHead>
           </TableRow>
@@ -61,8 +62,12 @@ export function QuestionBankTable({ rows }: { rows: QuestionBankRow[] }) {
               </TableCell>
               <TableCell className="whitespace-nowrap">{row.subject}</TableCell>
               <TableCell className="whitespace-nowrap">{row.typeLabel}</TableCell>
-              <TableCell className="text-center tabular-nums">{row.itemCount}</TableCell>
-              <TableCell className="text-center tabular-nums">{row.score}</TableCell>
+              <TableCell>
+                <span className="block max-w-[240px] truncate" title={row.source}>
+                  {row.source || "—"}
+                </span>
+              </TableCell>
+              <TableCell className="whitespace-nowrap text-muted-foreground">{row.grade || "—"}</TableCell>
               <TableCell className="whitespace-nowrap text-muted-foreground">{row.updatedAt}</TableCell>
               <TableCell className="text-center">
                 <div className="flex items-center justify-center gap-1">

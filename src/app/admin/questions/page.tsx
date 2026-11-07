@@ -79,9 +79,9 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
         title: true,
         subject: true,
         questionType: true,
-        score: true,
+        source: true,
+        grade: true,
         updatedAt: true,
-        _count: { select: { groupItems: true } },
       },
     }),
   ])
@@ -102,8 +102,8 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
     title: g.title,
     subject: g.subject,
     typeLabel: questionTypeLabel(g.questionType),
-    itemCount: g._count.groupItems,
-    score: g.score,
+    source: g.source,
+    grade: g.grade,
     updatedAt: formatDateTime(g.updatedAt),
   }))
 
