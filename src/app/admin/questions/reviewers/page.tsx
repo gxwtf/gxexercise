@@ -47,10 +47,6 @@ export default async function QuestionBankReviewersPage() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold sm:text-2xl">题库审核名单</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            名单里的同学（不是网站管理员也可以）登录后可在「管理 → 题库管理」里查看和修改题目。
-            名单变更会记入修改记录。
-          </p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/admin/questions">返回题库管理</Link>
