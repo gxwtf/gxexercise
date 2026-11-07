@@ -53,7 +53,6 @@ export const GROUP_BASIC_KEYS = [
   "source",
   "answerMode",
   "tags",
-  "imageUrl",
 ] as const satisfies readonly (keyof GroupFormValues)[]
 
 /** 「题组正文」板块的字段（阅读材料 / 语料，单独一个大编辑器） */

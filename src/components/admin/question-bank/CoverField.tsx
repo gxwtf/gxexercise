@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Image as ImageIcon, Loader2, Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   AlertDialog,
@@ -199,17 +198,20 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
             </p>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="cover-url">封面地址</Label>
-            <Input
-              id="cover-url"
-              value={imageUrl}
-              onChange={(event) => onChange(event.target.value)}
-              placeholder="/api/covers/<groupId>.jpg 或 https://…"
-              className="font-mono text-xs"
-              disabled={disabled}
-            />
-            <p className="text-xs text-muted-foreground">留空表示没有封面（前台用占位图）；改地址后仍需保存题组信息。</p>
+          <div className="space-y-1">
+            <Label>当前封面</Label>
+            {/* 只读展示：封面只能通过上传 / 候选封面 / 移除来改（这三种都是立即写库并记日志），
+                不需要手填地址，避免和「保存题组信息」的保存时机混淆 */}
+            <p className="break-all font-mono text-xs text-muted-foreground">
+              {imageUrl.trim() || "未设置（前台显示占位图）"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {imageUrl.startsWith("/api/covers/")
+                ? "自托管文件（/api/covers/<题组 id>.jpg）"
+                : imageUrl.trim()
+                  ? "外链图片（生成流水线直接写入的图库地址）"
+                  : "用上面的「选择图片」或下方候选封面设置，改完立即生效"}
+            </p>
           </div>
 
           {imageUrl ? (
