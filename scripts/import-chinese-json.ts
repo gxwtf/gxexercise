@@ -1,7 +1,8 @@
 /**
  * 把语文 JSON（output_json_chinese/<类型>/<卷>.json）导入题库
  *
- * 数据结构：{paper:{...}, groups:[{category, questionType, title, content, score, questions:[...]}]}
+ * 数据结构：{paper:{...}, sections:[{category, questionType, title, content, score, questions:[...]}]}
+ * 兼容旧格式 {paper, groups}（2025 及以前的语文 JSON）；sections 优先。
  * - 每个 group 建一个 QuestionGroup（category 决定它出现在哪个题型页）
  * - 同时建一张 TestPaper（套卷），把各题组按顺序挂进去，可整套练习
  *
@@ -39,7 +40,8 @@ interface Group {
 }
 interface Paper {
   paper: { title: string; subject: string; source?: string; grade?: string; year?: number | null; totalScore?: number | null; duration?: number | null; tags?: string[] };
-  groups: Group[];
+  sections?: Group[];
+  groups?: Group[];
 }
 
 /** 重导护栏：卷子上已有作答时，--force 会把作答一起删掉，必须显式加 --drop-submissions 才允许 */
@@ -92,11 +94,12 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
     if (!dryRun) await deletePaper(exists.id, title);
   }
 
-  const nQ = raw.groups.reduce((n, g) => n + g.questions.length, 0);
+  const secs: Group[] = raw.sections ?? raw.groups ?? [];
+  const nQ = secs.reduce((n, g) => n + g.questions.length, 0);
   if (dryRun) {
-    console.log(`[dry-run] ${title}: ${raw.groups.length} 组 / ${nQ} 题｜` +
-      raw.groups.map((g) => `${g.category}(${g.questions.length})`).join(" "));
-    return { papers: 1, groups: raw.groups.length, questions: nQ };
+    console.log(`[dry-run] ${title}: ${secs.length} 组 / ${nQ} 题｜` +
+      secs.map((g) => `${g.category}(${g.questions.length})`).join(" "));
+    return { papers: 1, groups: secs.length, questions: nQ };
   }
 
   const tags0 = Array.from(new Set([...(p.tags || []), subject]));
@@ -118,7 +121,7 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
     : null;
 
   let order = 0;
-  for (const g of raw.groups) {
+  for (const g of secs) {
     const tags = Array.from(new Set([...tags0, g.category]));
     const group = await prisma.questionGroup.create({
       data: {
@@ -157,8 +160,8 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
       await prisma.groupItem.create({ data: { groupId: group.id, questionId: created.id, orderIndex: gi++ } });
     }
   }
-  console.log(`✓ ${title}：${raw.groups.length} 组 / ${nQ} 题`);
-  return { papers: paper ? 1 : 0, groups: raw.groups.length, questions: nQ };
+  console.log(`✓ ${title}：${secs.length} 组 / ${nQ} 题`);
+  return { papers: paper ? 1 : 0, groups: secs.length, questions: nQ };
 }
 
 async function main() {
