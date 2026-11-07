@@ -122,6 +122,13 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
     },
   }))
 
+  // 题组所属的套卷（PaperItem itemType = questionGroup）：用于提供「下载原卷 PDF」，
+  // 管理员改题时可以对照原卷
+  const paperItem = await prisma.paperItem.findFirst({
+    where: { itemId: group.id, itemType: "questionGroup" },
+    select: { paper: { select: { id: true, title: true } } },
+  })
+
   // 候选封面来自流水线缓存（.cache/cover），没有就返回 null，界面上显示「暂无候选」
   const coverCandidates = await readCoverCandidates(group.id)
 
@@ -147,6 +154,7 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
         questions={editorQuestions}
         logs={editorLogs}
         coverCandidates={coverCandidates}
+        sourcePaper={paperItem?.paper ?? null}
       />
     </div>
   )

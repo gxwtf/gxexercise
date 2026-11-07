@@ -11,7 +11,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { ExternalLink, Info, ListChecks } from "lucide-react"
+import { ExternalLink, FileDown, Info, ListChecks } from "lucide-react"
 import { EmptyState } from "@/components/EmptyState"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -46,6 +46,8 @@ interface QuestionGroupEditorProps {
   logs: EditLogView[]
   /** 生成脚本产出的候选封面（没有缓存时为 null） */
   coverCandidates: CoverCandidateSetView | null
+  /** 题组所属套卷（用于下载原卷 PDF 对照改题；散题 / 不在套卷里时为 null） */
+  sourcePaper: { id: string; title: string } | null
 }
 
 type EditorTabValue = "basic" | "content" | "questions"
@@ -98,7 +100,7 @@ function restoreFields(
   return next
 }
 
-export function QuestionGroupEditor({ group, questions, logs, coverCandidates }: QuestionGroupEditorProps) {
+export function QuestionGroupEditor({ group, questions, logs, coverCandidates, sourcePaper }: QuestionGroupEditorProps) {
   const router = useRouter()
   const [draft, setDraft] = React.useState<GroupFormValues>(() => toGroupValues(group))
   const [saving, setSaving] = React.useState(false)
@@ -204,7 +206,15 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
             {group.title}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {sourcePaper ? (
+            <Button asChild variant="outline" size="sm" title={`下载原卷：${sourcePaper.title}`}>
+              <a href={`/api/test-paper/${sourcePaper.id}/pdf`} download>
+                <FileDown />
+                下载原卷 PDF
+              </a>
+            </Button>
+          ) : null}
           <Button asChild variant="outline" size="sm">
             <Link href={`/question/${group.id}`} target="_blank" rel="noreferrer">
               <ExternalLink />
@@ -350,6 +360,29 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
               <span className="text-muted-foreground">题组分值（按单题合计）</span>
               <span className="font-medium">{formatScoreValue(group.score)} 分</span>
             </div>
+            {sourcePaper ? (
+              <div className="flex items-start justify-between gap-2">
+                <span className="shrink-0 text-muted-foreground">所属套卷</span>
+                <span className="min-w-0 text-right">
+                  <Link
+                    href={`/test-paper/${sourcePaper.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block truncate hover:text-primary"
+                    title={sourcePaper.title}
+                  >
+                    {sourcePaper.title}
+                  </Link>
+                  <a
+                    href={`/api/test-paper/${sourcePaper.id}/pdf`}
+                    download
+                    className="text-xs text-muted-foreground hover:text-primary"
+                  >
+                    下载原卷 PDF
+                  </a>
+                </span>
+              </div>
+            ) : null}
             <div className="flex items-center justify-between gap-2 border-t border-border pt-2 text-xs">
               <span className="text-muted-foreground">创建时间</span>
               <span>{formatDateTime(new Date(group.createdAt))}</span>
