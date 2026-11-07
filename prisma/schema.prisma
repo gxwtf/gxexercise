@@ -211,6 +211,8 @@ model AdminEditLog {
   groupTitle  String?  @db.VarChar(255)
   /// 字段级 diff：{ field: { before, after, beforeLength?, afterLength? } }
   changes     Json?
+  /// 补充说明（如「选用候选封面 #3 · 相关度 0.512 · 出处链接」）
+  summary     String?  @db.VarChar(500)
   /// 请求来源 IP（nginx 透传的真实客户端 IP）
   ip          String?  @db.VarChar(64)
   createdAt   DateTime @default(now())

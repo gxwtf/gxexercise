@@ -12,7 +12,12 @@ import { prisma } from "@/lib/prisma"
 import type { Prisma } from "@/generated/prisma/client"
 
 /** 改动动作 */
-export type AdminEditAction = "update-group" | "update-question" | "upload-cover" | "delete-cover"
+export type AdminEditAction =
+  | "update-group"
+  | "update-question"
+  | "upload-cover"
+  | "pick-cover"
+  | "delete-cover"
 
 /** 改动对象类型 */
 export type AdminEditTargetType = "group" | "question"
@@ -108,6 +113,8 @@ export interface AdminEditLogInput {
   groupId?: string | null
   groupTitle?: string | null
   changes?: FieldChanges | null
+  /** 补充说明（长文本会被截断，供「修改记录」页展示） */
+  summary?: string | null
   ip?: string | null
 }
 
@@ -132,6 +139,7 @@ export async function writeAdminEditLog(
       groupId: input.groupId ?? null,
       groupTitle: input.groupTitle ? input.groupTitle.slice(0, 255) : null,
       changes: (input.changes ?? null) as unknown as Prisma.InputJsonValue,
+      summary: input.summary ? truncateLabel(input.summary, 500) : null,
       ip: input.ip ?? null,
     },
   })

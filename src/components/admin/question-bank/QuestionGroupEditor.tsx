@@ -20,9 +20,10 @@ import { EditorTabs } from "@/components/admin/question-bank/EditorTabs"
 import { GroupMetaForm } from "@/components/admin/question-bank/GroupMetaForm"
 import { GroupContentForm } from "@/components/admin/question-bank/GroupContentForm"
 import { QuestionEditorCard } from "@/components/admin/question-bank/QuestionEditorCard"
-import { CoverUploader } from "@/components/admin/question-bank/CoverUploader"
+import { CoverField } from "@/components/admin/question-bank/CoverField"
 import { EditHistoryList } from "@/components/admin/question-bank/EditHistoryList"
 import type {
+  CoverCandidateSetView,
   EditLogView,
   GroupEditorGroup,
   GroupEditorQuestion,
@@ -42,6 +43,8 @@ interface QuestionGroupEditorProps {
   group: GroupEditorGroup
   questions: GroupEditorQuestion[]
   logs: EditLogView[]
+  /** 生成脚本产出的候选封面（没有缓存时为 null） */
+  coverCandidates: CoverCandidateSetView | null
 }
 
 type EditorTabValue = "basic" | "content" | "questions"
@@ -94,7 +97,7 @@ function restoreFields(
   return next
 }
 
-export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEditorProps) {
+export function QuestionGroupEditor({ group, questions, logs, coverCandidates }: QuestionGroupEditorProps) {
   const router = useRouter()
   const [draft, setDraft] = React.useState<GroupFormValues>(() => toGroupValues(group))
   const [saving, setSaving] = React.useState(false)
@@ -221,31 +224,24 @@ export function QuestionGroupEditor({ group, questions, logs }: QuestionGroupEdi
 
         {/* 三个板块都保持挂载（hidden 切换），避免切走时丢掉小题卡片里的草稿 */}
         <div className={activeTab === "basic" ? "block" : "hidden"} role="tabpanel" aria-label="基本信息">
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_17rem] xl:items-start">
-            <GroupMetaForm
-              values={draft}
-              onChange={updateDraft}
-              onSave={saveGroup}
-              onReset={resetBasic}
-              saving={saving}
-              dirty={basicDirty}
-              syncKey={syncKey}
-            />
-            <Card>
-              <CardHeader>
-                <CardTitle>封面</CardTitle>
-                <CardDescription>题组卡片图，影响题库列表的展示。</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CoverUploader
-                  groupId={group.id}
-                  imageUrl={draft.imageUrl}
-                  onChange={(imageUrl) => updateDraft({ imageUrl })}
-                  disabled={saving}
-                />
-              </CardContent>
-            </Card>
-          </div>
+          <GroupMetaForm
+            values={draft}
+            onChange={updateDraft}
+            onSave={saveGroup}
+            onReset={resetBasic}
+            saving={saving}
+            dirty={basicDirty}
+            syncKey={syncKey}
+            coverSlot={
+              <CoverField
+                groupId={group.id}
+                imageUrl={draft.imageUrl}
+                candidates={coverCandidates}
+                onChange={(imageUrl) => updateDraft({ imageUrl })}
+                disabled={saving}
+              />
+            }
+          />
         </div>
 
         <div className={activeTab === "content" ? "block" : "hidden"} role="tabpanel" aria-label="题组正文">

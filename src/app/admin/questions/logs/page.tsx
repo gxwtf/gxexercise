@@ -89,6 +89,7 @@ export default async function AdminQuestionEditLogsPage({ searchParams }: PagePr
     targetLabel: log.targetLabel,
     groupId: log.groupId,
     groupTitle: log.groupTitle,
+    summary: log.summary ?? null,
     // changes 是 Json 列（Prisma 只保证是 unknown），结构由 EditLogTable 自己收窄校验
     changes: log.changes as Record<string, FieldChange> | null,
   }))

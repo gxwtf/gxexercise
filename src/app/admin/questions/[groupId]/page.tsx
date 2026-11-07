@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getAdminViewer } from "@/lib/admin-guard"
 import { Button } from "@/components/ui/button"
 import { QuestionGroupEditor } from "@/components/admin/question-bank/QuestionGroupEditor"
+import { readCoverCandidates } from "@/lib/cover-candidates"
 import type {
   EditLogFieldChange,
   EditLogView,
@@ -123,6 +124,9 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
     },
   }))
 
+  // 候选封面来自流水线缓存（.cache/cover），没有就返回 null，界面上显示「暂无候选」
+  const coverCandidates = await readCoverCandidates(group.id)
+
   const editorLogs: EditLogView[] = logs.map((log) => ({
     id: log.id,
     createdAt: log.createdAt.toISOString(),
@@ -135,6 +139,7 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
     groupId: log.groupId,
     groupTitle: log.groupTitle,
     changes: toEditLogChanges(log.changes),
+    summary: log.summary ?? null,
   }))
 
   return (
@@ -161,7 +166,12 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
         </div>
       </div>
 
-      <QuestionGroupEditor group={editorGroup} questions={editorQuestions} logs={editorLogs} />
+      <QuestionGroupEditor
+        group={editorGroup}
+        questions={editorQuestions}
+        logs={editorLogs}
+        coverCandidates={coverCandidates}
+      />
     </div>
   )
 }

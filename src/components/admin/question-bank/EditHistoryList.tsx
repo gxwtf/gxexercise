@@ -72,6 +72,12 @@ export function EditHistoryList({ logs, emptyText, showTarget = false }: EditHis
               {log.targetLabel}
             </p>
 
+            {log.summary ? (
+              <p className="line-clamp-2 text-xs text-muted-foreground" title={log.summary}>
+                {log.summary}
+              </p>
+            ) : null}
+
             {fields.length > 0 ? (
               <>
                 <div className="flex flex-wrap gap-1">

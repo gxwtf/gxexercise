@@ -30,6 +30,8 @@ export interface EditLogRow {
   groupId: string | null
   groupTitle: string | null
   changes: Record<string, FieldChange> | null
+  /** 补充说明（如选用候选封面的序号与出处） */
+  summary: string | null
 }
 
 /** 日志表里字段的展示顺序：沿用编辑页表单的字段顺序，未登记的字段排在最后 */
@@ -163,6 +165,11 @@ export function EditLogTable({ rows }: { rows: EditLogRow[] }) {
                     {row.targetType === "question" && row.groupTitle ? (
                       <span className="max-w-[360px] truncate text-xs text-muted-foreground">
                         所属题组：{row.groupTitle}
+                      </span>
+                    ) : null}
+                    {row.summary ? (
+                      <span className="max-w-[360px] truncate text-xs text-muted-foreground" title={row.summary}>
+                        {row.summary}
                       </span>
                     ) : null}
                   </div>

@@ -98,6 +98,7 @@ export const ADMIN_EDIT_ACTION_LABELS: Record<string, string> = {
   "update-group": "修改题组",
   "update-question": "修改小题",
   "upload-cover": "上传封面",
+  "pick-cover": "选用候选封面",
   "delete-cover": "移除封面",
 }
 

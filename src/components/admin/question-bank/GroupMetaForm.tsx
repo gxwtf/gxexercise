@@ -34,6 +34,8 @@ interface GroupMetaFormProps {
   /** 保存成功 / 重置后 +1，用于重置 TagsInput 的输入框文本 */
   syncKey: number
   disabled?: boolean
+  /** 封面区域（并进同一张卡片，放在标签之后） */
+  coverSlot?: React.ReactNode
 }
 
 export function GroupMetaForm({
@@ -45,6 +47,7 @@ export function GroupMetaForm({
   dirty,
   syncKey,
   disabled,
+  coverSlot,
 }: GroupMetaFormProps) {
   const typeOptions = questionTypeOptionsFor("group", values.questionType)
   const categoryOptions = categoriesBySubject[values.subject] ?? []
@@ -55,7 +58,7 @@ export function GroupMetaForm({
       <CardHeader>
         <CardTitle>题组信息</CardTitle>
         <CardDescription>
-          标题、分类、标签等元信息决定题库列表与筛选里的展示；封面在右侧单独维护。
+          标题、分类、标签与封面等元信息决定题库列表与筛选里的展示。
         </CardDescription>
         <CardAction>
           {dirty ? <Badge variant="secondary">有未保存的改动</Badge> : <Badge variant="outline">已同步</Badge>}
@@ -211,6 +214,8 @@ export function GroupMetaForm({
             disabled={disabled}
           />
         </div>
+
+        {coverSlot}
       </CardContent>
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-2">

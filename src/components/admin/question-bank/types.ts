@@ -73,4 +73,28 @@ export interface EditLogView {
   groupId: string | null
   groupTitle: string | null
   changes: Record<string, EditLogFieldChange> | null
+  /** 补充说明（如选用候选封面的序号与出处） */
+  summary: string | null
+}
+
+/** 生成脚本（article-cover）产出的候选封面（见 .cache/cover/<groupId>.candidates.json） */
+export interface CoverCandidateView {
+  /** 候选序号（1 起，按匹配分从高到低） */
+  rank: number
+  /** 与题组正文的相关度分数（OpenCLIP，越大越相关） */
+  score: number | null
+  imageUrl: string
+  thumbnailUrl: string
+  width: number | null
+  height: number | null
+  /** 署名（如 "Image by Pexels on Pixabay"） */
+  attribution: string | null
+  sourceUrl: string | null
+  license: string | null
+}
+
+export interface CoverCandidateSetView {
+  /** 生成时写进 imageUrl 的候选序号（用于标记「当前使用」的候选） */
+  writtenRank: number | null
+  candidates: CoverCandidateView[]
 }
