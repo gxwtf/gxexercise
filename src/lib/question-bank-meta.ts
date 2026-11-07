@@ -100,12 +100,14 @@ export const ADMIN_EDIT_ACTION_LABELS: Record<string, string> = {
   "upload-cover": "上传封面",
   "pick-cover": "选用候选封面",
   "delete-cover": "移除封面",
+  "update-reviewer": "管理审核名单",
 }
 
 /** 审计对象类型 → 中文名 */
 export const ADMIN_EDIT_TARGET_LABELS: Record<string, string> = {
   group: "题组",
   question: "单题",
+  reviewer: "审核员",
 }
 
 /** 覆盖的题组字段（顺序即编辑页表单 / 日志展示顺序） */

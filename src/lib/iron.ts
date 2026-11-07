@@ -9,6 +9,8 @@ export interface SessionData {
     email: string;
     userid: number;
     admin: boolean;
+    /** 题库审核名单成员（前端只用来决定是否显示「题库管理」入口，服务端会重新校验） */
+    questionBankEditor?: boolean;
     real_name: string;
     grade: number;
 }
@@ -20,6 +22,7 @@ export const defaultSession: SessionData = {
     email: "",
     userid: 0,
     admin: false,
+    questionBankEditor: false,
     real_name: "",
     grade: 0,
 };

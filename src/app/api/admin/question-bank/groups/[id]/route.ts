@@ -8,7 +8,7 @@
 // 返回 { success: true, data: { group, changed } }：group 是更新后的完整题组，
 // changed 是实际变动字段名（前端用来 toast「已保存：标题、分值」）。
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/api-auth"
+import { requireQuestionBankEditor } from "@/lib/question-bank-auth"
 import { prisma } from "@/lib/prisma"
 import { buildFieldChanges, getRequestIp, writeAdminEditLog } from "@/lib/admin-edit-log"
 import { GROUP_EDITABLE_FIELDS } from "@/lib/question-bank-meta"
@@ -26,7 +26,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdmin()
+  const auth = await requireQuestionBankEditor()
   if (!auth.ok) return auth.response
 
   const { id } = await params

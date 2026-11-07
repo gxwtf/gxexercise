@@ -71,7 +71,7 @@ export default function Header() {
         <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
           广学榜
         </Link>
-        {session.isLoggedIn && session.admin && (
+        {session.isLoggedIn && (session.admin || session.questionBankEditor) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-auto p-0 text-sm font-medium hover:text-primary flex items-center gap-1">
@@ -83,12 +83,16 @@ export default function Header() {
               <DropdownMenuItem asChild>
                 <Link href="/admin/questions">题库管理</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin/submissions">全部作答记录</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="https://account.gxwtf.cn/admin/users">用户管理</Link>
-              </DropdownMenuItem>
+              {session.admin && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/submissions">全部作答记录</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="https://account.gxwtf.cn/admin/users">用户管理</Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -114,7 +118,7 @@ export default function Header() {
       <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">
         广学榜
       </Link>
-      {session.isLoggedIn && session.admin && (
+      {session.isLoggedIn && (session.admin || session.questionBankEditor) && (
         <>
           <Link
             href="/admin/questions"
@@ -122,18 +126,22 @@ export default function Header() {
           >
             题库管理
           </Link>
-          <Link
-            href="/admin/submissions"
-            className="text-sm font-medium hover:text-primary"
-          >
-            全部作答记录
-          </Link>
-          <Link
-            href="https://account.gxwtf.cn/admin/users"
-            className="text-sm font-medium hover:text-primary"
-          >
-            用户管理
-          </Link>
+          {session.admin && (
+            <>
+              <Link
+                href="/admin/submissions"
+                className="text-sm font-medium hover:text-primary"
+              >
+                全部作答记录
+              </Link>
+              <Link
+                href="https://account.gxwtf.cn/admin/users"
+                className="text-sm font-medium hover:text-primary"
+              >
+                用户管理
+              </Link>
+            </>
+          )}
         </>
       )}
       <Link

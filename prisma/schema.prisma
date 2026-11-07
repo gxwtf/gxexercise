@@ -223,3 +223,17 @@ model AdminEditLog {
   @@index([adminId])
   @@index([createdAt])
 }
+
+/// 题库审核名单：拥有「题库管理」权限、但不是网站管理员的用户。
+/// 用广学账号用户名（SSO session.username）作为唯一标识 —— 审核同学通常没在本地 User 表登录过。
+model QuestionBankReviewer {
+  id        String   @id @default(cuid())
+  userName  String   @unique @db.VarChar(100)
+  /// 备注（如真实姓名 / 负责学科）
+  note      String?  @db.VarChar(200)
+  /// 谁加的（管理员用户名）
+  createdBy String?  @db.VarChar(100)
+  createdAt DateTime @default(now())
+
+  @@index([userName])
+}

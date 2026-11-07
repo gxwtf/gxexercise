@@ -12,7 +12,7 @@
 //   4) 事务内更新 imageUrl + 写审计日志；文件写入在事务外（文件系统没有回滚）
 import { promises as fs } from "node:fs"
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/api-auth"
+import { requireQuestionBankEditor } from "@/lib/question-bank-auth"
 import { prisma } from "@/lib/prisma"
 import { buildFieldChanges, getRequestIp, writeAdminEditLog } from "@/lib/admin-edit-log"
 import {
@@ -36,7 +36,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdmin()
+  const auth = await requireQuestionBankEditor()
   if (!auth.ok) return auth.response
 
   const { id } = await params
@@ -107,7 +107,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdmin()
+  const auth = await requireQuestionBankEditor()
   if (!auth.ok) return auth.response
 
   const { id } = await params

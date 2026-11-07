@@ -18,9 +18,10 @@ export type AdminEditAction =
   | "upload-cover"
   | "pick-cover"
   | "delete-cover"
+  | "update-reviewer"
 
 /** 改动对象类型 */
-export type AdminEditTargetType = "group" | "question"
+export type AdminEditTargetType = "group" | "question" | "reviewer"
 
 /** 单个字段的改动（before/after 都是展示用字符串；null 表示该字段原本为空 / 被清空） */
 export interface FieldChange {

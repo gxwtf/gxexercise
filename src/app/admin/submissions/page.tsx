@@ -29,8 +29,21 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
   const viewer = await getAdminViewer()
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/submissions")
-    // 非管理员：提示由 admin/layout.tsx 渲染，这里不查库、不返回任何数据
-    return null
+    // 题库审核同学可以进 admin 区域（题库管理），但「全部作答记录」仍只向网站管理员开放
+    return (
+      <div className="container mx-auto px-3 py-16 sm:px-4">
+        <EmptyState
+          icon={<Inbox />}
+          title="需要网站管理员权限"
+          description="「全部作答记录」仅向网站管理员开放；题库审核同学请使用「管理 → 题库管理」。"
+          action={
+            <Button asChild>
+              <Link href="/admin/questions">题库管理</Link>
+            </Button>
+          }
+        />
+      </div>
+    )
   }
 
   const sp = await searchParams

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { getAdminViewer } from "@/lib/admin-guard"
+import { getQuestionBankViewer } from "@/lib/question-bank-auth"
 import { subjects, categoriesBySubject } from "@/constants/subjects"
 import { Button } from "@/components/ui/button"
 import { QuestionBankFilter } from "@/components/admin/question-bank/QuestionBankFilter"
@@ -27,7 +27,7 @@ interface PageProps {
  */
 export default async function AdminQuestionBankPage({ searchParams }: PageProps) {
   // 权限校验必须放在查库之前：layout 的校验拦不住 page 的执行与 RSC 载荷
-  const viewer = await getAdminViewer()
+  const viewer = await getQuestionBankViewer()
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/questions")
     // 非管理员：提示由 admin/layout.tsx 渲染，这里不查库、不返回任何数据
@@ -115,7 +115,9 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
             题库管理
-            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">管理员</span>
+            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">
+              {viewer.isAdmin ? "管理员" : "题库审核"}
+            </span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             共 {total} 个题组
@@ -126,9 +128,16 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/questions/logs">修改记录</Link>
           </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/submissions">全部作答记录</Link>
-          </Button>
+          {viewer.isAdmin ? (
+            <>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/questions/reviewers">审核名单</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/submissions">全部作答记录</Link>
+              </Button>
+            </>
+          ) : null}
         </div>
       </div>
 

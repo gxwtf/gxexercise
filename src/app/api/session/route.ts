@@ -7,6 +7,7 @@ import { defaultSession, sessionOptions } from "@/lib/iron";
 import { SessionData } from "@/lib/iron";
 import axios from "axios";
 import { prisma } from "@/lib/prisma";
+import { isQuestionBankReviewer } from "@/lib/question-bank-auth";
 
 // login
 export async function POST(request: NextRequest) {
@@ -38,8 +39,11 @@ export async function POST(request: NextRequest) {
             session.grade = res.data.grade || 7;
             session.counter = 0;
             await session.save();
-            
-            return Response.json(session);
+
+            // 题库审核名单是站内维护的，不在 SSO 里，这里顺带算一下（只用于显示入口）
+            const questionBankEditor =
+                Boolean(session.admin) || (await isQuestionBankReviewer(session.username));
+            return Response.json({ ...session, questionBankEditor });
         }
         else {
             // 登录失败，不保存session，直接返回默认session
@@ -68,7 +72,10 @@ export async function GET() {
         return Response.json(defaultSession);
     }
 
-    return Response.json(session);
+    // 题库管理权限 = 网站管理员 或 题库审核名单成员（名单可能随时变化，所以每次查一下）
+    const questionBankEditor =
+        Boolean(session.admin) || (await isQuestionBankReviewer(session.username));
+    return Response.json({ ...session, questionBankEditor });
 }
 
 // logout

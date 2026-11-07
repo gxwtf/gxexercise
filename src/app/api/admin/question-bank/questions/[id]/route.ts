@@ -7,7 +7,7 @@
 // 这样「修改记录」页能从日志直接跳回题组编辑页。
 import { NextResponse } from "next/server"
 import { Prisma } from "@/generated/prisma/client"
-import { requireAdmin } from "@/lib/api-auth"
+import { requireQuestionBankEditor } from "@/lib/question-bank-auth"
 import { prisma } from "@/lib/prisma"
 import { buildFieldChanges, getRequestIp, writeAdminEditLog } from "@/lib/admin-edit-log"
 import { QUESTION_EDITABLE_FIELDS, questionStemPreview } from "@/lib/question-bank-meta"
@@ -74,7 +74,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdmin()
+  const auth = await requireQuestionBankEditor()
   if (!auth.ok) return auth.response
 
   const { id } = await params

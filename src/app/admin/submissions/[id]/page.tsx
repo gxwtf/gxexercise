@@ -1,4 +1,6 @@
 import Link from "next/link"
+import { Inbox } from "lucide-react"
+import { EmptyState } from "@/components/EmptyState"
 import { notFound, redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getAdminViewer } from "@/lib/admin-guard"
@@ -65,7 +67,20 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   const viewer = await getAdminViewer()
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/submissions")
-    return null
+    return (
+      <div className="container mx-auto px-3 py-16 sm:px-4">
+        <EmptyState
+          icon={<Inbox />}
+          title="需要网站管理员权限"
+          description="单条作答详情仅向网站管理员开放；题库审核同学请使用「管理 → 题库管理」。"
+          action={
+            <Button asChild>
+              <Link href="/admin/questions">题库管理</Link>
+            </Button>
+          }
+        />
+      </div>
+    )
   }
 
   const { id } = await params

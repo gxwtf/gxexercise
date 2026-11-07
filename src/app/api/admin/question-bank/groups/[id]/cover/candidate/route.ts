@@ -10,7 +10,7 @@
 //   * 下载 → 转 JPG 写 COVERS_DIR（与上传共用 writeCoverJpg），文件写入在事务外；
 //   * 事务内更新 imageUrl + 写审计日志（action=pick-cover，记 rank / 来源）。
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/api-auth"
+import { requireQuestionBankEditor } from "@/lib/question-bank-auth"
 import { prisma } from "@/lib/prisma"
 import { buildFieldChanges, getRequestIp, writeAdminEditLog } from "@/lib/admin-edit-log"
 import { findCoverCandidate, readCoverCandidates } from "@/lib/cover-candidates"
@@ -27,7 +27,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAdmin()
+  const auth = await requireQuestionBankEditor()
   if (!auth.ok) return auth.response
 
   const { id } = await params

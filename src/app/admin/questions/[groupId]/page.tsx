@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { getAdminViewer } from "@/lib/admin-guard"
+import { getQuestionBankViewer } from "@/lib/question-bank-auth"
 import { QuestionGroupEditor } from "@/components/admin/question-bank/QuestionGroupEditor"
 import { readCoverCandidates } from "@/lib/cover-candidates"
 import type {
@@ -54,7 +54,7 @@ function toOptions(value: unknown): QuestionOption[] | null {
  * 权限校验必须放在查库之前：layout 的校验拦不住 page 的执行与 RSC 载荷。
  */
 export default async function AdminQuestionBankEditPage({ params }: PageProps) {
-  const viewer = await getAdminViewer()
+  const viewer = await getQuestionBankViewer()
   const { groupId } = await params
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect(`/login?back=/admin/questions/${groupId}`)

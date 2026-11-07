@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { getAdminViewer } from "@/lib/admin-guard"
+import { getQuestionBankViewer } from "@/lib/question-bank-auth"
 import { Button } from "@/components/ui/button"
 import { EditLogFilter } from "@/components/admin/question-bank/EditLogFilter"
 import { EditLogTable, type EditLogRow } from "@/components/admin/question-bank/EditLogTable"
@@ -26,7 +26,7 @@ interface PageProps {
  */
 export default async function AdminQuestionEditLogsPage({ searchParams }: PageProps) {
   // 权限校验必须放在查库之前：layout 的校验拦不住 page 的执行与 RSC 载荷
-  const viewer = await getAdminViewer()
+  const viewer = await getQuestionBankViewer()
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/questions/logs")
     // 非管理员：提示由 admin/layout.tsx 渲染，这里不查库、不返回任何数据
