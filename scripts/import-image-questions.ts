@@ -14,6 +14,7 @@ import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { CHEM_FILL_CATEGORY, chemCategoryLabel } from "../src/constants/chemistry";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -33,6 +34,8 @@ interface Q {
   options?: { id: string; label: string }[];
   answer?: string;
   score?: number | null;
+  /** 非选择题的题型短名（结构/原理/有机/流程/探究），由流水线 chem_category.py 给出 */
+  category?: string;
 }
 interface Paper {
   title: string;
@@ -66,6 +69,25 @@ async function deletePaper(paperId: string, title: string) {
   console.log(`  已删除旧数据：${title}`);
 }
 
+/**
+ * 分组：选择题一个大组；非选择题按题型各成一组（物质结构与性质 / 化学反应原理 /
+ * 有机化学基础 / 工业流程 / 实验探究）。老 paper.json 没有 category 时退回原来的「非选择」大组。
+ */
+function buildGroups(paper: Paper): { category: string; type: string; qs: Q[] }[] {
+  const choice = paper.questions.filter((q) => q.type === "single");
+  const fill = paper.questions.filter((q) => q.type === "text");
+  const buckets = new Map<string, Q[]>();
+  for (const q of fill) {
+    const label = chemCategoryLabel(q.category) ?? CHEM_FILL_CATEGORY;
+    if (!buckets.has(label)) buckets.set(label, []);
+    buckets.get(label)!.push(q);
+  }
+  const groups2: { category: string; type: string; qs: Q[] }[] = [];
+  if (choice.length) groups2.push({ category: "选择", type: "chemistry-image", qs: choice });
+  for (const [category, qs] of buckets) groups2.push({ category, type: "chemistry-image", qs });
+  return groups2;
+}
+
 async function importOne(dirArg: string, force: boolean) {
   const paper = JSON.parse(fs.readFileSync(path.join(dirArg, "paper.json"), "utf-8")) as Paper;
   const subject = paper.subject || "化学";
@@ -84,10 +106,7 @@ async function importOne(dirArg: string, force: boolean) {
       duration: 90, tags,
     },
   });
-  const groups = [
-    { category: "选择", type: "chemistry-image", qs: paper.questions.filter((q) => q.type === "single") },
-    { category: "非选择", type: "chemistry-image", qs: paper.questions.filter((q) => q.type === "text") },
-  ];
+  const groups = buildGroups(paper);
   let order = 0;
   for (const g of groups) {
     if (!g.qs.length) continue;
@@ -116,7 +135,8 @@ async function importOne(dirArg: string, force: boolean) {
       await prisma.groupItem.create({ data: { groupId: group.id, questionId: created.id, orderIndex: gi++ } });
     }
   }
-  console.log(`✓ ${paper.title}：${paper.questions.length} 题（选择 ${groups[0].qs.length}，非选择 ${groups[1].qs.length}）`);
+  console.log(`✓ ${paper.title}：${paper.questions.length} 题（` +
+    groups.map((g) => `${g.category} ${g.qs.length}`).join("，") + `）`);
 }
 
 async function main() {
@@ -165,10 +185,7 @@ async function main() {
     },
   });
 
-  const groups: { category: string; type: string; qs: Q[] }[] = [
-    { category: "选择", type: "chemistry-image", qs: paper.questions.filter((q) => q.type === "single") },
-    { category: "非选择", type: "chemistry-image", qs: paper.questions.filter((q) => q.type === "text") },
-  ];
+  const groups = buildGroups(paper);
 
   let order = 0;
   for (const g of groups) {
@@ -208,7 +225,8 @@ async function main() {
       await prisma.groupItem.create({ data: { groupId: group.id, questionId: created.id, orderIndex: gi++ } });
     }
   }
-  console.log(`✓ ${paper.title}：${paper.questions.length} 题（选择 ${groups[0].qs.length}，非选择 ${groups[1].qs.length}）`);
+  console.log(`✓ ${paper.title}：${paper.questions.length} 题（` +
+    groups.map((g) => `${g.category} ${g.qs.length}`).join("，") + `）`);
   await prisma.$disconnect();
 }
 

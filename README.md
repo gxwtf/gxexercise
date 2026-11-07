@@ -279,6 +279,27 @@ npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部
 ⚠ **导入不是幂等的**：同一份 JSON 导两次会得到两套同名套卷，`--delete "<标题>"` 会按标题
 删除（连同该卷的作答记录）。重复导入前请先删同名套卷。
 
+### 化学：非选择题按题型拆组（物质结构与性质 / 化学反应原理 / 有机化学基础 / 工业流程 / 实验探究）
+
+化学图片版套卷里，选择题是一个大组，非选择题拆成 5 个题型组（分类全名就是
+`src/constants/subjects.ts` 中 `categoryToRoute['化学']` 的键，题库导航可直接筛）。
+题型由流水线分类器 `exam-parser/chem_category.py` 给出（`paper.json` 每题带 `category` + `score`）：
+
+- 2021+ 听位置（15结构 16原理 17有机 18流程 19探究），仅当「位置类别强标记命中=0、另一类别≥2」时按内容覆盖
+  （例：2026 海淀期中 17 题是原理，不是有机）；
+- 2020 及以前按关键词判（强标记权重 3），判不准再退位置表。
+
+```bash
+python3 ~/jingshibang/exam-parser/chem_category.py --all --json /tmp/chem_categories.json
+npx tsx scripts/split-chemistry-fill.ts --map /tmp/chem_categories.json --dry-run      # 先看分类表
+npx tsx scripts/split-chemistry-fill.ts --map /tmp/chem_categories.json --apply        # 原地搬家，不换题 id
+npx tsx scripts/split-chemistry-fill.ts --map <json> --paper "<卷名>" --apply --force   # 改完分类重跑单卷
+npx tsx scripts/repair-chemistry-groups.ts --apply   # 分组被误伤时按 Question.source 找回孤儿题
+```
+
+`--apply` 只做「新建题型组 + 题目原地搬组 + 删掉空的旧组 + 重排套卷顺序 + 重算分值」，
+**不动选择题组**，题目 id 不变（作答 / 优秀解答引用不受影响）。
+
 ### 整卷学科（生物 / 历史 / 地理 / 政治）：`scripts/import-subject-json.ts`
 
 这四科是「选择题一组 + 一个大题一个 section」的同构结构（材料挂在题组 `content`，

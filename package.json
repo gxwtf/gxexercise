@@ -15,7 +15,10 @@
     "db:seed-math": "npx tsx prisma/seed-math.ts",
     "db:seed-chinese": "npx tsx prisma/seed-chinese.ts",
     "db:generate": "npx prisma generate",
-    "db:push": "npx prisma db push"
+    "db:push": "npx prisma db push",
+    "chem:split": "tsx scripts/split-chemistry-fill.ts",
+    "chem:repair-groups": "tsx scripts/repair-chemistry-groups.ts",
+    "chem:refresh-images": "tsx scripts/refresh-chemistry-images.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
