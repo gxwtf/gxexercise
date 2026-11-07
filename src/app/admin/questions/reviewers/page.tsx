@@ -58,10 +58,6 @@ export default async function QuestionBankReviewersPage() {
       </div>
 
       <ReviewerManager reviewers={rows} />
-
-      <p className="mt-6 text-xs text-muted-foreground">
-        用户名必须是广学账号的用户名（与登录时一致）。如果同学改名，需要先移出旧名字再加入新名字。
-      </p>
     </div>
   )
 }
