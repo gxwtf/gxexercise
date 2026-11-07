@@ -277,9 +277,13 @@ async function buildReviewData(
   const questionScore = currentQuestion.score ?? 0
   const aiFeedbackRaw = selectedSubmission?.aiFeedback as Record<string, unknown> | null
   const aiFeedback = (aiFeedbackRaw?.feedback as string) ?? null
-  const enWritingFeedback = questionGroup.questionType === "en-writing" ? aiFeedbackRaw : null
+  // 评分明细（内容/语言/结构三条进度条）的判定：作文（en-writing）照旧一律走明细；
+  // 其它题型（如阅读表达第 4 题 43）只要 aiFeedback 里带 subScores 也走同一套明细。
+  const hasSubScores = !!aiFeedbackRaw?.subScores && typeof aiFeedbackRaw.subScores === "object"
+  const detailedFeedback =
+    questionGroup.questionType === "en-writing" || hasSubScores ? aiFeedbackRaw : null
 
-  const enWritingSubMaxes = enWritingFeedback
+  const detailedSubMaxes = detailedFeedback
     ? (() => {
         const contentMax = Math.round(questionScore * 0.4)
         const languageMax = Math.round(questionScore * 0.4)
@@ -288,20 +292,21 @@ async function buildReviewData(
       })()
     : null
 
-  const overallCommentMdx = enWritingFeedback?.overallComment
-    ? await serialize(String(enWritingFeedback.overallComment), { mdxOptions })
+  // 以下四项只有作文的 aiFeedback 才有，其它题型取不到值时自然是 null
+  const overallCommentMdx = detailedFeedback?.overallComment
+    ? await serialize(String(detailedFeedback.overallComment), { mdxOptions })
     : null
-  const lineCorrectionsMdx = enWritingFeedback?.lineCorrections
-    ? await serialize(String(enWritingFeedback.lineCorrections), { mdxOptions })
+  const lineCorrectionsMdx = detailedFeedback?.lineCorrections
+    ? await serialize(String(detailedFeedback.lineCorrections), { mdxOptions })
     : null
-  const correctionsMdx = enWritingFeedback?.corrections
-    ? await serialize(String(enWritingFeedback.corrections), { mdxOptions })
+  const correctionsMdx = detailedFeedback?.corrections
+    ? await serialize(String(detailedFeedback.corrections), { mdxOptions })
     : null
-  const betterExpressionsMdx = enWritingFeedback?.betterExpressions
-    ? await serialize(String(enWritingFeedback.betterExpressions), { mdxOptions })
+  const betterExpressionsMdx = detailedFeedback?.betterExpressions
+    ? await serialize(String(detailedFeedback.betterExpressions), { mdxOptions })
     : null
-  const modelEssayMdx = enWritingFeedback?.modelEssay
-    ? await serialize(String(enWritingFeedback.modelEssay), { mdxOptions })
+  const modelEssayMdx = detailedFeedback?.modelEssay
+    ? await serialize(String(detailedFeedback.modelEssay), { mdxOptions })
     : null
 
   // 任选一题（二选一 / 三选一）：回顾页要知道「用户选的是第几题、得了多少分」
@@ -363,8 +368,8 @@ async function buildReviewData(
     excellentAnswers,
     shareAsExcellent: selectedSubmission ? selectedSubmission.shareAsExcellent : null,
     aiFeedback,
-    enWritingFeedback,
-    enWritingSubMaxes,
+    detailedFeedback,
+    detailedSubMaxes,
     overallCommentMdx,
     lineCorrectionsMdx,
     correctionsMdx,

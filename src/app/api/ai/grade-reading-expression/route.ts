@@ -1,8 +1,20 @@
 import { prisma } from "@/lib/prisma";
-import { gradeWithConfig, preCheckGrade } from "@/lib/ai-service";
+import { gradeWithConfig, preCheckGrade, type GradeResult } from "@/lib/ai-service";
 import { getGradingPrompt } from "@/lib/grading-prompts";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-auth";
+
+/** 落库用的 AI 反馈（不包含 raw，那是算分用的中间数据） */
+function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
+  const data: Record<string, unknown> = {}
+  if (result.feedback) data.feedback = result.feedback
+  if (result.subScores) data.subScores = result.subScores
+  if (result.overallComment) data.overallComment = result.overallComment
+  if (result.lineCorrections) data.lineCorrections = result.lineCorrections
+  if (result.betterExpressions) data.betterExpressions = result.betterExpressions
+  if (result.modelEssay) data.modelEssay = result.modelEssay
+  return Object.keys(data).length > 0 ? data : undefined
+}
 
 export async function POST(request: Request) {
   // 此接口会并发触发多条 AI 批改，属于高成本操作，仅限管理员调用
@@ -89,7 +101,8 @@ export async function POST(request: Request) {
               score: result.score,
               isCorrect: result.score === maxScore,
               gradingStatus: "graded",
-              aiFeedback: result.feedback ? { feedback: result.feedback } : undefined,
+              // 43（三维度）要带 subScores，否则回顾页/报告里没有「内容/语言/结构」明细
+              aiFeedback: buildAiFeedback(result) as any,
             },
           });
 

@@ -195,6 +195,25 @@ src/
 - 提示词配置位于 [src/lib/grading-prompts](src/lib/grading-prompts)，包含系统提示词、用户提示词模板及 `config.json`；模板支持 `{stem}`、`{userAnswer}`、`{correctAnswer}`、`{maxScore}` 占位符
 - 也可调用 `/api/ai/retry-pending` 手动触发重试
 
+### 阅读表达（40-43）的判分口径
+
+阅读表达题组固定 4 题、满分 12（2 + 2 + 3 + 5），四题各有一套规则，写在
+[reading-expression/config.json](src/lib/grading-prompts/reading-expression/config.json)：
+
+| 题号 | `orderIndex` | 满分 | `scoring` | 规则 |
+| --- | --- | --- | --- | --- |
+| 40 / 41 | 0 / 1 | 2 | `info-points` | 信息点制：每个信息点分值 = 满分 ÷ 信息点数，缺一个扣其分值；多写/说反的信息每处 −0.5；语言错误每处 −0.5（整题最多 −1） |
+| 42 | 2 | 3 | `underline-fix` | 划线 1 分（必须完整 chunk，否则 0 分）+ 修改 2 分（三档 2/1/0）；划线错了照样判修改（海淀标准）；修改里夹带无关内容每处 −0.5；语言错误每处 −0.5（整题最多 −1） |
+| 43 | 3 | 5 | `essay-weights` | 按作文标准：内容 2 + 语言 2 + 结构 1；每个维度只给 0.5 的整数倍；必须是完整段落，第一句不完整 → 结构最多 0.5，条目式碎片 → 结构 0；**超字数不扣分**（与作文口径一致） |
+
+**关键实现**：模型只输出「结构化判断」（`infoPoints`/`hit`/`redundant`/`grammarErrors`、`underlineCorrect`/`underlineComplete`/`fixLevel`、`subScores`），
+分数一律由 [reading-expression-score.ts](src/lib/reading-expression-score.ts) 确定性算出 —— 小模型的减法不可靠，
+且规则要求「最低 0 分、绝不出现负数」。改 prompt 时如果新增字段，记得同步该文件的解析。
+
+回归：`pnpm check:reading`（[scripts/check-reading-expression.mts](scripts/check-reading-expression.mts)）会串行跑 12 条样例
+（含 40/41 的四个算例、42 的划线/修改组合、43 的完整段落 / 首句截断 / 碎片 / 超字数），有 FAIL 时退出码为 1。
+提示词 `.md` 是**运行时按 `process.cwd()` 读取**，改完重启服务即可生效；`config.json` 是打包进产物，改它必须重新 `pnpm build`。
+
 ## 题目 PDF 导出
 
 题库的 PDF 全部由**服务端生成**（`src/lib/pdf/`，HTML → LibreOffice headless 转 PDF），前端只放下载链接。

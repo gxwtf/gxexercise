@@ -58,8 +58,9 @@ interface ReviewContentData {
     excellentAnswers: ExcellentAnswerView[]
     shareAsExcellent: boolean | null
     aiFeedback: string | null
-    enWritingFeedback: Record<string, unknown> | null
-    enWritingSubMaxes: { contentMax: number; languageMax: number; structureMax: number } | null
+    /** 需要展示评分明细（内容/语言/结构）的 AI 反馈：作文一律有；其它题型仅当带 subScores 时才有 */
+    detailedFeedback: Record<string, unknown> | null
+    detailedSubMaxes: { contentMax: number; languageMax: number; structureMax: number } | null
     overallCommentMdx: MDXRemoteSerializeResult | null
     lineCorrectionsMdx: MDXRemoteSerializeResult | null
     correctionsMdx: MDXRemoteSerializeResult | null
@@ -162,8 +163,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         excellentAnswers,
         shareAsExcellent,
         aiFeedback,
-        enWritingFeedback,
-        enWritingSubMaxes,
+        detailedFeedback,
+        detailedSubMaxes,
         overallCommentMdx,
         lineCorrectionsMdx,
         correctionsMdx,
@@ -199,6 +200,15 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
 
     // 「参考答案」独立块：这几科的大题在回顾页没有「参考答案」Tab，所以单独补一块
     const showFillAnswerBlock = questionGroup.questionType === "biology-fill" || questionGroup.questionType === "history-fill" || questionGroup.questionType === "geography-fill" || questionGroup.questionType === "politics-fill"
+
+    // 「失分原因」纯文本块：没有评分明细的题型照旧只看它；
+    // 有评分明细的非作文题（如阅读表达第 4 题）在明细之外也保留这段原文
+    const lossReasonBlock = aiFeedback ? (
+        <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">失分原因</p>
+            <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{aiFeedback}</p>
+        </div>
+    ) : null
 
     // 任选一题（二选一 / 三选一）：本组只算用户作答的那一题
     const pickOneStrip = pickOne?.enabled ? (
@@ -404,25 +414,23 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         </div>
                                     </QuestionSection>
                                     
-                                    {isEnWriting && enWritingFeedback && !isPending ? (
-                                        <EnWritingFeedbackSection
-                                          feedback={enWritingFeedback}
-                                          subMaxes={enWritingSubMaxes}
-                                          overallCommentMdx={overallCommentMdx}
-                                          lineCorrectionsMdx={lineCorrectionsMdx}
-                                          correctionsMdx={correctionsMdx}
-                                          betterExpressionsMdx={betterExpressionsMdx}
-                                          modelEssayMdx={modelEssayMdx}
-                                        />
-                                    ) : (
+                                    {/* 有评分明细就走明细（作文照旧；带 subScores 的阅读表达等题型新增）；
+                                        非作文的数据里没有「整体评价/批改结果…」，所以另外把「失分原因」原文补回来 */}
+                                    {detailedFeedback && !isPending ? (
                                         <>
-                                            {aiFeedback && (
-                                                <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-                                                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">失分原因</p>
-                                                    <p className="text-sm text-amber-700 dark:text-amber-300 whitespace-pre-wrap">{aiFeedback}</p>
-                                                </div>
-                                            )}
+                                            <EnWritingFeedbackSection
+                                              feedback={detailedFeedback}
+                                              subMaxes={detailedSubMaxes}
+                                              overallCommentMdx={overallCommentMdx}
+                                              lineCorrectionsMdx={lineCorrectionsMdx}
+                                              correctionsMdx={correctionsMdx}
+                                              betterExpressionsMdx={betterExpressionsMdx}
+                                              modelEssayMdx={modelEssayMdx}
+                                            />
+                                            {!isEnWriting && lossReasonBlock}
                                         </>
+                                    ) : (
+                                        <>{lossReasonBlock}</>
                                     )}
                                 </TabsContent>
                             )}
@@ -565,6 +573,10 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     )
 }
 
+/**
+ * AI 反馈明细：评分明细（内容/语言/结构三条进度条）+ 作文专属的整体评价/批改结果/更多表达/个性化范文。
+ * 现在不只作文用：任何带 subScores 的 aiFeedback（如阅读表达第 4 题）都会走这里，其余板块没数据就不渲染。
+ */
 function EnWritingFeedbackSection({
   feedback,
   subMaxes,

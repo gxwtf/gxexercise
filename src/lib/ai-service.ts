@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import type { GradingPromptConfig } from "./grading-prompts";
+import { applyStructuredScoring } from "./reading-expression-score";
 
 const openai = new OpenAI({
   // apiKey: process.env.SILICONFLOW_API_API_KEY!,
@@ -20,6 +21,8 @@ export interface GradeResult {
   lineCorrections?: string;
   betterExpressions?: string;
   modelEssay?: string;
+  /** 模型原始 JSON。阅读表达用它做确定性算分（见 reading-expression-score.ts），不给前端展示 */
+  raw?: Record<string, unknown>;
 }
 
 function parseResponse(text: string, maxScore: number): GradeResult {
@@ -35,6 +38,7 @@ function parseResponse(text: string, maxScore: number): GradeResult {
         lineCorrections: parsed.lineCorrections || undefined,
         betterExpressions: parsed.betterExpressions || undefined,
         modelEssay: parsed.modelEssay || undefined,
+        raw: parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : undefined,
       };
     } catch {
       // JSON parse failed, continue to regex fallback
@@ -133,7 +137,22 @@ export async function gradeWithConfig(
   const prompt = buildPrompt(config.promptTemplate, stem, userAnswer, correctAnswer, maxScore);
   const isEnWriting = config.questionType === "en-writing";
   const maxTokens = isEnWriting ? 4096 : 600;
-  return await callModel(config.systemPrompt, prompt, maxScore, maxTokens);
+  const result = await callModel(config.systemPrompt, prompt, maxScore, maxTokens);
+  // 阅读表达（40-43）：模型只做结构化判断，分数由确定性规则算，避免小模型算错减法
+  if (config.scoring) {
+    const scored = applyStructuredScoring(config.scoring, result.raw, maxScore, {
+      score: result.score,
+      feedback: result.feedback,
+    });
+    result.score = scored.score;
+    result.feedback = scored.feedback;
+    if (scored.subScores) {
+      result.subScores = scored.subScores;
+    } else if (config.scoring === "essay-weights") {
+      delete result.subScores;
+    }
+  }
+  return result;
 }
 
 export async function gradeReadingExpression(
@@ -144,6 +163,6 @@ export async function gradeReadingExpression(
 ): Promise<GradeResult> {
   const { getGradingPrompt } = await import("./grading-prompts");
   const config = getGradingPrompt("reading-expression", 0)!;
-  const prompt = buildPrompt(config.promptTemplate, stem, userAnswer, correctAnswer, maxScore);
-  return await callModel(config.systemPrompt, prompt, maxScore);
+  // 走 gradeWithConfig 而不是直接 callModel：否则会漏掉 scoring 的确定性算分
+  return await gradeWithConfig(config, stem, userAnswer, correctAnswer, maxScore);
 }

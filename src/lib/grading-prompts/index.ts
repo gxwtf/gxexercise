@@ -1,5 +1,6 @@
 import { readFileSync } from "fs"
 import path from "path"
+import type { ScoringKind } from "../reading-expression-score"
 import readingExpression from "./reading-expression/config.json"
 import enWriting from "./en-writing/config.json"
 import chineseText from "./chinese-reading/config.json"
@@ -15,11 +16,14 @@ export interface GradingPromptConfig {
   systemPrompt: string
   promptTemplate: string
   enableExactMatch?: boolean
+  /** 有值时不采信模型给的总分，改由 src/lib/reading-expression-score.ts 确定性算分 */
+  scoring?: ScoringKind
 }
 
 interface JsonConfig {
   questionIndices: number[]
   enableExactMatch?: boolean
+  scoring?: ScoringKind
   systemPrompt: string
   promptFile: string
 }
@@ -54,6 +58,7 @@ function loadPrompts(): GradingPromptConfig[] {
       systemPrompt: config.systemPrompt,
       promptTemplate: loadPrompt(entry.questionType, config.promptFile),
       enableExactMatch: config.enableExactMatch,
+      scoring: config.scoring,
     }))
   )
 }
