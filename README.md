@@ -123,7 +123,7 @@ curl -fsS "https://ti.gxwtf.cn/api/v1/questions?subject=math&pageSize=5" \
   -H "Authorization: Bearer $GXEXERCISE_API_KEY"
 ```
 
-字段、筛选参数与错误码见开发文档 [开放 API](https://dev.gxwtf.cn/gxexercise/api.md)。
+字段、筛选参数与错误码见开发文档 [开放 API](https://dev.gxwtf.cn/#/gxexercise/api)。
 
 ## 目录结构
 
