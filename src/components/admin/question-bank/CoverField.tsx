@@ -145,19 +145,21 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
         <span className="text-xs text-muted-foreground">题组卡片图，影响题库列表的展示。</span>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
-        <div className="overflow-hidden rounded-lg border border-border bg-muted/40">
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] sm:items-start">
+        {/* 预览框固定 16:9 并 self-start：否则会被右侧更高的一列拉伸，图片下方留出一条灰边 */}
+        <div className="aspect-video overflow-hidden rounded-lg border border-border bg-muted/40">
           {preview && !previewFailed ? (
-            // 封面来源有自托管文件、外链、本地预览对象三种，尺寸不固定，这里用原生 img
+            // 封面来源有自托管文件、外链、本地预览对象三种，尺寸不固定，这里用原生 img；
+            // object-cover 默认按中心裁切（水平、垂直都居中）
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={preview}
               alt="题组封面预览"
-              className="aspect-video w-full object-cover"
+              className="h-full w-full object-cover object-center"
               onError={() => setPreviewFailed(true)}
             />
           ) : (
-            <div className="flex aspect-video w-full flex-col items-center justify-center gap-1 px-3 text-center text-muted-foreground">
+            <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-3 text-center text-muted-foreground">
               <ImageIcon className="size-6" />
               <span className="text-xs">
                 {previewFailed ? "封面加载失败（文件缺失或外链失效）" : "还没有封面"}
