@@ -20,6 +20,7 @@ import { EditorTabs } from "@/components/admin/question-bank/EditorTabs"
 import { GroupMetaForm } from "@/components/admin/question-bank/GroupMetaForm"
 import { GroupContentForm } from "@/components/admin/question-bank/GroupContentForm"
 import { QuestionEditorCard } from "@/components/admin/question-bank/QuestionEditorCard"
+import { AdminBackButton } from "@/components/admin/question-bank/AdminBackButton"
 import { CoverField } from "@/components/admin/question-bank/CoverField"
 import { EditHistoryList } from "@/components/admin/question-bank/EditHistoryList"
 import type {
@@ -195,7 +196,29 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
   const dirtyQuestionCount = dirtyQuestionIds.size
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_23rem]">
+    <div className="space-y-5">
+      {/* 页头：返回按钮对齐答题页（ghost + ChevronLeft + 返回，有未保存修改先弹确认） */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <AdminBackButton dirty={anyDirty} fallbackHref="/admin/questions" subject={group.title} />
+          <h1 className="truncate text-xl font-semibold text-foreground" title={group.title}>
+            {group.title}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/question/${group.id}`} target="_blank" rel="noreferrer">
+              <ExternalLink />
+              前台预览
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/admin/submissions">全部作答记录</Link>
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_23rem]">
       {/* 徽标行与板块切换横跨整行（col-span-full），这样下面右侧「题组概览」的卡片顶边
           才能和左侧「题组信息」卡片顶边对齐（否则它会对齐到徽标行） */}
       <div className="col-span-full flex flex-wrap items-center gap-1.5">
@@ -375,6 +398,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
           </CardContent>
         </Card>
       </aside>
+      </div>
     </div>
   )
 }

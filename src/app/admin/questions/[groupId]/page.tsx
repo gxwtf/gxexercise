@@ -1,8 +1,6 @@
-import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getAdminViewer } from "@/lib/admin-guard"
-import { Button } from "@/components/ui/button"
 import { QuestionGroupEditor } from "@/components/admin/question-bank/QuestionGroupEditor"
 import { readCoverCandidates } from "@/lib/cover-candidates"
 import type {
@@ -144,28 +142,6 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="-ml-2 h-7 px-2">
-            <Link href="/admin/questions">← 题库管理</Link>
-          </Button>
-          <span className="text-muted-foreground">/</span>
-          <h1 className="max-w-[52ch] truncate text-lg font-bold sm:text-xl" title={group.title}>
-            {group.title}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/question/${group.id}`} target="_blank" rel="noreferrer">
-              前台预览
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/admin/submissions">全部作答记录</Link>
-          </Button>
-        </div>
-      </div>
-
       <QuestionGroupEditor
         group={editorGroup}
         questions={editorQuestions}
