@@ -20,12 +20,11 @@ import { Separator } from "@/components/ui/separator"
 
 export const dynamic = "force-dynamic"
 
-/** 整卷链路（选择题 + 非选择题大题）的六科 */
-const FULL_SUBJECTS = ["语文", "英语", "生物", "历史", "地理", "政治"]
+/** 整卷链路（选择题 + 非选择题大题）的七科（化学 2026-11 起补齐图片版整卷） */
+const FULL_SUBJECTS = ["语文", "英语", "化学", "生物", "历史", "地理", "政治"]
 const PARTIAL_SUBJECTS: Record<string, string> = {
   数学: "选择 / 填空",
   物理: "选择",
-  化学: "图片版选择",
 }
 
 const dayFmt = new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" })
@@ -323,7 +322,7 @@ export default async function RootPage() {
       <section id="subjects" className="scroll-mt-20 space-y-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">按学科刷题</h2>
-          <p className="text-sm text-muted-foreground">六科是完整整卷；数学 / 物理 / 化学目前只收部分题型。</p>
+          <p className="text-sm text-muted-foreground">七科是完整整卷；数学 / 物理目前只收部分题型。</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
