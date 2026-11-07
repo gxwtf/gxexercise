@@ -11,7 +11,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Image as ImageIcon, Loader2, Upload, X } from "lucide-react"
+import { Image as ImageIcon, Loader2, Maximize2, Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -50,6 +50,24 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
   const [previewVersion, setPreviewVersion] = React.useState(0)
   // 预览图加载失败（封面文件被删 / 外链失效 / 环境里没有同步封面目录）时给明确提示
   const [previewFailed, setPreviewFailed] = React.useState(false)
+  // 点击封面 / 候选图查看大图（简单的全屏 lightbox，不引入额外依赖）
+  const [lightbox, setLightbox] = React.useState<{ src: string; fallback?: string; caption: string } | null>(null)
+  const [lightboxFailed, setLightboxFailed] = React.useState(false)
+
+  const openLightbox = (item: { src: string; fallback?: string; caption: string }) => {
+    setLightboxFailed(false)
+    setLightbox(item)
+  }
+
+  // Esc 关闭大图
+  React.useEffect(() => {
+    if (!lightbox) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setLightbox(null)
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [lightbox])
 
   // 选好文件先本地预览，确认后再上传
   React.useEffect(() => {
@@ -148,15 +166,26 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
         {/* 预览框固定 16:9 并 self-start：否则会被右侧更高的一列拉伸，图片下方留出一条灰边 */}
         <div className="aspect-video overflow-hidden rounded-lg border border-border bg-muted/40">
           {preview && !previewFailed ? (
-            // 封面来源有自托管文件、外链、本地预览对象三种，尺寸不固定，这里用原生 img；
-            // object-cover 默认按中心裁切（水平、垂直都居中）
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={preview}
-              alt="题组封面预览"
-              className="h-full w-full object-cover object-center"
-              onError={() => setPreviewFailed(true)}
-            />
+            <button
+              type="button"
+              onClick={() => openLightbox({ src: preview, caption: imageUrl.trim() || "题组封面" })}
+              className="group relative block h-full w-full cursor-zoom-in"
+              aria-label="查看封面大图"
+              title="点击查看大图"
+            >
+              {/* 封面来源有自托管文件、外链、本地预览对象三种，尺寸不固定，这里用原生 img；
+                  object-cover 默认按中心裁切（水平、垂直都居中） */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={preview}
+                alt="题组封面预览"
+                className="h-full w-full object-cover object-center"
+                onError={() => setPreviewFailed(true)}
+              />
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-transparent text-overlay-foreground opacity-0 transition group-hover:bg-overlay/70 group-hover:opacity-100">
+                <Maximize2 className="size-5" />
+              </span>
+            </button>
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-3 text-center text-muted-foreground">
               <ImageIcon className="size-6" />
@@ -281,16 +310,33 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
                     {/* 缩略图来自候选源站（pixabay / wikimedia）；源站不可达时露出占位图标，
                         仍可点「用这张」（服务端会重新下载，失败会提示） */}
                     <ImageIcon className="absolute inset-0 m-auto size-5 text-muted-foreground" />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={candidate.thumbnailUrl}
-                      alt={`候选封面 #${candidate.rank}`}
-                      className="absolute inset-0 size-full object-cover"
-                      loading="lazy"
-                      onError={(event) => {
-                        event.currentTarget.style.visibility = "hidden"
-                      }}
-                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openLightbox({
+                          src: candidate.imageUrl,
+                          fallback: candidate.thumbnailUrl,
+                          caption: `候选封面 #${candidate.rank}${candidate.score !== null ? ` · 相关度 ${candidate.score}` : ""}${candidate.attribution ? ` · ${candidate.attribution}` : ""}`,
+                        })
+                      }
+                      className="group absolute inset-0 cursor-zoom-in"
+                      aria-label={`查看候选封面 #${candidate.rank} 大图`}
+                      title="点击查看大图"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={candidate.thumbnailUrl}
+                        alt={`候选封面 #${candidate.rank}`}
+                        className="size-full object-cover"
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.style.visibility = "hidden"
+                        }}
+                      />
+                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-transparent text-overlay-foreground opacity-0 transition group-hover:bg-overlay/70 group-hover:opacity-100">
+                        <Maximize2 className="size-4" />
+                      </span>
+                    </button>
                     <span className="absolute left-1 top-1 rounded bg-background/90 px-1.5 py-0.5 text-[11px] font-medium leading-none">
                       #{candidate.rank}
                     </span>
@@ -333,6 +379,34 @@ export function CoverField({ groupId, imageUrl, candidates, onChange, disabled }
           </p>
         )}
       </div>
+
+      {lightbox ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="封面大图"
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-3 bg-overlay p-4"
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute right-4 top-4 rounded-full bg-overlay-foreground/20 p-2 text-overlay-foreground hover:bg-overlay-foreground/30"
+            aria-label="关闭大图"
+          >
+            <X className="size-5" />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lightboxFailed && lightbox.fallback ? lightbox.fallback : lightbox.src}
+            alt={lightbox.caption}
+            className="max-h-[82vh] max-w-[92vw] rounded-lg object-contain shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+            onError={() => setLightboxFailed(true)}
+          />
+          <p className="max-w-[92vw] break-all text-center text-xs text-overlay-foreground/90">{lightbox.caption}</p>
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -11,6 +11,9 @@
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted: var(--brand-muted);
+  /* 遮罩（看大图）用：bg-overlay + text-overlay-foreground */
+  --color-overlay: var(--overlay);
+  --color-overlay-foreground: var(--overlay-foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
@@ -83,6 +86,9 @@
   --brand: oklch(0.4667 0.1672 25.06);
   --brand-foreground: oklch(0.985 0 0);
   --brand-muted: oklch(0.95 0.021 25.06);
+  /* 遮罩 / 看大图（lightbox）：两种主题都是暗底 + 白字，所以单独给一组 token */
+  --overlay: oklch(0 0 0 / 0.72);
+  --overlay-foreground: oklch(1 0 0);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -130,6 +136,8 @@
   --brand: oklch(0.735 0.152 25.06);
   --brand-foreground: oklch(0.145 0 0);
   --brand-muted: oklch(0.283 0.049 25.06);
+  --overlay: oklch(0 0 0 / 0.82);
+  --overlay-foreground: oklch(1 0 0);
 }
 
 @layer base {
