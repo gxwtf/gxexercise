@@ -281,13 +281,14 @@ npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部
 
 ### 化学：非选择题按题型拆组（物质结构与性质 / 化学反应原理 / 有机化学基础 / 工业流程 / 实验探究）
 
-化学图片版套卷里，选择题是一个大组，非选择题拆成 5 个题型组（分类全名就是
-`src/constants/subjects.ts` 中 `categoryToRoute['化学']` 的键，题库导航可直接筛）。
+化学图片版套卷里，选择题是一个大组，**非选择题一题一组**（和生物一致）：组名 `<卷>·第N题`，
+题型（物质结构与性质 / 化学反应原理 / 有机化学基础 / 工业流程 / 实验探究，即
+`src/constants/subjects.ts` 中 `categoryToRoute['化学']` 的键）放在题组的 `category` 上，题库导航可直接筛。
 题型由流水线分类器 `exam-parser/chem_category.py` 给出（`paper.json` 每题带 `category` + `score`）：
 
-- **2021+ 按题号**（15结构 16原理 17有机 18流程 19探究）；分类器里另有一张 `PAPER_OVERRIDES` 人工例外表
-  （例：2026 海淀期中第 17 题考的是原理，该卷没有有机题），改例外表即可，不要改判定逻辑；
-- 2020 及以前按关键词判（强标记权重 3），判不准再退位置表。
+- **题型按内容判**（关键词打分：结构/原理/有机/流程/探究各自一套强标记词，强标记权重 3、普通词 1）；
+  2021+ 用位置（15结构 16原理 17有机 18流程 19探究）当先验，内容能明确判定时覆盖位置；
+  2020 及以前纯内容判、判不准才退老卷位置表（25-28 / 8-11 序）。
 
 ```bash
 python3 ~/jingshibang/exam-parser/chem_category.py --all --json /tmp/chem_categories.json
@@ -297,7 +298,7 @@ npx tsx scripts/split-chemistry-fill.ts --map <json> --paper "<卷名>" --apply 
 npx tsx scripts/repair-chemistry-groups.ts --apply   # 分组被误伤时按 Question.source 找回孤儿题
 ```
 
-`--apply` 只做「新建题型组 + 题目原地搬组 + 删掉空的旧组 + 重排套卷顺序 + 重算分值」，
+`--apply` 只做「每题建一个组 + 题目原地搬组 + 删掉空的旧组 + 重排套卷顺序 + 重算分值」，
 **不动选择题组**，题目 id 不变（作答 / 优秀解答引用不受影响）。
 
 ### 整卷学科（生物 / 历史 / 地理 / 政治）：`scripts/import-subject-json.ts`

@@ -104,10 +104,8 @@ async function main() {
     });
     // 重跑时按套卷顺序（题号）重排：先按原组的顺序拼
     if (resplitting) {
-      const orderOfGroup = new Map(catItems.map((i, k) => [i.itemId, k]));
-      fillQuestions.sort(
-        (a, b) => (orderOfGroup.get(a.groupId) ?? 0) - (orderOfGroup.get(b.groupId) ?? 0) || a.orderIndex - b.orderIndex,
-      );
+      // 重跑：按题目创建顺序（cuid 递增 = 当初的题号顺序）还原本卷的题序
+      fillQuestions.sort((a, b) => (a.question.id < b.question.id ? -1 : 1));
     }
 
     const entries = map[paper.title];
@@ -163,40 +161,30 @@ async function main() {
 
     if (!apply) continue;
 
-    // 同一题型可能有多道题（海淀期中 16、17 都是「化学反应原理」）→ 合成一个题组，组内按题号排
-    const buckets = new Map<string, PlanItem[]>();
-    for (const p of plan) {
-      if (!buckets.has(p.label)) buckets.set(p.label, []);
-      buckets.get(p.label)!.push(p);
-    }
-
+    // 一题一组（对齐生物的做法：组名就是题号），组名 `<卷>·第N题`，题型放在 category 上
     const createdGroups: { id: string; firstNo: number }[] = [];
-    for (const [label, qs] of buckets) {
+    for (const p of plan) {
       const group = await prisma.questionGroup.create({
         data: {
-          title: `${paper.title}·${label}`,
+          title: `${paper.title}·第${p.no}题`,
           content: "",
           questionType: fillGroup.questionType,
-          score: qs.reduce((n, q) => n + q.score, 0),
+          score: p.score,
           subject: fillGroup.subject,
           source: fillGroup.source,
           grade: fillGroup.grade,
-          category: label,
-          tags: Array.from(new Set([...(fillGroup.tags ?? []), label])),
+          category: p.label,
+          tags: Array.from(new Set([...(fillGroup.tags ?? []), p.label])),
         },
         select: { id: true },
       });
       // 题目原地搬家：question id 不变，作答/优秀解答引用都不受影响
-      let gi = 0;
-      for (const p of qs) {
-        // 重跑（--force）时源题分散在多个组里，必须按 questionId 全范围匹配，别只匹配第一组
-        await prisma.groupItem.updateMany({
-          where: { groupId: { in: sourceGroupIds }, questionId: p.questionId },
-          data: { groupId: group.id, orderIndex: gi++ },
-        });
-        await prisma.question.update({ where: { id: p.questionId }, data: { category: label, score: p.score } });
-      }
-      createdGroups.push({ id: group.id, firstNo: qs[0].no });
+      await prisma.groupItem.updateMany({
+        where: { groupId: { in: sourceGroupIds }, questionId: p.questionId },
+        data: { groupId: group.id, orderIndex: 0 },
+      });
+      await prisma.question.update({ where: { id: p.questionId }, data: { category: p.label, score: p.score } });
+      createdGroups.push({ id: group.id, firstNo: p.no });
     }
     createdGroups.sort((a, b) => a.firstNo - b.firstNo);
 

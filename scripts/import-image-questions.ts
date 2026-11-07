@@ -73,7 +73,7 @@ async function deletePaper(paperId: string, title: string) {
  * 分组：选择题一个大组；非选择题按题型各成一组（物质结构与性质 / 化学反应原理 /
  * 有机化学基础 / 工业流程 / 实验探究）。老 paper.json 没有 category 时退回原来的「非选择」大组。
  */
-function buildGroups(paper: Paper): { category: string; type: string; qs: Q[] }[] {
+function buildGroups(paper: Paper): { category: string; type: string; qs: Q[]; title?: string }[] {
   const choice = paper.questions.filter((q) => q.type === "single");
   const fill = paper.questions.filter((q) => q.type === "text");
   const buckets = new Map<string, Q[]>();
@@ -82,9 +82,14 @@ function buildGroups(paper: Paper): { category: string; type: string; qs: Q[] }[
     if (!buckets.has(label)) buckets.set(label, []);
     buckets.get(label)!.push(q);
   }
-  const groups2: { category: string; type: string; qs: Q[] }[] = [];
+  const groups2: { category: string; type: string; qs: Q[]; title?: string }[] = [];
   if (choice.length) groups2.push({ category: "选择", type: "chemistry-image", qs: choice });
-  for (const [category, qs] of buckets) groups2.push({ category, type: "chemistry-image", qs });
+  // 一题一组（对齐生物）：组名就是题号，题型放 category
+  for (const qs of buckets.values()) {
+    for (const q of qs) {
+      groups2.push({ category: chemCategoryLabel(q.category) ?? CHEM_FILL_CATEGORY, type: "chemistry-image", qs: [q], title: `第${q.no}题` });
+    }
+  }
   return groups2;
 }
 
@@ -112,10 +117,10 @@ async function importOne(dirArg: string, force: boolean) {
     if (!g.qs.length) continue;
     const group = await prisma.questionGroup.create({
       data: {
-        title: `${paper.title}·${g.category}`, content: "", questionType: g.type,
+        title: `${paper.title}·${g.title ?? g.category}`, content: "", questionType: g.type,
         score: g.qs.reduce((n, q) => n + (q.score || 0), 0),
         subject, source: paper.source, grade: paper.grade, category: g.category,
-        tags: [...tags, g.category],
+        tags: Array.from(new Set([...tags, g.category])),
       },
     });
     await prisma.paperItem.create({ data: { paperId: testPaper.id, itemId: group.id, itemType: "questionGroup", orderIndex: order++ } });
@@ -192,7 +197,7 @@ async function main() {
     if (!g.qs.length) continue;
     const group = await prisma.questionGroup.create({
       data: {
-        title: `${paper.title}·${g.category}`,
+        title: `${paper.title}·${g.title ?? g.category}`,
         content: "",
         questionType: g.type,
         score: g.qs.reduce((n, q) => n + (q.score || 0), 0),
@@ -200,7 +205,7 @@ async function main() {
         source: paper.source,
         grade: paper.grade,
         category: g.category,
-        tags: [...tags, g.category],
+        tags: Array.from(new Set([...tags, g.category])),
       },
     });
     await prisma.paperItem.create({ data: { paperId: testPaper.id, itemId: group.id, itemType: "questionGroup", orderIndex: order++ } });
@@ -219,7 +224,7 @@ async function main() {
           grade: paper.grade,
           category: g.category,
           year: paper.year ?? null,
-          tags: [...tags, g.category],
+          tags: Array.from(new Set([...tags, g.category])),
         },
       });
       await prisma.groupItem.create({ data: { groupId: group.id, questionId: created.id, orderIndex: gi++ } });
