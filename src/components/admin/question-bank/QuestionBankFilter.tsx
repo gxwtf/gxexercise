@@ -115,9 +115,9 @@ export function QuestionBankFilter({
           <Input
             value={kw}
             onChange={(e) => setKw(e.target.value)}
-            placeholder="搜索题组标题"
+            placeholder="搜索标题 / 标签 / 试卷来源 / 正文"
             className="h-9 w-full sm:w-64"
-            aria-label="搜索题组标题"
+            aria-label="搜索标题 / 标签 / 试卷来源 / 正文"
           />
           <Button type="submit" size="sm">
             查询

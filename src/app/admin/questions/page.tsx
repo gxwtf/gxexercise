@@ -49,10 +49,21 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
   const pageRaw = Number.parseInt(pick("page"), 10)
   const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1
 
+  // 关键词口径与题库浏览页保持一致（src/app/questions/[subject]/[category]/page.tsx）：
+  // 标题 / 题组正文 / 来源（试卷名）/ 标签，任一命中即算
   const where: Prisma.QuestionGroupWhereInput = {
     ...(subject !== "all" ? { subject } : {}),
     ...(category !== "all" ? { category } : {}),
-    ...(keyword ? { title: { contains: keyword, mode: "insensitive" } } : {}),
+    ...(keyword
+      ? {
+          OR: [
+            { title: { contains: keyword, mode: "insensitive" } },
+            { content: { contains: keyword, mode: "insensitive" } },
+            { source: { contains: keyword, mode: "insensitive" } },
+            { tags: { has: keyword } },
+          ],
+        }
+      : {}),
   }
 
   const [total, groups] = await Promise.all([
@@ -139,7 +150,7 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
       )}
 
       <p className="mt-6 text-xs text-muted-foreground">
-        按更新时间倒序排列。点「编辑」进入题组编辑页（可改题组信息与全部单题），
+        按更新时间倒序排列。关键词匹配标题 / 标签 / 试卷来源 / 正文（与题库浏览页一致）。点「编辑」进入题组编辑页（可改题组信息与全部单题），
         点「预览」在题库前台打开该题组；每次保存都会记入「修改记录」。
       </p>
     </div>
