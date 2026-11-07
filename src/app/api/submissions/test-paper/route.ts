@@ -3,6 +3,7 @@ import { isAnswerCorrect, isCaseSensitiveAnswer } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
 import { isSubjectiveQuestion, isUngradedQuestion, isImageAnswer } from "@/lib/excellent-answer-rules"
+import { aggregatePickOne, isPickOneMode } from "@/lib/pick-one"
 
 export async function POST(request: Request) {
   // 身份一律取自登录会话，绝不信任请求体里的 userId
@@ -72,6 +73,9 @@ export async function POST(request: Request) {
         })
 
         if (!questionGroup) return null
+
+        // 任选一题（二选一 / 三选一）板块：只按用户实际作答的那一题计分
+        const pickOne = isPickOneMode(questionGroup.answerMode)
 
         let groupCorrectNum = 0
         let groupTotalNum = questionGroup.groupItems.length
@@ -169,8 +173,9 @@ export async function POST(request: Request) {
           })
         )
 
-        const unansweredSubmissions = questionGroup.groupItems
-          .filter((item) => !submittedIds.has(item.question.id))
+        // 任选一题的组：没选的题不是「答错」，不写 0 分记录
+        const unansweredSubmissions = (pickOne ? [] : questionGroup.groupItems
+          .filter((item) => !submittedIds.has(item.question.id)))
           .map((item) => {
             // 未作答里，参考答案是图片的画图题不判分（避免 worker 拿图片当文字答案去批）
             const skip = isUngradedQuestion(questionGroup.questionType) || isImageAnswer(item.question.answer ?? "");
@@ -182,6 +187,14 @@ export async function POST(request: Request) {
               ...(skip ? { gradingStatus: "skipped" as const } : {}),
             };
           })
+
+        if (pickOne) {
+          // 多答不惩罚：取已判分里得分最高的一题，组内只算 1 题
+          const agg = aggregatePickOne(processedSubmissions.filter(Boolean) as Array<{ score: number | null; isCorrect: boolean | null }>)
+          groupScore = agg.score
+          groupCorrectNum = agg.correctNum
+          groupTotalNum = agg.totalNum
+        }
 
         const validSubmissions = [...processedSubmissions.filter(Boolean), ...unansweredSubmissions] as NonNullable<typeof processedSubmissions[0]>[]
 

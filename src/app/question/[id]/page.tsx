@@ -317,6 +317,7 @@ async function QuestionPageContent({ id }: { id: string }) {
         <Problem
           questions={questions as any}
           language="zh"
+          pickOne={questionGroup.answerMode === 'pick-one'}
           showWordCount
         />
       </>
@@ -330,6 +331,7 @@ async function QuestionPageContent({ id }: { id: string }) {
         <Problem
           questions={questions as any}
           language="zh"
+          pickOne={questionGroup.answerMode === 'pick-one'}
           minHeight="min-h-64"
           showWordCount
         />

@@ -18,6 +18,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { excellentCriteriaText } from "@/lib/excellent-answer-rules"
 import Link from "next/link"
+import { pickOneModeLabel } from "@/lib/pick-one"
+import { round1 } from "@/lib/submission-records"
 
 interface ReviewContentData {
     questionGroup: {
@@ -62,6 +64,16 @@ interface ReviewContentData {
     correctionsMdx: MDXRemoteSerializeResult | null
     betterExpressionsMdx: MDXRemoteSerializeResult | null
     modelEssayMdx: MDXRemoteSerializeResult | null
+    /** 任选一题（二选一 / 三选一）板块的回顾信息；非 pick-one 组为 null */
+    pickOne?: {
+        enabled: boolean
+        total: number
+        pickedIndex: number | null
+        pickedScore: number | null
+        pickedGradingStatus: string | null
+        pickedMax: number
+        isCurrentPicked: boolean
+    } | null
 }
 
 interface ExcellentAnswerView {
@@ -156,6 +168,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         correctionsMdx,
         betterExpressionsMdx,
         modelEssayMdx,
+        pickOne,
     } = data
 
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
@@ -185,6 +198,28 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
 
     // 「参考答案」独立块：这几科的大题在回顾页没有「参考答案」Tab，所以单独补一块
     const showFillAnswerBlock = questionGroup.questionType === "biology-fill" || questionGroup.questionType === "history-fill" || questionGroup.questionType === "geography-fill" || questionGroup.questionType === "politics-fill"
+
+    // 任选一题（二选一 / 三选一）：本组只算用户作答的那一题
+    const pickOneStrip = pickOne?.enabled ? (
+        <div className="mx-auto mt-4 max-w-4xl px-6">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-brand/40 bg-brand/10 px-4 py-2.5 text-sm text-foreground">
+                <span className="font-semibold text-brand">{pickOneModeLabel(pickOne.total)}</span>
+                {pickOne.pickedIndex != null ? (
+                    <>
+                        <span>
+                            已选第 <span className="font-semibold text-brand">{pickOne.pickedIndex}</span> 题
+                        </span>
+                        <span>
+                            得分 <span className="font-semibold">{pickOne.pickedScore == null ? (pickOne.pickedGradingStatus === "pending" ? "评阅中" : "不判分") : `${round1(pickOne.pickedScore)} / ${pickOne.pickedMax}`}</span>
+                        </span>
+                        <span className="text-muted-foreground">批改与计分只算这一题</span>
+                    </>
+                ) : (
+                    <span>本组尚未作答任何一题（任选一题计分）</span>
+                )}
+            </div>
+        </div>
+    ) : null
 
     return (
         <div className="h-screen overflow-hidden bg-background">
@@ -252,6 +287,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                 )}
 
                 <div className="flex-1 p-6 overflow-y-auto">
+                    {pickOneStrip && <div className="mb-4">{pickOneStrip}</div>}
                     {hasMultipleQuestions && (
                         <QuestionSwitcher
                             questions={questionSwitcherItems}
@@ -320,7 +356,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             {isSkipped ? (
                                                 <span className="text-muted-foreground">不判分</span>
                                             ) : !hasAnswer ? (
-                                                <span className="text-muted-foreground">未作答</span>
+                                                <span className="text-muted-foreground">{pickOne?.enabled && !pickOne.isCurrentPicked ? "未选" : "未作答"}</span>
                                             ) : isPending || isCorrect === null ? (
                                                 <>
                                                     <span className="text-amber-700 dark:text-amber-400">评阅中</span>
@@ -416,7 +452,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                 <>
                                 <p className="text-base">
                                     我的作答：
-                                    <span className="font-medium text-foreground">{displayUserAnswer ?? "未作答"}</span>
+                                    <span className="font-medium text-foreground">{displayUserAnswer ?? (pickOne?.enabled && !pickOne.isCurrentPicked ? "未选" : "未作答")}</span>
                                     {"  "}得分：
                                     <span className="font-medium">
                                         {isSkipped ? (
@@ -452,7 +488,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             <p className="text-base">
                                 我的作答：
                                 <span className={isCorrect === null ? "text-muted-foreground font-medium" : isCorrect ? "text-green-700 dark:text-green-400 font-medium" : "text-red-700 dark:text-red-400 font-medium"}>
-                                    {displayUserAnswer ?? "未作答"}
+                                    {displayUserAnswer ?? (pickOne?.enabled && !pickOne.isCurrentPicked ? "未选" : "未作答")}
                                 </span>
                                 {"  "}正确答案：
                                 <span className="text-green-700 dark:text-green-400 font-medium">{displayCorrectAnswer}</span>

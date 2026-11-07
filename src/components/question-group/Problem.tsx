@@ -1,6 +1,8 @@
 'use client'
 
 import { useRef, useCallback } from 'react'
+import { Info } from 'lucide-react'
+import { pickOneHint } from '@/lib/pick-one'
 import { ChoiceField } from '@/components/question/ChoiceField'
 import { AnswerQuestion } from '@/components/question/AnswerQuestion'
 import { ReadingLayout } from '@/components/question-group/ReadingLayout'
@@ -32,6 +34,8 @@ interface ProblemProps {
   fullWidth?: boolean
   /** 内容列靠左（去掉 mx-auto 居中），宽度限制保持不变 */
   alignLeft?: boolean
+  /** 任选一题（二选一 / 三选一）板块：顶部显示「只算你作答的那一题」提示 */
+  pickOne?: boolean
 }
 
 export default function Problem({
@@ -45,6 +49,7 @@ export default function Problem({
   articleLayout = 'side',
   fullWidth = false,
   alignLeft = false,
+  pickOne = false,
 }: ProblemProps) {
   const { setAnswer, answers } = useAnswer()
   const components = useMDXComponents()
@@ -87,8 +92,18 @@ export default function Problem({
     }
   }
 
+  // 任选一题板块的提示条：作文/微写作的题目本身是长材料，必须两题都完整可读才能选，
+  // 所以这里不折叠题目，只在顶部说清「批改与计分只算你作答的那一题」。
+  const pickOneBanner = pickOne && questions.length > 1 ? (
+    <div className="mb-6 flex items-start gap-2 rounded-lg border border-brand/40 bg-brand/10 px-4 py-3">
+      <Info className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+      <p className="text-sm font-medium text-foreground">{pickOneHint(questions.length)}</p>
+    </div>
+  ) : null
+
   const body = (
     <>
+      {pickOneBanner}
       {segments.map((seg) => {
         if (seg.type === 'choice') {
           return (

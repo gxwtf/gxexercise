@@ -174,6 +174,7 @@ export default async function TestPaperPracticePage({ params }: PageProps) {
         questions,
         startQuestionNumber: startNumber,
         score: group.score,
+        answerMode: group.answerMode,
       }
     })
   )

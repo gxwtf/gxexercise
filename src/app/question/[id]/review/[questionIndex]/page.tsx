@@ -13,6 +13,7 @@ import type { QuestionSwitcherItem } from "@/components/review/QuestionSwitcher"
 import type { SubmissionHistoryItem } from "@/components/review/SubmissionHistoryTable"
 import { ReviewContent } from "./review-content"
 import { isSubjectiveQuestion } from "@/lib/excellent-answer-rules"
+import { isPickOneMode, pickIndexFromRows } from "@/lib/pick-one"
 import { findExcellentAnswers } from "@/lib/excellent-answers"
 
 interface PageProps {
@@ -303,6 +304,32 @@ async function buildReviewData(
     ? await serialize(String(enWritingFeedback.modelEssay), { mdxOptions })
     : null
 
+  // 任选一题（二选一 / 三选一）：回顾页要知道「用户选的是第几题、得了多少分」
+  const pickOneEnabled = isPickOneMode(questionGroup.answerMode)
+  const pickedQuestionId = pickOneEnabled
+    ? pickIndexFromRows(questionSubmissions.map((s) => ({ questionId: s.questionId, score: s.score, isCorrect: s.isCorrect })))
+    : null
+  const pickedIndex = pickedQuestionId
+    ? questions.findIndex((item) => item.question.id === pickedQuestionId) + 1
+    : 0
+  const pickedSubmission = pickedQuestionId
+    ? questionSubmissions.find((s) => s.questionId === pickedQuestionId) ?? null
+    : null
+  const pickedQuestion = pickedQuestionId
+    ? questions.find((item) => item.question.id === pickedQuestionId)?.question ?? null
+    : null
+  const pickOne = pickOneEnabled
+    ? {
+        enabled: true,
+        total: questions.length,
+        pickedIndex: pickedIndex > 0 ? pickedIndex : null,
+        pickedScore: pickedSubmission?.score ?? null,
+        pickedGradingStatus: pickedSubmission?.gradingStatus ?? null,
+        pickedMax: pickedQuestion?.score ?? questionGroup.score,
+        isCurrentPicked: currentQuestion.id === pickedQuestionId,
+      }
+    : null
+
   return {
     questionGroup: {
       id: questionGroup.id,
@@ -343,6 +370,7 @@ async function buildReviewData(
     correctionsMdx,
     betterExpressionsMdx,
     modelEssayMdx,
+    pickOne,
   }
 }
 

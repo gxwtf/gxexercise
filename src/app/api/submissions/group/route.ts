@@ -3,6 +3,7 @@ import { isAnswerCorrect, isCaseSensitiveAnswer } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
 import { isSubjectiveQuestion, isUngradedQuestion, isImageAnswer } from "@/lib/excellent-answer-rules"
+import { aggregatePickOne, isPickOneMode } from "@/lib/pick-one"
 
 export async function POST(request: Request) {
   // 身份一律取自登录会话，绝不信任请求体里的 userId
@@ -39,9 +40,12 @@ export async function POST(request: Request) {
       create: { id: userId, userName }
     });
 
+    // 任选一题（二选一 / 三选一）板块：只按用户实际作答的那一题计分
+    const pickOne = isPickOneMode(questionGroup.answerMode)
+
     let totalScore = 0;
     let correctNum = 0;
-    const totalNum = questionGroup.groupItems.length;
+    let totalNum = questionGroup.groupItems.length;
 
     const submittedIds = new Set(questionSubmissions.map((s: any) => s.questionId));
 
@@ -143,7 +147,9 @@ export async function POST(request: Request) {
       })
     );
 
-    const unansweredSubmissions = questionGroup.groupItems
+    // 未作答的候选题：普通题组照旧写 0 分记录（组内「全对 / 正确题数」要用）；
+    // 任选一题的题组**不写**——没选的题不是「答错」，写 0 分会污染正确率与回顾页
+    const unansweredSubmissions = pickOne ? [] : questionGroup.groupItems
       .filter((item) => !submittedIds.has(item.question.id))
       .map((item) => {
         // 未作答里，参考答案是图片的画图题同样不判分
@@ -157,6 +163,16 @@ export async function POST(request: Request) {
           gradingStatus: skip ? "skipped" : "graded",
         };
       });
+
+    if (pickOne) {
+      // 多答不惩罚：取已判分里得分最高的一题；pending 的行不参与，等 Worker 判完再回写
+      const agg = aggregatePickOne(
+        processedSubmissions.filter((s): s is NonNullable<typeof s> => s !== null)
+      )
+      totalScore = agg.score
+      correctNum = agg.correctNum
+      totalNum = agg.totalNum
+    }
 
     const validSubmissions = [...processedSubmissions.filter((s) => s !== null), ...unansweredSubmissions];
     const isAllCorrect = correctNum === totalNum && totalNum > 0;

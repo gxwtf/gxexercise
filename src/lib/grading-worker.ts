@@ -1,6 +1,7 @@
 import { prisma } from "./prisma"
 import { gradeWithConfig, preCheckGrade, type GradeResult } from "./ai-service"
 import { getGradingPrompt, GRADING_PROMPT_REGISTRY } from "./grading-prompts"
+import { aggregatePickOne, isPickOneMode } from "./pick-one"
 
 function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
   const data: Record<string, unknown> = {}
@@ -137,10 +138,26 @@ export function startGradingWorker() {
           where: { groupSubmissionId: gid },
           select: { score: true, isCorrect: true, gradingStatus: true },
         })
-        const newTotalScore = allSubs.reduce((sum, s) => sum + (s.score ?? 0), 0)
-        const gradedSubs = allSubs.filter(s => s.gradingStatus === "graded")
-        const newCorrectNum = gradedSubs.filter(s => s.isCorrect).length
-        const newTotalNum = allSubs.length
+        // 任选一题（二选一 / 三选一）板块：组分数取「已判分里得分最高的那一题」，不是相加
+        const meta = await prisma.questionGroupSubmission.findUnique({
+          where: { id: gid },
+          select: { testSubmissionId: true, questionGroup: { select: { answerMode: true } } },
+        })
+        const pickOne = isPickOneMode(meta?.questionGroup?.answerMode)
+        let newTotalScore: number
+        let newCorrectNum: number
+        let newTotalNum: number
+        if (pickOne) {
+          const agg = aggregatePickOne(allSubs)
+          newTotalScore = agg.score
+          newCorrectNum = agg.correctNum
+          newTotalNum = agg.totalNum
+        } else {
+          newTotalScore = allSubs.reduce((sum, s) => sum + (s.score ?? 0), 0)
+          const gradedSubs = allSubs.filter(s => s.gradingStatus === "graded")
+          newCorrectNum = gradedSubs.filter(s => s.isCorrect).length
+          newTotalNum = allSubs.length
+        }
         const updated = await prisma.questionGroupSubmission.update({
           where: { id: gid },
           data: { score: newTotalScore, correctNum: newCorrectNum, totalNum: newTotalNum },

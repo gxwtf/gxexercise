@@ -43,6 +43,8 @@ interface GroupPracticeData {
   questions: QuestionPracticeData[]
   startQuestionNumber: number
   score: number | null
+  /** 作答模式：all=全部作答；pick-one=任选一题（二选一 / 三选一） */
+  answerMode?: string | null
 }
 
 interface TestPaperPracticeProps {
@@ -249,7 +251,7 @@ export function TestPaperPractice({
   const renderGroup = () => {
     if (!currentGroup) return null
 
-    const { questionType, category, contentMdx, questions, startQuestionNumber, content } = currentGroup
+    const { questionType, category, contentMdx, questions, startQuestionNumber, content, answerMode } = currentGroup
 
     if (questionType === "cloze") {
       return (
@@ -376,6 +378,7 @@ export function TestPaperPractice({
         <Problem
           questions={questions as any}
           language="zh"
+          pickOne={answerMode === "pick-one"}
           showWordCount
           startQuestionNumber={startQuestionNumber}
         />
@@ -387,6 +390,7 @@ export function TestPaperPractice({
         <Problem
           questions={questions as any}
           language="zh"
+          pickOne={answerMode === "pick-one"}
           minHeight="min-h-64"
           showWordCount
           startQuestionNumber={startQuestionNumber}
