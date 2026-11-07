@@ -14,6 +14,8 @@
  *   npx tsx scripts/import-chinese-json.ts --type 二模 --force --manifest /tmp/manifest.json
  *   npx tsx scripts/import-chinese-json.ts --rollback /tmp/manifest.json   # 按清单回退（新建的删掉、覆盖的用 .old-groups.json 还原）
  *   npx tsx scripts/import-chinese-json.ts --delete "2026北京西城高三一模语文"
+ *   npx tsx scripts/import-chinese-json.ts --files /tmp/list.txt --force   # 列表导入（单进程，比逐卷 npx 快得多）
+ *       列表每行一个 JSON 路径（绝对路径，或相对 JSON_ROOT 的 <类型>/<卷>.json）
  */
 import "dotenv/config";
 import fs from "node:fs";
@@ -435,8 +437,13 @@ async function main() {
   const force = has("force");
   const withPaper = !has("no-paper");
 
+  const listFile = arg("files");
   let files: string[];
-  if (file) files = [path.resolve(file)];
+  if (listFile) {
+    files = fs.readFileSync(listFile, "utf-8").split("\n").map((l) => l.trim()).filter(Boolean)
+      .map((l) => (path.isAbsolute(l) ? l : path.join(JSON_ROOT, l)))
+      .filter((f) => fs.existsSync(f));
+  } else if (file) files = [path.resolve(file)];
   else {
     const dir = path.join(JSON_ROOT, type);
     files = fs.readdirSync(dir).map((f) => path.join(dir, f)).filter(isImportableJson).sort();
