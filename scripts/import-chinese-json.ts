@@ -11,6 +11,9 @@
  *   npx tsx scripts/import-chinese-json.ts --file ...            # 导入
  *   npx tsx scripts/import-chinese-json.ts --file ... --force    # 覆盖（先删旧数据）
  *   npx tsx scripts/import-chinese-json.ts --type 二模            # 导入目录下全部
+ *   npx tsx scripts/import-chinese-json.ts --type 二模 --force --manifest /tmp/manifest.json
+ *   npx tsx scripts/import-chinese-json.ts --rollback /tmp/manifest.json   # 按清单回退（新建的删掉、覆盖的用 .old-groups.json 还原）
+ *   npx tsx scripts/import-chinese-json.ts --delete "2026北京西城高三一模语文"
  */
 import "dotenv/config";
 import fs from "node:fs";
@@ -42,6 +45,41 @@ interface Paper {
   paper: { title: string; subject: string; source?: string; grade?: string; year?: number | null; totalScore?: number | null; duration?: number | null; tags?: string[] };
   sections?: Group[];
   groups?: Group[];
+}
+
+/** 导入清单：记录每卷「导入前是否存在 / 原 paperId / 旧格式备份路径」，供 --rollback 使用 */
+interface ManifestRow {
+  title: string;
+  subject: string;
+  jsonFile: string;
+  existed: boolean;
+  oldPaperId: string | null;
+  oldBackup: string | null;
+}
+
+function readManifest(file: string): ManifestRow[] {
+  if (!fs.existsSync(file)) return [];
+  return JSON.parse(fs.readFileSync(file, "utf-8")) as ManifestRow[];
+}
+
+function writeManifest(file: string, rows: ManifestRow[]) {
+  fs.writeFileSync(file, JSON.stringify(rows, null, 2), "utf-8");
+}
+
+/** 目录模式要跳过旧格式备份与临时文件 */
+function isImportableJson(file: string): boolean {
+  const base = path.basename(file);
+  return base.endsWith(".json") && !base.includes(".old-groups.") && !base.startsWith(".");
+}
+
+async function deletePaperById(paperId: string, title: string) {
+  const items = await prisma.paperItem.findMany({ where: { paperId }, select: { itemId: true } });
+  for (const it of items) {
+    await prisma.questionGroup.delete({ where: { id: it.itemId } });
+  }
+  await prisma.paperItem.deleteMany({ where: { paperId } });
+  await prisma.testPaper.delete({ where: { id: paperId } });
+  console.log(`  ✗ 已删除：${title}`);
 }
 
 /** 重导护栏：卷子上已有作答时，--force 会把作答一起删掉，必须显式加 --drop-submissions 才允许 */
@@ -81,13 +119,30 @@ async function deletePaper(paperId: string, title: string) {
   console.log(`  已删除旧数据以便重导：${title}`);
 }
 
-async function importOne(file: string, dryRun: boolean, force: boolean, withPaper: boolean) {
+async function importOne(
+  file: string,
+  dryRun: boolean,
+  force: boolean,
+  withPaper: boolean,
+  manifest?: ManifestRow[],
+) {
   const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as Paper;
   const p = raw.paper;
   const title = p.title;
   const subject = p.subject || "语文";
 
   const exists = await prisma.testPaper.findFirst({ where: { title, subject }, select: { id: true } });
+  if (manifest) {
+    const backup = path.join(path.dirname(file), `${title}.old-groups.json`);
+    manifest.push({
+      title,
+      subject,
+      jsonFile: file,
+      existed: Boolean(exists),
+      oldPaperId: exists?.id ?? null,
+      oldBackup: fs.existsSync(backup) ? backup : null,
+    });
+  }
   if (exists) {
     if (!force) { console.log(`跳过（已存在）：${title}`); return { papers: 0, groups: 0, questions: 0 }; }
     await assertNoSubmissions(exists.id, title);
@@ -165,6 +220,33 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
 }
 
 async function main() {
+  const rollbackFile = arg("rollback");
+  if (rollbackFile) {
+    const rows = readManifest(rollbackFile);
+    console.log(`回退 ${rows.length} 卷…`);
+    for (const row of rows) {
+      const cur = await prisma.testPaper.findFirst({ where: { title: row.title, subject: row.subject }, select: { id: true } });
+      if (cur) await deletePaperById(cur.id, row.title);
+      if (row.existed && row.oldBackup && fs.existsSync(row.oldBackup)) {
+        await importOne(row.oldBackup, false, false, true);
+        console.log(`  ↩ 已用旧格式还原：${row.title}`);
+      }
+    }
+    console.log("回退完成");
+    await prisma.$disconnect();
+    return;
+  }
+
+  const delTitle = arg("delete");
+  if (delTitle) {
+    const t = await prisma.testPaper.findFirst({ where: { title: delTitle }, select: { id: true } });
+    if (!t) { console.log(`没有这套卷：${delTitle}`); await prisma.$disconnect(); return; }
+    await assertNoSubmissions(t.id, delTitle);
+    await deletePaperById(t.id, delTitle);
+    await prisma.$disconnect();
+    return;
+  }
+
   const file = arg("file");
   const type = arg("type", "二模")!;
   const dryRun = has("dry-run");
@@ -175,17 +257,23 @@ async function main() {
   if (file) files = [path.resolve(file)];
   else {
     const dir = path.join(JSON_ROOT, type);
-    files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => path.join(dir, f)).sort();
+    files = fs.readdirSync(dir).map((f) => path.join(dir, f)).filter(isImportableJson).sort();
   }
+  const manifestPath = arg("manifest");
+  const manifest: ManifestRow[] | undefined = manifestPath ? [] : undefined;
   console.log(`待导入 ${files.length} 份（${dryRun ? "dry-run" : "写库"}）`);
   let tp = 0, tg = 0, tq = 0;
   for (const f of files) {
     try {
-      const r = await importOne(f, dryRun, force, withPaper);
+      const r = await importOne(f, dryRun, force, withPaper, manifest);
       tp += r.papers; tg += r.groups; tq += r.questions;
     } catch (e) {
       console.error(`✗ ${path.basename(f)}: ${String((e as Error)?.message || e).slice(0, 200)}`);
     }
+  }
+  if (manifestPath && manifest && !dryRun) {
+    writeManifest(manifestPath, manifest);
+    console.log(`清单：${manifestPath}（${manifest.length} 卷）`);
   }
   console.log(`\n完成：试卷 ${tp} 份 / 题组 ${tg} 个 / 题目 ${tq} 道`);
   await prisma.$disconnect();
