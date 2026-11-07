@@ -1,5 +1,5 @@
 /**
- * 把英语 JSON（output_json/<类型>/英语/<卷>.json）安全导入题库
+ * 把英语 JSON（output_json/<类型>/英语/<卷>.json 或 output_json_english/<类型>/<卷>.json）安全导入题库
  *
  * 结构对齐 problem_generate/import-exam.ts（英语链路 ① 的入库口径），但**重导保护**照抄
  * scripts/import-biology-json.ts 的做法：
@@ -15,7 +15,7 @@
  *
  * 选项：
  *   --file <path>        单份 JSON（与 --type 二选一，--file 优先）
- *   --type <类型>        批量：output_json/<类型>/英语/*.json
+ *   --type <类型>        批量：output_json/<类型>/英语/*.json 与 output_json_english/<类型>/*.json
  *   --dry-run            只打印将要做的事（含旧卷/作答统计），不写库
  *   --force              库里已有同名套卷时覆盖（默认跳过）
  *   --drop-submissions   确认丢弃旧作答（默认有作答且映射不上就中止）
@@ -26,11 +26,41 @@ import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { paperTitleWithSubject } from "../src/constants/subjects";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
-const JSON_ROOT = "/home/gxwtf/jingshibang/output_json";
+/**
+ * 英语 JSON 有两个历史根目录（结构都是 <根>/<类型>/…）：
+ *   1. output_json/<类型>/英语/<卷>.json      —— 老链路（一模/二模/上期末/下期末/真题）
+ *   2. output_json_english/<类型>/<卷>.json   —— 新链路，按学科分根（与 output_json_bio 同构，
+ *      2026 上学期的期中卷只在这里）
+ * --type 批量时两个根都找，同名 JSON 以第一个根为准。
+ */
+const JSON_ROOTS = [
+  "/home/gxwtf/jingshibang/output_json",
+  "/home/gxwtf/jingshibang/output_json_english",
+];
+
+/** 某个「类型」下所有待导入的英语 JSON（跨两个根，按文件名去重） */
+function filesOfType(type: string): string[] {
+  const dirs = [
+    path.join(JSON_ROOTS[0], type, SUBJECT),
+    path.join(JSON_ROOTS[1], type),
+  ];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir).sort()) {
+      if (!f.endsWith(".json") || seen.has(f)) continue;
+      seen.add(f);
+      out.push(path.join(dir, f));
+    }
+  }
+  return out;
+}
 const SUBJECT = "英语";
 
 const arg = (n: string, d?: string) => {
@@ -289,12 +319,15 @@ async function importOne(file: string, dryRun: boolean, force: boolean, dropSubs
   const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as EngPaper;
   const p = raw.paper || ({} as Paper);
   const sections = raw.sections || [];
-  const title = p.title || path.basename(file, ".json");
+  // 英语解析产物的 paper.title 不带「英语」，入库时按其他学科的惯例补齐（见 paperTitleWithSubject）
+  const rawTitle = p.title || path.basename(file, ".json");
+  const title = paperTitleWithSubject(rawTitle, SUBJECT);
   if (!sections.length) throw new Error("JSON 里没有 sections");
 
   const nQ = sections.reduce((n, s) => n + s.questions.length, 0);
+  // 兼容老数据：库里可能还是没补「英语」的旧标题，两种都算「已存在」
   const exists = await prisma.testPaper.findFirst({
-    where: { title, subject: SUBJECT }, select: { id: true },
+    where: { title: { in: Array.from(new Set([title, rawTitle])) }, subject: SUBJECT }, select: { id: true },
   });
 
   if (dryRun) {
@@ -353,7 +386,7 @@ async function importOne(file: string, dryRun: boolean, force: boolean, dropSubs
         title,
         description: p.description ?? "",
         subject: SUBJECT,
-        source: p.source || title,
+        source: paperTitleWithSubject(p.source || title, SUBJECT),
         grade: p.grade || "高三",
         year: p.year ?? null,
         totalScore: p.totalScore ?? null,
@@ -372,7 +405,7 @@ async function importOne(file: string, dryRun: boolean, force: boolean, dropSubs
           questionType: sec.questionType,
           score: Math.round(sec.score || 0),
           subject: SUBJECT,
-          source: sec.source || p.source || title,
+          source: paperTitleWithSubject(sec.source || p.source || title, SUBJECT),
           grade: sec.grade || p.grade || "高三",
           category: sec.category || "",
           tags: Array.from(new Set([...(sec.tags || []), ...tags0])),
@@ -394,7 +427,7 @@ async function importOne(file: string, dryRun: boolean, force: boolean, dropSubs
             analysis: q.analysis || "",
             score: q.score ?? 0,
             subject: SUBJECT,
-            source: sec.source || p.source || title,
+            source: paperTitleWithSubject(sec.source || p.source || title, SUBJECT),
             category: sec.category || "",
             grade: sec.grade || p.grade || "高三",
             year: p.year ?? null,
@@ -424,10 +457,7 @@ async function main() {
   if (file) {
     files = [path.resolve(file)];
   } else if (type) {
-    const dir = path.join(JSON_ROOT, type, SUBJECT);
-    files = fs.existsSync(dir)
-      ? fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => path.join(dir, f)).sort()
-      : [];
+    files = filesOfType(type);
   } else {
     console.error("用法: --file <json> 或 --type <类型> [--dry-run] [--force] [--drop-submissions]");
     process.exit(1);

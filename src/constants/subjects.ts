@@ -147,3 +147,17 @@ export const subjectNavItems: Record<string, {
     },
   ])
 );
+
+/**
+ * 套卷标题统一带学科名，例如「2026北京海淀高三（上）期中数学」——列表里一眼能分出是哪科。
+ *
+ * 各科解析产物本来就带（历史/数学/语文…），只有英语的 `paper.title` 一直是
+ * 「2026北京海淀高三（上）期中」，没有「英语」二字，所以英语入库时用本函数补齐。
+ * 幂等：标题里已经有学科名就原样返回，重复导入不会变成「…英语英语」。
+ */
+export function paperTitleWithSubject(title: string, subject: string): string {
+  const t = (title || "").trim()
+  if (!t || !subject) return t
+  if (t.includes(subject)) return t
+  return `${t}${subject}`
+}

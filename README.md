@@ -261,6 +261,15 @@ src/
 
 脚本依赖 `.env` 中的 `DATABASE_URL`，通过 `npx tsx` 运行。
 
+**套卷标题约定（重要）**：`TestPaper.title` 一律以学科名结尾，如 `2026北京海淀高三（上）期中数学`。
+各科解析产物本来就带，只有英语的 `paper.title` 一直是 `2026北京海淀高三（上）期中`（没有「英语」），
+所以英语的两个入库脚本（`scripts/import-english-json.ts`、`problem_generate/import-exam.ts`）在写库前
+统一过一遍 `paperTitleWithSubject()`（`src/constants/subjects.ts`，幂等，已有学科名不会再补）。
+`scripts/sync-json-to-db.ts` 找套卷时对两种标题都兼容，老库/新库都能匹配。
+
+英语 JSON 有两个根目录，`--type` 批量时都会找：老的 `output_json/<类型>/英语/`、
+新的 `output_json_english/<类型>/`（2026 上学期的期中卷只在后者）。
+
 ```bash
 npx tsx problem_generate/import-exam.ts "<json 文件或目录>"      # 导入（新建套卷）
 npx tsx problem_generate/import-exam.ts --delete "<套卷标题>"     # 删除某套

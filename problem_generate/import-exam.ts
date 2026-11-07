@@ -2,6 +2,7 @@ import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { paperTitleWithSubject } from "../src/constants/subjects";
 import fs from "fs";
 import path from "path";
 
@@ -73,17 +74,19 @@ async function importExam(jsonPath: string) {
   const data: ExamData = JSON.parse(raw);
 
   const { paper, sections } = data;
+  // 套卷标题统一带学科名（其他学科本来就带），英语的解析产物缺「英语」二字，这里补齐
+  const paperTitle = paperTitleWithSubject(paper.title, paper.subject);
 
-  console.log(`Importing: ${paper.title}`);
+  console.log(`Importing: ${paperTitle}`);
   console.log(`  Grade: ${paper.grade}, Year: ${paper.year}`);
   console.log(`  Sections: ${sections.length}`);
 
   const testPaper = await prisma.testPaper.create({
     data: {
-      title: paper.title,
+      title: paperTitle,
       description: paper.description || "",
       subject: paper.subject,
-      source: paper.source,
+      source: paperTitleWithSubject(paper.source || paper.title, paper.subject),
       grade: paper.grade,
       year: paper.year,
       totalScore: paper.totalScore,

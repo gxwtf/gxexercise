@@ -47,6 +47,7 @@ import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { paperTitleWithSubject } from "../src/constants/subjects";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -193,6 +194,8 @@ async function syncPaper(
   const data = JSON.parse(fs.readFileSync(file, "utf-8")) as PaperJson;
   const stem = path.basename(file, ".json");
   const title = (data.paper?.title || "").trim() || stem;
+  // 英语 JSON 的 paper.title 不带「英语」，入库时补齐；老库里可能还是旧标题，两种都试
+  const titleCandidates = Array.from(new Set([title, paperTitleWithSubject(title, subject)]));
   const units: Unit[] = data.sections || data.groups || [];
   const structure = data.sections ? "sections" : data.groups ? "groups" : "(none)";
   const log = newLog(subject, type, file, title);
@@ -201,7 +204,7 @@ async function syncPaper(
   if (!units.length) { log.skip = `JSON 无 ${structure} 内容`; return log; }
 
   const paper = await prisma.testPaper.findFirst({
-    where: { title, subject },
+    where: { title: { in: titleCandidates }, subject },
     include: { paperItems: { orderBy: { orderIndex: "asc" } } },
   });
   if (!paper) { log.skip = "库中缺卷"; return log; }
