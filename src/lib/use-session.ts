@@ -63,6 +63,9 @@ export default function useSession() {
         fetchJson<SessionData>,
         {
             fallbackData: defaultSession,
+            // fallbackData 会跳过挂载时的自动重新验证，导致刷新后 Header 一直显示「登录」、
+            // 「管理」菜单不出现；强制挂载时拉一次真实会话（顺带拿到 questionBankEditor 标记）
+            revalidateOnMount: true,
         },
     );
 

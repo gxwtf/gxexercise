@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import { sessionOptions, type SessionData } from "@/lib/iron"
 import { subjects, subjectToRoute, categoriesBySubject, categoryToRoute } from "@/constants/subjects"
 import { getLeaderboard, getMyRank } from "@/lib/leaderboard"
+import { isQuestionBankReviewer } from "@/lib/question-bank-auth"
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList"
 import SampleQuestion from "@/components/home/sample-question"
 import PaperFinder from "@/components/home/paper-finder"
@@ -34,6 +35,12 @@ export default async function RootPage() {
   const version = pkg.version
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   const userId = session.isLoggedIn && session.userid ? session.userid : 0
+
+  // 题库管理入口（网站管理员 / 题库审核名单成员）：主页上给一个明显入口，免得只藏在「管理」菜单里
+  const isAdmin = Boolean(session.admin)
+  const isReviewer =
+    session.isLoggedIn && !isAdmin ? await isQuestionBankReviewer(session.username) : false
+  const canManageQuestionBank = isAdmin || isReviewer
 
   const [
     paperTotal,
@@ -200,6 +207,23 @@ export default async function RootPage() {
             </Link>
           </Button>
         </div>
+
+        {canManageQuestionBank ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-brand/30 bg-brand/5 px-3 py-2 text-sm">
+            <Badge variant="outline" className="text-brand">
+              {isAdmin ? "管理员" : "题库审核"}
+            </Badge>
+            <span className="text-muted-foreground">你可以直接维护题库：</span>
+            <Button asChild size="sm">
+              <Link href="/admin/questions">进入题库管理</Link>
+            </Button>
+            {isAdmin ? (
+              <Button asChild size="sm" variant="outline">
+                <Link href="/admin/questions/reviewers">题库审核名单</Link>
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
 
         {activityView.length > 0 ? (
           <ActivityTicker items={activityView} />
