@@ -192,3 +192,31 @@ model User {
   @@unique([id])
   @@index([id])
 }
+
+/// 题库编辑审计日志：谁（管理员）在什么时候改了哪个题组 / 小题的哪些字段。
+/// 独立表、不建外键：管理员来自 SSO（本地 User 表可能没有记录），题目也可能被删除。
+model AdminEditLog {
+  id          String   @id @default(cuid())
+  /// 操作管理员（SSO userId）
+  adminId     Int
+  adminName   String?  @db.VarChar(100)
+  /// update-group | update-question | upload-cover | delete-cover
+  action      String   @db.VarChar(30)
+  /// group | question
+  targetType  String   @db.VarChar(20)
+  targetId    String   @db.VarChar(64)
+  /// 变更对象的人类可读标识（题组标题 / 小题题干摘要）
+  targetLabel String   @db.VarChar(255)
+  groupId     String?  @db.VarChar(64)
+  groupTitle  String?  @db.VarChar(255)
+  /// 字段级 diff：{ field: { before, after, beforeLength?, afterLength? } }
+  changes     Json?
+  /// 请求来源 IP（nginx 透传的真实客户端 IP）
+  ip          String?  @db.VarChar(64)
+  createdAt   DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([groupId])
+  @@index([adminId])
+  @@index([createdAt])
+}

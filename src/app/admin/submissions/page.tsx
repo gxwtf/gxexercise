@@ -134,9 +134,14 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
             {total > PAGE_SIZE && `，第 ${safePage} / ${pageCount} 页`}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/records">我的作答记录</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/questions">题库管理</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/records">我的作答记录</Link>
+          </Button>
+        </div>
       </div>
 
       <AdminSubmissionsFilter

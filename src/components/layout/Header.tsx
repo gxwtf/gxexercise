@@ -81,6 +81,9 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
+                <Link href="/admin/questions">题库管理</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href="/admin/submissions">全部作答记录</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -113,6 +116,12 @@ export default function Header() {
       </Link>
       {session.isLoggedIn && session.admin && (
         <>
+          <Link
+            href="/admin/questions"
+            className="text-sm font-medium hover:text-primary"
+          >
+            题库管理
+          </Link>
           <Link
             href="/admin/submissions"
             className="text-sm font-medium hover:text-primary"
