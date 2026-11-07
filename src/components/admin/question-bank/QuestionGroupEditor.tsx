@@ -1,11 +1,11 @@
 "use client"
 
-// 题组编辑页的客户端容器：三个板块（基本信息 / 题组正文 / 小题）+ 右侧（概览 / 最近修改 / 须知）
+// 题组编辑页的客户端容器：三个板块（基本信息 / 题组正文 / 单题）+ 右侧（概览 / 最近修改 / 须知）
 //
-// 板块切换只切显示、不卸载内容：小题卡片各自持有草稿，切板块不能把没保存的修改丢掉，
+// 板块切换只切显示、不卸载内容：单题卡片各自持有草稿，切板块不能把没保存的修改丢掉，
 // 所以三个面板都保持挂载，用 hidden 控制可见性。
 //
-// 题组级草稿（基本信息 + 正文）放在这里，统一算 diff / 统一保存；小题各自独立保存。
+// 题组级草稿（基本信息 + 正文）放在这里，统一算 diff / 统一保存；单题各自独立保存。
 
 import * as React from "react"
 import Link from "next/link"
@@ -14,8 +14,6 @@ import { toast } from "sonner"
 import { ExternalLink, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { EditorTabs } from "@/components/admin/question-bank/EditorTabs"
 import { GroupMetaForm } from "@/components/admin/question-bank/GroupMetaForm"
 import { GroupContentForm } from "@/components/admin/question-bank/GroupContentForm"
@@ -116,7 +114,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
   const groupDirty = basicDirty || contentDirty
   const anyDirty = groupDirty || dirtyQuestionIds.size > 0
 
-  // 有未保存改动时，关闭 / 刷新页面给浏览器一个确认（20 道小题手改一次不容易）
+  // 有未保存改动时，关闭 / 刷新页面给浏览器一个确认（20 道单题手改一次不容易）
   React.useEffect(() => {
     if (!anyDirty) return
     const handler = (event: BeforeUnloadEvent) => {
@@ -127,7 +125,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
     return () => window.removeEventListener("beforeunload", handler)
   }, [anyDirty])
 
-  // 小题卡片用回调上报脏状态；保持回调稳定，避免每键重渲染整棵树
+  // 单题卡片用回调上报脏状态；保持回调稳定，避免每键重渲染整棵树
   const handleQuestionDirty = React.useCallback((questionId: string, isDirty: boolean) => {
     setDirtyQuestionIds((prev) => {
       if (prev.has(questionId) === isDirty) return prev
@@ -226,7 +224,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
         <Badge variant="secondary">{draft.category || "未分类"}</Badge>
         <Badge variant="outline">{questionTypeLabel(draft.questionType)}</Badge>
         <span className="text-xs text-muted-foreground">
-          {questions.length} 道小题 · 题组分值 {draft.score}
+          {questions.length} 道单题 · 题组分值 {draft.score}
         </span>
         {anyDirty ? <Badge variant="secondary">有未保存的改动</Badge> : null}
       </div>
@@ -240,7 +238,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
             { value: "content", label: "题组正文", dirty: contentDirty },
             {
               value: "questions",
-              label: "小题",
+              label: "单题",
               badge: String(questions.length),
               dirty: dirtyQuestionCount > 0,
             },
@@ -249,7 +247,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
       </div>
 
       <div className="min-w-0 space-y-4">
-        {/* 三个板块都保持挂载（hidden 切换），避免切走时丢掉小题卡片里的草稿 */}
+        {/* 三个板块都保持挂载（hidden 切换），避免切走时丢掉单题卡片里的草稿 */}
         <div className={activeTab === "basic" ? "block" : "hidden"} role="tabpanel" aria-label="基本信息">
           <GroupMetaForm
             values={draft}
@@ -283,11 +281,11 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
           />
         </div>
 
-        <div className={activeTab === "questions" ? "block" : "hidden"} role="tabpanel" aria-label="小题">
+        <div className={activeTab === "questions" ? "block" : "hidden"} role="tabpanel" aria-label="单题">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-base font-semibold">
-                小题列表
+                单题列表
                 <span className="ml-2 text-sm font-normal text-muted-foreground">共 {questions.length} 题</span>
                 {dirtyQuestionCount > 0 ? (
                   <span className="ml-2 text-xs font-normal text-brand">（{dirtyQuestionCount} 题未保存）</span>
@@ -307,10 +305,10 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
 
             {questions.length === 0 ? (
               <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                该题组下还没有关联小题。小题的增删 / 排序由导入脚本负责，本页面只修改已有小题的内容。
+                该题组下还没有关联单题。单题的增删 / 排序由导入脚本负责，本页面只修改已有单题的内容。
               </p>
             ) : (
-              <div className="space-y-3">
+              <div>
                 {questions.map((question, index) => (
                   <QuestionEditorCard
                     key={question.id}
@@ -335,27 +333,24 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
         </div>
       </div>
 
-      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-        <Card>
-          <CardHeader>
-            <CardTitle>题组概览</CardTitle>
-            <CardDescription className="break-all font-mono text-xs">{group.id}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
+      <aside className="space-y-5 lg:sticky lg:top-4 lg:self-start">
+        <section className="space-y-2">
+          <h2 className="text-base font-semibold">题组概览</h2>
+          <p className="break-all font-mono text-xs text-muted-foreground">{group.id}</p>
+          <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground">小题数</span>
+              <span className="text-muted-foreground">单题数</span>
               <span className="font-medium">{questions.length} 题</span>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground">小题合计分</span>
+              <span className="text-muted-foreground">单题合计分</span>
               <span className="font-medium">{totalSavedScore} 分</span>
             </div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-muted-foreground">题组分值（自动）</span>
               <span className="font-medium">{group.score} 分</span>
             </div>
-            <Separator />
-            <div className="flex items-center justify-between gap-2 text-xs">
+            <div className="flex items-center justify-between gap-2 border-t border-border pt-2 text-xs">
               <span className="text-muted-foreground">创建时间</span>
               <span>{formatDateTime(new Date(group.createdAt))}</span>
             </div>
@@ -363,8 +358,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
               <span className="text-muted-foreground">最后更新</span>
               <span>{formatDateTime(new Date(group.updatedAt))}</span>
             </div>
-            <Separator />
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-2 border-t border-border pt-2">
               <Button asChild size="sm" variant="outline" className="flex-1">
                 <Link href={`/question/${group.id}`} target="_blank" rel="noreferrer">
                   <ExternalLink />
@@ -375,33 +369,27 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
                 <Link href={`/admin/questions/logs?q=${encodeURIComponent(group.title)}`}>修改记录</Link>
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>最近修改</CardTitle>
-            <CardDescription>最近 15 条改动（题组 + 组内小题）。</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <EditHistoryList logs={logs} />
-          </CardContent>
-        </Card>
+        <section className="space-y-2 border-t border-border pt-4">
+          <h2 className="text-base font-semibold">最近修改</h2>
+          <p className="text-sm text-muted-foreground">最近 15 条改动（题组 + 组内单题）。</p>
+          <EditHistoryList logs={logs} />
+        </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-1.5">
-              <Info className="size-4" />
-              编辑须知
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-xs text-muted-foreground">
+        <section className="space-y-2 border-t border-border pt-4">
+          <h2 className="flex items-center gap-1.5 text-base font-semibold">
+            <Info className="size-4" />
+            编辑须知
+          </h2>
+          <div className="space-y-2 text-xs text-muted-foreground">
             <p>每次保存都会存档：管理员、时间、改了哪些字段、改动前后的内容。</p>
             <p>正文与题干直接编辑 Markdown 源码；公式用 $...$，填空占位用 &lt;Input&gt; 等私有标签。</p>
             <p>保存不影响已有作答记录，但改答案 / 选项 ID 会让历史作答的判分口径发生变化，请谨慎。</p>
             <p>改完建议点「前台预览」核对渲染效果。</p>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </aside>
       </div>
     </div>

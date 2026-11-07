@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 export interface EditorTabItem {
   value: string
   label: string
-  /** 右侧小徽标，如小题数量 */
+  /** 右侧小徽标，如单题数量 */
   badge?: string
   /** 该板块有未保存改动时显示红点 */
   dirty?: boolean

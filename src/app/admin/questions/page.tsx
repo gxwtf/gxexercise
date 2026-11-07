@@ -67,10 +67,8 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
         id: true,
         title: true,
         subject: true,
-        category: true,
         questionType: true,
         score: true,
-        imageUrl: true,
         updatedAt: true,
         _count: { select: { groupItems: true } },
       },
@@ -92,11 +90,9 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
     no: startNo + index + 1,
     title: g.title,
     subject: g.subject,
-    category: g.category,
     typeLabel: questionTypeLabel(g.questionType),
     itemCount: g._count.groupItems,
     score: g.score,
-    imageUrl: g.imageUrl,
     updatedAt: formatDateTime(g.updatedAt),
   }))
 
@@ -143,7 +139,7 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
       )}
 
       <p className="mt-6 text-xs text-muted-foreground">
-        按更新时间倒序排列。点「编辑」进入题组编辑页（可改题组信息与全部小题），
+        按更新时间倒序排列。点「编辑」进入题组编辑页（可改题组信息与全部单题），
         点「预览」在题库前台打开该题组；每次保存都会记入「修改记录」。
       </p>
     </div>

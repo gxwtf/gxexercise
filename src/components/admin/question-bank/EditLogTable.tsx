@@ -128,7 +128,7 @@ export function EditLogTable({ rows }: { rows: EditLogRow[] }) {
             const fields = changes
               ? Object.keys(changes).sort((a, b) => fieldRank(a) - fieldRank(b))
               : []
-            // 题组日志点进该题组；小题日志点进它所属的题组（没有所属题组就只能纯文本）
+            // 题组日志点进该题组；单题日志点进它所属的题组（没有所属题组就只能纯文本）
             const href =
               row.targetType === "group"
                 ? `/admin/questions/${row.targetId}`
@@ -161,7 +161,7 @@ export function EditLogTable({ rows }: { rows: EditLogRow[] }) {
                     ) : (
                       <span className="block max-w-[360px] truncate font-medium">{row.targetLabel}</span>
                     )}
-                    {/* 小题日志回填所属题组；题组本身的日志再显示一遍就是重复信息 */}
+                    {/* 单题日志回填所属题组；题组本身的日志再显示一遍就是重复信息 */}
                     {row.targetType === "question" && row.groupTitle ? (
                       <span className="max-w-[360px] truncate text-xs text-muted-foreground">
                         所属题组：{row.groupTitle}

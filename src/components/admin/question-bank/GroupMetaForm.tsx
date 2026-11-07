@@ -9,7 +9,6 @@ import * as React from "react"
 import { Loader2, RotateCcw, Save } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -36,7 +35,7 @@ interface GroupMetaFormProps {
   disabled?: boolean
   /** 封面区域（并进同一张卡片，放在标签之后） */
   coverSlot?: React.ReactNode
-  /** 题组分值：只读展示，由服务端从小题分值合计而来（取整） */
+  /** 题组分值：只读展示，由服务端从单题分值合计而来（取整） */
   derivedScore: number
 }
 
@@ -57,18 +56,16 @@ export function GroupMetaForm({
   const categoryListId = React.useId()
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>题组信息</CardTitle>
-        <CardDescription>
-          标题、分类、标签与封面等元信息决定题库列表与筛选里的展示。
-        </CardDescription>
-        <CardAction>
-          {dirty ? <Badge variant="secondary">有未保存的改动</Badge> : <Badge variant="outline">已同步</Badge>}
-        </CardAction>
-      </CardHeader>
+    <section className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h2 className="text-base font-semibold">题组信息</h2>
+          <p className="mt-1 text-sm text-muted-foreground">标题、分类、标签与封面等元信息决定题库列表与筛选里的展示。</p>
+        </div>
+        {dirty ? <Badge variant="secondary">有未保存的改动</Badge> : <Badge variant="outline">已同步</Badge>}
+      </div>
 
-      <CardContent className="space-y-4">
+      <div className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="group-title">
             标题 <span className="text-destructive">*</span>
@@ -194,7 +191,7 @@ export function GroupMetaForm({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="group-score-readonly">题组分值</Label>
-            {/* 只读：由小题分值自动合计（服务端在小题保存时重算），不在这里手改 */}
+            {/* 只读：由单题分值自动合计（服务端在单题保存时重算），不在这里手改 */}
             <div
               id="group-score-readonly"
               className="flex h-8 items-center gap-1.5 rounded-lg border border-input bg-muted/40 px-2.5 text-sm"
@@ -202,7 +199,7 @@ export function GroupMetaForm({
               <span className="font-medium">{derivedScore} 分</span>
               <span className="text-xs text-muted-foreground">自动合计</span>
             </div>
-            <p className="text-xs text-muted-foreground">由各小题分值合计（取整）；改单题分值在「小题」板块。</p>
+            <p className="text-xs text-muted-foreground">由各单题分值合计（取整）；改单题分值在「单题」板块。</p>
           </div>
         </div>
 
@@ -218,9 +215,9 @@ export function GroupMetaForm({
         </div>
 
         {coverSlot}
-      </CardContent>
+      </div>
 
-      <CardFooter className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
         <p className="text-xs text-muted-foreground">
           保存会一并提交本页其他板块里未保存的题组字段，并记入修改记录。
         </p>
@@ -234,7 +231,7 @@ export function GroupMetaForm({
             {saving ? "保存中…" : "保存基本信息"}
           </Button>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </section>
   )
 }

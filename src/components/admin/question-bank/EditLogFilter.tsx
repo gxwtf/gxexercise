@@ -53,14 +53,14 @@ export function EditLogFilter({ targetType, keyword, admin }: EditLogFilterProps
             {/* 直接给出文案：Radix 的 SelectValue 在选项没展开过时取不到 item 文本，会显示空白 */}
             <SelectValue placeholder="全部对象">
               <span className={type === "all" ? "text-muted-foreground" : undefined}>
-                {type === "all" ? "全部对象" : type === "group" ? "题组" : "小题"}
+                {type === "all" ? "全部对象" : type === "group" ? "题组" : "单题"}
               </span>
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">全部对象</SelectItem>
             <SelectItem value="group">题组</SelectItem>
-            <SelectItem value="question">小题</SelectItem>
+            <SelectItem value="question">单题</SelectItem>
           </SelectContent>
         </Select>
 

@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { CoverThumb } from "@/components/admin/question-bank/CoverThumb"
 import {
   Table,
   TableBody,
@@ -16,20 +15,18 @@ export interface QuestionBankRow {
   no: number
   title: string
   subject: string
-  category: string
-  /** 题型中文名（questionTypeLabel 结果） */
+  /** 题型中文名（questionTypeLabel 结果）——列表里只展示题型，类别与题型大多重复，不再单列 */
   typeLabel: string
-  /** 小题数（GroupItem 数量） */
+  /** 单题数（GroupItem 数量） */
   itemCount: number
   score: number
-  imageUrl: string | null
   /** 更新时间（已格式化） */
   updatedAt: string
 }
 
 /**
  * 题组列表表格：只读展示 + 进入编辑页 / 前台预览。
- * 封面直接用原生 <img>：缩略图是 40x24 的小图，没必要走 next/image 的按需优化。
+ * 只显示题型（类别与题型基本一一对应，重复显示没有信息量）；不显示封面。
  */
 export function QuestionBankTable({ rows }: { rows: QuestionBankRow[] }) {
   return (
@@ -40,11 +37,9 @@ export function QuestionBankTable({ rows }: { rows: QuestionBankRow[] }) {
             <TableHead className="w-[60px]">序号</TableHead>
             <TableHead>标题</TableHead>
             <TableHead className="w-[70px]">学科</TableHead>
-            <TableHead className="w-[100px]">类别</TableHead>
-            <TableHead className="w-[110px]">题型</TableHead>
-            <TableHead className="w-[70px] text-center">小题数</TableHead>
+            <TableHead className="w-[120px]">题型</TableHead>
+            <TableHead className="w-[70px] text-center">单题数</TableHead>
             <TableHead className="w-[70px] text-center">分值</TableHead>
-            <TableHead className="w-[70px]">封面</TableHead>
             <TableHead className="w-[140px]">更新时间</TableHead>
             <TableHead className="w-[180px] text-center">操作</TableHead>
           </TableRow>
@@ -65,13 +60,9 @@ export function QuestionBankTable({ rows }: { rows: QuestionBankRow[] }) {
                 </div>
               </TableCell>
               <TableCell className="whitespace-nowrap">{row.subject}</TableCell>
-              <TableCell className="whitespace-nowrap text-muted-foreground">{row.category || "—"}</TableCell>
               <TableCell className="whitespace-nowrap">{row.typeLabel}</TableCell>
               <TableCell className="text-center tabular-nums">{row.itemCount}</TableCell>
               <TableCell className="text-center tabular-nums">{row.score}</TableCell>
-              <TableCell>
-                <CoverThumb src={row.imageUrl} title={row.title} />
-              </TableCell>
               <TableCell className="whitespace-nowrap text-muted-foreground">{row.updatedAt}</TableCell>
               <TableCell className="text-center">
                 <div className="flex items-center justify-center gap-1">

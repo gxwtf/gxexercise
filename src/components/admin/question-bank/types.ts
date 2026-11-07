@@ -23,7 +23,7 @@ export interface GroupFormValues {
   content: string
 }
 
-/** 小题可编辑字段（与 QUESTION_EDITABLE_FIELDS 对齐） */
+/** 单题可编辑字段（与 QUESTION_EDITABLE_FIELDS 对齐） */
 export interface QuestionFormValues {
   questionType: string
   content: string
@@ -43,7 +43,7 @@ export interface GroupEditorGroup extends GroupFormValues {
   id: string
   createdAt: string
   updatedAt: string
-  /** 题组下小题数（用于概览） */
+  /** 题组下单题数（用于概览） */
   itemCount: number
 }
 

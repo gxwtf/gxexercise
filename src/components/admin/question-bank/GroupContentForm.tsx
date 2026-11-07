@@ -9,7 +9,6 @@ import * as React from "react"
 import { Loader2, RotateCcw, Save } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -33,18 +32,18 @@ export function GroupContentForm({
   disabled,
 }: GroupContentFormProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>题组正文</CardTitle>
-        <CardDescription>
-          题组的阅读材料 / 完形语料 / 提示语（Markdown + 公式 + 题库私有标签），前台渲染时作为整块的「材料」显示。
-        </CardDescription>
-        <CardAction>
-          {dirty ? <Badge variant="secondary">有未保存的改动</Badge> : <Badge variant="outline">已同步</Badge>}
-        </CardAction>
-      </CardHeader>
+    <section className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h2 className="text-base font-semibold">题组正文</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            题组的阅读材料 / 完形语料 / 提示语（Markdown + 公式 + 题库私有标签），前台渲染时作为整块的「材料」显示。
+          </p>
+        </div>
+        {dirty ? <Badge variant="secondary">有未保存的改动</Badge> : <Badge variant="outline">已同步</Badge>}
+      </div>
 
-      <CardContent className="space-y-2">
+      <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <Label htmlFor="group-content">Markdown 源码</Label>
           <span className="text-xs text-muted-foreground">{content.length} 字</span>
@@ -60,11 +59,11 @@ export function GroupContentForm({
         />
         <p className="text-xs text-muted-foreground">
           填空占位用 &lt;Input&gt; / &lt;Input2&gt; / &lt;ClozeBlank&gt;，公式用 $...$；
-          原子题（完形 / 七选五等）正文里不要塞选项，选项在「小题」板块维护。
+          原子题（完形 / 七选五等）正文里不要塞选项，选项在「单题」板块维护。
         </p>
-      </CardContent>
+      </div>
 
-      <CardFooter className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
         <p className="text-xs text-muted-foreground">
           改完建议点右上角「前台预览」核对渲染；保存会记入修改记录。
         </p>
@@ -78,7 +77,7 @@ export function GroupContentForm({
             {saving ? "保存中…" : "保存正文"}
           </Button>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </section>
   )
 }

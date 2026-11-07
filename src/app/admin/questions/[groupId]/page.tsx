@@ -50,7 +50,7 @@ function toOptions(value: unknown): QuestionOption[] | null {
 }
 
 /**
- * 管理员：编辑某个题组（题组信息 + 题组下每一道小题）。
+ * 管理员：编辑某个题组（题组信息 + 题组下每一道单题）。
  * 权限校验必须放在查库之前：layout 的校验拦不住 page 的执行与 RSC 载荷。
  */
 export default async function AdminQuestionBankEditPage({ params }: PageProps) {
@@ -74,7 +74,7 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
 
   const questionIds = group.groupItems.map((item) => item.questionId)
 
-  // 最近的改动存档：题组本身的 + 组内任意小题的
+  // 最近的改动存档：题组本身的 + 组内任意单题的
   const logs = await prisma.adminEditLog.findMany({
     where: {
       OR: [

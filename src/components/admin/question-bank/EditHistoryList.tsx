@@ -15,7 +15,7 @@ interface EditHistoryListProps {
   logs: EditLogView[]
   /** 空状态文案 */
   emptyText?: string
-  /** 是否显示「对象」一行（编辑页里对象是当前题组/小题，可以省） */
+  /** 是否显示「对象」一行（编辑页里对象是当前题组/单题，可以省） */
   showTarget?: boolean
 }
 

@@ -1,9 +1,9 @@
 "use client"
 
-// 单道小题编辑器（题组下的一个 GroupItem）
+// 单道单题编辑器（题组下的一个 GroupItem）
 //
 // 折叠态只显示题号 / 题型 / 分值 / 题干摘要，展开后编辑题型、正文、选项、答案、解析等。
-// 每道小题独立保存（PATCH /api/admin/question-bank/questions/[id]），保存后刷新服务端数据。
+// 每道单题独立保存（PATCH /api/admin/question-bank/questions/[id]），保存后刷新服务端数据。
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
@@ -12,7 +12,6 @@ import { ChevronDown, ChevronUp, Loader2, RotateCcw, Save } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -121,7 +120,7 @@ export function QuestionEditorCard({
     }
     const changed = pickChangedFields(values, draft, QUESTION_FORM_KEYS)
     if (Object.keys(changed).length === 0) {
-      toast.info("这道小题没有改动")
+      toast.info("这道单题没有改动")
       return
     }
 
@@ -157,8 +156,8 @@ export function QuestionEditorCard({
   const categoryOptions = categoriesBySubject[subject] ?? []
 
   return (
-    <Card className={cn("overflow-hidden", expanded && "border-ring/40")}>
-      <CardHeader className={cn("gap-2", expanded && "border-b border-border/60")}>
+    <div className="border-t border-border first:border-t-0">
+      <div className={cn("py-3", expanded && "pb-1")}>
         <button
           type="button"
           onClick={onToggle}
@@ -189,11 +188,11 @@ export function QuestionEditorCard({
             <ChevronDown className="mt-1 size-4 shrink-0 text-muted-foreground" />
           )}
         </button>
-      </CardHeader>
+      </div>
 
       {expanded ? (
         <>
-          <CardContent className="space-y-4 pt-4">
+          <div className="space-y-4 pb-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>题型</Label>
@@ -362,11 +361,11 @@ export function QuestionEditorCard({
                 />
               </div>
             </div>
-          </CardContent>
+          </div>
 
-          <CardFooter className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pb-4 pt-3">
             <p className="text-xs text-muted-foreground">
-              {dirty ? "这道小题有未保存的改动。" : "没有未保存的改动。"}
+              {dirty ? "这道单题有未保存的改动。" : "没有未保存的改动。"}
             </p>
             <div className="flex items-center gap-2">
               <Button type="button" variant="outline" size="sm" onClick={reset} disabled={!dirty || saving}>
@@ -378,9 +377,9 @@ export function QuestionEditorCard({
                 {saving ? "保存中…" : `保存第 ${index + 1} 题`}
               </Button>
             </div>
-          </CardFooter>
+          </div>
         </>
       ) : null}
-    </Card>
+    </div>
   )
 }

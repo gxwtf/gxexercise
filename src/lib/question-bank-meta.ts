@@ -9,7 +9,7 @@ export interface QuestionTypeMeta {
   label: string
 }
 
-/** 小题（Question）题型：与 src/app/question/[id]/page.tsx 的分支保持一致 */
+/** 单题（Question）题型：与 src/app/question/[id]/page.tsx 的分支保持一致 */
 export const SINGLE_QUESTION_TYPES: QuestionTypeMeta[] = [
   { value: "single", label: "单选" },
   { value: "multiple", label: "多选" },
@@ -96,7 +96,7 @@ export const EDIT_FIELD_LABELS: Record<string, string> = {
 /** 审计动作 → 中文名 */
 export const ADMIN_EDIT_ACTION_LABELS: Record<string, string> = {
   "update-group": "修改题组",
-  "update-question": "修改小题",
+  "update-question": "修改单题",
   "upload-cover": "上传封面",
   "pick-cover": "选用候选封面",
   "delete-cover": "移除封面",
@@ -105,7 +105,7 @@ export const ADMIN_EDIT_ACTION_LABELS: Record<string, string> = {
 /** 审计对象类型 → 中文名 */
 export const ADMIN_EDIT_TARGET_LABELS: Record<string, string> = {
   group: "题组",
-  question: "小题",
+  question: "单题",
 }
 
 /** 覆盖的题组字段（顺序即编辑页表单 / 日志展示顺序） */
@@ -123,7 +123,7 @@ export const GROUP_EDITABLE_FIELDS = [
   "content",
 ] as const
 
-/** 覆盖的小题字段 */
+/** 覆盖的单题字段 */
 export const QUESTION_EDITABLE_FIELDS = [
   "questionType",
   "content",
@@ -139,8 +139,8 @@ export const QUESTION_EDITABLE_FIELDS = [
 ] as const
 
 /**
- * 从小题正文生成人类可读摘要（去掉 MDX 标签 / 公式包裹，压缩空白）。
- * 用于审计日志的 targetLabel —— 小题没有标题字段。
+ * 从单题正文生成人类可读摘要（去掉 MDX 标签 / 公式包裹，压缩空白）。
+ * 用于审计日志的 targetLabel —— 单题没有标题字段。
  */
 export function questionStemPreview(content: string | null | undefined, max = 60): string {
   if (!content) return "（空题干）"

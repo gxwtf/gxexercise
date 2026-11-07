@@ -1,9 +1,9 @@
-// PATCH /api/admin/question-bank/questions/[id] —— 管理员修改小题（题组编辑页里的小题表单）
+// PATCH /api/admin/question-bank/questions/[id] —— 管理员修改单题（题组编辑页里的单题表单）
 //
 // 与题组 PATCH 同样的三条约束：校验通过 → 确实有变化 → 业务更新与审计日志同事务。
 //
-// 小题没有 title 字段，审计日志的 targetLabel 用题干摘要（questionStemPreview）；
-// 同时回填所属题组（小题可能属于多个题组，取 orderIndex 最小的那个），
+// 单题没有 title 字段，审计日志的 targetLabel 用题干摘要（questionStemPreview）；
+// 同时回填所属题组（单题可能属于多个题组，取 orderIndex 最小的那个），
 // 这样「修改记录」页能从日志直接跳回题组编辑页。
 import { NextResponse } from "next/server"
 import { Prisma } from "@/generated/prisma/client"
@@ -29,12 +29,12 @@ interface GroupScoreUpdate {
 }
 
 /**
- * 重算「包含这道小题」的所有题组的总分。
+ * 重算「包含这道单题」的所有题组的总分。
  *
  * 规则（与题库展示口径一致）：
- *   - 普通题组：小题分值之和；
+ *   - 普通题组：单题分值之和；
  *   - answerMode = "pick-one"（作文二选一 / 微写作三选一）：取单题最高分（等于单题满分，不是翻倍）；
- *   - QuestionGroup.score 是 Int 列，四舍五入取整（小题分值允许 .5，例如完形每题 1.5 分）。
+ *   - QuestionGroup.score 是 Int 列，四舍五入取整（单题分值允许 .5，例如完形每题 1.5 分）。
  */
 async function recalcGroupScores(
   tx: Prisma.TransactionClient,
@@ -91,7 +91,7 @@ export async function PATCH(
   try {
     const before = await prisma.question.findUnique({ where: { id } })
     if (!before) {
-      return NextResponse.json({ success: false, error: "小题不存在" }, { status: 404 })
+      return NextResponse.json({ success: false, error: "单题不存在" }, { status: 404 })
     }
 
     // 所属题组只用于写日志（题目可以不属于任何题组，如题库里还没组卷的散题）
@@ -123,7 +123,7 @@ export async function PATCH(
     const ip = getRequestIp(request)
     const question = await prisma.$transaction(async (tx) => {
       const updated = await tx.question.update({ where: { id }, data })
-      // 题组分值 = 小题分值合计（pick-one 取单题满分），改小题分值后同步重算
+      // 题组分值 = 单题分值合计（pick-one 取单题满分），改单题分值后同步重算
       const scoreUpdates = await recalcGroupScores(tx, id)
       await writeAdminEditLog(tx, {
         adminId: auth.userId,
@@ -147,7 +147,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: { question, changed } })
   } catch (error) {
-    console.error("管理员修改小题失败:", error)
+    console.error("管理员修改单题失败:", error)
     return NextResponse.json({ success: false, error: "保存失败" }, { status: 500 })
   }
 }

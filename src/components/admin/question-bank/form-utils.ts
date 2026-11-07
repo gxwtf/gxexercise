@@ -94,7 +94,7 @@ export function validateGroupDraft(draft: GroupFormValues): string | null {
   return null
 }
 
-/** 保存小题前的校验 */
+/** 保存单题前的校验 */
 export function validateQuestionDraft(draft: QuestionFormValues): string | null {
   if (!draft.questionType.trim()) return "请选择题型"
   if (draft.content.length > 200_000) return "题干不能超过 20 万字"
@@ -116,7 +116,7 @@ export function validateQuestionDraft(draft: QuestionFormValues): string | null 
   return null
 }
 
-/** 小题在列表里的状态色：有答案 / 无答案 */
+/** 单题在列表里的状态色：有答案 / 无答案 */
 export function answerState(draft: QuestionFormValues): "empty" | "ok" {
   return draft.answer.trim() ? "ok" : "empty"
 }
