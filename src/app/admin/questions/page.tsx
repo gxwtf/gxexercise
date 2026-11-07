@@ -131,7 +131,7 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
           {viewer.isAdmin ? (
             <>
               <Button asChild variant="outline" size="sm">
-                <Link href="/admin/questions/reviewers">审核名单</Link>
+                <Link href="/admin/questions/reviewers">题目审核管理</Link>
               </Button>
               <Button asChild variant="outline" size="sm">
                 <Link href="/admin/submissions">全部作答记录</Link>

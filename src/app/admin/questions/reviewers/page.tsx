@@ -10,7 +10,7 @@ import { ReviewerManager, type ReviewerRow } from "@/components/admin/question-b
 export const dynamic = "force-dynamic"
 
 /**
- * 管理员：题库审核名单（哪些非网站管理员可以管理题库）。
+ * 管理员：题目审核管理（哪些非网站管理员可以管理题库）。
  * 只有网站管理员能看/改这份名单；审核同学本人进不来这个页面（layout 放行，但本页自己拦）。
  */
 export default async function QuestionBankReviewersPage() {
@@ -22,7 +22,7 @@ export default async function QuestionBankReviewersPage() {
         <EmptyState
           icon={<Inbox />}
           title="需要网站管理员权限"
-          description="审核名单仅网站管理员可查看和修改；题库审核同学可以直接去「题库管理」改题。"
+          description="题目审核管理仅网站管理员可查看和修改；题库审核同学可以直接去「题库管理」改题。"
           action={
             <Button asChild>
               <Link href="/admin/questions">题库管理</Link>
@@ -46,7 +46,10 @@ export default async function QuestionBankReviewersPage() {
     <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold sm:text-2xl">题库审核名单</h1>
+          <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
+            题目审核管理
+            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">管理员</span>
+          </h1>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/admin/questions">返回题库管理</Link>

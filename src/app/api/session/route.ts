@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
             // 审核名单里如果已有这个用户名，顺手同步 userId / 年级（用于头像、年级展示）
             await syncQuestionBankReviewerProfile(res.data.userId, res.data.userName, res.data.grade);
 
-            // 题库审核名单是站内维护的，不在 SSO 里，这里顺带算一下（只用于显示入口）
+            // 题目审核名单是站内维护的，不在 SSO 里，这里顺带算一下（只用于显示入口）
             const questionBankEditor =
                 Boolean(session.admin) || (await isQuestionBankReviewer(session.username));
             return Response.json({ ...session, questionBankEditor });
@@ -75,7 +75,7 @@ export async function GET() {
         return Response.json(defaultSession);
     }
 
-    // 题库管理权限 = 网站管理员 或 题库审核名单成员（名单可能随时变化，所以每次查一下）
+    // 题库管理权限 = 网站管理员 或 题目审核名单成员（名单可能随时变化，所以每次查一下）
     const questionBankEditor =
         Boolean(session.admin) || (await isQuestionBankReviewer(session.username));
     return Response.json({ ...session, questionBankEditor });

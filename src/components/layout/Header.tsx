@@ -86,7 +86,7 @@ export default function Header() {
               {session.admin && (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link href="/admin/questions/reviewers">题库审核名单</Link>
+                    <Link href="/admin/questions/reviewers">题目审核管理</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/admin/submissions">全部作答记录</Link>
@@ -135,7 +135,7 @@ export default function Header() {
                 href="/admin/questions/reviewers"
                 className="text-sm font-medium hover:text-primary"
               >
-                题库审核名单
+                题目审核管理
               </Link>
               <Link
                 href="/admin/submissions"

@@ -1,6 +1,6 @@
 "use client"
 
-// 题库审核名单：与广学账号衔接
+// 题目审核名单：与广学账号衔接
 //
 // 添加：按用户名去账号中心（account.gxwtf.cn）搜人，带上头像 / 年级一起加入；
 // 展示：表格显示头像、用户名、年级（不展示操作人 / 备注）。
@@ -131,7 +131,7 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
       })
       const json = await response.json()
       if (!response.ok || !json.success) throw new Error(json.error || `添加失败（${response.status}）`)
-      toast.success(`已把 ${payload.userName} 加入题库审核名单`)
+      toast.success(`已把 ${payload.userName} 加入题目审核名单`)
       setResults(null)
       setQuery("")
       router.refresh()
@@ -288,7 +288,7 @@ export function ReviewerManager({ reviewers }: ReviewerManagerProps) {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>把 {reviewer.userName} 移出题库审核名单？</AlertDialogTitle>
+                            <AlertDialogTitle>把 {reviewer.userName} 移出题目审核名单？</AlertDialogTitle>
                             <AlertDialogDescription>
                               移出后该账号将无法再进入「题库管理」（已保存的修改和审计记录不受影响）。
                             </AlertDialogDescription>

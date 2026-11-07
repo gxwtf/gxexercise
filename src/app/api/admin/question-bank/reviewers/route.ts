@@ -1,4 +1,4 @@
-// 题库审核名单的增删查（仅网站管理员可操作）
+// 题目审核名单的增删查（仅网站管理员可操作）
 //
 // 「题库管理」权限 = 网站管理员 或 本名单里的同学；
 // 名单按广学账号用户名（SSO session.username）标识，大小写不敏感。
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       targetId: reviewer.id,
       targetLabel: userName,
       changes: { reviewer: { before: null, after: userName } },
-      summary: "加入题库审核名单",
+      summary: "加入题目审核名单",
       ip: getRequestIp(request),
     })
   } catch (error) {
@@ -115,7 +115,7 @@ export async function DELETE(request: Request) {
       targetId: reviewer.id,
       targetLabel: reviewer.userName,
       changes: { reviewer: { before: reviewer.userName, after: null } },
-      summary: "移出题库审核名单",
+      summary: "移出题目审核名单",
       ip: getRequestIp(request),
     })
   } catch (error) {

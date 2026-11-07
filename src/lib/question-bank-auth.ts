@@ -2,7 +2,7 @@
 //
 // 「题库管理」不等于「网站管理员」：
 //   网站管理员（SSO session.admin）天然可用；
-//   另外维护一份「题库审核名单」（QuestionBankReviewer），名单里的同学也能看、能改题目，
+//   另外维护一份「题目审核名单」（QuestionBankReviewer），名单里的同学也能看、能改题目，
 //   但看不到「全部作答记录」等其他管理员页面。
 //
 // 与 src/lib/admin-guard.ts 一样：page 里必须在查库之前调用，layout 挡住了不代表 page 不执行。
@@ -20,12 +20,12 @@ export type QuestionBankViewer =
       userId: number
       /** 网站管理员（admin 为真） */
       isAdmin: boolean
-      /** 仅在题库审核名单里（非网站管理员） */
+      /** 仅在题目审核名单里（非网站管理员） */
       isReviewer: boolean
     }
   | { ok: false; reason: "anonymous" | "forbidden" }
 
-/** 判断某个用户名是否在题库审核名单里（大小写不敏感） */
+/** 判断某个用户名是否在题目审核名单里（大小写不敏感） */
 export async function isQuestionBankReviewer(userName: string | null | undefined): Promise<boolean> {
   const name = (userName ?? "").trim()
   if (!name) return false
@@ -51,7 +51,7 @@ export async function getQuestionBankViewer(): Promise<QuestionBankViewer> {
   return { ok: true, session, userId, isAdmin: false, isReviewer: true }
 }
 
-/** API 用：要求「网站管理员 或 题库审核名单成员」 */
+/** API 用：要求「网站管理员 或 题目审核名单成员」 */
 export async function requireQuestionBankEditor() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   const userId = Number(session.userid)
@@ -92,6 +92,6 @@ export async function syncQuestionBankReviewerProfile(
       },
     })
   } catch (error) {
-    console.error("同步题库审核名单用户信息失败:", error)
+    console.error("同步题目审核名单用户信息失败:", error)
   }
 }
