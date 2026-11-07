@@ -196,17 +196,19 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_23rem]">
-      <div className="min-w-0 space-y-4">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Badge variant="outline">{draft.subject}</Badge>
-          <Badge variant="secondary">{draft.category || "未分类"}</Badge>
-          <Badge variant="outline">{questionTypeLabel(draft.questionType)}</Badge>
-          <span className="text-xs text-muted-foreground">
-            {questions.length} 道小题 · 题组分值 {draft.score}
-          </span>
-          {anyDirty ? <Badge variant="secondary">有未保存的改动</Badge> : null}
-        </div>
+      {/* 徽标行与板块切换横跨整行（col-span-full），这样下面右侧「题组概览」的卡片顶边
+          才能和左侧「题组信息」卡片顶边对齐（否则它会对齐到徽标行） */}
+      <div className="col-span-full flex flex-wrap items-center gap-1.5">
+        <Badge variant="outline">{draft.subject}</Badge>
+        <Badge variant="secondary">{draft.category || "未分类"}</Badge>
+        <Badge variant="outline">{questionTypeLabel(draft.questionType)}</Badge>
+        <span className="text-xs text-muted-foreground">
+          {questions.length} 道小题 · 题组分值 {draft.score}
+        </span>
+        {anyDirty ? <Badge variant="secondary">有未保存的改动</Badge> : null}
+      </div>
 
+      <div className="col-span-full">
         <EditorTabs
           value={activeTab}
           onChange={(value) => setActiveTab(value as EditorTabValue)}
@@ -221,7 +223,9 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates }:
             },
           ]}
         />
+      </div>
 
+      <div className="min-w-0 space-y-4">
         {/* 三个板块都保持挂载（hidden 切换），避免切走时丢掉小题卡片里的草稿 */}
         <div className={activeTab === "basic" ? "block" : "hidden"} role="tabpanel" aria-label="基本信息">
           <GroupMetaForm
