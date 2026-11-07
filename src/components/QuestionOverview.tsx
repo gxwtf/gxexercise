@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, FileText, SlidersHorizontal } from "lucide-react";
+import { EXAM_TYPE_FILTERS } from "@/constants/exam-types";
 import { QuestionCard } from "./QuestionCard";
 import { TestCard } from "./TestCard";
 import { GroupRowCard } from "./GroupRowCard";
@@ -71,10 +72,7 @@ interface QuestionOverviewProps {
 /** 界面上的一级筛选（对应 tags / 来源） */
 const CATEGORY_OPTIONS = [
   { value: "all", label: "全部题型" },
-  { value: "高考真题", label: "高考真题" },
-  { value: "各区一模", label: "各区一模" },
-  { value: "各区二模", label: "各区二模" },
-  { value: "各区期末", label: "各区期末" },
+  ...EXAM_TYPE_FILTERS.map((f) => ({ value: f.value, label: f.label })),
 ];
 
 export function QuestionOverview({

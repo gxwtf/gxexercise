@@ -13,17 +13,12 @@ import {
   subjectToRoute,
 } from "@/constants/subjects"
 import { DISTRICTS, DISTRICT_ZHENTI } from "@/constants/districts"
+import { EXAM_TYPE_FILTERS, examTypeWhere } from "@/constants/exam-types"
 
 export const DEFAULT_PAGE_SIZE = 20
 export const MAX_PAGE_SIZE = 100
 
-/** 分类筛选 → tags 映射（与列表页一致） */
-const CATEGORY_TAG_MAP: Record<string, string> = {
-  高考真题: "真题",
-  各区一模: "一模",
-  各区二模: "二模",
-  各区期末: "期末",
-}
+
 
 export interface Paging {
   page: number
@@ -67,8 +62,8 @@ function districtWhere(raw: string): Prisma.QuestionGroupWhereInput | null {
 
 function categoryWhere(raw: string): Prisma.QuestionGroupWhereInput | null {
   if (!raw || raw === "all") return null
-  const tag = CATEGORY_TAG_MAP[raw]
-  if (tag) return { tags: { has: tag } }
+  const exam = examTypeWhere(raw)
+  if (exam) return exam as Prisma.QuestionGroupWhereInput
   return { source: raw }
 }
 
@@ -356,7 +351,7 @@ export function apiMeta() {
     districts: [...DISTRICTS],
     /** 「北京真题」在接口里传 "真题" 或 "北京真题" 都可以 */
     districtZhenti: DISTRICT_ZHENTI,
-    categoryTags: Object.keys(CATEGORY_TAG_MAP),
+    categoryTags: EXAM_TYPE_FILTERS.map((f) => f.value),
   }
 }
 

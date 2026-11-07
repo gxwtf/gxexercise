@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { routeToSubject, routeToCategory } from "@/constants/subjects";
 import { QuestionOverview } from "@/components/QuestionOverview";
 import { DISTRICT_ZHENTI, isDistrictValue } from "@/constants/districts";
+import { examTypeWhere } from "@/constants/exam-types";
 
 interface PageProps {
   params: Promise<{
@@ -13,13 +14,7 @@ interface PageProps {
 
 const PAGE_SIZE = 12;
 
-/** 分类筛选 → tags 映射（与界面上的筛选项一一对应） */
-const CATEGORY_TAG_MAP: Record<string, string> = {
-  高考真题: "真题",
-  各区一模: "一模",
-  各区二模: "二模",
-  各区期末: "期末",
-};
+
 
 export default async function SubjectCategoryPage({ params, searchParams }: PageProps) {
   const { subject, category } = await params;
@@ -42,10 +37,11 @@ export default async function SubjectCategoryPage({ params, searchParams }: Page
   const keyword = pick("q").trim();
   const page = Math.max(1, Number.parseInt(pick("page"), 10) || 1);
 
-  // 分类筛选：有 tag 映射的按 tags 过滤，其余按来源精确匹配（如「广学模拟」）
-  const catTag = CATEGORY_TAG_MAP[catFilter];
-  const catWhere: Record<string, unknown> = catTag
-    ? { tags: { has: catTag } }
+  // 卷别筛选（高考真题 / 各区一模 / 各区二模 / 各区期中 / 各区期末）：按卷名关键词匹配，
+  // 其余自定义分类仍按来源精确匹配（如「广学模拟」）
+  const examWhere = examTypeWhere(catFilter);
+  const catWhere: Record<string, unknown> = examWhere
+    ? examWhere
     : catFilter !== "all"
       ? { source: catFilter }
       : {};
