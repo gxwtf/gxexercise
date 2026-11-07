@@ -7,7 +7,46 @@ import { readdirSync, statSync } from "node:fs"
 import path from "node:path"
 
 const SUBJECT_ROOT = process.env.EXAM_SOURCE_ROOT || "/home/gxwtf/jingshibang/gaozhong"
-const TYPES = ["一模", "二模", "上期末", "下期末", "真题"]
+// 素材目录的卷别（上期中 曾经漏了，导致期中卷匹配不到、被模糊匹配成上期末）
+const TYPES = ["一模", "二模", "上期中", "下期中", "上期末", "下期末", "真题"]
+
+/** 卷别阶段：期中 ≠ 期末、一模 ≠ 二模。标题与文件名阶段不一致时一律不许匹配 */
+const STAGE_RULES: Array<[string, RegExp]> = [
+  ["一模", /一模|第一次模拟/],
+  ["二模", /二模|第二次模拟/],
+  ["期中", /期中/],
+  ["期末", /期末/],
+  ["真题", /真题|高考/],
+]
+
+/** 学期：上 ≠ 下（「高三上期中」和「高三下期中」只差一个字，相似度同样很高） */
+const TERM_RULES: Array<[string, RegExp]> = [
+  ["上", /上期中|上期末/],
+  ["下", /下期中|下期末/],
+]
+
+/** 取卷名里的卷别阶段（期中 / 期末 / 一模 / 二模 / 真题），没有则 null */
+export function examStageOf(name: string): string | null {
+  for (const [stage, re] of STAGE_RULES) if (re.test(name)) return stage
+  return null
+}
+
+/** 取卷名里的学期（上 / 下），没有则 null */
+export function examTermOf(name: string): string | null {
+  for (const [term, re] of TERM_RULES) if (re.test(name)) return term
+  return null
+}
+
+/** 标题与候选文件的卷别/学期冲突（两边都取得到、却不相同） */
+function conflicts(title: string, candidate: string): boolean {
+  const s1 = examStageOf(title)
+  const s2 = examStageOf(candidate)
+  if (s1 && s2 && s1 !== s2) return true
+  const t1 = examTermOf(title)
+  const t2 = examTermOf(candidate)
+  if (t1 && t2 && t1 !== t2) return true
+  return false
+}
 
 /** 规范化：去掉版本后缀、学科名、空白与括号差异，便于比较 */
 function normalize(input: string, subject: string): string {
@@ -89,7 +128,10 @@ export interface SourcePdfMatch {
 export function findSourcePdf(title: string, subject: string): SourcePdfMatch | null {
   const target = normalize(title, subject)
   if (!target) return null
-  const entries = buildIndex(subject)
+  const all = buildIndex(subject)
+  if (!all.length) return null
+  // 先剔掉卷别/学期对不上的候选：否则「期中」会被相似度兜底成「期末」（只差一个字，score≈0.92）
+  const entries = all.filter((e) => !conflicts(title, e.name) && !conflicts(title, e.norm))
   if (!entries.length) return null
 
   const exact = entries.find((e) => e.norm === target)

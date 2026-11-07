@@ -10,6 +10,7 @@
     "check:colors": "node scripts/check-colors.mjs",
     "check:answers": "tsx scripts/check-answer-case.mjs",
     "check:reading": "tsx scripts/check-reading-expression.mts",
+    "check:source-pdf": "tsx scripts/check-source-pdf.mts",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:seed-math": "npx tsx prisma/seed-math.ts",
     "db:seed-chinese": "npx tsx prisma/seed-chinese.ts",
