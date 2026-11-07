@@ -66,6 +66,7 @@ cp .env.example .env
 | `OPENAI_BASE_URL` | OpenAI 兼容 API 地址（如 SiliconFlow） |
 | `OPENAI_API_KEY` | 大模型 API Key |
 | `OPENAI_MODEL` | 批改使用的模型名称 |
+| `GXEXERCISE_API_KEY` | `/api/v1` 只读接口的 Bearer key（逗号分隔可配多把，留空则接口 503） |
 
 ### 3. 初始化数据库
 
@@ -101,6 +102,28 @@ pnpm dev
 | `pnpm run db:generate` | 生成 Prisma Client（输出到 `src/generated/prisma`） |
 | `pnpm run db:push` | 同步 schema 到数据库 |
 | `pnpm run db:seed` | 执行基础种子脚本 `prisma/seed.ts` |
+
+## 开放 API（`/api/v1`）
+
+给脚本、快捷指令、其他站点读取题库用的一套**只读**接口，Bearer 鉴权，不依赖浏览器登录态。
+配置：`.env` 里加 `GXEXERCISE_API_KEY=<随机 48 位十六进制>`（逗号分隔可配多把）。
+
+| 接口 | 说明 |
+|------|------|
+| `GET /api/v1/health` | 健康检查（公开，不需要 key） |
+| `GET /api/v1/meta` | 学科 / 类别 / 路由 slug / 考区枚举 |
+| `GET /api/v1/questions` | 题组列表（筛选 + 分页，只回元信息） |
+| `GET /api/v1/questions/<groupId>` | 题组详情（含题干、选项、答案、解析） |
+| `GET /api/v1/test-papers` | 套卷列表 |
+| `GET /api/v1/test-papers/<id>` | 套卷结构（按顺序展开题组与单题） |
+| `GET /api/v1/stats` | 题库规模总览 |
+
+```bash
+curl -fsS "https://ti.gxwtf.cn/api/v1/questions?subject=math&pageSize=5" \
+  -H "Authorization: Bearer $GXEXERCISE_API_KEY"
+```
+
+字段、筛选参数与错误码见开发文档 [开放 API](https://dev.gxwtf.cn/gxexercise/api.md)。
 
 ## 目录结构
 
