@@ -116,7 +116,7 @@ export default async function AdminQuestionBankPage({ searchParams }: PageProps)
           <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
             题库管理
             <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">
-              {viewer.isAdmin ? "管理员" : "题库审核"}
+              题库审核
             </span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
