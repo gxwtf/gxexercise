@@ -189,6 +189,10 @@ function mdOptions(group: PaperGroupInput, blankStart: number): MarkdownOptions 
     blankMode: "number" as const,
     blankStart,
     ...(group.questionType === "chemistry-image" ? IMAGE_FULL_WIDTH : {}),
+    // 解答题 / 计算题的逐行小问：短句被 justify 会把字距拉开，改左对齐
+    ...(group.questionType === "math-solve" || group.questionType === "physics-solve"
+      ? { paraAlign: "left" as const }
+      : {}),
   }
 }
 
@@ -241,7 +245,11 @@ function stemWithNumber(number: number, stemHtml: string, tail = ""): string {
 function questionBlock(group: PaperGroupInput, q: PaperQuestionInput): string {
   const hasStem = Boolean(q.content?.trim())
   const stemHtml = hasStem ? passageHtml(q.content, mdOptions(group, q.number)) : ""
-  const qClass = group.questionType === "chemistry-image" ? "q q-image" : "q"
+  // q-solve：数学解答题 / 物理计算题。它们的小问是逐行短句，而 LibreOffice 导入
+  // `text-align: justify` 时会把「最后一行」也拉满（单行段落就被拉成「字散开」），
+  // 所以这两类单独给 left 对齐（见样式表里的 .q-solve .stem p）。
+  const isSolve = group.questionType === "math-solve" || group.questionType === "physics-solve"
+  const qClass = group.questionType === "chemistry-image" ? "q q-image" : isSolve ? "q q-solve" : "q"
 
   if (isChoice(q.questionType)) {
     // 选项文字为空的（图片版题目把选项画在图片里）不印 "A. B. C. D." 这种空壳
@@ -530,6 +538,8 @@ export function paperPageHtml(title: string, body: string): string {
   .underline, u { text-decoration: underline; }
   .superscript { vertical-align: super; font-size: 75%; }
   .math-disp { display: block; text-align: center; }
+  /* 解答题 / 计算题的逐行小问：不要两端对齐（LO 会把单行段落的最后一行拉满，字距散开会很难看） */
+  .q-solve .stem p, .q-solve > p { text-align: left; }
   .q-writing .stem p { text-indent: 2em; }
   .figure { text-align: center; margin-top: 4pt; margin-bottom: 6pt; margin-left: 0; margin-right: 0; }
   img { max-width: 100%; max-height: 62mm; }

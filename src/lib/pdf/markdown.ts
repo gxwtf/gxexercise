@@ -32,6 +32,12 @@ export interface MarkdownOptions {
   imageMaxWidthPt?: number
   /** 插图最大高度（pt），默认 170pt ≈ 60mm */
   imageMaxHeightPt?: number
+  /**
+   * 段落对齐。默认不给（沿用样式表的 justify）。LibreOffice 的 HTML 导入对
+   * 「类选择器 / 后代选择器」几乎不生效，只有内联 style 才管用 —— 所以要 left 的时候
+   * 必须写成内联样式（数学解答题 / 物理计算题的小问就是短句，被 justify 的最后一行会拉散）。
+   */
+  paraAlign?: "left" | "justify"
 }
 
 interface RenderContext {
@@ -40,6 +46,7 @@ interface RenderContext {
   tokens: string[]
   imageMaxWidthPt: number
   imageMaxHeightPt: number
+  paraStyle: string
 }
 
 function createContext(options: MarkdownOptions = {}): RenderContext {
@@ -49,6 +56,7 @@ function createContext(options: MarkdownOptions = {}): RenderContext {
     tokens: [],
     imageMaxWidthPt: options.imageMaxWidthPt ?? DEFAULT_IMAGE_MAX_WIDTH_PT,
     imageMaxHeightPt: options.imageMaxHeightPt ?? DEFAULT_IMAGE_MAX_HEIGHT_PT,
+    paraStyle: options.paraAlign ? ` style="text-align:${options.paraAlign}"` : "",
   }
 }
 
@@ -358,7 +366,7 @@ export function markdownToHtml(md: string, options: MarkdownOptions = {}): strin
       i++
     }
     // 兜底：本行没有被上面任何分支吃掉时，按普通段落消费掉，避免死循环
-    if (!para.length) { out.push(`<p>${inline(line, ctx)}</p>`); i++; continue }
+    if (!para.length) { out.push(`<p${ctx.paraStyle}>${inline(line, ctx)}</p>`); i++; continue }
     const paraHtml = para
       .map((l) => {
         const m = /^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$/.exec(l)
@@ -366,7 +374,7 @@ export function markdownToHtml(md: string, options: MarkdownOptions = {}): strin
         return inline(l, ctx)
       })
       .join("<br/>")
-    out.push(`<p>${paraHtml}</p>`)
+    out.push(`<p${ctx.paraStyle}>${paraHtml}</p>`)
   }
 
   return out.join("\n")
