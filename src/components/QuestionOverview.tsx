@@ -71,7 +71,7 @@ interface QuestionOverviewProps {
 
 /** 界面上的一级筛选（对应 tags / 来源） */
 const CATEGORY_OPTIONS = [
-  { value: "all", label: "全部" },
+  { value: "all", label: "全部题型" },
   ...EXAM_TYPE_FILTERS.map((f) => ({ value: f.value, label: f.label })),
 ];
 

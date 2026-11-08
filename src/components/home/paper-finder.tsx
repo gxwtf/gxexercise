@@ -12,9 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
  * 链接在前端拼（相对路径 push），这样本地 1230 与 cpolar 公网域名都能正确跳转。
  */
 const PAPER_TYPES = [
+  { label: "全部", cat: "all" },
   { label: "北京高考真题", cat: "高考真题" },
   { label: "各区一模", cat: "各区一模" },
   { label: "各区二模", cat: "各区二模" },
+  { label: "期中", cat: "各区期中" },
   { label: "各区上期末", cat: "各区期末" },
 ]
 
@@ -35,7 +37,8 @@ export default function PaperFinder({ defaultSubject = "历史" }: { defaultSubj
       router.push("/questions")
       return
     }
-    const params = new URLSearchParams({ cat })
+    const params = new URLSearchParams()
+    if (cat !== "all") params.set("cat", cat)
     if (year !== "all") params.set("year", year)
     if (district !== "all") params.set("district", district)
     router.push(`/questions/${subjectRoute}/${categoryRoute}?${params.toString()}`)
