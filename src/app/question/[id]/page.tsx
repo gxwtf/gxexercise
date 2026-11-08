@@ -256,12 +256,15 @@ async function QuestionPageContent({ id }: { id: string }) {
   // 题面（LaTeX + 图）在单题的 stem 里，学生在一个多行文本框里写整题过程；
   // 这两类**不做 AI 批改**（没有批改提示词），提交后只留作答、回顾页给参考答案。
   if (questionGroup.questionType === 'math-solve' || questionGroup.questionType === 'physics-solve') {
+    // 题号按原卷显示（组名形如「2026北京西城高三二模数学·第19题」），不要退化成「1.」
+    const bigNo = Number((questionGroup.title.match(/第\s*(\d{1,3})\s*题/) || [])[1] || 0) || undefined
     return (
       <>
         <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
         <Problem
           questions={questions as any}
           language="zh"
+          startQuestionNumber={bigNo}
           minHeight="min-h-72"
           placeholder={questionGroup.questionType === 'math-solve'
             ? '请写出完整解答过程（可分步书写，换行不会被合并；需说明依据与结论）'

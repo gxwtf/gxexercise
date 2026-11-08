@@ -251,9 +251,13 @@ async function syncPaper(
     // ── 题组：title / content / category / score ──
     const groupData: Record<string, any> = {};
     const dupTitle = `${title}·`;
-    const wantsTitle = g.title.startsWith(dupTitle)
-      ? `${title}·${(u.category || u.title || "").trim() || g.title.slice(dupTitle.length)}`
-      : ((u.title || u.category || "").trim() || g.title);
+    // 「大题」按**题号**命名（卷名·第16题）：JSON 里 section.title 是 第N题 时优先用它，
+    // 别退化成 category（否则数学解答题会变成「…·三角」，题号就丢了）
+    const secTitle = (u.title || "").trim();
+    const tail = /^第\s*\d{1,3}\s*题$/.test(secTitle)
+      ? secTitle
+      : ((u.category || secTitle || "").trim() || g.title.slice(dupTitle.length));
+    const wantsTitle = g.title.startsWith(dupTitle) ? `${title}·${tail}` : (tail || g.title);
     if (wantsTitle && wantsTitle !== g.title) { groupData.title = wantsTitle; bump("group.title"); }
     const bodyRaw = ((u.article && u.article.trim()) ? u.article : (u.content && u.content.trim() ? u.content : ""));
     const body = rewriteImages(bodyRaw, type, stem, subject);
@@ -380,6 +384,9 @@ async function main() {
   const reportPath = arg("report");
   const limit = Number(arg("limit", "0"));
   const fileArg = arg("file");
+  // --only <清单>：只同步清单里的卷（CSV 取 title 列，或一行一个卷名）。
+  // 一次进程内同步整批，别再一卷一个 npx tsx（每次启动 5 秒，批量时是主要耗时）。
+  const onlyArg = arg("only");
   if (!subject) throw new Error("缺少 --subject（英语/语文/政治/数学/物理/化学）");
   if (!apply && !hasFlag("dry-run")) {
     console.log("⚠ 未指定 --apply，按 dry-run 处理（不写库）");
@@ -395,6 +402,14 @@ async function main() {
     if (!fs.existsSync(dir)) throw new Error(`目录不存在：${dir}`);
     files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).sort().map((f) => path.join(dir, f));
     if (!files.length) throw new Error(`目录里没有 .json：${dir}`);
+  }
+
+  if (onlyArg) {
+    const raw = fs.readFileSync(path.resolve(onlyArg), "utf-8").split("\n").map((l) => l.trim()).filter(Boolean);
+    const isCsv = raw[0]?.includes(",") && /(^|,)title(,|$)/.test(raw[0]);
+    const keep = new Set(isCsv ? raw.slice(1).map((l) => l.split(",")[1]) : raw);
+    files = files.filter((f) => keep.has(path.basename(f, ".json")));
+    console.log(`--only：清单 ${keep.size} 份 → 命中 ${files.length} 份`);
   }
 
   const startedAt = new Date().toISOString();
