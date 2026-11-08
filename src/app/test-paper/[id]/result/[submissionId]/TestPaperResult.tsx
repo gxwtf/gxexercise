@@ -95,7 +95,7 @@ export function TestPaperResult({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
+      <div className="app-container py-6 sm:py-8">
         <div className="mb-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-2xl font-bold">{testPaperTitle}</h1>

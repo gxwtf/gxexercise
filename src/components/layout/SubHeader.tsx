@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { subjects, subjectToRoute, subjectNavItems, categoryToRoute } from '@/constants/subjects';
+import useSession from '@/lib/use-session';
 
 export default function SubHeader({
   subject,
@@ -22,6 +23,8 @@ export default function SubHeader({
 }>) {
   const router = useRouter();
   const pathname = usePathname();
+  const { session } = useSession();
+  const canManage = session.isLoggedIn && (session.admin || session.questionBankEditor);
   // 学科 slug 认不出来时（比如手输 /questions/英语）不能直接崩：导航按钮为空即可
   const currentNavItems = subjectNavItems[subject];
   const navButtons = currentNavItems?.navButtons ?? [];
@@ -117,6 +120,26 @@ export default function SubHeader({
 
   const mobileMenuContent = (
     <nav className="flex flex-col gap-3">
+      {/* 顶部主导航（桌面端在 Header 里，手机端收进这个抽屉） */}
+      <div className="flex flex-col gap-3 border-b border-border pb-3">
+        <Link href="/" className="text-sm font-medium hover:text-primary">首页</Link>
+        <Link href="/leaderboard" className="text-sm font-medium hover:text-primary">广学榜</Link>
+        {canManage && (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-muted-foreground">管理</span>
+            <Link href="/admin/questions" className="pl-3 text-sm font-medium hover:text-primary">题库管理</Link>
+            {session.admin && (
+              <>
+                <Link href="/admin/questions/reviewers" className="pl-3 text-sm font-medium hover:text-primary">题目审核管理</Link>
+                <Link href="/admin/submissions" className="pl-3 text-sm font-medium hover:text-primary">全部作答记录</Link>
+                <Link href="https://account.gxwtf.cn/admin/users" className="pl-3 text-sm font-medium hover:text-primary">用户管理</Link>
+              </>
+            )}
+          </div>
+        )}
+        <Link href="https://gxwtf.cn/home" className="text-sm font-medium hover:text-primary">前往竞赛题库</Link>
+      </div>
+
       {navButtons.map((item, index) => {
         const isActive = item.label === currentCategory;
         return (

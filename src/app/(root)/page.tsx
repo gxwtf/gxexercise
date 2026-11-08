@@ -161,7 +161,7 @@ export default async function RootPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8 sm:px-6 sm:py-10">
+    <div className="app-container space-y-8 py-8 sm:py-10">
       {/* 首屏：定位 + 数据 + 主入口 */}
       <section className="space-y-4">
         <Badge variant="outline" className="gap-1">

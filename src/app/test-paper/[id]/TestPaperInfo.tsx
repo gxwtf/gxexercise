@@ -37,7 +37,7 @@ export function TestPaperInfo({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-3xl px-3 py-6 sm:px-4 sm:py-8">
+      <div className="app-container py-6 sm:py-8">
         <div>
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-muted-foreground" />

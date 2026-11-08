@@ -68,7 +68,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/submissions")
     return (
-      <div className="container mx-auto px-3 py-16 sm:px-4">
+      <div className="app-container py-16">
         <EmptyState
           icon={<Inbox />}
           title="需要网站管理员权限"
@@ -129,7 +129,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   const displayUser = submission.user.userName || `同学${submission.user.id}`
 
   return (
-    <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
+    <div className="app-container py-6 sm:py-8">
       <div className="mb-5">
         <div className="mb-2 flex items-center justify-between gap-2">
           <Button asChild variant="ghost" size="sm" className="-ml-2 h-7 px-2">

@@ -148,7 +148,7 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
   }))
 
   return (
-    <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
+    <div className="app-container py-6 sm:py-8">
       <QuestionGroupEditor
         group={editorGroup}
         questions={editorQuestions}

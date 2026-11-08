@@ -26,7 +26,7 @@ export default function BaseHeader({
 
   return (
     <header className={`${sticky ? 'sticky top-0 z-50' : ''} bg-background ${className}`}>
-      <div className={`container mx-auto ${containerClassName}`}>
+      <div className={`app-container ${containerClassName}`}>
         <div className="flex items-center justify-between">
           <div className="flex-1 flex items-center">
             {children}

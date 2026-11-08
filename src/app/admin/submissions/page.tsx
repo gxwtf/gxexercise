@@ -31,7 +31,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/submissions")
     // 题库审核同学可以进 admin 区域（题库管理），但「全部作答记录」仍只向网站管理员开放
     return (
-      <div className="container mx-auto px-3 py-16 sm:px-4">
+      <div className="app-container py-16">
         <EmptyState
           icon={<Inbox />}
           title="需要网站管理员权限"
@@ -136,7 +136,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
   })
 
   return (
-    <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
+    <div className="app-container py-6 sm:py-8">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">

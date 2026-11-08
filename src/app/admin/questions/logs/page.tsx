@@ -97,7 +97,7 @@ export default async function AdminQuestionEditLogsPage({ searchParams }: PagePr
   }))
 
   return (
-    <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
+    <div className="app-container py-6 sm:py-8">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">

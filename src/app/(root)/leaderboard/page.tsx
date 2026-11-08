@@ -37,7 +37,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
   const periodLabel = period === "week" ? "周榜" : "月榜"
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-12">
+    <div className="app-container py-8">
       {/* 头部 */}
       <div className="mb-6 flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">

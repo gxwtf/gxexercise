@@ -18,7 +18,7 @@ export default async function QuestionBankReviewersPage() {
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect("/login?back=/admin/questions/reviewers")
     return (
-      <div className="container mx-auto px-3 py-16 sm:px-4">
+      <div className="app-container py-16">
         <EmptyState
           icon={<Inbox />}
           title="需要网站管理员权限"
@@ -43,7 +43,7 @@ export default async function QuestionBankReviewersPage() {
   }))
 
   return (
-    <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
+    <div className="app-container py-6 sm:py-8">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">

@@ -326,3 +326,28 @@
   max-height: none !important;
   height: auto !important;
 }
+
+/* ── 全站统一内容宽度（header / footer / 页面正文必须用同一个）─────
+   参照 gxwtf_reading（阅读收集）的做法：header 与 main 用**完全相同**的一串宽度，
+   避免「header 铺满 1536、正文只有 1024」的错位。
+   分档：
+     < 1024px            宽度 100%，左右 16px
+     ≥ 1024px (lg)       左右 24px
+     ≥ 1280px (xl)       最大 1280px
+     ≥ 1536px (2xl)      最大 1536px */
+@utility app-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 64rem;
+  padding-inline: 1rem;
+
+  @media (min-width: 1024px) {
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 1280px) {
+    max-width: 80rem;
+  }
+  @media (min-width: 1536px) {
+    max-width: 96rem;
+  }
+}

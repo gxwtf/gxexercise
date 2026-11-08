@@ -12,10 +12,10 @@ export interface ExamTypeFilter {
 
 export const EXAM_TYPE_FILTERS: ExamTypeFilter[] = [
   { value: "高考真题", label: "高考真题", keywords: ["真题", "高考"] },
-  { value: "各区一模", label: "各区一模", keywords: ["一模"] },
-  { value: "各区二模", label: "各区二模", keywords: ["二模"] },
-  { value: "各区期中", label: "各区期中", keywords: ["期中"] },
-  { value: "各区期末", label: "各区期末", keywords: ["期末"] },
+  { value: "各区一模", label: "一模", keywords: ["一模"] },
+  { value: "各区二模", label: "二模", keywords: ["二模"] },
+  { value: "各区期中", label: "期中", keywords: ["期中"] },
+  { value: "各区期末", label: "期末", keywords: ["期末"] },
 ]
 
 /** 选项值 → 关键词列表；不是已知卷别返回 null */

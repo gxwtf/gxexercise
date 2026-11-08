@@ -71,7 +71,7 @@ interface QuestionOverviewProps {
 
 /** 界面上的一级筛选（对应 tags / 来源） */
 const CATEGORY_OPTIONS = [
-  { value: "all", label: "全部题型" },
+  { value: "all", label: "全部" },
   ...EXAM_TYPE_FILTERS.map((f) => ({ value: f.value, label: f.label })),
 ];
 
@@ -171,7 +171,7 @@ export function QuestionOverview({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
+      <div className="app-container py-4 sm:py-6 lg:py-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
           {/* 左侧筛选面板（移动端默认折叠） */}
           <Card className={`${filtersOpen ? "block" : "hidden"} w-full shrink-0 bg-card rounded-xl p-4 sm:p-6 h-fit lg:block lg:w-72`}>
