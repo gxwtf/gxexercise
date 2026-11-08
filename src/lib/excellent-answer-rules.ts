@@ -14,12 +14,28 @@ export function isSubjectiveQuestion(questionType: string, groupType: string): b
   if (groupType === "biology-fill") return true
   // 历史 / 地理 / 政治大题：结构与生物同构（材料内联填空 + 小问是主观题），每个小问都交 AI 判分
   if (groupType === "history-fill" || groupType === "geography-fill" || groupType === "politics-fill") return true
+  // 物理实验题：结构与生物同构（材料 + 内联空，一个空一条单题），逐空交 AI 判分
+  if (groupType === "physics-fill") return true
+  // 数学解答题 / 物理计算题：一整道大题 = 一条 text 单题，学生写整题过程。
+  // 形态上是主观题（回顾页要有「我的作答 / 参考答案」两块），但**不批阅**（见 isUngradedQuestion）。
+  if (groupType === "math-solve" || groupType === "physics-solve") return true
   return false
 }
 
-/** 暂不做 AI 判分的题型（语文微写作、大作文） */
+/**
+ * 暂不做 AI 判分的题型：语文微写作 / 大作文，以及没有批改提示词、只给参考答案的
+ * 数学解答题（math-solve）/ 物理计算题（physics-solve）。
+ *
+ * 这两类必须走这里：提交接口里 isSubjective 为真是写 `pending` 等 Worker 判分的，
+ * 而 Worker 只捞「有提示词配置」的题型 —— 若走 pending 会永远卡在「评阅中」。
+ */
 export function isUngradedQuestion(groupType: string): boolean {
-  return groupType === "chinese-essay" || groupType === "chinese-micro-writing"
+  return (
+    groupType === "chinese-essay" ||
+    groupType === "chinese-micro-writing" ||
+    groupType === "math-solve" ||
+    groupType === "physics-solve"
+  )
 }
 
 interface ExcellentRatio {

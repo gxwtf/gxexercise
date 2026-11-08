@@ -74,7 +74,9 @@ const isWriting = (t: string) => t === "en-writing" || t === "chinese-essay" || 
 /** 只靠材料里的填空作答、小题本身没有题干 */
 const isContentOnly = (t: string) =>
   t === "grammar" || t === "chinese-dictation" || t === "biology-fill" ||
-  t === "history-fill" || t === "geography-fill" || t === "politics-fill"
+  t === "history-fill" || t === "geography-fill" || t === "politics-fill" ||
+  // 物理实验题：与生物完全同构（材料 + 内联空，小题没有题干），按生物口径印
+  t === "physics-fill"
 
 /** 输入类题型的小题上限行数：按分值估一个够写的空间 */
 function answerLineCount(groupType: string, score: number): number {
@@ -83,6 +85,10 @@ function answerLineCount(groupType: string, score: number): number {
   if (groupType === "chinese-essay") return 22
   if (groupType === "chinese-micro-writing") return 10
   if (groupType === "reading-expression") return clamp(Math.ceil(score) + 1, 3, 6)
+  // 数学解答题 / 物理计算题：一整道大题就一道题，学生要写完整的推演过程（A4 版心约 26 行/页），
+  // 按分值给足空间：13 分的解答题 ≈ 20 行（接近一整页），17 分 ≈ 26 行（一整页）。
+  if (groupType === "math-solve") return clamp(Math.ceil(score * 1.5), 14, 30)
+  if (groupType === "physics-solve") return clamp(Math.ceil(score * 1.5), 12, 26)
   return clamp(Math.ceil(score) + 2, 2, 8)
 }
 

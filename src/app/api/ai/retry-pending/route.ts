@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { gradeWithConfig, preCheckGrade, type GradeResult } from "@/lib/ai-service";
 import { getGradingPrompt } from "@/lib/grading-prompts";
+import { gradingStem } from "@/lib/grading-stem";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-auth";
 
@@ -36,6 +37,8 @@ export async function POST() {
             questionGroup: {
               select: {
                 questionType: true,
+                // 物理实验题的题面在题组 content 上（单题 content 为空），批改时要用它当 {stem}
+                content: true,
                 groupItems: {
                   select: { questionId: true },
                   orderBy: { orderIndex: "asc" },
@@ -87,7 +90,7 @@ export async function POST() {
 
           const result = await gradeWithConfig(
             config,
-            sub.question.content,
+            gradingStem(questionType, sub.question.content, sub.groupSubmission?.questionGroup?.content ?? ""),
             userAnswer,
             sub.question.answer,
             maxScore,

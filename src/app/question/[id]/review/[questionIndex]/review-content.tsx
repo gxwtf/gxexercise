@@ -122,8 +122,10 @@ function getQuestionCategory(questionType: string, groupType: string): "choice" 
     const combined = `${questionType} ${groupType}`
     if (combined.includes("选择") || combined.includes("七选五") || (groupType === "math-choice" || groupType === "physics-choice" || groupType === "chemistry-choice" || groupType === "biology-choice" || groupType === "history-choice" || groupType === "geography-choice" || groupType === "politics-choice")) return "choice"
     if (combined.includes("填空") || combined.includes("语法") || combined.includes("grammar") || combined.includes("input2") || groupType === "word-choice" || groupType === "math-fill") return "fill" 
-    if (groupType === "biology-fill" || groupType === "history-fill" || groupType === "geography-fill" || groupType === "politics-fill") return "fill"
+    if (groupType === "biology-fill" || groupType === "history-fill" || groupType === "geography-fill" || groupType === "politics-fill" || groupType === "physics-fill") return "fill"
     if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return "essay"
+    // 数学解答题 / 物理计算题：整题一条 text 单题，走「我的作答 / 参考答案」两块（与作文同一个分支）
+    if (groupType === "math-solve" || groupType === "physics-solve") return "essay"
     if (groupType === "chinese-reading") {
         if (questionType === "input" || questionType === "input2") return "fill"
         if (questionType === "text") return "essay"
@@ -176,7 +178,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
     const isChoiceType = category === "choice"
     const isEnWriting = questionGroup.questionType === "en-writing"
-    const isMathType = ["math-fill", "math-choice", "physics-choice", "chemistry-choice", "biology-choice", "history-choice", "geography-choice", "politics-choice"].includes(questionGroup.questionType)
+    const isMathType = ["math-fill", "math-choice", "math-solve", "physics-choice", "physics-solve", "chemistry-choice", "biology-choice", "history-choice", "geography-choice", "politics-choice"].includes(questionGroup.questionType)
     const isWordChoice = questionGroup.questionType === "word-choice"
     // 名著阅读：没有阅读区，材料直接排在题目上方
     const isNamedBook = questionGroup.category === "名著"
@@ -196,10 +198,19 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
 
     // 左栏材料里是否有「空位」需要按对错着色：生物与历史/地理/政治大题都是「材料内联占位符」
     // （历史/地理/政治的占位符是 <AnswerBox> 大答题框），所以这几个都在里面
-    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice", "biology-fill", "history-fill", "geography-fill", "politics-fill"].includes(questionGroup.questionType)
+    const usesBlanks = ["seven-choose-five", "cloze", "grammar", "en-reading", "reading-expression", "word-choice", "biology-fill", "history-fill", "geography-fill", "politics-fill", "physics-fill"].includes(questionGroup.questionType)
 
     // 「参考答案」独立块：这几科的大题在回顾页没有「参考答案」Tab，所以单独补一块
-    const showFillAnswerBlock = questionGroup.questionType === "biology-fill" || questionGroup.questionType === "history-fill" || questionGroup.questionType === "geography-fill" || questionGroup.questionType === "politics-fill"
+    const showFillAnswerBlock = questionGroup.questionType === "biology-fill" || questionGroup.questionType === "history-fill" || questionGroup.questionType === "geography-fill" || questionGroup.questionType === "politics-fill" || questionGroup.questionType === "physics-fill"
+
+    // 不显示「优秀解答 / 允许展示」的题型：只有数学解答题 / 物理计算题（整题一条 text 单题、
+    // 不计分，优秀解答必然为空，留着只会让人以为功能坏了）。
+    // 注意：语文大作文 / 微写作虽然也 isUngradedQuestion（不做 AI 判分），但它们的分数由其它途径给出、
+    // 优秀解答确实在用，**不能**跟着一起隐藏。
+    const showExcellent =
+        isSubjective &&
+        questionGroup.questionType !== "math-solve" &&
+        questionGroup.questionType !== "physics-solve"
 
     // 「失分原因」纯文本块：没有评分明细的题型照旧只看它；
     // 有评分明细的非作文题（如阅读表达第 4 题）在明细之外也保留这段原文
@@ -277,7 +288,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                     <>
                         <div className="flex-1 overflow-y-auto p-6">
                             <EnglishReading
-                                indentParagraphs={questionGroup.questionType !== "biology-fill" && questionGroup.questionType !== "biology-choice"}
+                                indentParagraphs={questionGroup.questionType !== "biology-fill" && questionGroup.questionType !== "biology-choice" && questionGroup.questionType !== "physics-fill"}
                                 startQuestionNumber={1}
                                 blanks={allUserBlanks}
                                 options={options}
@@ -384,7 +395,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
                                         </span>
                                     </p>
-                                    {shareAsExcellent != null && data.currentSubmissionId && hasAnswer && (
+                                    {showExcellent && shareAsExcellent != null && data.currentSubmissionId && hasAnswer && (
                                         <div className="mt-3 border-t border-border pt-3">
                                             <ExcellentShareToggle
                                                 submissionId={data.currentSubmissionId}
@@ -400,7 +411,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     <TabsTrigger value="my-answer">我的作答</TabsTrigger>
                                 )}
                                 <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
-                                {isSubjective && (
+                                {showExcellent && (
                                     <TabsTrigger value="excellent-answers">
                                         优秀解答{excellentAnswers.length > 0 ? `（${excellentAnswers.length}）` : ""}
                                     </TabsTrigger>
@@ -445,7 +456,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         </div>
                                     </QuestionSection>
                                 </TabsContent>
-                                {isSubjective && (
+                                {showExcellent && (
                                     <TabsContent value="excellent-answers">
                                         <ExcellentAnswersPanel
                                             answers={excellentAnswers}
@@ -484,7 +495,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         {avgScore != null ? `${avgScore.toFixed(1)} / ${questionScore}` : "-"}
                                     </span>
                                 </p>
-                                {shareAsExcellent != null && data.currentSubmissionId && hasAnswer && (
+                                {showExcellent && shareAsExcellent != null && data.currentSubmissionId && hasAnswer && (
                                     <div className="mt-3 border-t border-border pt-3">
                                         <ExcellentShareToggle
                                             submissionId={data.currentSubmissionId}
@@ -534,7 +545,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         </div>
                     )}
 
-                    {isSubjective && category !== "essay" && (
+                    {showExcellent && category !== "essay" && (
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold mb-3">优秀解答</h3>
                             <ExcellentAnswersPanel

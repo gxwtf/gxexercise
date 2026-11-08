@@ -110,6 +110,10 @@ const TYPE_LABELS: Record<string, string> = {
   "chinese-essay": "语文大作文",
   "chinese-micro-writing": "微写作",
   "chemistry-image": "化学图片题",
+  // 数学解答题 / 物理计算题（整题一条 text 单题）/ 物理实验题（逐空填空题组）
+  "math-solve": "数学解答题",
+  "physics-solve": "物理计算题",
+  "physics-fill": "物理实验题",
 }
 
 function typeLabelOf(q: ReportQuestionInput): string {
@@ -117,7 +121,7 @@ function typeLabelOf(q: ReportQuestionInput): string {
   return TYPE_LABELS[q.questionType] || q.questionType || ""
 }
 
-const isEssayType = (t: string) => /en-writing|chinese-essay|writing|essay|作文/.test(t)
+const isEssayType = (t: string) => /en-writing|chinese-essay|writing|essay|作文|解答题|计算题/.test(t)
 
 /** 单题结果 → 标签 / 符号 / 类名 */
 type Status = { label: string; mark: string; cls: string }

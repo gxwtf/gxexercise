@@ -37,6 +37,10 @@ const GROUP_TYPE_LABELS: Record<string, string> = {
   "geography-fill": "地理大题",
   "politics-choice": "政治选择题",
   "politics-fill": "政治大题",
+  // 数学解答题 / 物理计算题：一整道大题 = 一条 text 单题（不批阅）；物理实验题：逐空填空（AI 判分）
+  "math-solve": "数学解答题",
+  "physics-solve": "物理计算题",
+  "physics-fill": "物理实验题",
 }
 
 /** 一次作答里单题的原始数据（QuestionSubmission） */

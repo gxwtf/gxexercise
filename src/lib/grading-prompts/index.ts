@@ -9,6 +9,7 @@ import biologyFill from "./biology-fill/config.json"
 import historyFill from "./history-fill/config.json"
 import geographyFill from "./geography-fill/config.json"
 import politicsFill from "./politics-fill/config.json"
+import physicsFill from "./physics-fill/config.json"
 
 export interface GradingPromptConfig {
   questionType: string
@@ -49,6 +50,8 @@ function loadPrompts(): GradingPromptConfig[] {
     historyFill,
     geographyFill,
     politicsFill,
+    // 物理实验题（结构与生物同构：材料 + 内联空，一空一条单题，逐空交 AI 判分）
+    physicsFill,
   ]
 
   return jsonFiles.flatMap((entry) =>
@@ -70,6 +73,9 @@ function normalizeType(t: string): string {
   if (t === "英文写作" || t === "英语作文" || t === "作文") return "en-writing"
   if (t === "语文作文" || t === "中文写作") return "chinese-essay"
   if (t === "生物" || t === "biology" || t === "生物大题") return "biology-fill"
+  // 物理实验题：与生物大题同构（一个空一条单题），中文别名都归到 physics-fill；
+  // 数学解答题 / 物理计算题没有批改提示词，故意不在这里映射（不批阅）。
+  if (t === "物理实验" || t === "物理实验题" || t === "物理实验大题" || t === "physics-experiment") return "physics-fill"
   return t
 }
 

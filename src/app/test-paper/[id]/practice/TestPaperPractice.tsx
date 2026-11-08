@@ -328,6 +328,33 @@ export function TestPaperPractice({
       )
     }
 
+    // 物理实验题（与生物完全同构：材料 + 内联空，一个空一条单题，逐空 AI 判分）；理科材料不缩进
+    if (questionType === "physics-fill") {
+      return (
+        <Grammar
+          questions={questions as any}
+          mdxSource={contentMdx!}
+          startQuestionNumber={startQuestionNumber}
+          indentParagraphs={false}
+        />
+      )
+    }
+
+    // 数学解答题 / 物理计算题：整题一条 text 单题，多行文本框写过程；不判分
+    if (questionType === "math-solve" || questionType === "physics-solve") {
+      return (
+        <Problem
+          questions={questions as any}
+          language="zh"
+          minHeight="min-h-72"
+          startQuestionNumber={startQuestionNumber}
+          placeholder={questionType === "math-solve"
+            ? "请写出完整解答过程（可分步书写，换行不会被合并；需说明依据与结论）"
+            : "请写出完整计算过程（先写所用公式，再代入数据并注明单位）"}
+        />
+      )
+    }
+
     if (questionType === "en-reading") {
       return (
         <Problem

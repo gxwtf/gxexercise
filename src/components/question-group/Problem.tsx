@@ -25,6 +25,8 @@ interface ProblemProps {
   mdxSource?: MDXRemoteSerializeResult | null
   language?: 'zh' | 'en'
   minHeight?: string
+  /** 文本框占位提示（大题需要「写过程」的题型会换成专门的提示语） */
+  placeholder?: string
   indentParagraphs?: boolean
   startQuestionNumber?: number
   showWordCount?: boolean
@@ -43,6 +45,7 @@ export default function Problem({
   mdxSource,
   language = 'zh',
   minHeight,
+  placeholder,
   indentParagraphs = true,
   startQuestionNumber,
   showWordCount = false,
@@ -154,6 +157,7 @@ export default function Problem({
             index={(startQuestionNumber ?? 1) + seg.index}
             language={language}
             minHeight={minHeight}
+            placeholder={placeholder}
             showWordCount={showWordCount}
             showIndex={!!startQuestionNumber || !isSingleTextQuestion}
           />

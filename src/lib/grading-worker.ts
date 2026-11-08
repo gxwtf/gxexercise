@@ -2,6 +2,7 @@ import { prisma } from "./prisma"
 import { gradeWithConfig, preCheckGrade, type GradeResult } from "./ai-service"
 import { getGradingPrompt, GRADING_PROMPT_REGISTRY } from "./grading-prompts"
 import { aggregatePickOne, isPickOneMode } from "./pick-one"
+import { gradingStem } from "./grading-stem"
 
 function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
   const data: Record<string, unknown> = {}
@@ -49,6 +50,9 @@ export function startGradingWorker() {
               questionGroup: {
                 select: {
                   questionType: true,
+                  // 物理实验题的题面在题组 content 上（单题 content 是空的，与生物同构），
+                  // 批改时要拿它当 {stem}，否则模型只能看到「参考答案 vs 学生作答」盲批
+                  content: true,
                   groupItems: {
                     select: { questionId: true },
                     orderBy: { orderIndex: "asc" },
@@ -91,6 +95,8 @@ export function startGradingWorker() {
           const content = sub.content as { answer?: string } | null
           const userAnswer = content?.answer ?? ""
           const maxScore = sub.question.score
+          // 物理实验题的题面在题组材料里（单题 content 为空），其余题型仍用单题题干
+          const stem = gradingStem(questionType, sub.question.content, sub.groupSubmission?.questionGroup?.content ?? "")
 
           const pre = preCheckGrade(userAnswer, sub.question.answer, maxScore, config.enableExactMatch ?? false)
           if (pre) {
@@ -110,7 +116,7 @@ export function startGradingWorker() {
 
           const result = await gradeWithConfig(
             config,
-            sub.question.content,
+            stem,
             userAnswer,
             sub.question.answer,
             maxScore,

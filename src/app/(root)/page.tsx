@@ -413,7 +413,8 @@ export default async function RootPage() {
               <p className="text-sm text-foreground">
                 <span className="font-medium">主观题按采分点</span>
                 <span className="ml-1 text-muted-foreground">
-                  作文与阅读表达按维度；语文阅读、历史 / 地理 / 政治按采分点或等级表；生物大题按每个空判。
+                  作文与阅读表达按维度；语文阅读、历史 / 地理 / 政治按采分点或等级表；生物大题、物理实验题按每个空判；
+                  数学解答题与物理计算题暂不判分，只提供参考答案对照。
                 </span>
               </p>
             </div>

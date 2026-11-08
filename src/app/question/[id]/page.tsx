@@ -236,6 +236,41 @@ async function QuestionPageContent({ id }: { id: string }) {
     );
   }
 
+  // 物理实验题（与生物完全同构：材料 + 内联 <Input>/<InputLong>，一个空一条单题，逐空 AI 判分）
+  if (questionGroup.questionType === 'physics-fill') {
+    const mdxSource = contentMdx;
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
+        {/* 理科卷材料不缩进（与生物一致） */}
+        <Grammar
+          questions={questions as any}
+          mdxSource={mdxSource!}
+          indentParagraphs={false}
+        />
+      </>
+    );
+  }
+
+  // 数学解答题 / 物理计算题：一整道大题 = 一个题组 + 一条 text 单题，
+  // 题面（LaTeX + 图）在单题的 stem 里，学生在一个多行文本框里写整题过程；
+  // 这两类**不做 AI 批改**（没有批改提示词），提交后只留作答、回顾页给参考答案。
+  if (questionGroup.questionType === 'math-solve' || questionGroup.questionType === 'physics-solve') {
+    return (
+      <>
+        <QuestionGroupHeader title={questionGroup.title} questionGroupId={id} questionCount={questionGroup.groupItems.length} score={questionGroup.score} />
+        <Problem
+          questions={questions as any}
+          language="zh"
+          minHeight="min-h-72"
+          placeholder={questionGroup.questionType === 'math-solve'
+            ? '请写出完整解答过程（可分步书写，换行不会被合并；需说明依据与结论）'
+            : '请写出完整计算过程（先写所用公式，再代入数据并注明单位）'}
+        />
+      </>
+    );
+  }
+
   // 历史 / 地理 / 政治大题（结构与生物同构：材料里内联设问 + 占位符；
   // 占位符是 <AnswerBox>，长得像「阅读表达」那种大答题框；
   // 中文文科材料，indentParagraphs 用 Grammar 默认的 true）

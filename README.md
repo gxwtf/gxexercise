@@ -193,7 +193,10 @@ src/
 - 学生提交后，客观题即时判分；需 AI 批改的提交写入 `pending` 状态
 - 服务启动时通过 `instrumentation.ts` 运行 [grading-worker.ts](src/lib/grading-worker.ts)，每 10 秒轮询待批改记录，按题型匹配提示词并调用大模型
 - 提示词配置位于 [src/lib/grading-prompts](src/lib/grading-prompts)，包含系统提示词、用户提示词模板及 `config.json`；模板支持 `{stem}`、`{userAnswer}`、`{correctAnswer}`、`{maxScore}` 占位符
+- `{stem}` 的取值：一般用单题题干；**材料写在题组上的题型**（`physics-fill` 等「材料 + 内联空」结构）改用题组材料，
+  逻辑在 [grading-stem.ts](src/lib/grading-stem.ts)（目前只对 `physics-fill` 兜底，生物 / 历史 / 地理 / 政治保持原口径）
 - 也可调用 `/api/ai/retry-pending` 手动触发重试
+- 不批阅的题型（语文作文 / 微写作、数学解答题 `math-solve`、物理计算题 `physics-solve`）提交即 `skipped`，不进队列
 
 ### 阅读表达（40-43）的判分口径
 
@@ -278,6 +281,48 @@ npx tsx problem_generate/import-exam.ts --delete --all            # 删除全部
 
 ⚠ **导入不是幂等的**：同一份 JSON 导两次会得到两套同名套卷，`--delete "<标题>"` 会按标题
 删除（连同该卷的作答记录）。重复导入前请先删同名套卷。
+
+### 数学解答题 / 物理实验题 + 计算题（2026-11 新增，三类题型）
+
+数学与物理原本只有「选择 / 填空」，2026-11 起补上非选择题，形态与化学一致（**不按小问拆分**），
+但题面是 **LaTeX 文本 + 裁图**（与两科选择题同一条 PDF 页图多模态链路），不是化学的整题截图：
+
+| 题型 | `QuestionGroup.questionType` | `category` | 批阅 |
+| --- | --- | --- | --- |
+| 数学解答题 | `math-solve` | 三角 / 概统 / 立几 / 解几 / 导数 / 新定义 | **不批阅**（只给参考答案对照） |
+| 物理计算题 | `physics-solve` | 力学 / 电磁学 / 热学 / 光学 | **不批阅** |
+| 物理实验题 | `physics-fill` | 实验题 | **AI 批改**，结构与生物 `biology-fill` 完全一致 |
+
+- `math-solve` / `physics-solve`：一道大题 = 一个题组（组名 `<卷>·第N题`）+ 一条 `text` 单题，
+  题干与整题参考答案都在那条单题上；题组 `content` 为空。因为不做 AI 批改，提交直接落
+  `gradingStatus=skipped`（见 `excellent-answer-rules.ts` 的 `isUngradedQuestion`），**不会卡 pending**。
+- `physics-fill`：题组 `content` = 材料 + 各小问设问（空位内联 `<Input>` / `<InputLong>`），
+  **一个空一条单题**（`questionType=input`，id = 题号×100+序号），提交后进 `pending` 由 Worker 逐空判分，
+  提示词是 `src/lib/grading-prompts/physics-fill/`。
+  批改时 `{stem}` 取**题组材料**（单题 content 为空），见 `src/lib/grading-stem.ts`。
+- 分类用确定性关键词分类器（数学 `math_category.py`、物理 `physics_category.py`，强标记权重 3 / 普通词 1 +
+  位置先验），判不准落 `.review.txt`；物理的「填空式选择题」（卷面单列的填空题、以实验为主体的选择题）
+  一律归 `实验题`，因为内容上是实验主体。
+
+```bash
+# ① 解析（在 ~/jingshibang/exam-parser）
+python3 convert_math_pdf.py -T 一模 -w 4            # 先跑选择 / 填空（老链路）
+python3 convert_math_big.py -T 一模 --force         # 再追加 6 个解答题 section（幂等，只替换自己那几节）
+python3 math_category.py --json ../output_json_math/一模/数学/<卷>.json --dry-run
+
+python3 convert_physics_pdf.py -T 一模 -w 8 && python3 keep_choice_only.py --type 一模 --subject 物理 --apply
+python3 convert_physics_big.py -T 一模 --force      # 追加实验题（physics-fill）与计算题（physics-solve）
+python3 physics_category.py --json ../output_json_math/一模/物理/<卷>.json --dry-run
+
+# ② 入库（在 ~/gxexercise）
+npx tsx scripts/import-big-questions.ts --dry-run                        # 契约里钉死的 16 份示例卷
+npx tsx scripts/import-big-questions.ts --type 一模 --subject 数学 --apply
+npx tsx scripts/import-big-questions.ts --rollback /home/gxwtf/bigq/import-manifest.json
+```
+
+`import-big-questions.ts` 的两条路径：**卷已存在**只追加新 section 的题组（既有题目 id 不动，二模那 6 套就是这样补的）、
+**卷不存在**整卷新建；图片复制到 `output_docx_to_md/<类型>/<学科>/<卷>/images/` 并改写为 `/exam-images/...`。
+`--apply` 之外一律 dry-run，幂等（同 JSON 再跑应为 0 变更）；`--force` 重导前先快照作答，映射不上直接中止。
 
 ### 化学：非选择题按题型拆组（物质结构与性质 / 化学反应原理 / 有机化学基础 / 工业流程 / 实验探究）
 
