@@ -37,7 +37,7 @@ const MD_ROOT = "/home/gxwtf/jingshibang/output_docx_to_md";
 
 /** 新增三个新题型的 questionType（题组级） */
 const BIG_TYPES = new Set(["math-solve", "physics-solve", "physics-fill"]);
-const TYPES = ["一模", "二模", "真题"];
+const TYPES = ["一模", "二模", "真题", "上期中", "下期中", "上期末", "下期末"];
 const SUBJECTS = ["数学", "物理"];
 
 /** 契约第 0 节钉死的 8 套示例卷（每科）。不带 --file 时只吃这些卷，免得把 2011~2019 的老卷一起导进去 */
@@ -724,13 +724,28 @@ async function rollback(file: string, dryRun: boolean) {
 
 // ---------------------------------------------------------------- main
 
-function collectFiles(typeDir: string, subject: string, file: string | undefined): { ready: string[]; missing: string[] } {
+function collectFiles(
+  typeDir: string,
+  subject: string,
+  file: string | undefined,
+  all = false,
+): { ready: string[]; missing: string[] } {
   if (file) {
     const abs = path.resolve(file);
     if (!fs.existsSync(abs)) throw new Error(`文件不存在：${abs}`);
     return { ready: [abs], missing: [] };
   }
   const dir = path.join(JSON_ROOT, typeDir, subject);
+  // --all：批量模式，整目录都吃（跳过 *.old-groups.json 之类的备份），不再只认契约那 8 套
+  if (all) {
+    if (!fs.existsSync(dir)) return { ready: [], missing: [] };
+    const ready = fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".json") && !f.includes(".old-groups") && !f.includes(".big_backup"))
+      .sort()
+      .map((f) => path.join(dir, f));
+    return { ready, missing: [] };
+  }
   const tag = typeDir === "真题" ? "高考真题" : typeDir;
   const ready: string[] = [];
   const missing: string[] = [];
@@ -759,6 +774,10 @@ async function main() {
   const subjectArg = arg("subject");
   const force = has("force");
   const limit = Number(arg("limit", "0"));
+  const allMode = has("all");
+  // 批量模式下，库里没有的卷默认**不新建**（避免把 2011~2019 的老卷一次性塞进线上题库），
+  // 要整卷新建必须显式 --allow-create
+  const allowCreate = has("allow-create");
   const manifestFile = arg("manifest");
   if (typeArg && !TYPES.includes(typeArg)) throw new Error(`--type 只能是 ${TYPES.join(" / ")}`);
   if (subjectArg && !SUBJECTS.includes(subjectArg)) throw new Error(`--subject 只能是 ${SUBJECTS.join(" / ")}`);
@@ -774,7 +793,19 @@ async function main() {
   const notReady: string[] = [];
   for (const t of types) {
     for (const s of subjects) {
-      const { ready, missing } = collectFiles(t, s, file);
+      const { ready, missing } = collectFiles(t, s, file, allMode);
+      if (allMode && !allowCreate && !file) {
+        // 先把「库里没有这套卷」的剔掉
+        const kept: string[] = [];
+        for (const f of ready) {
+          const t0 = path.basename(f, ".json");
+          const exists = await prisma.testPaper.findFirst({ where: { title: t0 }, select: { id: true } });
+          if (exists) kept.push(f);
+          else notReady.push(`${f}（库中缺卷，未加 --allow-create 时跳过）`);
+        }
+        ready.length = 0;
+        ready.push(...kept);
+      }
       notReady.push(...missing);
       let files = ready;
       if (limit > 0) files = files.slice(0, limit);
