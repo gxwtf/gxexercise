@@ -20,11 +20,25 @@ import { Separator } from "@/components/ui/separator"
 
 export const dynamic = "force-dynamic"
 
-/** 整卷链路（选择题 + 非选择题大题）的七科（化学 2026-11 起补齐图片版整卷） */
-const FULL_SUBJECTS = ["语文", "英语", "化学", "生物", "历史", "地理", "政治"]
-const PARTIAL_SUBJECTS: Record<string, string> = {
-  数学: "选择 / 填空",
-  物理: "选择",
+/** 首页学科卡片顺序：语文 数学 英语 物理 化学 生物 历史 地理 政治（刚好 3×3） */
+const FULL_SUBJECTS = ["语文", "数学", "英语", "物理", "化学", "生物", "历史", "地理", "政治"]
+
+/**
+ * 卡片角标：按库里**实际有的题型**算，九个学科用同一套规则
+ *   有填空题（input2）→ 选择 + 填空
+ *   有大题（text / input）→ 选择 + 大题
+ *   只有选择题        → 选择
+ */
+function scopeBadge(counts: Record<string, number> | undefined): string {
+  const c = counts ?? {}
+  const hasChoice = (c.single ?? 0) + (c.choice ?? 0) + (c.multiple ?? 0) > 0
+  const hasFill = (c.input2 ?? 0) > 0
+  const hasEssay = (c.text ?? 0) + (c.input ?? 0) > 0
+  // 有大题（text/input）优先按「选择 + 大题」；只有填空类（input2）才是「选择 + 填空」
+  if (hasEssay) return "选择 + 大题"
+  if (hasFill) return "选择 + 填空"
+  if (hasChoice) return "选择"
+  return "题组"
 }
 
 const dayFmt = new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" })
@@ -60,6 +74,18 @@ export default async function RootPage() {
     atLabel: relativeTimeLabel(a.at),
     kindLabel: a.kind === "paper" ? "整卷" : "题组",
   }))
+
+  // 每科各题型的题数（卡片角标用）
+  const typeRows = await prisma.question.groupBy({
+    by: ["subject", "questionType"],
+    _count: { _all: true },
+  })
+  const typeCountMap = new Map<string, Record<string, number>>()
+  for (const r of typeRows) {
+    const m = typeCountMap.get(r.subject) ?? {}
+    m[r.questionType] = r._count._all
+    typeCountMap.set(r.subject, m)
+  }
 
   const paperCountMap = new Map(paperBySubject.map((r) => [r.subject, r._count.id]))
   const groupCountMap = new Map(groupBySubject.map((r) => [r.subject, r._count.id]))
@@ -322,7 +348,7 @@ export default async function RootPage() {
       <section id="subjects" className="scroll-mt-20 space-y-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">按学科刷题</h2>
-          <p className="text-sm text-muted-foreground">七科是完整整卷；数学 / 物理目前只收部分题型。</p>
+          <p className="text-sm text-muted-foreground">九科都有整卷；角标是题库里实际有的题型。</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -339,7 +365,7 @@ export default async function RootPage() {
                         {subject}
                       </Link>
                     </CardTitle>
-                    <Badge variant="secondary">选择 + 大题</Badge>
+                    <Badge variant="secondary">{scopeBadge(typeCountMap.get(subject))}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {paperCountMap.get(subject) ?? 0} 套卷 · {groupCountMap.get(subject) ?? 0} 题组
@@ -367,24 +393,6 @@ export default async function RootPage() {
           })}
         </div>
 
-        <Alert>
-          <BookOpenCheck aria-hidden="true" />
-          <AlertTitle>部分题型（整卷还在补）</AlertTitle>
-          <AlertDescription>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              {Object.entries(PARTIAL_SUBJECTS).map(([subject, note]) => (
-                <span key={subject}>
-                  <Link href={`/questions/${subjectToRoute[subject]}`} className="font-medium text-foreground hover:underline">
-                    {subject}
-                  </Link>
-                  <span className="ml-1">
-                    {paperCountMap.get(subject) ?? 0} 套 · {note}
-                  </span>
-                </span>
-              ))}
-            </div>
-          </AlertDescription>
-        </Alert>
       </section>
 
       {/* 判分与导出 */}
