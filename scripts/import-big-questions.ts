@@ -741,7 +741,7 @@ function collectFiles(
     if (!fs.existsSync(dir)) return { ready: [], missing: [] };
     const ready = fs
       .readdirSync(dir)
-      .filter((f) => f.endsWith(".json") && !f.includes(".old-groups") && !f.includes(".big_backup"))
+      .filter((f) => f.endsWith(".json") && !f.includes(".old-groups") && !f.includes(".big_backup") && !f.endsWith(".figures.json"))
       .sort()
       .map((f) => path.join(dir, f));
     return { ready, missing: [] };
@@ -775,12 +775,23 @@ async function main() {
   const force = has("force");
   const limit = Number(arg("limit", "0"));
   const allMode = has("all");
+  // --only <文件>：只导入清单里的卷（一行一个卷名，或 batch CSV 取 title 列）。
+  // 批量补大题时用它卡范围，避免 --all + --allow-create 把范围外的老卷也新建到线上。
+  const onlyFile = arg("only");
   // 批量模式下，库里没有的卷默认**不新建**（避免把 2011~2019 的老卷一次性塞进线上题库），
   // 要整卷新建必须显式 --allow-create
   const allowCreate = has("allow-create");
   const manifestFile = arg("manifest");
   if (typeArg && !TYPES.includes(typeArg)) throw new Error(`--type 只能是 ${TYPES.join(" / ")}`);
   if (subjectArg && !SUBJECTS.includes(subjectArg)) throw new Error(`--subject 只能是 ${SUBJECTS.join(" / ")}`);
+
+  let onlySet: Set<string> | null = null;
+  if (onlyFile) {
+    const raw = fs.readFileSync(path.resolve(onlyFile), "utf-8").split("\n").map((l) => l.trim()).filter(Boolean);
+    const isCsv = raw[0]?.includes(",") && /(^|,)title(,|$)/.test(raw[0]);
+    onlySet = new Set<string>(isCsv ? raw.slice(1).map((l) => l.split(",")[1]) : raw);
+    console.log(`--only：清单 ${onlySet.size} 份（${onlyFile}）\n`);
+  }
 
   const types = file ? [typeArg || "二模"] : (typeArg ? [typeArg] : TYPES);
   const subjects = file ? [subjectArg || "数学"] : (subjectArg ? [subjectArg] : SUBJECTS);
@@ -808,6 +819,7 @@ async function main() {
       }
       notReady.push(...missing);
       let files = ready;
+      if (onlySet) files = files.filter((f) => onlySet!.has(path.basename(f, ".json")));
       if (limit > 0) files = files.slice(0, limit);
       if (!files.length) continue;
       console.log(`— ${s} / ${t}：待处理 ${files.length} 份${missing.length ? `（JSON 未就绪 ${missing.length} 份）` : ""}`);
