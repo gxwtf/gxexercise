@@ -33,6 +33,9 @@ interface ExcellentRatio {
  */
 const EXCELLENT_RATIOS: Record<string, ExcellentRatio> = {
   "en-writing": { numerator: 18, denominator: 20 },
+  // 阅读表达：四道小题满分 2/2/3/5，按 90% 算就是 1.8 / 1.8 / 2.7 / 4.5，
+  // 也就是 40-42 要满分、第 4 题（43，5 分）4.5 分即达标
+  "reading-expression": { numerator: 9, denominator: 10 },
   "chinese-essay": { numerator: 45, denominator: 50 },
   "chinese-micro-writing": { numerator: 9, denominator: 10 },
 }
@@ -58,6 +61,8 @@ export function excellentCriteriaText(groupType: string): string {
       return "语文大作文得分率达到 90%（新题相当于 45/50）"
     case "chinese-micro-writing":
       return "微写作得分率达到 90%（新题相当于 9/10）"
+    case "reading-expression":
+      return "阅读表达得分率达到 90%（40-42 需满分，第 4 题 5 分制相当于 4.5 分）"
     default:
       return "主观题拿到满分"
   }
