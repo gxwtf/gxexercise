@@ -7,6 +7,10 @@
  * 选择题：题干 = ![](图片)，options = 4 个空 label（前端只显示 A/B/C/D 按钮）。
  *
  * 用法：npx tsx scripts/import-image-questions.ts --dir <单题目录> [--force]
+ *
+ * ⚠ 能不重建就不重建：`--force` 会删掉整套卷（题组、题目、作答）再重建，题目 id 全变。
+ *   只改答案/分值/题型这类字段时，优先原地 UPDATE（或跑 split-chemistry-fill / recat-chemistry-fill），
+ *   不要为了更新一张图就 --force 整卷。确实要重建时，本脚本会自动快照并回填作答。
  */
 import "dotenv/config";
 import fs from "node:fs";
