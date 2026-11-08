@@ -94,10 +94,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ```bash
 pnpm check:colors      # 颜色约定自检（改前端必跑，必须 0 问题）
 pnpm check:answers     # 判题口径自检（动 answer-check / 判题接口 / 题型大小写规则必跑，必须 PASS）
+pnpm check:home-sample # 首页「先做一道真题」取题池自检（**每录入一批真题后必跑**，末行必须 PASS）
 pnpm build             # 生产构建（线上用 next start，务必本地先过）
 # pnpm lint 目前会因 eslint-plugin-react 与 ESLint 10 不兼容而直接崩（与本约定无关），
 # 修好之前以 check:colors + build 作为颜色相关的准入门槛。
 ```
+
+**首页「先做一道真题」体验位的口径**（判据在 `src/lib/home-sample.ts`，接口在
+`src/app/api/home-sample/route.ts`）：那块是**纯文本渲染**（`whitespace-pre-wrap`，不跑 Markdown、不加载
+图片/KaTeX、不认识 MDX 标签），所以**题干和选项**都不能含图片、表格、`$…$`/裸 LaTeX、未知标签；
+图/表指代、试卷级说明、题组小问、靠 `<Dot>`/`<U>` 传达信息却没有标记的「加点/画线」题一律不下发；
+材料在 `QuestionGroup` 里而题干没有的（语文阅读/文言文/古诗/文学类）也不下发（与英语同理）；
+`<Dot>`/`<U>` 等语义标签在展示前剥掉标签保留文字。**录入新学科/新批次真题后跑 `pnpm check:home-sample`**。
 
 **判题大小写的口径**（`src/lib/answer-check.ts`，改之前先读）：
 选择题（choice / single / multiple，含完形、阅读、七选五、数学 / 物理 / 化学 / 语文选择题）的答案是
