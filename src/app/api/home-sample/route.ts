@@ -56,10 +56,18 @@ async function candidatePool(): Promise<Record<string, Bucket>> {
   // SQL 只做便宜、无转义坑的预筛；更细的判定（图指代 / 标签 / 选项）在 JS 里做，
   // 与 scripts/audit-home-sample.ts 共用同一套 inspectHomeSample()
   const rows = await prisma.$queryRaw<
-    { id: string; subject: string; has_analysis: boolean }[]
+    {
+      id: string
+      subject: string
+      has_analysis: boolean
+      content: string
+      options: unknown
+      answer: string
+    }[]
   >`
     SELECT q.id, q.subject,
-           (q.analysis IS NOT NULL AND length(btrim(q.analysis)) >= 20) AS has_analysis
+           (q.analysis IS NOT NULL AND length(btrim(q.analysis)) >= 20) AS has_analysis,
+           q.content, q.options, q.answer
     FROM "Question" q
     WHERE q."questionType" = 'single'
       AND q.answer ~ '^[A-Da-d]$'
@@ -85,6 +93,11 @@ async function candidatePool(): Promise<Record<string, Bucket>> {
   `
   const bySubject: Record<string, Bucket> = {}
   for (const r of rows) {
+    // 建池时就跑一遍与下发完全相同的判据：这样「池量」= 真正能上首页的题量，
+    // log2(池量) 的权重才准（只按 SQL 粗筛计数会把「后面一定会被拒」的题也算进去，
+    // 实测会让地理这类图多的科目被多分到出镜率）。
+    const verdict = inspectHomeSample({ content: r.content, options: r.options, answer: r.answer })
+    if (!verdict.ok) continue
     const bucket = (bySubject[r.subject] ??= { withAnalysis: [], withoutAnalysis: [] })
     if (r.has_analysis) bucket.withAnalysis.push(r.id)
     else bucket.withoutAnalysis.push(r.id)
@@ -100,6 +113,45 @@ function continueHrefFor(subject: string, category: string | null): string {
   return subjectRoute && catRoute ? `/questions/${subjectRoute}/${catRoute}` : "/questions"
 }
 
+/**
+ * 学科权重：**log2(池量)**。
+ *
+ * 为什么不用「每科等权」：池子只有 1–2 道的学科（数学 1、物理 2）等权时就占了 1/7 的出镜率，
+ * 等于反复同一道题；而池子 151 道的历史也只有 1/7。log2 让「题多的科多出镜、题少的科少出镜」，
+ * 又不像线性按题量加权那样把薄池学科压到几乎不出现。
+ *
+ * 末尾 **+1**：log2(池量) 在池量 = 1 时是 0（数学池正好只有 1 道），那样该学科会
+ * 彻底从首页消失；+1 相当于给每个学科一个基础出镜率，数学（1 道）权重 1、物理（2 道）2，
+ * 既不会消失，也不会像等权时那样占 1/7。若只想「池量 +1 再取 log2」，改成 `Math.log2(n + 1)`。
+ */
+const poolWeight = (n: number): number => Math.log2(n) + 1
+
+/**
+ * 按权重给出「学科的随机尝试顺序」（无放回加权抽样）。
+ *
+ * 用 Efraimidis–Spirakis：每个学科抽 key = random^(1/w)，按 key 降序排列，
+ * 得到的就是「按权重抽第一个、剩下的再按权重抽第二个……」的合法顺序。
+ *
+ * 之前这里是 `[...subjects].sort(() => Math.random() - 0.5)` —— 这是经典反模式：
+ * V8 的 sort 是 TimSort/插入排序，随机比较器不产生均匀排列，而是偏向数组的某些位置；
+ * 而数组顺序又是 SQL 返回行的顺序，结果实测配比 10%~20%（χ²=69），完全不是「随机学科」。
+ */
+function weightedSubjectOrder(
+  subjects: string[],
+  bySubject: Record<string, Bucket>,
+): string[] {
+  return subjects
+    .map((subject) => {
+      const bucket = bySubject[subject]
+      const n = bucket.withAnalysis.length + bucket.withoutAnalysis.length
+      const w = poolWeight(n)
+      return { subject, w, key: w > 0 ? Math.pow(Math.random(), 1 / w) : 0 }
+    })
+    .filter((x) => x.w > 0)
+    .sort((a, b) => b.key - a.key)
+    .map((x) => x.subject)
+}
+
 async function pickQuestion(): Promise<SampleQuestion | null> {
   const bySubject = await candidatePool()
   const subjectsWithOptions = Object.keys(bySubject).filter(
@@ -107,9 +159,18 @@ async function pickQuestion(): Promise<SampleQuestion | null> {
   )
   if (!subjectsWithOptions.length) return null
 
-  // 先随机学科，再随机题：避免题量大的科目垄断首页体验位
-  const shuffled = [...subjectsWithOptions].sort(() => Math.random() - 0.5)
-  for (const subject of shuffled) {
+  // 先按 log2(池量) 加权抽学科，再在该学科里随机取题
+  let order = weightedSubjectOrder(subjectsWithOptions, bySubject)
+  // 兜底：所有学科池量都只有 1 道（权重全为 0）时退回等权随机，别把体验位清空
+  if (!order.length) {
+    order = [...subjectsWithOptions]
+    for (let i = order.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[order[i], order[j]] = [order[j], order[i]]
+    }
+  }
+
+  for (const subject of order) {
     const { withAnalysis, withoutAnalysis } = bySubject[subject]
     // 有解析的优先；该学科的解析池全被筛掉时再退回无解析池
     for (const pool of [withAnalysis, withoutAnalysis]) {
