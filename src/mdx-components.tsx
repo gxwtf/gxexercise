@@ -559,6 +559,18 @@ function U({ children, className, ...props }: React.HTMLAttributes<HTMLElement>)
 }
 U.displayName = 'U';
 
+/** 单元格里是否是「几个字的短文本」（纯字符串/数字，不含标签、公式、图片） */
+function isShortText(children: React.ReactNode, limit = 8): boolean {
+    const parts = Array.isArray(children) ? children : [children]
+    let text = ''
+    for (const part of parts) {
+        if (typeof part === 'string' || typeof part === 'number') text += String(part)
+        else return false // 有 <strong>/<br>/公式等结构化内容，一律当长表头处理
+    }
+    text = text.trim()
+    return text.length > 0 && text.length <= limit
+}
+
 const components: MDXComponents = {
     ...Typography,
     p: Typography.P,
@@ -576,21 +588,36 @@ const components: MDXComponents = {
             {children}
         </sup>
     ),
-    // markdown 表格（生物大题的实验数据表等）：走语义 token，浅深色都可读
+    // markdown 表格（政治的「完成下表」、生物实验数据表等）：走语义 token，浅深色都可读
+    // 宽度锁在内容区宽度（w-full），单元格里的长文本到边界就换行——
+    // 不能像以前那样 w-max 让表格按内容无限撑开：政史地那种「故事一…」几百字的长段落
+    // 会变成一条几屏宽的长横线，学生只能看到第一列，得横向拖着看。
+    // 只有「怎么都塞不进」的情况（列特别多、或者单元格里有不可断开的超长串）才由外层
+    // overflow-x-auto 兜底横向滚动，原来的宽数据表行为不变。
     table: ({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) => (
-        // 宽表（生物实验设计表常有 8-9 列）按内容撑开并横向滚动，不要压成「单字竖排」
-        <div className="my-4 w-full overflow-x-auto">
-            <table className={cn("w-max min-w-full border-collapse text-base", className)} {...props} />
+        <div className="my-4 w-full max-w-full overflow-x-auto [contain:inline-size]">
+            <table className={cn("w-full max-w-full table-auto border-collapse text-base", className)} {...props} />
         </div>
     ),
     thead: ({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => (
         <thead className={cn("bg-muted/60", className)} {...props} />
     ),
-    th: ({ className, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
-        <th className={cn("border border-border px-3 py-1.5 text-left font-semibold text-foreground", className)} {...props} />
+    th: ({ className, children, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+        // 表头通常只有几个字：短表头不折行（否则窄列会「一个字一行」地竖排下来，
+        // 像「经济学依据」挤成 5 行）；长表头照常换行，不会把表撑宽。
+        <th
+            className={cn(
+                "border border-border px-3 py-1.5 text-left font-semibold text-foreground break-words",
+                isShortText(children) && "whitespace-nowrap",
+                className
+            )}
+            {...props}
+        >
+            {children}
+        </th>
     ),
     td: ({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
-        <td className={cn("border border-border px-3 py-1.5 align-top text-foreground", className)} {...props} />
+        <td className={cn("border border-border px-3 py-1.5 align-top text-foreground break-words", className)} {...props} />
     ),
     img: "img",
     QImg,
