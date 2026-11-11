@@ -87,6 +87,17 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
   const title = p.title;
   const subject = p.subject || "政治";
 
+  // 先校验结构再删库：删在前、解析在后时，一旦 JSON 结构不对就会「删了旧的、没导进新的」
+  // （2026-11-11 事故：41 份政治二模因此被删空，靠重导恢复）
+  if (!Array.isArray(raw.groups) || raw.groups.length === 0) {
+    throw new Error(`${title}：JSON 里没有 groups/sections，拒绝导入（不会删除已有数据）`);
+  }
+  for (const g of raw.groups) {
+    if (!Array.isArray(g.questions) || g.questions.length === 0) {
+      throw new Error(`${title}：板块「${g.title}」没有题目，拒绝导入（不会删除已有数据）`);
+    }
+  }
+
   const exists = await prisma.testPaper.findFirst({ where: { title, subject }, select: { id: true } });
   if (exists) {
     if (!force) { console.log(`跳过（已存在）：${title}`); return { papers: 0, groups: 0, questions: 0 }; }
@@ -167,13 +178,28 @@ async function importOne(file: string, dryRun: boolean, force: boolean, withPape
 
 async function main() {
   const file = arg("file");
+  const filesArg = arg("files");
   const type = arg("type", "二模")!;
   const dryRun = has("dry-run");
   const force = has("force");
   const withPaper = !has("no-paper");
+  const KNOWN = new Set(["--file", "--files", "--type", "--dry-run", "--force", "--no-paper", "--drop-submissions"]);
+  const unknown = process.argv.slice(2).filter((a) => a.startsWith("--") && !KNOWN.has(a));
+  if (unknown.length) {
+    console.error(`未知参数：${unknown.join(" ")}；已中止（避免误扫整个目录）`);
+    process.exit(2);
+  }
 
   let files: string[];
-  if (file) files = [path.resolve(file)];
+  if (filesArg) {
+    // --files <清单文件>：每行一个 JSON 相对/绝对路径
+    files = fs
+      .readFileSync(path.resolve(filesArg), "utf-8")
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .map((l) => (path.isAbsolute(l) ? l : path.join(JSON_ROOT, l)));
+  } else if (file) files = [path.resolve(file)];
   else {
     const dir = path.join(JSON_ROOT, type);
     files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => path.join(dir, f)).sort();
