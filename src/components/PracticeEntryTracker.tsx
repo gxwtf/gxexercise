@@ -1,26 +1,25 @@
 "use client"
 
 import { useEffect } from "react"
+import { readListUrl, readPracticeEntry, rememberPracticeEntry } from "@/lib/practice-entry"
 
 /**
- * 记录「进入做题页之前的那一页」。
- * 回顾页的返回按钮会优先回到这里，而不是退回到做题页本身。
- * 用 sessionStorage 按题组 id 存，避免多标签/多题组互相覆盖。
+ * 给「一套卷里的每个题组」补一条来路记录，供做题页 / 回顾页的「返回」使用。
+ *
+ * 以前是拿 document.referrer 推的：站内跳转是客户端路由，referrer 永远停在整页加载那一页，
+ * 经常推出「上一页是首页 / 上上个列表」这种错值。现在统一用列表页现场记下的地址
+ * （含 ?year=2020 这类筛选条件），且**不覆盖**点卡片时已经按 id 记好的那份。
  */
 export function PracticeEntryTracker({ groupIds }: { groupIds: string[] }) {
   const key = groupIds.join(",")
   useEffect(() => {
     if (typeof window === "undefined") return
-    try {
-      const from = document.referrer || ""
-      if (!from || from.includes("/review")) return
-      const url = new URL(from)
-      if (url.origin !== window.location.origin) return
-      for (const id of key.split(",").filter(Boolean)) {
-        sessionStorage.setItem(`practice_entry_${id}`, url.pathname + url.search)
-      }
-    } catch {
-      /* 忽略 */
+    const listUrl = readListUrl()
+    if (!listUrl) return
+    const current = window.location.pathname + window.location.search
+    if (listUrl === current) return
+    for (const id of key.split(",").filter(Boolean)) {
+      if (!readPracticeEntry(id)) rememberPracticeEntry(id, listUrl)
     }
   }, [key])
   return null

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, FileText, SlidersHorizontal } from "lucide-react";
@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { PageBar } from "@/components/PageBar";
 import useSession from "@/lib/use-session";
 import { DISTRICT_OPTIONS, DISTRICT_ZHENTI } from "@/constants/districts";
+import { rememberListUrl, rememberPracticeEntry } from "@/lib/practice-entry";
 
 /** 这些学科用「套卷样式」的单行卡片（不带封面图） */
 const ROW_CARD_SUBJECTS = ["数学", "物理", "化学", "政治"];
@@ -105,13 +106,6 @@ export function QuestionOverview({
     setSearchDraft(filters.q);
   }, [filters.q]);
 
-  // 记录列表页地址：从列表点进做题页时，回顾页的「返回」要回到这里
-  useEffect(() => {
-    try {
-      sessionStorage.setItem("list_url", window.location.pathname + window.location.search);
-    } catch {}
-  }, []);
-
   // 练习次数 / 最近一次提交（仅当前页）
   useEffect(() => {
     const groupIds = groups.map((g) => g.id).join(",");
@@ -146,7 +140,7 @@ export function QuestionOverview({
   }, [session.userid, papers]);
 
   /** 拼接带筛选条件的地址：所有分页/筛选都走 URL，服务端渲染，状态不会错乱 */
-  const hrefWith = (over: Partial<Filters> & { page?: number }) => {
+  const hrefWith = useCallback((over: Partial<Filters> & { page?: number }) => {
     const next = { ...filters, ...over };
     const params = new URLSearchParams();
     if (next.cat && next.cat !== "all") params.set("cat", next.cat);
@@ -158,7 +152,14 @@ export function QuestionOverview({
     if (targetPage > 1) params.set("page", String(targetPage));
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
-  };
+  }, [filters, pathname]);
+
+  // 记下列表页「当前这一屏」的地址（含筛选条件）：从列表点进做题页后，
+  // 做题页 / 回顾页的「返回」要能回到同样的筛选结果，而不是回到没有筛选的列表。
+  // 原来只在挂载时记一次，筛选是客户端跳转（组件不重新挂载），所以记的永远是没筛选的地址。
+  useEffect(() => {
+    rememberListUrl(hrefWith({ page }));
+  }, [hrefWith, page]);
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const isTestPaperPage = mode === "papers";
@@ -316,17 +317,19 @@ export function QuestionOverview({
               <div>
                 <div className="grid grid-cols-1 gap-4">
                   {papers.map((paper) => (
-                    <TestCard
-                      key={paper.id}
-                      id={paper.id}
-                      title={paper.title}
-                      type={paper.source}
-                      year={paper.year || null}
-                      grade={paper.grade || null}
-                      subject={paper.subject}
-                      latestSubmissionId={testSubmissions[paper.id]}
-                      submissionCount={submissionCounts.testPapers[paper.id] || 0}
-                    />
+                    // 点卡片（含「开始练习 / 继续答题」）时先记下来路，套卷练习页的「返回」用得到
+                    <div key={paper.id} onClickCapture={() => rememberPracticeEntry(paper.id)}>
+                      <TestCard
+                        id={paper.id}
+                        title={paper.title}
+                        type={paper.source}
+                        year={paper.year || null}
+                        grade={paper.grade || null}
+                        subject={paper.subject}
+                        latestSubmissionId={testSubmissions[paper.id]}
+                        submissionCount={submissionCounts.testPapers[paper.id] || 0}
+                      />
+                    </div>
                   ))}
                 </div>
 
@@ -355,7 +358,8 @@ export function QuestionOverview({
                   }
                 >
                   {groups.map((group) => (
-                    <div key={group.id}>
+                    // 点卡片时记下「从哪一屏点进来的」：做题页 / 回顾页的「返回」要回到同样的筛选结果
+                    <div key={group.id} onClickCapture={() => rememberPracticeEntry(group.id)}>
                       {useRowCard ? (
                         <GroupRowCard
                           id={group.id}

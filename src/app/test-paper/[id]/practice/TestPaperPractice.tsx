@@ -16,6 +16,7 @@ import Grammar from "@/components/question-group/grammar"
 import SevenChooseFive from "@/components/question-group/seven-choose-five"
 import { PageBar } from "@/components/PageBar"
 import { PracticeEntryTracker } from "@/components/PracticeEntryTracker"
+import { readPracticeEntry, resolveBackTarget } from "@/lib/practice-entry"
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -97,19 +98,21 @@ export function TestPaperPractice({
   const totalGroups = groupsData.length
   const currentGroup = groupsData[currentGroupIndex]
 
-  // 放弃作答并返回：回到进入这套卷之前的那一页
+  // 放弃作答并返回：回到进入这套卷之前的那一页（列表页的筛选条件一并保留）
   const handleQuit = useCallback(() => {
-    try {
-      const first = groupsData[0]?.id
-      const entry = first ? sessionStorage.getItem(`practice_entry_${first}`) : null
+    // 列表页点套卷卡片时会按套卷 id 记一份；老记录只有按题组 id 的那份，依次兜底
+    const ids = [testPaperId, ...groupsData.map((g) => g.id)].filter(Boolean)
+    for (const id of ids) {
+      const entry = readPracticeEntry(id)
       if (entry) {
         router.push(entry)
         return
       }
-    } catch {}
-    if (typeof window !== "undefined" && window.history.length > 1) router.back()
-    else router.push("/")
-  }, [groupsData, router])
+    }
+    const target = resolveBackTarget()
+    if (target.type === "back") router.back()
+    else router.push(target.url)
+  }, [groupsData, router, testPaperId])
 
   const isFirstGroup = currentGroupIndex === 0
   const isLastGroup = currentGroupIndex === totalGroups - 1

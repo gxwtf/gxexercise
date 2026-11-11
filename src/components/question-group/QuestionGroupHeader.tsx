@@ -18,6 +18,7 @@ import useSession from '@/lib/use-session';
 import { useRouter } from 'next/navigation';
 import { useAlertContext } from '@/components/alert-provider';
 import { useAnswer, hasAnyAnswer } from './AnswerContext';
+import { readListUrl, readPracticeEntry, rememberPracticeEntry, resolveBackTarget } from '@/lib/practice-entry';
 
 interface QuestionGroupHeaderProps {
   title: string;
@@ -43,20 +44,14 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
     return () => clearInterval(timer);
   }, []);
 
-  // 记录「进入做题页之前的那一页」：回顾页的返回按钮会直接回到它
+  // 「进入做题页之前的那一页」：列表页点卡片时已经按题组 id 记好了（含 ?year=2020 这类筛选条件），
+  // 这里只在没记到时用最近一次列表页地址兜底（比如直接输网址进来），不再用 document.referrer
+  // ——客户端路由跳转下 referrer 永远停在整页加载那一页，会把来路记错。
   useEffect(() => {
-    try {
-      const cur = window.location.pathname + window.location.search;
-      let entry = "";
-      const from = document.referrer || "";
-      if (from) {
-        const u = new URL(from);
-        const p = u.pathname + u.search;
-        if (u.origin === window.location.origin && !u.pathname.includes("/review") && p !== cur) entry = p;
-      }
-      if (!entry) entry = sessionStorage.getItem("list_url") || "";
-      if (entry && entry !== cur) sessionStorage.setItem(`practice_entry_${questionGroupId}`, entry);
-    } catch {}
+    if (readPracticeEntry(questionGroupId)) return;
+    const listUrl = readListUrl();
+    const cur = window.location.pathname + window.location.search;
+    if (listUrl && listUrl !== cur) rememberPracticeEntry(questionGroupId, listUrl);
   }, [questionGroupId]);
 
   const formatTime = (totalSeconds: number) => {
@@ -69,17 +64,11 @@ export default function QuestionGroupHeader({ title, questionGroupId, questionCo
     return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // 放弃作答并返回：优先回到「进入做题页之前的那一页」
+  // 放弃作答并返回：回到「进入做题页之前的那一页」（保留列表页的筛选条件）
   const handleQuit = useCallback(() => {
-    try {
-      const entry = sessionStorage.getItem(`practice_entry_${questionGroupId}`)
-      if (entry) {
-        router.push(entry)
-        return
-      }
-    } catch {}
-    if (typeof window !== 'undefined' && window.history.length > 1) router.back()
-    else router.push('/')
+    const target = resolveBackTarget(questionGroupId)
+    if (target.type === 'back') router.back()
+    else router.push(target.url)
   }, [router, questionGroupId])
 
   const handleSubmit = useCallback(async () => {

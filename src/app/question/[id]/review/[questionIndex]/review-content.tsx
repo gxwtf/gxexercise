@@ -1,5 +1,6 @@
 "use client"
 
+import { resolveBackTarget } from "@/lib/practice-entry"
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Award, ChevronLeft, FileDown, FileText } from "lucide-react"
@@ -94,26 +95,16 @@ interface ReviewContentProps {
     basePath: string
 }
 
-/** 返回：优先回到「进入做题页之前的那一页」（做题页会记在 sessionStorage 里），否则退回上一页 */
+/**
+ * 返回：回到「进入做题页之前的那一页」——列表页点卡片时按题组 id 记下过（含 ?year=2020 这类
+ * 筛选条件），没有就退回浏览器历史，再没有才回首页。口径统一在 @/lib/practice-entry。
+ */
 function useGoBack(groupId?: string) {
     const router = useRouter()
     return React.useCallback(() => {
-        if (typeof window !== "undefined") {
-            try {
-                const saved = groupId ? sessionStorage.getItem(`practice_entry_${groupId}`) : null
-                if (saved) {
-                    router.push(saved)
-                    return
-                }
-            } catch {
-                /* 忽略 */
-            }
-            if (window.history.length > 1) {
-                router.back()
-                return
-            }
-        }
-        router.push("/")
+        const target = resolveBackTarget(groupId)
+        if (target.type === "back") router.back()
+        else router.push(target.url)
     }, [router, groupId])
 }
 

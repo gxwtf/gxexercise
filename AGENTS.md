@@ -128,3 +128,18 @@ pnpm build             # 生产构建（线上用 next start，务必本地先�
 | 进度圆环/统计数字糊 | 写死 `gray-200/700/400` | `text-muted` / `text-foreground` / `text-muted-foreground` |
 | 滚动条、原生控件发白 | 缺 `color-scheme` | `:root{color-scheme:light}`、`.dark{color-scheme:dark}`（已配） |
 | 批改报告白纸里看不见字 | 打印稿继承了深色 token | 第 5 条：容器内重置变量 + `color-scheme: light` |
+
+## 8. 返回导航（做题页 / 回顾页的「返回」）—— 别再用 document.referrer
+
+列表页的筛选条件全在 URL 里（`?cat=各区期末&year=2020&district=海淀&grade=…&q=…&page=2`），
+**组件不会因为筛选而重新挂载**，所以任何「只在挂载时记一次」的地址都会记成没筛选的那一版；
+站内跳转又全是客户端路由，`document.referrer` 永远停在「整页加载那一页」，也不可靠。
+
+统一口径在 `src/lib/practice-entry.ts`：
+
+- 列表页（`QuestionOverview`）：`hrefWith({ page })` 算出当前这一屏的地址，**每次筛选 / 翻页都写** `list_url`；
+- 点卡片（`onClickCapture` 或做题页兜底）：按题目 / 套卷 id 写 `practice_entry_<id>`（多标签互不覆盖）；
+- 返回一律走 `resolveBackTarget(id)`：**① 按 id 那份 → ② 浏览器历史 → ③ list_url → ④ 首页**。
+
+新增「列表 → 详情 → 返回」的流程时复用这三件套，不要各写一套 `router.back()`；
+也不要再往 `document.referrer` 上打主意（客户端跳转下它不会更新）。
