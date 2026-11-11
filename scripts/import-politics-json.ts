@@ -80,7 +80,9 @@ async function deletePaper(paperId: string, title: string) {
 }
 
 async function importOne(file: string, dryRun: boolean, force: boolean, withPaper: boolean) {
-  const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as Paper;
+  const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as Paper & { sections?: Group[] };
+  // 新版政治转换器输出 {paper, sections}；旧版是 {paper, groups}，两种都认
+  if (!raw.groups && raw.sections) raw.groups = raw.sections;
   const p = raw.paper;
   const title = p.title;
   const subject = p.subject || "政治";
