@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { getAdminViewer } from "@/lib/admin-guard"
 import { Button } from "@/components/ui/button"
 import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton"
+import { AdminRegradeButton } from "@/components/admin/AdminRegradeButton"
 import { cn } from "@/lib/utils"
 import {
   answerText,
@@ -85,40 +86,47 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
   const { id } = await params
 
-  const submission = await prisma.questionGroupSubmission.findUnique({
-    where: { id },
-    include: {
-      user: { select: { id: true, userName: true } },
-      questionGroup: {
-        select: {
-          id: true,
-          title: true,
-          subject: true,
-          category: true,
-          questionType: true,
-          score: true,
-          source: true,
-          groupItems: {
-            select: {
-              orderIndex: true,
-              question: {
-                select: { id: true, questionType: true, score: true, answer: true, analysis: true },
+  const [submission, groupSubmissionCount] = await Promise.all([
+    prisma.questionGroupSubmission.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, userName: true } },
+        questionGroup: {
+          select: {
+            id: true,
+            title: true,
+            subject: true,
+            category: true,
+            questionType: true,
+            score: true,
+            source: true,
+            groupItems: {
+              select: {
+                orderIndex: true,
+                question: {
+                  select: { id: true, questionType: true, score: true, answer: true, analysis: true },
+                },
               },
+              orderBy: { orderIndex: "asc" },
             },
-            orderBy: { orderIndex: "asc" },
+          },
+        },
+        submissions: true,
+        testSubmission: {
+          select: {
+            id: true,
+            testPaperId: true,
+            testPaper: { select: { title: true, totalScore: true } },
           },
         },
       },
-      submissions: true,
-      testSubmission: {
-        select: {
-          id: true,
-          testPaperId: true,
-          testPaper: { select: { title: true, totalScore: true } },
-        },
-      },
-    },
-  })
+    }),
+    // 该题组的作答总次数（重评弹窗里「共 N 次作答」）：
+    // 先按 id 反查所属题组，和上面的详情查询并行发出，避免多一次串行查库
+    prisma.questionGroupSubmission.count({
+      where: { questionGroup: { submissions: { some: { id } } } },
+    }),
+  ])
 
   if (!submission) notFound()
 
@@ -135,13 +143,23 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           <Button asChild variant="ghost" size="sm" className="-ml-2 h-7 px-2">
             <Link href="/admin/submissions">← 返回全部作答记录</Link>
           </Button>
-          <AdminDeleteButton
-            kind={inPaper ? "paper" : "group"}
-            id={inPaper ? inPaper.id : submission.id}
-            title={displayTitle}
-            userName={displayUser}
-            afterDelete="back"
-          />
+          <div className="flex items-center gap-1">
+            <AdminRegradeButton
+              groupSubmissionId={submission.id}
+              questionGroupId={group.id}
+              title={group.title}
+              userName={displayUser}
+              time={formatDateTime(submission.createdAt)}
+              totalCount={groupSubmissionCount}
+            />
+            <AdminDeleteButton
+              kind={inPaper ? "paper" : "group"}
+              id={inPaper ? inPaper.id : submission.id}
+              title={displayTitle}
+              userName={displayUser}
+              afterDelete="back"
+            />
+          </div>
         </div>
 
         <h1 className="text-xl font-bold sm:text-2xl">作答详情</h1>
@@ -288,6 +306,11 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           )
         })}
       </div>
+
+      <p className="mt-6 text-xs text-muted-foreground">
+        重评会用题库里最新的参考答案重算客观题；有批改提示词的主观题会重新排队交 AI
+        批改（约 10–30 秒），期间显示「待批改」。图片答案 / 数学解答题 / 物理计算题 / 语文作文不参与重评。
+      </p>
     </div>
   )
 }
