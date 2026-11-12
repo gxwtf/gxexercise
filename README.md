@@ -310,6 +310,12 @@ b12Evidence: string[], a7:{threeCell,body}, b7BoilerplateParagraphs, dFindings:[
 为准并写进 `internal.formula` 告警、不抛错。D 级只靠 counts 仍会 ±1（`dFindings` 只能保证「有 quote
 才算」），要彻底收敛需另定算分规则（属改算法，不是改提示词）。
 
+**D 级那 ±1 不打算用算分规则硬收**：有人提过「同一 code 需 ≥2 处独立证据才计」「D 级只在 ≥48 分时才计」，
+两条都会**改变分值**（46 分命中 D1 就从 45 变 46），违反 SPEC §0「运行时不得自行发明规则、不得修改数值」；
+§10 那句「D 级的唯一用途是区分满分和差一点点满分」是设计意图说明、不是可执行阈值。收益也小（−1、约 1/10、
+不单独导致跨档），所以**不动**。真要收敛，应当让规格出 v1.6，而不是在实现里私下改口径。
+程序侧只做一道证据闸门：`dFindings` 每条必须带原文引用才算命中（随 `counts` 一起做）。
+
 ## 题目 PDF 导出
 
 题库的 PDF 全部由**服务端生成**（`src/lib/pdf/`，HTML → LibreOffice headless 转 PDF），前端只放下载链接。
