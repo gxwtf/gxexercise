@@ -61,6 +61,14 @@ export function pageHtml(title: string, body: string): string {
   sup, sub { font-size: 70%; }
   /* AI 批改正文左对齐：两端对齐 + 行内 <br> 会被 LibreOffice 拉出巨大词间距 */
   .ai-md, .ai-md p, .ai-md li { text-align: left; }
+  /* 语文大作文「AI 批阅单」（v1.5）：分数 / 档位 / 判词 / 建议，不含任何计分过程 */
+  table.sheet-essay td { font-size: 10.5pt; }
+  table.sheet-essay td.k { background: #f7f7f7; font-weight: bold; white-space: nowrap; }
+  p.essay-verdict { font-size: 12pt; font-weight: bold; text-align: left; margin-top: 8pt; margin-bottom: 6pt; }
+  ol.sugg { margin-left: 18pt; }
+  ol.sugg li { text-align: left; margin-bottom: 3pt; }
+  p.essay-direction { text-align: left; border-left: 2pt solid #7a1a1e; background: #faf6f6; padding-left: 6pt; padding-top: 2pt; padding-bottom: 2pt; }
+  p.essay-note { font-size: 9.5pt; color: #666; text-align: left; }
   .math-disp { display: block; text-align: center; margin-top: 4pt; margin-bottom: 4pt; }
   .foot { margin-top: 18pt; padding-top: 6pt; border-top: .8pt solid gray; font-size: 9.5pt; color: gray; text-align: center; }
 </style></head>

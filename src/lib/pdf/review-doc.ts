@@ -1,5 +1,6 @@
 /** 把「一次作答的回顾」组织成 PDF 用的 HTML 片段 */
 import { markdownToHtml } from "./markdown"
+import { essayReviewOf, essaySheetBodyHtml } from "./essay-sheet-html"
 
 const esc = (s: unknown) => String(s ?? "").replace(/[<>&]/g, (m) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[m] as string))
 
@@ -57,6 +58,20 @@ export function reviewDocHtml(input: ReviewDocInput): string {
   )
 
   if (aiFeedback) {  // 有 AI 批改结果就展示（作文类走下面的分项，生物填空等走通用简评）
+    // 语文大作文的 AI 批阅单（v1.5）：这里只印学生可见的分数 / 档位 / 判词 / 修改建议，
+    // 条款编号与计分算式（essayReview.internal）在 PDF 里一个字都不出现。
+    const essayReview = essayReviewOf(aiFeedback.essayReview)
+    if (essayReview) parts.push(`${heading("AI 批阅单")}${essaySheetBodyHtml(essayReview)}`)
+
+    // 明确未评分（记叙文等非议论文，终态）：把后端给的说明原样印出来，避免「什么都没有」
+    const essaySkipNote =
+      !essayReview && typeof aiFeedback.essaySkipReason === "string"
+        ? typeof aiFeedback.feedback === "string"
+          ? aiFeedback.feedback.trim()
+          : ""
+        : ""
+    if (essaySkipNote) parts.push(`${heading("AI 批阅")}<p class="essay-note">${esc(essaySkipNote)}</p>`)
+
     const sub = aiFeedback.subScores as Record<string, number> | undefined
     if (sub) {
       const parsedMax = scoreText ? Number(String(scoreText).split("/")[1]) : NaN
@@ -95,7 +110,11 @@ export function reviewDocHtml(input: ReviewDocInput): string {
       }
     }
   } else {
-    if (correctAnswer) parts.push(`${heading("正确答案")}${mdWithTables(correctAnswer)}`)
+    // 语文大作文的「参考答案」是脏数据（有的录入批次把文言文参考译文塞进了作文题的 answer），
+    // 回顾页已整块隐藏，PDF 里同样不印；作文的「参考」由上面的 AI 批阅单承担。
+    if (correctAnswer && questionType !== "chinese-essay") {
+      parts.push(`${heading("正确答案")}${mdWithTables(correctAnswer)}`)
+    }
     if (analysis) parts.push(`${heading("题目解析")}${mdWithTables(analysis)}`)
   }
 

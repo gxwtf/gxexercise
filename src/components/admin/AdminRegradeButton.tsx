@@ -166,7 +166,9 @@ export function AdminRegradeButton({
           <AlertDialogTitle>重评</AlertDialogTitle>
           <AlertDialogDescription>
             客观题按题库里最新的参考答案重判；有批改提示词的主观题会重新排队交 AI
-            批改（约 10–30 秒，期间显示「待批改」）。图片答案、数学解答题、物理计算题、语文作文不参与重评。
+            批改（约 10–30 秒，期间显示「待批改」）。语文大作文按 v1.5 议论文标准重新排队判分
+            （约 10–20 秒出分，记叙文会直接标为「本次未评分」）；
+            图片答案、数学解答题、物理计算题不参与重评。
           </AlertDialogDescription>
         </AlertDialogHeader>
 

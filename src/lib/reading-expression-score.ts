@@ -12,7 +12,13 @@
  * 对应的 prompt 见 src/lib/grading-prompts/reading-expression/。
  */
 
-export type ScoringKind = "info-points" | "underline-fix" | "essay-weights"
+/**
+ * 各题型的算分口径（写在 grading-prompts 的 config.json 里）：
+ * - info-points / underline-fix / essay-weights：本文件算（阅读表达 40-43、英语作文 43 三维度）；
+ * - essay-v15：语文大作文的 v1.5 口径，算分在 `src/lib/essay-score.ts`（模型只做结构化命中判断），
+ *   本文件只在 `applyStructuredScoring` 里拦一道，防止有人绕过 `ai-service` 的 essay 分支瞎给分。
+ */
+export type ScoringKind = "info-points" | "underline-fix" | "essay-weights" | "essay-v15"
 
 export interface ScoredResult {
   score: number
@@ -213,6 +219,11 @@ export function applyStructuredScoring(
       return scoreUnderlineFix(safeRaw, maxScore, fallback)
     case "essay-weights":
       return scoreEssayWeights(safeRaw, maxScore, fallback)
+    case "essay-v15":
+      // 语文大作文（北京卷议论文 v1.5）：分数由 essay-score.ts 按 §4 公式算，
+      // 采信模型自己的总分等于放行「不可复现的印象分」。走到这里说明调用方没走
+      // ai-service.gradeWithConfig 的 essay 分支，宁可报错也不要写一个假分数进库。
+      throw new Error("essay-v15 不能用 applyStructuredScoring 算分，请走 essay-score.computeEssayScore()")
     default:
       return { score: clamp(half(fallback?.score ?? 0), maxScore), feedback: fallback?.feedback }
   }

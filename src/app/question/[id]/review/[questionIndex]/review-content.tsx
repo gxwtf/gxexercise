@@ -16,6 +16,8 @@ import { EnglishReading, ClozeContext } from "@/components/article/english-readi
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { QueueStatus } from "@/components/review/QueueStatus"
+import { EssaySheet, EssaySkipNotice } from "@/components/review/EssaySheet"
+import type { EssayReviewPublic } from "@/lib/essay-review"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { excellentCriteriaText } from "@/lib/excellent-answer-rules"
@@ -59,6 +61,14 @@ interface ReviewContentData {
     excellentAnswers: ExcellentAnswerView[]
     shareAsExcellent: boolean | null
     aiFeedback: string | null
+    /**
+     * 语文大作文的 AI 批阅单（判分标准 v1.5，北京卷议论文）。
+     * 服务端已用 toPublicEssayReview() 剥成学生可见字段（分数 / 档位 / 分数段 / 判词 /
+     * 修改建议 / 最该动的地方 / 字数），**不含任何 internal 判分过程**。
+     */
+    essayReview: EssayReviewPublic | null
+    /** 语文大作文「明确不评分」的原因（如 non-argumentative）：终态，不提示稍后重试 */
+    essaySkipReason: string | null
     /** 需要展示评分明细（内容/语言/结构）的 AI 反馈：作文一律有；其它题型仅当带 subScores 时才有 */
     detailedFeedback: Record<string, unknown> | null
     detailedSubMaxes: { contentMax: number; languageMax: number; structureMax: number } | null
@@ -156,6 +166,8 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         excellentAnswers,
         shareAsExcellent,
         aiFeedback,
+        essayReview,
+        essaySkipReason,
         detailedFeedback,
         detailedSubMaxes,
         overallCommentMdx,
@@ -169,6 +181,9 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
     const category = getQuestionCategory(currentQuestion.questionType, questionGroup.questionType)
     const isChoiceType = category === "choice"
     const isEnWriting = questionGroup.questionType === "en-writing"
+    // 语文大作文：答案字段是脏数据（有录入批次把文言文参考译文塞进了 answer），
+    // 学生页整块隐藏「参考答案」；它的「参考」是 AI 批阅单（判词 + 修改建议）。
+    const isChineseEssay = questionGroup.questionType === "chinese-essay"
     const isMathType = ["math-fill", "math-choice", "math-solve", "physics-choice", "physics-solve", "chemistry-choice", "biology-choice", "history-choice", "geography-choice", "politics-choice"].includes(questionGroup.questionType)
     const isWordChoice = questionGroup.questionType === "word-choice"
     // 名著阅读：没有阅读区，材料直接排在题目上方
@@ -396,12 +411,20 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                     )}
                                 </div>
                             )}
-                            <Tabs defaultValue={userAnswerMdx ? "my-answer" : "reference-answer"}>
+                            {/* 明确不评分（记叙文等非议论文）：终态，只说明原因，不提示重试 */}
+                            {isChineseEssay && essaySkipReason && aiFeedback ? (
+                                <EssaySkipNotice text={aiFeedback} className="mb-4" />
+                            ) : null}
+                            <Tabs defaultValue={userAnswerMdx ? "my-answer" : isChineseEssay ? "excellent-answers" : "reference-answer"}>
                                 <TabsList>
                                     {userAnswerMdx && (
                                     <TabsTrigger value="my-answer">我的作答</TabsTrigger>
                                 )}
-                                <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
+                                {/* 语文大作文不展示「参考答案」：题库里 chinese-essay 的 answer
+                                    字段是脏数据（有的把文言文参考译文塞进了作文题），见 page.tsx */}
+                                {!isChineseEssay && (
+                                    <TabsTrigger value="reference-answer">参考答案</TabsTrigger>
+                                )}
                                 {showExcellent && (
                                     <TabsTrigger value="excellent-answers">
                                         优秀解答{excellentAnswers.length > 0 ? `（${excellentAnswers.length}）` : ""}
@@ -415,6 +438,16 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             <MDXRemote {...userAnswerMdx} components={components} />
                                         </div>
                                     </QuestionSection>
+
+                                    {/* AI 批阅单（仅语文大作文、且已经有批阅结果时）：
+                                        学生只看到分数 / 档位 / 分数段 / 判词 / 修改建议 /
+                                        最该动的地方；条款编号与算式在服务端就被剥掉了。
+                                        待批改时这里不渲染，沿用上方「评阅中」+ QueueStatus 的排队提示。 */}
+                                    {essayReview ? (
+                                        <div className="mt-6">
+                                            <EssaySheet review={essayReview} />
+                                        </div>
+                                    ) : null}
                                     
                                     {/* 有评分明细就走明细（作文照旧；带 subScores 的阅读表达等题型新增）；
                                         非作文的数据里没有「整体评价/批改结果…」，所以另外把「失分原因」原文补回来 */}
@@ -432,21 +465,26 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                             {!isEnWriting && lossReasonBlock}
                                         </>
                                     ) : (
-                                        <>{lossReasonBlock}</>
+                                        // 语文大作文：未评分的原因在说明条里原样展示，已评分的结论在批阅单里，
+                                        // 不再复用「失分原因」这块（标签也不对，且模型原文未经清洗）
+                                        <>{isChineseEssay ? null : lossReasonBlock}</>
                                     )}
                                 </TabsContent>
                             )}
-                                <TabsContent value="reference-answer">
-                                    <QuestionSection>
-                                        <div className="prose dark:prose-invert max-w-none">
-                                            {correctAnswerMdx ? (
-                                                <MDXRemote {...correctAnswerMdx} components={components} />
-                                            ) : (
-                                                <span className="text-muted-foreground">暂无参考答案</span>
-                                            )}
-                                        </div>
-                                    </QuestionSection>
-                                </TabsContent>
+                                {/* 语文大作文连内容也不挂载（服务端本来就没序列化答案，见 page.tsx） */}
+                                {!isChineseEssay && (
+                                    <TabsContent value="reference-answer">
+                                        <QuestionSection>
+                                            <div className="prose dark:prose-invert max-w-none">
+                                                {correctAnswerMdx ? (
+                                                    <MDXRemote {...correctAnswerMdx} components={components} />
+                                                ) : (
+                                                    <span className="text-muted-foreground">暂无参考答案</span>
+                                                )}
+                                            </div>
+                                        </QuestionSection>
+                                    </TabsContent>
+                                )}
                                 {showExcellent && (
                                     <TabsContent value="excellent-answers">
                                         <ExcellentAnswersPanel

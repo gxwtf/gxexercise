@@ -6,7 +6,7 @@ export const EXCELLENT_ANSWER_LIMIT = 3
 export function isSubjectiveQuestion(questionType: string, groupType: string): boolean {
   const combined = `${questionType} ${groupType}`
   if (combined.includes("解答") || combined.includes("阅读表达") || combined.includes("reading-expression") || combined.includes("写作") || combined.includes("en-writing")) return true
-  // 语文大作文 / 微写作虽然暂不判分，但写法上仍是主观题
+  // 语文大作文（AI 批改已上线，见 isUngradedQuestion）/ 微写作（仍暂不判分）：写法上都是主观题
   if (groupType === "chinese-essay" || groupType === "chinese-micro-writing") return true
   if (groupType === "chinese-reading" && questionType === "text") return true
   if (groupType === "politics" && questionType === "text") return true
@@ -23,19 +23,40 @@ export function isSubjectiveQuestion(questionType: string, groupType: string): b
 }
 
 /**
- * 暂不做 AI 判分的题型：语文微写作 / 大作文，以及没有批改提示词、只给参考答案的
+ * 暂不做 AI 判分的题型：语文微写作，以及没有批改提示词、只给参考答案的
  * 数学解答题（math-solve）/ 物理计算题（physics-solve）。
  *
- * 这两类必须走这里：提交接口里 isSubjective 为真是写 `pending` 等 Worker 判分的，
+ * 这些必须走这里：提交接口里 isSubjective 为真是写 `pending` 等 Worker 判分的，
  * 而 Worker 只捞「有提示词配置」的题型 —— 若走 pending 会永远卡在「评阅中」。
+ *
+ * **语文大作文（chinese-essay）已于 2026-11 接入 AI 批改**（v1.5 议论文规格，
+ * 模型只做结构化命中判断、分数由 src/lib/essay-score.ts 算），因此不再列在这里 ——
+ * 它现在和阅读表达 / 英语作文一样走 `pending` + Worker。
  */
 export function isUngradedQuestion(groupType: string): boolean {
   return (
-    groupType === "chinese-essay" ||
     groupType === "chinese-micro-writing" ||
     groupType === "math-solve" ||
     groupType === "physics-solve"
   )
+}
+
+/**
+ * 该题型判分是否**依赖**题目里的参考答案（`Question.answer`）。
+ *
+ * 提交接口 / 重评 / Worker 都有一条前置判断：「参考答案是图片或为空 → skipped，
+ * 不判分」。这条判断对语文大作文必须**放行**，原因是它的 answer 字段是历史脏数据：
+ * 实测有题组把文言文参考译文、默写答案（2017 组「爽籁发而清风生…」）、甚至「略」
+ * 塞进了作文题的 answer，而 v1.5 判分只用「题干 + 学生作文」，与 answer 无关。
+ * 若不放行，新录入的、answer 为空的作文题会在提交时被直接置为 skipped（永远不出分）。
+ *
+ * 其余题型（客观题 / 填空 / 阅读表达 / 英语作文 / 各科大题）都靠参考答案判分，保持原口径。
+ */
+export function isReferenceAnswerRequired(groupType: string): boolean {
+  const t = (groupType || "").trim()
+  // 中文别名兜一层：Worker 取提示词时会把「语文作文 / 中文写作 / 大作文」归一成 chinese-essay，
+  // 若某个题组真的存的是中文类型名，前置判断也必须同样放行，否则两边口径又对不上。
+  return !(t === "chinese-essay" || t === "语文作文" || t === "中文写作" || t === "大作文")
 }
 
 interface ExcellentRatio {

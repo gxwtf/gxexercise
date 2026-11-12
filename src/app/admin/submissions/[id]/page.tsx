@@ -16,6 +16,9 @@ import {
   scoreText,
 } from "@/lib/submission-records"
 import { isSubjectiveQuestion, meetsExcellentStandard } from "@/lib/excellent-answer-rules"
+import { EssaySheet, EssaySkipNotice } from "@/components/review/EssaySheet"
+import { EssayReviewTrace } from "@/components/review/EssayReviewTrace"
+import { toPublicEssayReview, type EssayReviewInternal } from "@/lib/essay-review"
 
 export const dynamic = "force-dynamic"
 
@@ -213,6 +216,11 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           const answer = answerText(sub?.content)
           const feedback = (sub?.aiFeedback ?? null) as Record<string, unknown> | null
           const subScores = (feedback?.subScores ?? null) as Record<string, number> | null
+          // 语文大作文的 AI 批阅单：学生可见那部分（剥过 internal）+ 管理员专属的判分留痕
+          const essayReviewRaw = feedback?.essayReview
+          const essayReview = toPublicEssayReview(essayReviewRaw)
+          const essayInternal = (essayReviewRaw as { internal?: EssayReviewInternal } | undefined)?.internal ?? null
+          const essaySkipReason = typeof feedback?.essaySkipReason === "string" ? feedback.essaySkipReason : null
           const subjective = isSubjectiveQuestion(question.questionType, group.questionType)
           const excellent = subjective && sub
             ? meetsExcellentStandard(group.questionType, sub.score, question.score)
@@ -251,7 +259,24 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              {feedback && (subScores || FEEDBACK_TEXT_FIELDS.some((f) => feedback[f.key])) ? (
+              {essayReview ? (
+                <div className="mb-4 space-y-3">
+                  <h3 className="text-sm font-medium text-muted-foreground">AI 批阅单（学生可见内容）</h3>
+                  <EssaySheet review={essayReview} />
+                  {essayInternal ? <EssayReviewTrace internal={essayInternal} /> : null}
+                </div>
+              ) : essaySkipReason ? (
+                <div className="mb-4 space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">AI 批阅单</h3>
+                  <EssaySkipNotice text={typeof feedback?.feedback === "string" ? feedback.feedback : ""} />
+                  {essayInternal ? <EssayReviewTrace internal={essayInternal} /> : null}
+                </div>
+              ) : null}
+
+              {/* 语文大作文：上面的「批阅单 / 未评分说明」已经是学生可见的全部内容。
+                  aiFeedback.feedback 是后端写的「判词 + 建议」纯文本兜底版，渲出来与批阅单
+                  逐字重复，所以有 essayReview / essaySkipReason 时整块跳过 */}
+              {essayReview || essaySkipReason ? null : feedback && (subScores || FEEDBACK_TEXT_FIELDS.some((f) => feedback[f.key])) ? (
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-muted-foreground">AI 批改反馈</h3>
                   {subScores && Object.keys(subScores).length > 0 && (
@@ -309,7 +334,9 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
       <p className="mt-6 text-xs text-muted-foreground">
         重评会用题库里最新的参考答案重算客观题；有批改提示词的主观题会重新排队交 AI
-        批改（约 10–30 秒），期间显示「待批改」。图片答案 / 数学解答题 / 物理计算题 / 语文作文不参与重评。
+        批改（约 10–30 秒），期间显示「待批改」。语文大作文按 v1.5 议论文标准重新排队判分
+        （约 10–20 秒出分，记叙文会直接标为「本次未评分」）；
+        图片答案 / 数学解答题 / 物理计算题不参与重评。
       </p>
     </div>
   )

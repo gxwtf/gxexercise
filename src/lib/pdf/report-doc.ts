@@ -12,6 +12,7 @@
  * - 小节标题 `break-after: avoid`，避免标题孤立在页底
  */
 import { markdownToHtml, inlineToHtml } from "./markdown"
+import { essayReviewOf, essaySheetBodyHtml } from "./essay-sheet-html"
 
 const esc = (s: unknown): string =>
   String(s ?? "").replace(/[<>&]/g, (m) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[m] as string))
@@ -60,6 +61,8 @@ export interface ReportQuestionInput {
   subjective?: boolean
   /** 作文等主观题的 AI 批改原始 JSON */
   aiFeedback?: Record<string, unknown> | null
+  /** 不印「正确答案」：语文大作文的 answer 字段是脏数据（见回顾页同名注释） */
+  hideCorrectAnswer?: boolean
 }
 
 export interface ReportSectionInput {
@@ -310,11 +313,16 @@ function aiFeedbackHtml(q: ReportQuestionInput): string {
     }
     return ""
   }
-  const parts: string[] = [`<h4 class="ai-head">AI 批改</h4>`]
+  // 语文大作文（v1.5）：整段就是一份「AI 批阅单」，只印学生可见的分数 / 档位 / 判词 / 建议；
+  // 条款编号与计分算式（essayReview.internal）在 PDF 里一个字都不出现。
+  const essayReview = essayReviewOf(fb.essayReview)
+  const parts: string[] = [`<h4 class="ai-head">${essayReview ? "AI 批阅单" : "AI 批改"}</h4>`]
+  if (essayReview) parts.push(essaySheetBodyHtml(essayReview))
   parts.push(scoreDetailHtml(q, fb))
 
+  // 语文大作文的 feedback 是「判词 + 建议」的纯文本兜底版，批阅单已经结构化印过一遍，别再重复
   const feedbackText = typeof fb.feedback === "string" ? fb.feedback.trim() : ""
-  if (feedbackText) parts.push(`<h4>评语</h4>${mdAi(feedbackText)}`)
+  if (feedbackText && !essayReview) parts.push(`<h4>评语</h4>${mdAi(feedbackText)}`)
 
   for (const [key, heading] of AI_MARKDOWN_SECTIONS) {
     const val = fb[key]
@@ -376,7 +384,7 @@ function questionHtml(q: ReportQuestionInput): string {
         : `<span class="muted">（未作答）</span>`
     }</td></tr>`
   )
-  if (correct) {
+  if (correct && !q.hideCorrectAnswer) {
     answerRows.push(
       `<tr><td class="a ok"><span class="ans-label">正确答案</span>${
         inlineAnswer(correct) ? inlineToHtml(correct) : md(correct)
@@ -571,6 +579,14 @@ export function reportPageHtml(title: string, body: string): string {
   .passage p { margin-top: 0; margin-bottom: 5pt; }
   /* AI 批改正文左对齐：两端对齐 + 行内 <br> 会被 LibreOffice 拉出巨大词间距 */
   .ai-md, .ai-md p, .ai-md li { text-align: left; }
+  /* 语文大作文「AI 批阅单」（v1.5）：分数 / 档位 / 判词 / 建议，不含任何计分过程 */
+  table.sheet-essay td { font-size: 10pt; }
+  table.sheet-essay td.k { background: #f7f7f7; font-weight: bold; white-space: nowrap; }
+  p.essay-verdict { font-size: 11pt; font-weight: bold; text-align: left; margin-top: 8pt; margin-bottom: 6pt; }
+  ol.sugg { margin-left: 18pt; }
+  ol.sugg li { text-align: left; margin-bottom: 3pt; }
+  p.essay-direction { text-align: left; border-left: 2pt solid #7a1a1e; background: #faf6f6; padding-left: 6pt; padding-top: 2pt; padding-bottom: 2pt; }
+  p.essay-note { font-size: 8.5pt; color: #666; text-align: left; }
   .ai-md p { margin-top: 0; margin-bottom: 4pt; }
   .foot { margin-top: 14pt; padding-top: 5pt; border-top: .6pt solid #999; font-size: 8.5pt; color: #555; text-align: center; }
 </style></head>

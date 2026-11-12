@@ -11,6 +11,7 @@
     "check:answers": "tsx scripts/check-answer-case.mjs",
     "check:home-sample": "tsx scripts/audit-home-sample.ts",
     "check:reading": "tsx scripts/check-reading-expression.mts",
+    "check:essay": "tsx scripts/check-essay-grading.mts",
     "check:source-pdf": "tsx scripts/check-source-pdf.mts",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:seed-math": "npx tsx prisma/seed-math.ts",

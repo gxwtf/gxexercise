@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { isAnswerCorrect, isCaseSensitiveAnswer } from "@/lib/answer-check"
 import { NextResponse } from "next/server"
 import { requireLogin } from "@/lib/api-auth"
-import { isSubjectiveQuestion, isUngradedQuestion, isImageAnswer } from "@/lib/excellent-answer-rules"
+import { isSubjectiveQuestion, isUngradedQuestion, isImageAnswer, isReferenceAnswerRequired } from "@/lib/excellent-answer-rules"
 import { aggregatePickOne, isPickOneMode } from "@/lib/pick-one"
 
 export async function POST(request: Request) {
@@ -64,8 +64,10 @@ export async function POST(request: Request) {
         const questionScore = question.question.score ?? 0;
         const isSubjective = isSubjectiveQuestion(question.question.questionType, questionGroup.questionType);
 
-        // 画图/补图题：参考答案是图片，无法按文字判分
-        if (isImageAnswer(correctAnswer) || !correctAnswer.trim()) {
+        // 画图/补图题：参考答案是图片或为空，无法按文字判分。
+        // 语文大作文放行：它的 answer 是历史脏数据（文言文译文/默写答案/「略」），
+        // v1.5 判分只用题干 + 学生作文，与参考答案无关（见 isReferenceAnswerRequired）。
+        if (isReferenceAnswerRequired(questionGroup.questionType) && (isImageAnswer(correctAnswer) || !correctAnswer.trim())) {
           return {
             userId,
             questionId: sub.questionId,
@@ -152,8 +154,10 @@ export async function POST(request: Request) {
     const unansweredSubmissions = pickOne ? [] : questionGroup.groupItems
       .filter((item) => !submittedIds.has(item.question.id))
       .map((item) => {
-        // 未作答里，参考答案是图片的画图题同样不判分
-        const skip = isUngradedQuestion(questionGroup.questionType) || isImageAnswer(item.question.answer ?? "");
+        // 未作答里，参考答案是图片的画图题同样不判分（语文大作文同上：不依赖参考答案）
+        const skip =
+          isUngradedQuestion(questionGroup.questionType) ||
+          (isReferenceAnswerRequired(questionGroup.questionType) && isImageAnswer(item.question.answer ?? ""));
         return {
           userId,
           questionId: item.question.id,

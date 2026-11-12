@@ -12,6 +12,7 @@ import rehypeKatex from 'rehype-katex'
 import type { QuestionSwitcherItem } from "@/components/review/QuestionSwitcher"
 import type { SubmissionHistoryItem } from "@/components/review/SubmissionHistoryTable"
 import { ReviewContent } from "./review-content"
+import { toPublicEssayReview, type EssayReviewPublic } from "@/lib/essay-review"
 import { isSubjectiveQuestion } from "@/lib/excellent-answer-rules"
 import { isPickOneMode, pickIndexFromRows } from "@/lib/pick-one"
 import { findExcellentAnswers } from "@/lib/excellent-answers"
@@ -112,6 +113,8 @@ async function buildReviewData(
 
   const currentItem = questions[questionIndex - 1]
   const currentQuestion = currentItem.question
+  // 语文大作文（题组类型 chinese-essay）：答案字段是脏数据、另有 AI 批阅单要下发，下面多处要用
+  const isChineseEssay = questionGroup.questionType === "chinese-essay"
 
   const currentSubmission = questionSubmissions.find(
     (s) => s.questionId === currentQuestion.id
@@ -152,7 +155,13 @@ async function buildReviewData(
     : null
 
   // 参考答案里的 `##` 表示「多个可接受答案」（判分端按任一命中处理），展示时换成「或」
-  const answerForDisplay = (currentQuestion.answer || '').replace(/\s*##\s*/g, ' 或 ')
+  //
+  // 语文大作文**不展示「参考答案」板块**：题库里 chinese-essay 的 answer 字段是脏数据
+  // （有的录入批次把文言文参考译文塞进了作文题的 answer），给学生看是错的。
+  // 这里连序列化都跳过，脏文本也不会进 RSC 载荷；作文的「参考」由 AI 批阅单承担。
+  const answerForDisplay = isChineseEssay
+    ? ''
+    : (currentQuestion.answer || '').replace(/\s*##\s*/g, ' 或 ')
   const correctAnswerMdx = answerForDisplay
     ? await serialize(escapeLatexBraces(answerForDisplay).replace(/\n/g, '\n\n'), { mdxOptions })
     : null
@@ -277,6 +286,22 @@ async function buildReviewData(
   const questionScore = currentQuestion.score ?? 0
   const aiFeedbackRaw = selectedSubmission?.aiFeedback as Record<string, unknown> | null
   const aiFeedback = (aiFeedbackRaw?.feedback as string) ?? null
+
+  // 语文大作文的 AI 批阅单（判分标准 v1.5，北京卷议论文）：
+  // **只把 toPublicEssayReview() 剥过的学生可见部分下发** —— score / maxScore / band /
+  // range / verdict / suggestions / direction / wordCount。aiFeedback.essayReview 里的
+  // internal（A/B/C/D/L 条款编号、命中条数、起点分、上限、扣分算式）绝不进 RSC 载荷，
+  // 给学生的界面里一个内部过程都不许出现。
+  const essayReview: EssayReviewPublic | null = isChineseEssay
+    ? toPublicEssayReview(aiFeedbackRaw?.essayReview)
+    : null
+  // 「明确不评分」是终态：后端判到记叙文等非议论文时会跳过判分并写明理由
+  // （aiFeedback.essaySkipReason = "non-argumentative"，说明文案在 aiFeedback.feedback）。
+  const essaySkipReason =
+    isChineseEssay && typeof aiFeedbackRaw?.essaySkipReason === "string"
+      ? aiFeedbackRaw.essaySkipReason
+      : null
+
   // 评分明细（内容/语言/结构三条进度条）的判定：作文（en-writing）照旧一律走明细；
   // 其它题型（如阅读表达第 4 题 43）只要 aiFeedback 里带 subScores 也走同一套明细。
   const hasSubScores = !!aiFeedbackRaw?.subScores && typeof aiFeedbackRaw.subScores === "object"
@@ -348,7 +373,7 @@ async function buildReviewData(
     questionSwitcherItems,
     currentQuestion,
     options,
-    correctAnswer: currentQuestion.answer || "",
+    correctAnswer: isChineseEssay ? "" : currentQuestion.answer || "",
     correctAnswerMdx,
     userAnswer,
     userAnswerMdx,
@@ -368,6 +393,8 @@ async function buildReviewData(
     excellentAnswers,
     shareAsExcellent: selectedSubmission ? selectedSubmission.shareAsExcellent : null,
     aiFeedback,
+    essayReview,
+    essaySkipReason,
     detailedFeedback,
     detailedSubMaxes,
     overallCommentMdx,

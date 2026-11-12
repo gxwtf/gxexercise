@@ -128,6 +128,8 @@ function toReportQuestion(
     maxScore: question.score ?? null,
     gradingStatus: sub?.gradingStatus ?? null,
     subjective: group ? isSubjectiveQuestion(question.questionType, groupType) : undefined,
+    // 语文大作文的 answer 是脏数据（有把文言文参考译文塞进作文题的情况），报告里也不印
+    hideCorrectAnswer: groupType === "chinese-essay",
     aiFeedback,
   }
 }

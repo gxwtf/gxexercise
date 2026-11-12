@@ -1,22 +1,31 @@
 import { prisma } from "./prisma"
-import { gradeWithConfig, preCheckGrade, type GradeResult } from "./ai-service"
+import { gradeWithConfig, preCheckGrade } from "./ai-service"
 import { getGradingPrompt, GRADING_PROMPT_REGISTRY } from "./grading-prompts"
 import { aggregatePickOne, isPickOneMode } from "./pick-one"
 import { gradingStem } from "./grading-stem"
-
-function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
-  const data: Record<string, unknown> = {}
-  if (result.feedback) data.feedback = result.feedback
-  if (result.subScores) data.subScores = result.subScores
-  if (result.overallComment) data.overallComment = result.overallComment
-  if (result.lineCorrections) data.lineCorrections = result.lineCorrections
-  if (result.betterExpressions) data.betterExpressions = result.betterExpressions
-  if (result.modelEssay) data.modelEssay = result.modelEssay
-  return Object.keys(data).length > 0 ? data : undefined
-}
+import { isEssayScoring } from "./essay-score"
+import { buildAiFeedback, buildEssaySkipFeedback, buildGradingErrorFeedback } from "./ai-feedback"
 
 let running = false
 let polling = false
+
+/**
+ * 语文大作文「判不动」的失败计数 —— 仅进程内（重启归零），不落库、不需要迁移。
+ *
+ * 为什么需要它：Worker 对批改异常的一贯作法是「保持 pending，下次轮询再试」。这对阅读表达
+ * （一次 1–2k tokens、一两秒）没问题；但**语文作文单篇约 8.8k prompt tokens、7–12 秒**，
+ * 如果某篇作文让模型稳定输出不出合格 JSON（长文本 + json_object 偶尔失败，或提示词与
+ * 该篇的体裁/题干打架），就会变成「每 10 秒烧一次 8.8k tokens，一直烧下去」——
+ * 成本比其它题型高一个量级，必须设上限。
+ *
+ * 口径：第 1–3 次失败保持 pending（现象就是回顾页「评阅中」，QueueStatus 继续轮询）；
+ * 第 4 次失败判定为「判不动」，写成 `skipped` + `gradingError: true`，并把计数清掉。
+ * 为什么用 skipped 而不是新增状态：回顾页对 skipped 已有渲染；而 regrade 里
+ * chinese-essay 已不在 `isUngradedQuestion`，管理员点「重评」会正常把它重新排队，
+ * 所以这不是死路。**只对语文作文计数**，其它题型口径完全不变。
+ */
+const ESSAY_MAX_FAILED_ATTEMPTS = 3
+const essayFailures = new Map<string, number>()
 
 export function startGradingWorker() {
   if (running) return
@@ -84,13 +93,16 @@ export function startGradingWorker() {
       const updatedGroupIds = new Set<string>()
 
       for (const sub of toGrade) {
+        // 配置 / 是否语文作文先取出来：catch 里要靠它决定「这次失败要不要计数」
+        const groupItems = sub.groupSubmission?.questionGroup?.groupItems ?? []
+        const idx = groupItems.findIndex((item) => item.questionId === sub.questionId)
+        const questionType = sub.groupSubmission?.questionGroup?.questionType ?? ""
+        const config = getGradingPrompt(questionType, idx)
+        if (!config) continue
+        const essay = isEssayScoring(config.scoring)
+
         try {
-          console.log(`[GradingWorker] Grading submission ${sub.id} (type: ${sub.groupSubmission?.questionGroup?.questionType}, question: ${sub.questionId})`)
-          const groupItems = sub.groupSubmission?.questionGroup?.groupItems ?? []
-          const idx = groupItems.findIndex((item) => item.questionId === sub.questionId)
-          const questionType = sub.groupSubmission?.questionGroup?.questionType ?? ""
-          const config = getGradingPrompt(questionType, idx)
-          if (!config) continue
+          console.log(`[GradingWorker] Grading submission ${sub.id} (type: ${questionType}, question: ${sub.questionId})`)
 
           const content = sub.content as { answer?: string } | null
           const userAnswer = content?.answer ?? ""
@@ -122,6 +134,24 @@ export function startGradingWorker() {
             maxScore,
           )
 
+          // 语文作文的「这次不该出分」（学生写的是记叙文，v1.5 只量议论文）：终态 skipped。
+          // 它不是批改失败 —— 不写分数、**不消耗**下面的失败重试次数；管理员点「重评」会重新排队。
+          if (result.skip) {
+            await prisma.questionSubmission.updateMany({
+              where: { id: sub.id, gradingStatus: "pending" },
+              data: {
+                score: null,
+                isCorrect: null,
+                gradingStatus: "skipped",
+                aiFeedback: buildEssaySkipFeedback(result.skip.reason, result.feedback ?? "") as any,
+              },
+            })
+            console.log(`[GradingWorker] ${sub.id} skipped: ${result.skip.reason}`)
+            essayFailures.delete(sub.id)
+            if (sub.groupSubmissionId) updatedGroupIds.add(sub.groupSubmissionId)
+            continue
+          }
+
           await prisma.questionSubmission.updateMany({
             where: { id: sub.id, gradingStatus: "pending" },
             data: {
@@ -132,9 +162,40 @@ export function startGradingWorker() {
             },
           })
           console.log(`[GradingWorker] ${sub.id} graded: score=${result.score}`)
+          essayFailures.delete(sub.id)
           if (sub.groupSubmissionId) updatedGroupIds.add(sub.groupSubmissionId)
         } catch (error) {
           console.error(`[GradingWorker] Failed to grade ${sub.id}:`, error)
+          // 其它题型口径不变：保持 pending，下次轮询重试
+          if (!essay) continue
+
+          // 语文作文：失败次数设上限，防止一篇判不动的作文把队列变成「每 10 秒烧 8.8k tokens」的循环
+          const attempts = (essayFailures.get(sub.id) ?? 0) + 1
+          essayFailures.set(sub.id, attempts)
+          if (attempts <= ESSAY_MAX_FAILED_ATTEMPTS) {
+            console.warn(
+              `[GradingWorker] ${sub.id} 语文作文批改失败（第 ${attempts} 次），保持 pending 继续重试`,
+            )
+            continue
+          }
+          essayFailures.delete(sub.id)
+          try {
+            await prisma.questionSubmission.updateMany({
+              where: { id: sub.id, gradingStatus: "pending" },
+              data: {
+                gradingStatus: "skipped",
+                aiFeedback: buildGradingErrorFeedback(
+                  "AI 批改暂时失败，本次已跳过；管理员可在作答详情页点「重评」重新排队。",
+                ) as any,
+              },
+            })
+            if (sub.groupSubmissionId) updatedGroupIds.add(sub.groupSubmissionId)
+            console.warn(
+              `[GradingWorker] ${sub.id} 语文作文连续 ${attempts} 次批改失败，已置为 skipped（管理员可「重评」重新排队）`,
+            )
+          } catch (updateError) {
+            console.error(`[GradingWorker] 把 ${sub.id} 标记为 skipped 失败:`, updateError)
+          }
         }
       }
 

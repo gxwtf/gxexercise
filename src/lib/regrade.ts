@@ -19,7 +19,7 @@
 import { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { isAnswerCorrect, isCaseSensitiveAnswer } from "@/lib/answer-check"
-import { isImageAnswer, isSubjectiveQuestion, isUngradedQuestion } from "@/lib/excellent-answer-rules"
+import { isImageAnswer, isReferenceAnswerRequired, isSubjectiveQuestion, isUngradedQuestion } from "@/lib/excellent-answer-rules"
 import { aggregatePickOne, isPickOneMode } from "@/lib/pick-one"
 import { getGradingPrompt } from "@/lib/grading-prompts"
 
@@ -191,12 +191,15 @@ function planQuestion(input: PlanInput): PlannedQuestion {
     },
   })
 
-  // ① 画图/补图题：参考答案是图片，或参考答案为空 —— 无法按文字判分，保持原状态
-  if (isImageAnswer(correctAnswer) || !correctAnswer.trim()) {
+  // ① 画图/补图题：参考答案是图片，或参考答案为空 —— 无法按文字判分，保持原状态。
+  //    语文大作文放行：它的 answer 是历史脏数据，v1.5 判分只用题干 + 学生作文，
+  //    与提交接口（group / test-paper）同口径，见 isReferenceAnswerRequired。
+  if (isReferenceAnswerRequired(groupType) && (isImageAnswer(correctAnswer) || !correctAnswer.trim())) {
     return build("skipped", before, "参考答案是图片或为空，无法按文字重判，保持原状态", undefined)
   }
 
-  // ② 语文大作文 / 微写作 / 数学解答 / 物理计算：本来就不批阅，分数与批阅状态都不能动
+  // ② 语文微写作 / 数学解答 / 物理计算：本来就不批阅，分数与批阅状态都不能动
+  //    （语文大作文已接入 AI 批改，不再走这里 —— 它会落到下面的 ③ 重新排队）
   if (isUngradedQuestion(groupType)) {
     return build("skipped", before, "该题型暂不批阅，保持原状态", undefined)
   }

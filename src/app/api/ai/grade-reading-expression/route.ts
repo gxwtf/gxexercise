@@ -1,21 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { gradeWithConfig, preCheckGrade, type GradeResult } from "@/lib/ai-service";
+import { gradeWithConfig, preCheckGrade } from "@/lib/ai-service";
 import { getGradingPrompt } from "@/lib/grading-prompts";
 import { gradingStem } from "@/lib/grading-stem";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-auth";
-
-/** 落库用的 AI 反馈（不包含 raw，那是算分用的中间数据） */
-function buildAiFeedback(result: GradeResult): Record<string, unknown> | undefined {
-  const data: Record<string, unknown> = {}
-  if (result.feedback) data.feedback = result.feedback
-  if (result.subScores) data.subScores = result.subScores
-  if (result.overallComment) data.overallComment = result.overallComment
-  if (result.lineCorrections) data.lineCorrections = result.lineCorrections
-  if (result.betterExpressions) data.betterExpressions = result.betterExpressions
-  if (result.modelEssay) data.modelEssay = result.modelEssay
-  return Object.keys(data).length > 0 ? data : undefined
-}
+import { buildAiFeedback, buildEssaySkipFeedback } from "@/lib/ai-feedback";
 
 export async function POST(request: Request) {
   // 此接口会并发触发多条 AI 批改，属于高成本操作，仅限管理员调用
@@ -97,6 +86,20 @@ export async function POST(request: Request) {
             correctAnswer,
             maxScore,
           );
+
+          // 语文作文的记叙文（v1.5 只量议论文）：不出分，写 skipped 而不是写一个冤枉分
+          if (result.skip) {
+            await prisma.questionSubmission.update({
+              where: { id: sub.id },
+              data: {
+                score: null,
+                isCorrect: null,
+                gradingStatus: "skipped",
+                aiFeedback: buildEssaySkipFeedback(result.skip.reason, result.feedback ?? "") as any,
+              },
+            });
+            return { id: sub.id, score: null, feedback: result.feedback, status: "skipped" };
+          }
 
           await prisma.questionSubmission.update({
             where: { id: sub.id },

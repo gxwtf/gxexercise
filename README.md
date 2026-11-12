@@ -192,11 +192,14 @@ src/
 
 - 学生提交后，客观题即时判分；需 AI 批改的提交写入 `pending` 状态
 - 服务启动时通过 `instrumentation.ts` 运行 [grading-worker.ts](src/lib/grading-worker.ts)，每 10 秒轮询待批改记录，按题型匹配提示词并调用大模型
-- 提示词配置位于 [src/lib/grading-prompts](src/lib/grading-prompts)，包含系统提示词、用户提示词模板及 `config.json`；模板支持 `{stem}`、`{userAnswer}`、`{correctAnswer}`、`{maxScore}` 占位符
+- 提示词配置位于 [src/lib/grading-prompts](src/lib/grading-prompts)，包含系统提示词、用户提示词模板及 `config.json`；模板支持 `{stem}`、`{userAnswer}`、`{correctAnswer}`、`{maxScore}`、`{wordCount}` 占位符（`{wordCount}` 由程序按 `countEssayWords()` 数，见下面的语文作文一节）
 - `{stem}` 的取值：一般用单题题干；**材料写在题组上的题型**（`physics-fill` 等「材料 + 内联空」结构）改用题组材料，
   逻辑在 [grading-stem.ts](src/lib/grading-stem.ts)（目前只对 `physics-fill` 兜底，生物 / 历史 / 地理 / 政治保持原口径）
 - 也可调用 `/api/ai/retry-pending` 手动触发重试
-- 不批阅的题型（语文作文 / 微写作、数学解答题 `math-solve`、物理计算题 `physics-solve`）提交即 `skipped`，不进队列
+- 不批阅的题型（语文微写作、数学解答题 `math-solve`、物理计算题 `physics-solve`）提交即 `skipped`，不进队列。
+  **语文大作文 `chinese-essay` 已于 2026-11 接入 AI 批改**，不再属于这一类（见下面的「语文大作文的 AI 批改口径」）
+- `/api/ai/retry-pending` 是**同步**批量跑 AI 的管理员接口，**故意把语文大作文排除在外**：单篇约 8.8k prompt tokens、7–12 秒，
+  批量同步必然超过 nginx 的 60s `proxy_read_timeout`；作文一律交给 10 秒一轮的 Worker
 
 ### 管理员手动重评（答案 / 分值 / 提示词改过之后）
 
@@ -213,7 +216,7 @@ src/
 | 客观题 | 按**最新参考答案** + 现行判分规则（`answer-check.ts`：大小写 / 全角 / 分隔符）重算，分数与对错改了才写库 |
 | 有批改提示词的主观题 | 清空分数与旧评语、状态回到 `pending`，由 GradingWorker 在 10 秒轮询里重新交 AI 批改（页面 20 秒后自动再刷新一次） |
 | 主观题但未作答 | 按提交接口同口径记 0 分 / 已批阅 |
-| 参考答案是图片或为空、不批阅题型（语文作文 / 微写作 / 数学解答 / 物理计算）、无提示词配置的题型 | **保持原状态**（`skipped`），不抹分数 |
+| 参考答案是图片或为空、不批阅题型（语文微写作 / 数学解答 / 物理计算）、无提示词配置的题型 | **保持原状态**（`skipped`），不抹分数 |
 
 重评完会一并回算：题组提交的得分 / 正确题数 / 是否全对（任选一题板块仍按「得分最高的那一题」），
 以及套卷提交的整卷总分。接口是 `POST /api/admin/submissions/regrade`（body `{ groupSubmissionIds: [id] }`
@@ -242,6 +245,58 @@ src/
 回归：`pnpm check:reading`（[scripts/check-reading-expression.mts](scripts/check-reading-expression.mts)）会串行跑 12 条样例
 （含 40/41 的四个算例、42 的划线/修改组合、43 的完整段落 / 首句截断 / 碎片 / 超字数），有 FAIL 时退出码为 1。
 提示词 `.md` 是**运行时按 `process.cwd()` 读取**，改完重启服务即可生效；`config.json` 是打包进产物，改它必须重新 `pnpm build`。
+
+### 语文大作文（chinese-essay）的 AI 批改口径（v1.5，2026-11 上线）
+
+判分标准是 jab《北京卷议论文批阅复现规格 v1.5》（**冻结版**，原文 `~/gxwtf_docs/essay-spec-v15/SPEC.md`，
+进提示词的那份是 [chinese-essay/prompt.md](src/lib/grading-prompts/chinese-essay/prompt.md)）。
+题库里 102 个 `chinese-essay` 题组，满分 94 个是 50，另有 40 / 45 / 48 / 60 分制。
+
+**模型只做结构化命中判断，分数由程序算**（[essay-score.ts](src/lib/essay-score.ts)）：
+模型输出「命中了哪些条款编号（A / B / C / D / L）、A7′ 档位、体裁、判词、修改建议」，
+分数严格按 §4 的顺序算 —— `L 合计封顶 9 → base = 43+L → min(base,50) → −4×B −2×C −1×min(D,3) −A7′ →
+带 .5 向上取整 → 最后套 A 级上限（1 条 ≤39 / 2 条 ≤35 / ≥3 条 ≤32；A1 与题干毫无关系、A2 贯穿全文 ≤32；
+A7′ 全篇皆例 ≤39）`。**顺序不可交换**（先封顶再扣分），且 A 级是上限、不是「停止判分」。
+这样同一篇作文永远得到同一个分，小模型也不会把 48−4−2−2−2 算错。
+
+几条容易踩的运行时口径：
+
+| 事项 | 口径 |
+| --- | --- |
+| 字数 | **程序数**（[countEssayWords](src/lib/essay-review.ts) = 字符数，含标点与段落换行，与做题页 textarea 下方显示的「字数」一致），不采信模型。`<600` → 追加 A10；`<400` → 再套上限 25；`600–699` → 追加 C7 |
+| 参考答案 | **完全不参与判分**。`Question.answer` 是历史脏数据（实测有题组把文言文参考译文、默写答案、甚至「略」塞进作文题），所以 `gradeWithConfig` 对 essay 一律传空串；三处「参考答案是图片或为空 → skipped」的前置判断用 [isReferenceAnswerRequired()](src/lib/excellent-answer-rules.ts) 给它**放行**（否则新录入的空 answer 作文会被直接 skip） |
+| 非 50 分制 | 不套字数条款（老题字数要求各不相同），分数按 v15 的 50 分制结果**等比换算**并取 0.5 粒度（`Math.round(x*2)/2`）；档位 / 区间仍按 50 分制档位给 |
+| 体裁闸门 | 模型先判 `genre`：北京卷作文常年是「(1) 议论文 (2) 记叙文，任选一题」，学生写记叙文时**不出分**（拿议论文尺子量会误伤到二类下 / 三类），落 `skipped` + `aiFeedback.essaySkipReason = "non-argumentative"`。这是**终态**，不消耗失败重试次数；管理员点「重评」会重新排队 |
+| 判分失败 | 模型输出不能解析（缺字段 / 编号非法 / 不是 JSON）时**抛错**、不写假分数。Worker 里语文作文另有失败计数：第 1–3 次保持 `pending` 重试，第 4 次置 `skipped` + `gradingError`，防止「一篇判不动的作文每 10 秒烧 8.8k tokens」的循环（计数只在进程内，重启归零） |
+
+落库形状：`QuestionSubmission.aiFeedback` = `{ feedback, essayReview }`，其中 `essayReview` 见
+[essay-review.ts](src/lib/essay-review.ts)：学生可见的只有 `score / maxScore / band / range / verdict /
+suggestions / direction / wordCount`；A/B/C/D/L 编号、命中条数、算式与上限全在 `essayReview.internal`，
+**只给管理员和排查用**，下发前用 `toPublicEssayReview()` 剥掉（`ai-feedback.ts` 是三个批改入口共用的落库构造函数）。
+
+回归：`pnpm check:essay`（[scripts/check-essay-grading.mts](scripts/check-essay-grading.mts)）分两段 ——
+A 段 45 条**纯算分**用例（§14 走查应得 38、A 级三档上限、A7′ 四档、字数条款的 599 / 699 / 700 边界、
+L 封顶 +9、.5 向上、非 50 分制换算、C 级与多位数编号解析、未启用条款被忽略、非法编号抛错、记叙文跳过等），
+B 段调真实模型跑 **SPEC §13 两个校准锚**（必须 43 / 50，走
+`getGradingPrompt → gradeWithConfig → essay-score` 全链路）。两段都过，末行才是 `PASS`。
+改动提示词或算分逻辑后**先跑它**；它只读 `src/**`、只调模型，不碰数据库、不跑 build。
+
+**已知局限（2026-11 上线时实测，改提示词前先看）**
+
+`prompt.md` 里 §20（逐条判法）＋ §22（落笔前必答）是关键承重件：把「数段 / 数论据」这类判法写死之后，
+同一篇作文连判 5 次的**命中集合才逐字一致**（实测生产用例 794 字：5/5 都是 29 分）。删掉 §13 两篇锚文正文
+会直接让锚一 43 漂到 46（已实测），所以**不要为了省 token 瘦身这几段**。
+
+残余抖动只有一个来源：**计数类条款的边界**。实测三篇没见过的作文各判 3 次，**档位 3/3 都稳定**
+（一类下 / 四类 / 四类），但具体分数会抖：`±1`（亮点齐全的作文）、`±4~5`（很弱、多处条款同时命中的作文），
+抖动来自 B12（「可核论据 ≤1 个」，模型对「单例＋泛称」类文章偶尔把泛指也算成论据）与 A7′ 的 `k/N` 正好落在
+1/2 时的分档。**方向多为少扣（偏宽松），不会误伤学生**；界面上也明确标注「AI 批阅仅供参考，以教师评分为准」。
+
+要根治，方向是**把「数」交给模型、把「阈值」留给程序**（模型报
+`counts: { bodyParagraphs, b1ParallelRun, b7BoilerplateParagraphs, b12Evidence: string[], a7:{threeCell,body}, … }`，
+`essay-score.ts` 按 SPEC 阈值推导 B/C/D/A7′）——判据与数值不变，只是执行者从模型换成程序。**尚未实施**，
+`counts` 若实施必须作为**可选键**（缺了就照旧读编号，向后兼容），与编号冲突时以 `counts` 为准并写进
+`internal.formula` 告警、不抛错。
 
 ## 题目 PDF 导出
 
