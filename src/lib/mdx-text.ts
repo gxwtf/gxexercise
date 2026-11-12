@@ -65,3 +65,40 @@ export function normalizeQuestionMdx(text: string): string {
   if (!text) return text
   return stringifyNumericTagAttrs(mergeAdjacentInlineMath(selfCloseBr(text)))
 }
+
+/* -------------------------------------------------- 保留 Markdown 表格的换行处理 */
+
+/** GFM 表格行：以 `|` 开头、以 `|` 结尾（表头 / 分隔 / 数据行都是这个形状） */
+const TABLE_ROW_RE = /^\s*\|.*\|\s*$/
+/** 表格分隔行：`| --- | :--: |`（至少两段横线） */
+const TABLE_DELIM_RE = /^\s*\|(?:\s*:?-{2,}:?\s*\|)+\s*$/
+
+/**
+ * 把单换行变成空行（回顾页「参考答案」靠这个保留分段），但**不碰 Markdown 表格**。
+ *
+ * 背景：回顾页原来对所有答案做 `answer.replace(/\n/g, '\n\n')`，表格行之间被插空行后
+ * GFM 表格就不再成立，整张表退化成一行行「| 水平4 | 观点鲜明… |」纯文本
+ * （政治 / 地理的「等级赋分」表就是这样坏掉的，2026-11-12）。
+ * 这里按行扫描：表头行 + 分隔行开头进入「表格态」，表格内部保持单换行，其余照旧变空行。
+ */
+export function doubleNewlinesPreserveTables(text: string): string {
+  if (!text || !text.includes('\n')) return text
+  const lines = text.split('\n')
+  const out: string[] = []
+  let inTable = false
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i]
+    if (i > 0) {
+      const prev = lines[i - 1]
+      const keepTight = inTable && TABLE_ROW_RE.test(prev) && TABLE_ROW_RE.test(line)
+      out.push(keepTight ? '\n' : '\n\n')
+    }
+    if (TABLE_ROW_RE.test(line)) {
+      if (!inTable && TABLE_DELIM_RE.test(lines[i + 1] ?? '')) inTable = true
+    } else {
+      inTable = false
+    }
+    out.push(line)
+  }
+  return out.join('')
+}

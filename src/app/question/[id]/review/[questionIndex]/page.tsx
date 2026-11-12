@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { normalizeQuestionMdx } from "@/lib/mdx-text"
+import { doubleNewlinesPreserveTables, normalizeQuestionMdx } from "@/lib/mdx-text"
 import { notFound, redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { getIronSession } from "iron-session"
@@ -186,11 +186,11 @@ async function buildReviewData(
     ? ''
     : (currentQuestion.answer || '').replace(/\s*##\s*/g, ' 或 ')
   const correctAnswerMdx = answerForDisplay
-    ? await serialize(escapeLatexBraces(answerForDisplay).replace(/\n/g, '\n\n'), { mdxOptions })
+    ? await serialize(doubleNewlinesPreserveTables(escapeLatexBraces(answerForDisplay)), { mdxOptions })
     : null
 
   const userAnswerMdx = userAnswer
-    ? await serialize(escapeLatexBraces(userAnswer).replace(/\n/g, '\n\n'), { mdxOptions })
+    ? await serialize(doubleNewlinesPreserveTables(escapeLatexBraces(userAnswer)), { mdxOptions })
     : null
 
   const questionSwitcherItems: QuestionSwitcherItem[] = questions.map((item, idx) => {
@@ -217,7 +217,7 @@ async function buildReviewData(
     let answerMdx: MDXRemoteSerializeResult | null = null
     try {
       if (answer) {
-        answerMdx = await serialize(escapeLatexBraces(answer).replace(/\n/g, '\n\n'), { mdxOptions })
+        answerMdx = await serialize(doubleNewlinesPreserveTables(escapeLatexBraces(answer)), { mdxOptions })
       }
     } catch {}
     return {
@@ -269,7 +269,7 @@ async function buildReviewData(
     excellentAnswerRecords.map(async (item) => {
       let answerMdx: MDXRemoteSerializeResult | null = null
       try {
-        answerMdx = await serialize(escapeLatexBraces(item.answer).replace(/\n/g, '\n\n'), { mdxOptions })
+        answerMdx = await serialize(doubleNewlinesPreserveTables(escapeLatexBraces(item.answer)), { mdxOptions })
       } catch {
         answerMdx = null
       }
