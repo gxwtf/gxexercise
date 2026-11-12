@@ -180,7 +180,7 @@ export async function buildGroupReportInput(
   const scoreAnnotated = usesScoreAnnotation(group.questionType)
   if (scoreAnnotated) {
     for (const q of questions) {
-      if (q.content) q.content = annotateStemScore(q.content, q.maxScore)
+      if (q.content) q.content = annotateStemScore(q.content, q.maxScore, { html: false })
     }
   }
 
@@ -189,7 +189,8 @@ export async function buildGroupReportInput(
     material: scoreAnnotated
       ? annotateMaterialScores(
           group.content,
-          group.groupItems.map((item) => item.question.score)
+          group.groupItems.map((item) => item.question.score),
+          { html: false }
         )
       : group.content ?? "",
     questions,
@@ -273,7 +274,7 @@ export async function buildPaperReportInput(
     const scoreAnnotated = usesScoreAnnotation(group.questionType)
     if (scoreAnnotated) {
       for (const q of questions) {
-        if (q.content) q.content = annotateStemScore(q.content, q.maxScore)
+        if (q.content) q.content = annotateStemScore(q.content, q.maxScore, { html: false })
       }
     }
 
@@ -285,7 +286,8 @@ export async function buildPaperReportInput(
       const materialText = scoreAnnotated
         ? annotateMaterialScores(
             group.content,
-            group.groupItems.map((gi) => gi.question.score)
+            group.groupItems.map((gi) => gi.question.score),
+            { html: false }
           )
         : group.content
       current.material = current.material ? `${current.material}\n\n${materialText}` : materialText

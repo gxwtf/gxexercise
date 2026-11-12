@@ -59,7 +59,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
       group.category === "名著" && group.content
         ? `${group.content}\n\n${question.content ?? ""}`
         : usesScoreAnnotation(group.questionType)
-          ? annotateStemScore(question.content, question.score)
+          ? annotateStemScore(question.content, question.score, { html: false })
           : question.content ?? "",
     userAnswer,
     correctAnswer: question.answer ?? "",

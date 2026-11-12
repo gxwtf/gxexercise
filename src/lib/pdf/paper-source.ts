@@ -61,7 +61,7 @@ export function toPaperGroups(groups: GroupSource[], startNumber = 1): PaperGrou
     // 历史 / 地理 / 政治大题：材料里每个 <AnswerBox> 对应一条小题，印卷时在设问句末补「（6分）」
     // （与屏幕上的题面同一套规则；库里 content 不动）
     const materialText = usesScoreAnnotation(group.questionType)
-      ? annotateMaterialScores(group.content, questions.map((q) => q.score))
+      ? annotateMaterialScores(group.content, questions.map((q) => q.score), { html: false })
       : group.content ?? ""
     return {
       id: group.id,
