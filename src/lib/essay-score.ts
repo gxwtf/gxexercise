@@ -281,6 +281,57 @@ function modelReportedC8(raw: Record<string, unknown>): boolean {
   return value.some((item) => typeof item === "string" && parseCodeEntry(item).code === "C8")
 }
 
+/** 从 `raw.counts` 里取一个非负整数字段；缺失返回 null，非法返回 null + note */
+function readCountsInt(
+  raw: Record<string, unknown>,
+  field: string,
+): { value: number | null; note?: string } {
+  const counts = raw.counts
+  if (!counts || typeof counts !== "object" || Array.isArray(counts)) return { value: null }
+  const v = (counts as Record<string, unknown>)[field]
+  if (v === undefined || v === null || v === "") return { value: null }
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number.parseFloat(v) : Number.NaN
+  if (!Number.isFinite(n)) return { value: null, note: `counts.${field} 非法（${JSON.stringify(v)}），已忽略` }
+  const value = Math.max(0, Math.floor(n))
+  return { value, note: n !== value ? `counts.${field}=${n} 已取整为 ${value}` : undefined }
+}
+
+/** 从 `raw.counts` 里取一个布尔字段；缺失或非法返回 null */
+function readCountsBool(
+  raw: Record<string, unknown>,
+  field: string,
+): { value: boolean | null; note?: string } {
+  const counts = raw.counts
+  if (!counts || typeof counts !== "object" || Array.isArray(counts)) return { value: null }
+  const v = (counts as Record<string, unknown>)[field]
+  if (v === undefined || v === null || v === "") return { value: null }
+  if (v === true || v === "true") return { value: true }
+  if (v === false || v === "false") return { value: false }
+  return { value: null, note: `counts.${field} 非布尔（${JSON.stringify(v)}），已忽略` }
+}
+
+/**
+ * B4（素材堆砌无扣点）的机械判定 —— SPEC §8：**同一段并列 ≥3 个素材，且每个素材后都没有分析
+ * （有一个扣点句就不判本条）**。
+ *
+ * 为什么改由程序判：这是纯计数 + 存在性问题（"那一共有几个具名素材"、"那一段里有没有回扣句"），
+ * 而模型经常（a）把类比/泛称也算成素材、（b）忽略容忍条款 —— 线上真实一例：某篇第 5 段的具名素材
+ * 只有 2 个（孔子、遵义会议），且孔子那段后面明确有回扣句，模型仍判了 B4，一扣就是 −4（32 而不是 36）。
+ * 所以让模型只报两个**事实**（素材个数 / 有没有扣点句），阈值由本文件按 §8 执行。
+ */
+function readB4Counts(raw: Record<string, unknown>): {
+  itemCount: number | null
+  hasPointing: boolean | null
+  notes: string[]
+} {
+  const count = readCountsInt(raw, "b4ItemCount")
+  const pointing = readCountsBool(raw, "b4HasPointing")
+  const notes: string[] = []
+  if (count.note) notes.push(count.note)
+  if (pointing.note) notes.push(pointing.note)
+  return { itemCount: count.value, hasPointing: pointing.value, notes }
+}
+
 function readEvidence(value: unknown): Record<string, string> | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined
   const out: Record<string, string> = {}
@@ -366,6 +417,26 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
         ? "C8 缺 counts.c8ErrorCount，退回按 ≥6 档执行（−2）"
         : c8Read.note ?? ""
 
+  // B4 单独判：counts 同时给出「具名素材个数」与「有无扣点句」时以程序推导为准（模型 bHits 里的
+  // B4 忽略并留痕）；缺字段则退回旧行为（bHits 里写了 B4 就 −4），保证老提示词/老数据不会炸。
+  const b4Read = readB4Counts(raw)
+  const b4FromModel = bRead.codes.includes("B4")
+  const b4Authoritative = b4Read.itemCount !== null && b4Read.hasPointing !== null
+  const b4Hit = b4Authoritative
+    ? b4Read.itemCount! >= 3 && b4Read.hasPointing === false
+    : b4FromModel
+  // B4 只由上面的 b4Hit 决定是否计入（模型自报的那条先从集合里摘掉，避免重复计一次 −4）
+  const bOthers = bRead.codes.filter((code) => code !== "B4")
+  const bHits = b4Hit ? [...bOthers, "B4"] : bOthers
+  const b4Note = b4Authoritative
+    ? `B4 按 counts 判：并列且无扣点的具名素材 ${b4Read.itemCount} 个 / ${
+        b4Read.hasPointing ? "该段有扣点句" : "该段无扣点句"
+      } → ${b4Hit ? `命中 −4` : "不命中"}` +
+      (b4FromModel !== b4Hit ? `（模型自报 B4=${b4FromModel}，以 counts 为准）` : "")
+    : b4FromModel
+      ? "B4 缺 counts.b4ItemCount / b4HasPointing，退回按模型自报执行（−4）"
+      : b4Read.notes.join("；")
+
   // ③ 字数条款：只有 **50 分制**的题才套（题库里 40 / 45 / 48 / 60 分制的老题字数要求各不相同，
   //    套 v1.5 的 600 / 700 阈值会平白扣分；分数最后按满分等比换算，档位仍按 50 分制给）
   const appliesWordRule = Math.abs(maxScore - 50) < 1e-9
@@ -386,8 +457,7 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   const baseCapped = Math.min(base, 50)
   const a7Penalty = A7_PENALTY[a7Band] ?? 0
   const dCount = Math.min(dRead.codes.length, D_CAP)
-  const deducted =
-    baseCapped - 4 * bRead.codes.length - cPenalty - 1 * dCount - a7Penalty
+  const deducted = baseCapped - 4 * bHits.length - cPenalty - 1 * dCount - a7Penalty
   // .5 向上取整（43 + 1.5 − … 只会出现 .5），减 1e-9 防浮点误差把 44 抬成 45
   const scoreBeforeCaps = Math.max(0, Math.ceil(deducted - 1e-9))
   let scoreFifty = scoreBeforeCaps
@@ -441,7 +511,7 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   parts.push(`43+${fmt(lTotal)}=${fmt(base)}`)
   parts.push(`封顶 50 → ${fmt(baseCapped)}`)
   const terms: string[] = []
-  if (bRead.codes.length > 0) terms.push(`−4×${bRead.codes.length}（${bRead.codes.join("、")}）`)
+  if (bHits.length > 0) terms.push(`−4×${bHits.length}（${bHits.join("、")}）`)
   if (cBase.length > 0) terms.push(`−${C_PENALTY}×${cBase.length}（${cBase.join("、")}）`)
   if (c8Penalty > 0) {
     terms.push(`−${c8Penalty}（C8：${c8Count !== null ? `${c8Count} 处错别字` : "旧口径 ≥6 档"}）`)
@@ -454,6 +524,7 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   if (a7Penalty > 0) terms.push(`−${a7Penalty}（A7′=${a7Band}）`)
   parts.push(terms.length > 0 ? terms.join(" ") : "无扣分")
   if (c8Note) parts.push(c8Note)
+  if (b4Note) parts.push(b4Note)
   parts.push(`= ${fmt(deducted)}`)
   parts.push(`取整 → ${scoreBeforeCaps}`)
   if (caps.length > 0) parts.push(`上限 ${caps.join("；")}`)
@@ -476,7 +547,7 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
     aHits,
     a7Band,
     lHits: lRead.codes,
-    bHits: bRead.codes,
+    bHits,
     cHits,
     dHits: dRead.codes,
     formula: parts.join(" → "),

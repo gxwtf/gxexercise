@@ -601,6 +601,83 @@ const LOGIC_CASES: LogicCase[] = [
     expect: 41,
     why: "非法计数只告警不抛错；C8 按兼容路径 −2",
   },
+  // ── B4（素材堆砌无扣点）：SPEC §8 是「同一段并列 ≥3 个素材」**且**「每个素材后都没有分析」。
+  //    线上真实误判：某篇第 5 段具名素材只有 2 个（孔子、遵义会议，类比不算）、且孔子那段后有回扣句，
+  //    模型仍判 B4 → 一扣 −4（32 而非 36）。现由 counts 报两个事实、程序按 §8 判。
+  {
+    name: "A56 B4：素材 2 个且无扣点 → 不命中",
+    raw: () => essayRaw({ counts: { b4ItemCount: 2, b4HasPointing: false } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 43,
+    why: "<3 个素材 → 不命中（类比/泛称不算素材）",
+  },
+  {
+    name: "A57 B4：素材 3 个且无扣点 → −4",
+    raw: () => essayRaw({ counts: { b4ItemCount: 3, b4HasPointing: false } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 39,
+    why: "43−4 = 39",
+  },
+  {
+    name: "A58 B4：素材 3 个但有扣点句 → 不命中（容忍条款）",
+    raw: () => essayRaw({ counts: { b4ItemCount: 3, b4HasPointing: true } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 43,
+    why: "有一个扣点句就不判本条（SPEC §8 容忍条款）",
+  },
+  {
+    name: "A59 B4：素材 5 个但有扣点句 → 不命中",
+    raw: () => essayRaw({ counts: { b4ItemCount: 5, b4HasPointing: true } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 43,
+    why: "同上：扣点句一票否决",
+  },
+  {
+    name: "A60 兼容路径：缺 counts 且 bHits 含 B4 → −4",
+    raw: () => essayRaw({ bHits: ["B4"] }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 39,
+    why: "老提示词/老数据不炸：沿用模型自报",
+  },
+  {
+    name: "A61 counts 与模型冲突（模型写 B4，但素材只有 2 个）→ 以 counts 为准撤销",
+    raw: () =>
+      essayRaw({ bHits: ["B4"], counts: { b4ItemCount: 2, b4HasPointing: false } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 43,
+    why: "线上误判复现：撤销 B4 后回到 43（真实案例是 32 → 36）",
+  },
+  {
+    name: "A62 counts 判命中、模型漏报 B4 → 程序补上 −4",
+    raw: () => essayRaw({ counts: { b4ItemCount: 4, b4HasPointing: false } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 39,
+    why: "counts 为唯一事实源：程序补 B4",
+  },
+  {
+    name: "A63 B4 与 B7 同时命中按条累加",
+    raw: () =>
+      essayRaw({ bHits: ["B7"], counts: { b4ItemCount: 3, b4HasPointing: false } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 35,
+    why: "43−4(B4)−4(B7) = 35",
+  },
+  {
+    name: "A64 只有 b4ItemCount（缺 b4HasPointing）→ 不推导、退回模型自报",
+    raw: () => essayRaw({ bHits: ["B4"], counts: { b4ItemCount: 3 } }),
+    maxScore: 50,
+    answer: essayOfLength(900),
+    expect: 39,
+    why: "两个事实缺一个就不接管，维持旧行为",
+  },
 ]
 
 interface LogicOutcome {
