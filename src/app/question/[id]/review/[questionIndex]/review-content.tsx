@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge"
 import { excellentCriteriaText } from "@/lib/excellent-answer-rules"
 import Link from "next/link"
 import { pickOneModeLabel } from "@/lib/pick-one"
-import { round1 } from "@/lib/submission-records"
+import { formatDateTime, round1 } from "@/lib/submission-records"
 
 interface ReviewContentData {
     questionGroup: {
@@ -59,6 +59,8 @@ interface ReviewContentData {
     allCorrectBlanks: Record<string, string>
     allBlankCorrect?: Record<string, boolean>
     currentSubmissionId: string | null
+    /** 本次回顾的那一次作答的提交时间（没有作答时 null） */
+    submittedAt: Date | null
     isSubjective: boolean
     userScore: number | null
     questionScore: number
@@ -268,9 +270,15 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                         <ChevronLeft className="size-4" />
                         返回
                     </Button>
-                    <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-foreground">
-                        {questionGroup.title} - 学习回顾
-                    </h1>
+                    <div className="min-w-0 flex-1">
+                        <h1 className="truncate text-lg font-semibold leading-tight text-foreground">
+                            {questionGroup.title} - 学习回顾
+                        </h1>
+                        {/* 每次提交都能单独回顾（/question/<submissionId>/review/<i>），这里标明看的是哪一次 */}
+                        <p className="truncate text-xs text-muted-foreground" title="本次作答的提交时间">
+                            {data.submittedAt ? `作答时间 ${formatDateTime(data.submittedAt)}` : "尚未作答"}
+                        </p>
+                    </div>
                     {/* 主入口：整组分析报告（全部小题 + 我的作答 + 正确答案 + 解析 + AI 批改） */}
                     <Button asChild size="sm" className="shrink-0" title="导出本题组的整份分析报告 PDF">
                         <a href={`/question/${questionGroup.id}/review/pdf`}>

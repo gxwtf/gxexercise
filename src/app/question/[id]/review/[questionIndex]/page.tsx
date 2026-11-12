@@ -412,6 +412,8 @@ async function buildReviewData(
     allCorrectBlanks,
     allBlankCorrect,
     currentSubmissionId: selectedSubmission?.id ?? null,
+    // 本次回顾的是哪一次作答：头部显示「作答时间」用（从 /records 或作答记录点进来时是那一次）
+    submittedAt: selectedSubmission?.createdAt ?? null,
     isSubjective,
     userScore,
     questionScore,
