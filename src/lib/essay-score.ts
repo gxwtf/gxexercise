@@ -67,10 +67,16 @@ const D_CAP = 3
 /**
  * 由**程序**判定、不接受模型自报的编号：
  * - A7 不在 A 级（以例代议改走 `a7Band` 分级扣分，见 §7）；
- * - A10（<600 字）/ C7（600–699 字）由 `countEssayWords()` 的结果判，模型数不准。
+ * - A10（<600 字）/ C7（600–699 字）由 `countEssayWords()` 的结果判，模型数不准；
+ * - C8（错别字）是 §9 里**唯一分两档**的条款（≥3 处 −1 / ≥6 处 −2），编号本身带不了档位，
+ *   所以改由 `counts.c8ErrorCount` 判（见 `resolveC8Penalty()`）。老提示词/老数据没有这个计数时，
+ *   退回「模型写了 C8 就按 ≥6 档 −2」的旧行为，不炸。
  */
 const A_IGNORED_FROM_MODEL = new Set(["A7", "A10"])
-const C_IGNORED_FROM_MODEL = new Set(["C7"])
+const C_IGNORED_FROM_MODEL = new Set(["C7", "C8"])
+
+/** C 级 · 单条扣分（C8 除外：它按错别字处数分 −1 / −2 两档） */
+const C_PENALTY = 2
 
 /** §7 A7′ 档位 → 扣分。`lt-half` 与 `none` 都是 0（不足 1/2 主体段不扣） */
 const A7_PENALTY: Record<string, number> = { none: 0, "lt-half": 0, mid: 2, high: 4, all: 6 }
@@ -241,6 +247,40 @@ function isNarrative(raw: Record<string, unknown>): boolean {
   return /记叙|叙事|叙述|narrative|narrat/i.test(genre)
 }
 
+/**
+ * C8（错别字）的扣分档位 —— SPEC §9：**≥3 处 −1；≥6 处 −2**。
+ *
+ * 为什么要单列：`cHits` 只给编号、带不了档位，而这一条是全表唯一分两档的扣分项。
+ * 按编号一律 −2 会**系统性多扣 1 分**（且可能跨档，如 42 → 41），所以改由模型只报处数、
+ * 程序判档位（与 A10 / C7 同一个思路：能数的条款交给程序）。
+ */
+function c8PenaltyOf(count: number): 0 | 1 | 2 {
+  if (count >= 6) return 2
+  if (count >= 3) return 1
+  return 0
+}
+
+/** 从 `raw.counts.c8ErrorCount` 读错别字处数；缺失/非法时返回 null（= 走兼容路径） */
+function readC8Count(raw: Record<string, unknown>): { value: number | null; note?: string } {
+  const counts = raw.counts
+  if (!counts || typeof counts !== "object" || Array.isArray(counts)) return { value: null }
+  const v = (counts as Record<string, unknown>).c8ErrorCount
+  if (v === undefined || v === null || v === "") return { value: null }
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number.parseFloat(v) : Number.NaN
+  if (!Number.isFinite(n)) {
+    return { value: null, note: `counts.c8ErrorCount 非法（${JSON.stringify(v)}），已忽略` }
+  }
+  const value = Math.max(0, Math.floor(n))
+  return { value, note: n !== value ? `counts.c8ErrorCount=${n} 已取整为 ${value}` : undefined }
+}
+
+/** 模型是否还在 cHits 里写了 C8（老提示词会写；新版由 counts.c8ErrorCount 取代） */
+function modelReportedC8(raw: Record<string, unknown>): boolean {
+  const value = raw.cHits
+  if (!Array.isArray(value)) return false
+  return value.some((item) => typeof item === "string" && parseCodeEntry(item).code === "C8")
+}
+
 function readEvidence(value: unknown): Record<string, string> | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined
   const out: Record<string, string> = {}
@@ -313,15 +353,31 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   const cRead = readCodes(raw, "cHits", C_CODES, C_IGNORED_FROM_MODEL)
   const dRead = readCodes(raw, "dHits", D_CODES)
 
+  // C8 单独判档：有 counts.c8ErrorCount 就以它为准（模型误写 cHits 里的 C8 忽略）；
+  // 没有这个计数则退回旧行为（写了 C8 就按 ≥6 档 −2），保证老提示词/老数据不会炸。
+  const c8Read = readC8Count(raw)
+  const c8FromModel = modelReportedC8(raw)
+  const c8Count = c8Read.value
+  const c8Penalty = c8Count !== null ? c8PenaltyOf(c8Count) : c8FromModel ? 2 : 0
+  const c8Note =
+    c8Count !== null
+      ? `C8 按 counts.c8ErrorCount=${c8Count} 判：${c8Penalty > 0 ? `−${c8Penalty}` : "不足 3 处，不计"}`
+      : c8FromModel
+        ? "C8 缺 counts.c8ErrorCount，退回按 ≥6 档执行（−2）"
+        : c8Read.note ?? ""
+
   // ③ 字数条款：只有 **50 分制**的题才套（题库里 40 / 45 / 48 / 60 分制的老题字数要求各不相同，
   //    套 v1.5 的 600 / 700 阈值会平白扣分；分数最后按满分等比换算，档位仍按 50 分制给）
   const appliesWordRule = Math.abs(maxScore - 50) < 1e-9
   const aHits = [...aRead.codes]
-  const cHits = [...cRead.codes]
+  // cBase = 按编号计 −2 的 C 级（含程序补的 C7）；C8 不进这里，它按处数分档
+  const cBase = [...cRead.codes]
   if (appliesWordRule) {
     if (wordCount < 600) aHits.push("A10")
-    else if (wordCount < 700) cHits.push("C7")
+    else if (wordCount < 700) cBase.push("C7")
   }
+  const cHits = c8Penalty > 0 ? [...cBase, "C8"] : [...cBase]
+  const cPenalty = C_PENALTY * cBase.length + c8Penalty
 
   // ④ §4 公式，顺序不可交换
   const lRaw = lRead.codes.reduce((sum, code) => sum + (L_POINTS[code] ?? 0), 0)
@@ -331,7 +387,7 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   const a7Penalty = A7_PENALTY[a7Band] ?? 0
   const dCount = Math.min(dRead.codes.length, D_CAP)
   const deducted =
-    baseCapped - 4 * bRead.codes.length - 2 * cHits.length - 1 * dCount - a7Penalty
+    baseCapped - 4 * bRead.codes.length - cPenalty - 1 * dCount - a7Penalty
   // .5 向上取整（43 + 1.5 − … 只会出现 .5），减 1e-9 防浮点误差把 44 抬成 45
   const scoreBeforeCaps = Math.max(0, Math.ceil(deducted - 1e-9))
   let scoreFifty = scoreBeforeCaps
@@ -386,7 +442,10 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   parts.push(`封顶 50 → ${fmt(baseCapped)}`)
   const terms: string[] = []
   if (bRead.codes.length > 0) terms.push(`−4×${bRead.codes.length}（${bRead.codes.join("、")}）`)
-  if (cHits.length > 0) terms.push(`−2×${cHits.length}（${cHits.join("、")}）`)
+  if (cBase.length > 0) terms.push(`−${C_PENALTY}×${cBase.length}（${cBase.join("、")}）`)
+  if (c8Penalty > 0) {
+    terms.push(`−${c8Penalty}（C8：${c8Count !== null ? `${c8Count} 处错别字` : "旧口径 ≥6 档"}）`)
+  }
   if (dRead.codes.length > 0) {
     terms.push(
       `−1×${dCount}（${dRead.codes.join("、")}${dRead.codes.length > D_CAP ? `，${dRead.codes.length} 条最多计 ${D_CAP}` : ""}）`,
@@ -394,6 +453,7 @@ export function computeEssayScore(input: EssayScoreInput): EssayScoreOutcome {
   }
   if (a7Penalty > 0) terms.push(`−${a7Penalty}（A7′=${a7Band}）`)
   parts.push(terms.length > 0 ? terms.join(" ") : "无扣分")
+  if (c8Note) parts.push(c8Note)
   parts.push(`= ${fmt(deducted)}`)
   parts.push(`取整 → ${scoreBeforeCaps}`)
   if (caps.length > 0) parts.push(`上限 ${caps.join("；")}`)
