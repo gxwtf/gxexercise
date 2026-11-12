@@ -11,6 +11,7 @@ import rehypeKatex from 'rehype-katex'
 import { TestPaperPractice } from "./TestPaperPractice"
 import { AnswerProvider } from "@/components/question-group/AnswerContext"
 import { trimSharedMaterialContents, usesSharedMaterial } from "@/lib/shared-material"
+import { annotateMaterialScores, usesScoreAnnotation } from "@/lib/score-annotate"
 
 function escapeLatexBraces(input: string): string {
   input = normalizeQuestionMdx(input)
@@ -110,7 +111,14 @@ export default async function TestPaperPracticePage({ params }: PageProps) {
       let contentMdx = null
       if (group.content) {
         try {
-          const escaped = escapeLatexBraces(group.content)
+          // 历史 / 地理 / 政治大题：设问句末补「（6分）」（与单题组练习页同一套规则）
+          const materialText = usesScoreAnnotation(group.questionType)
+            ? annotateMaterialScores(
+                group.content,
+                group.groupItems.map((item) => item.question.score)
+              )
+            : group.content
+          const escaped = escapeLatexBraces(materialText)
           contentMdx = await serialize(escaped, { mdxOptions })
         } catch {}
       }

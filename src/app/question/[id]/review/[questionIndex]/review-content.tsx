@@ -34,6 +34,11 @@ interface ReviewContentData {
     }
     articleMdx: MDXRemoteSerializeResult | null
     stemMdx: MDXRemoteSerializeResult | null
+    /**
+     * 题干自带卷面编号（政治 / 历史 / 地理大题的「（1）（2）」）：
+     * true 时不再在题干前面叠系统题号，避免「1.（1）结合材料…」这种重复。
+     */
+    stemHasOwnNumber: boolean
     analysisMdx: MDXRemoteSerializeResult | null
     questionSwitcherItems: QuestionSwitcherItem[]
     currentQuestion: {
@@ -143,6 +148,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
         questionGroup,
         articleMdx,
         stemMdx,
+        stemHasOwnNumber,
         analysisMdx,
         questionSwitcherItems,
         currentQuestion,
@@ -338,7 +344,7 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                                         : "flex items-baseline gap-1"
                                 }
                             >
-                                {hasMultipleQuestions && (
+                                {hasMultipleQuestions && !stemHasOwnNumber && (
                                     <span
                                         className={
                                             questionGroup.questionType === "chemistry-image"

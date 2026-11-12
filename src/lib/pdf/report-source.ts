@@ -8,6 +8,7 @@
 import { prisma } from "../prisma"
 import { isSubjectiveQuestion } from "../excellent-answer-rules"
 import { toOptions } from "./paper-source"
+import { annotateMaterialScores, annotateStemScore, usesScoreAnnotation } from "../score-annotate"
 import type {
   AnalysisReportInput,
   ReportQuestionInput,
@@ -175,9 +176,22 @@ export async function buildGroupReportInput(
     }
   }
 
+  // 历史 / 地理 / 政治大题：设问句末补「（6分）」（材料与单题题干都补，与题面规则一致）
+  const scoreAnnotated = usesScoreAnnotation(group.questionType)
+  if (scoreAnnotated) {
+    for (const q of questions) {
+      if (q.content) q.content = annotateStemScore(q.content, q.maxScore)
+    }
+  }
+
   const section: ReportSectionInput = {
     groupTitle: group.title,
-    material: group.content ?? "",
+    material: scoreAnnotated
+      ? annotateMaterialScores(
+          group.content,
+          group.groupItems.map((item) => item.question.score)
+        )
+      : group.content ?? "",
     questions,
   }
 
@@ -255,12 +269,26 @@ export async function buildPaperReportInput(
       return toReportQuestion(number, gi.question, subMap.get(gi.question.id), group)
     })
 
+    // 历史 / 地理 / 政治大题：设问句末补「（6分）」（与题面规则一致）
+    const scoreAnnotated = usesScoreAnnotation(group.questionType)
+    if (scoreAnnotated) {
+      for (const q of questions) {
+        if (q.content) q.content = annotateStemScore(q.content, q.maxScore)
+      }
+    }
+
     if (!current || current.heading !== group.category) {
       current = { heading: group.category, groupTitle: group.title, material: "", questions: [] }
       sections.push(current)
     }
     if (group.content?.trim()) {
-      current.material = current.material ? `${current.material}\n\n${group.content}` : group.content
+      const materialText = scoreAnnotated
+        ? annotateMaterialScores(
+            group.content,
+            group.groupItems.map((gi) => gi.question.score)
+          )
+        : group.content
+      current.material = current.material ? `${current.material}\n\n${materialText}` : materialText
     }
     current.questions.push(...questions)
   }

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeQuestionMdx } from "@/lib/mdx-text"
 import { trimSharedMaterialContents, usesSharedMaterial } from "@/lib/shared-material"
+import { annotateMaterialScores, usesScoreAnnotation } from "@/lib/score-annotate"
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
@@ -153,8 +154,16 @@ async function QuestionPageContent({ id }: { id: string }) {
   }));
 
   // 题组正文（阅读材料）：为空时不给 MDX，前端就不会再画出空的「阅读区域」
-  const contentMdx = (questionGroup.content || '').trim()
-    ? await serialize(normalizeQuestionMdx(questionGroup.content), { mdxOptions })
+  // 历史 / 地理 / 政治大题：材料里内联设问，每个 <AnswerBox> 对应一条小题，
+  // 序列化前在设问句末补「（6分）」（只影响显示，库里的 content 与判分提示词都不动）。
+  const materialText = usesScoreAnnotation(questionGroup.questionType)
+    ? annotateMaterialScores(
+        questionGroup.content,
+        questionGroup.groupItems.map((item) => item.question.score)
+      )
+    : (questionGroup.content || '');
+  const contentMdx = materialText.trim()
+    ? await serialize(normalizeQuestionMdx(materialText), { mdxOptions })
     : null;
 
   if (questionGroup.questionType === 'cloze') {

@@ -5,6 +5,7 @@ import { sessionOptions, type SessionData } from "@/lib/iron"
 import { prisma } from "@/lib/prisma"
 import { htmlToPdf, pageHtml } from "@/lib/pdf/soffice"
 import { reviewDocHtml } from "@/lib/pdf/review-doc"
+import { annotateStemScore, usesScoreAnnotation } from "@/lib/score-annotate"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -57,7 +58,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
     content:
       group.category === "名著" && group.content
         ? `${group.content}\n\n${question.content ?? ""}`
-        : question.content ?? "",
+        : usesScoreAnnotation(group.questionType)
+          ? annotateStemScore(question.content, question.score)
+          : question.content ?? "",
     userAnswer,
     correctAnswer: question.answer ?? "",
     analysis: question.analysis ?? "",

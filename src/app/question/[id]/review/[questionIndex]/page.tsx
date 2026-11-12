@@ -16,6 +16,12 @@ import { toPublicEssayReview, type EssayReviewPublic } from "@/lib/essay-review"
 import { isSubjectiveQuestion } from "@/lib/excellent-answer-rules"
 import { isPickOneMode, pickIndexFromRows } from "@/lib/pick-one"
 import { findExcellentAnswers } from "@/lib/excellent-answers"
+import {
+  annotateMaterialScores,
+  annotateStemScore,
+  stemHasOwnNumber,
+  usesScoreAnnotation,
+} from "@/lib/score-annotate"
 
 interface PageProps {
   params: Promise<{
@@ -142,12 +148,29 @@ async function buildReviewData(
   const isCorrect = selectedSubmission?.isCorrect ?? null
   const gradingStatus = selectedSubmission?.gradingStatus ?? null
 
+  // 历史 / 地理 / 政治大题：材料里内联设问 + <AnswerBox>，设问句末补「（6分）」；
+  // 右侧「本题设问」也同样补一次（学生在这里看分值与得分对照）。
+  const scoreAnnotated = usesScoreAnnotation(questionGroup.questionType)
+
   const articleMdx = questionGroup.content
-    ? await serialize(escapeLatexBraces(questionGroup.content), { mdxOptions })
+    ? await serialize(
+        escapeLatexBraces(
+          scoreAnnotated
+            ? annotateMaterialScores(
+                questionGroup.content,
+                questionGroup.groupItems.map((item) => item.question.score)
+              )
+            : questionGroup.content
+        ),
+        { mdxOptions }
+      )
     : null
 
-  const stemMdx = currentQuestion.content
-    ? await serialize(escapeLatexBraces(currentQuestion.content), { mdxOptions })
+  const stemText = scoreAnnotated
+    ? annotateStemScore(currentQuestion.content, currentQuestion.score)
+    : currentQuestion.content
+  const stemMdx = stemText
+    ? await serialize(escapeLatexBraces(stemText), { mdxOptions })
     : null
 
   const analysisMdx = currentQuestion.analysis
@@ -369,6 +392,9 @@ async function buildReviewData(
     },
     articleMdx,
     stemMdx,
+    // 政治 / 历史 / 地理的题干自带「（1）（2）」卷面编号时，右侧不再叠一层系统题号
+    // （否则回顾页会显示成「1.（1）结合材料…」）
+    stemHasOwnNumber: scoreAnnotated && stemHasOwnNumber(currentQuestion.content),
     analysisMdx,
     questionSwitcherItems,
     currentQuestion,
