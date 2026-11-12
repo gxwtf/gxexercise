@@ -515,6 +515,13 @@ npx tsx scripts/import-subject-json.ts --rollback ~/backups/imp.json          # 
   （原来显示成「1.（1）结合材料…」），题号导航交给上方的 1/2/3 切换按钮。
 - 生物 / 物理的 `<Input>` / `<InputLong>` 是逐空判分的小空（一题十几个空），**不走**这套标注。
 
+**回顾页「参考答案」里的 Markdown 表格**（政治 / 地理的「等级赋分」表最典型）：回顾页原先对
+所有答案做 `replace(/\n/g, '\n\n')` 保留分段，表格行之间被插空行后 GFM 表格就不再成立，
+整张表退化成一行行「| 水平4 | 观点鲜明… |」纯文本。现改用 `doubleNewlinesPreserveTables()`
+（`src/lib/mdx-text.ts`）：表头行 + 分隔行进入「表格态」，表内保持单换行，其余照旧变空行；
+回顾页的参考答案 / 我的作答 / 历史作答 / 优秀解答四处都走它。PDF 侧走 `markdownToHtml`，
+本来就支持 pipe 表格。
+
 ### 批量维护题库数据
 
 本仓库只负责「JSON → 数据库」这一步。上游（爬取菁师帮新卷、docx → md → JSON、校验、批量入库、
