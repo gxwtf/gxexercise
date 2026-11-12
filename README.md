@@ -374,6 +374,7 @@ b12Evidence: string[], a7:{threeCell,body}, b7BoilerplateParagraphs, dFindings:[
 - 填空题：题干里的 `<Input2>` / `<Input>` / `<ClozeBlank>` / `<Blank>` 统一印成 `___3___`（题号与前缀对齐）
 - 主观题：按题型和分值给带横线的作答区（作文 22 行、英语写作 14–16 行、阅读表达 3–6 行）
 - 图片版题目（化学 `<QImg>`）：按 300dpi 原始像素换算宽度、铺满版心
+- 历史 / 地理 / 政治大题：材料里每个 `<AnswerBox>` 前补「（6分）」（见下节「题面分值标注」）
 - 整卷按 `category` 把连续题组合并成「一、完形填空（第 1-20 题，共 20 单题，共 30 分）」，作文类另起一页
 
 **LibreOffice 排版踩坑（务必遵守）**：它的 HTML 导入能力有限，以下写法才会真正生效，否则会出现
@@ -496,6 +497,23 @@ npx tsx scripts/import-subject-json.ts --rollback ~/backups/imp.json          # 
   （没有作答的旧题组不参与映射，所以「按模块分组的老卷 → 按大题分组的新卷」也能过）；
   映射不上直接中止，确实要丢弃才加 `--drop-submissions`。
 - `--manifest` 会记录本次导入的 `{subject,title,paperId}`，`--rollback` 按它整批删除（用于试跑回退）。
+
+### 历史 / 地理 / 政治大题：题面自动标分值、回顾页不叠重复题号（2026-11-12）
+
+这三科的大题是「材料里内联设问 + `<AnswerBox>` 大答题框」，**一条小题对应材料里一个
+`<AnswerBox>`**（入库自检已保证：每组的 AnswerBox 数 == 小题数）。两处显示规则在
+`src/lib/score-annotate.ts`：
+
+- **设问后补「（6分）」**：渲染前按小题分值把分值插到对应 `<AnswerBox>` 之前（= 设问句末）。
+  **只改显示**——数据库 `content` 不动，判分提示词（`grading-stem.ts` 直接读库）也不受影响；
+  设问里已经手写过分值的自动跳过（幂等）。接入点：练习页、套卷练习页、回顾页（左栏材料 +
+  右栏本题设问）、纸质作答卷（`paper-source.ts`）、分析报告（`report-source.ts`）、单题 PDF。
+- **Web 端用 nowrap 包住**：中文行内可在「6」和「分」之间折行，实测会把「（6分）」折成两行，
+  所以 Web MDX 输出 `<span className="whitespace-nowrap">（6分）</span>`；
+  PDF 走 LibreOffice（不认 `white-space`），那边传 `{ html: false }` 保持纯文本。
+- **回顾页题号去重**：题干自带「（1）（2）」卷面编号时，右侧不再叠一层系统题号
+  （原来显示成「1.（1）结合材料…」），题号导航交给上方的 1/2/3 切换按钮。
+- 生物 / 物理的 `<Input>` / `<InputLong>` 是逐空判分的小空（一题十几个空），**不走**这套标注。
 
 ### 批量维护题库数据
 
