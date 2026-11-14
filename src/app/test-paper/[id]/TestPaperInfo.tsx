@@ -4,7 +4,7 @@ import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote"
 import { useMDXComponents } from "@/mdx-components"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, FileDown, FileText, BookOpen, Layers } from "lucide-react"
+import { Clock, FileDown, FileText, BookOpen, Layers, FileCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface TestPaperInfoProps {
@@ -18,6 +18,8 @@ interface TestPaperInfoProps {
   duration: number | null
   descriptionMdx: MDXRemoteSerializeResult | null
   groupCount: number
+  /** 素材目录里有该套试卷的参考答案时显示「下载答案」 */
+  hasAnswer: boolean
 }
 
 export function TestPaperInfo({
@@ -31,6 +33,7 @@ export function TestPaperInfo({
   duration,
   descriptionMdx,
   groupCount,
+  hasAnswer,
 }: TestPaperInfoProps) {
   const components = useMDXComponents()
   const router = useRouter()
@@ -99,6 +102,14 @@ export function TestPaperInfo({
                 导出空白卷
               </a>
             </Button>
+            {hasAnswer && (
+              <Button size="lg" variant="outline" className="flex-1" asChild>
+                <a href={`/api/test-paper/${id}/answer`} download title="下载该套试卷的参考答案（官方答案与评分说明）">
+                  <FileCheck className="w-4 h-4" />
+                  下载答案
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </div>

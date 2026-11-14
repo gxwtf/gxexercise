@@ -2,83 +2,22 @@
  * 在「金师邦」素材目录里找某套试卷对应的原始 PDF。
  * 文件名与库里的标题常有差异（（教师版）/含答案/反馈卷/学科名/空格/全角括号），
  * 这里做规范化后再匹配：先精确匹配，再按相似度兜底。
+ *
+ * 公共的规范化 / 冲突判定 / 路径常量在 source-match.ts（与 find-source-answer.ts 共用）。
  */
-import { readdirSync, statSync } from "node:fs"
 import path from "node:path"
+import {
+  SUBJECT_ROOT,
+  TYPES,
+  conflicts,
+  isAnswerFile,
+  isFile,
+  listFiles,
+  normalize,
+  similarity,
+} from "./source-match"
 
-const SUBJECT_ROOT = process.env.EXAM_SOURCE_ROOT || "/home/gxwtf/jingshibang/gaozhong"
-// 素材目录的卷别（上期中 曾经漏了，导致期中卷匹配不到、被模糊匹配成上期末）
-const TYPES = ["一模", "二模", "上期中", "下期中", "上期末", "下期末", "真题"]
-
-/** 卷别阶段：期中 ≠ 期末、一模 ≠ 二模。标题与文件名阶段不一致时一律不许匹配 */
-const STAGE_RULES: Array<[string, RegExp]> = [
-  ["一模", /一模|第一次模拟/],
-  ["二模", /二模|第二次模拟/],
-  ["期中", /期中/],
-  ["期末", /期末/],
-  ["真题", /真题|高考/],
-]
-
-/** 学期：上 ≠ 下（「高三上期中」和「高三下期中」只差一个字，相似度同样很高） */
-const TERM_RULES: Array<[string, RegExp]> = [
-  ["上", /上期中|上期末/],
-  ["下", /下期中|下期末/],
-]
-
-/** 取卷名里的卷别阶段（期中 / 期末 / 一模 / 二模 / 真题），没有则 null */
-export function examStageOf(name: string): string | null {
-  for (const [stage, re] of STAGE_RULES) if (re.test(name)) return stage
-  return null
-}
-
-/** 取卷名里的学期（上 / 下），没有则 null */
-export function examTermOf(name: string): string | null {
-  for (const [term, re] of TERM_RULES) if (re.test(name)) return term
-  return null
-}
-
-/** 标题与候选文件的卷别/学期冲突（两边都取得到、却不相同） */
-function conflicts(title: string, candidate: string): boolean {
-  const s1 = examStageOf(title)
-  const s2 = examStageOf(candidate)
-  if (s1 && s2 && s1 !== s2) return true
-  const t1 = examTermOf(title)
-  const t2 = examTermOf(candidate)
-  if (t1 && t2 && t1 !== t2) return true
-  return false
-}
-
-/** 规范化：去掉版本后缀、学科名、空白与括号差异，便于比较 */
-function normalize(input: string, subject: string): string {
-  return input
-    .replace(/（教师版）|\(教师版\)|（反馈卷）|反馈卷|含答案|教师版/g, "")
-    .replace(new RegExp(subject, "g"), "")
-    .replace(/[（）()【】\[\]\s·・_\-—－]/g, "")
-    .replace(/数学|语文|英语|物理|化学/g, "")
-    .toLowerCase()
-}
-
-/** 编辑距离 */
-function distance(a: string, b: string): number {
-  const m = a.length
-  const n = b.length
-  if (!m) return n
-  if (!n) return m
-  let prev = Array.from({ length: n + 1 }, (_, i) => i)
-  for (let i = 1; i <= m; i++) {
-    const cur = [i]
-    for (let j = 1; j <= n; j++) {
-      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
-    }
-    prev = cur
-  }
-  return prev[n]
-}
-
-const similarity = (a: string, b: string) => {
-  const len = Math.max(a.length, b.length)
-  return len === 0 ? 1 : 1 - distance(a, b) / len
-}
+export { examStageOf, examTermOf } from "./source-match"
 
 interface IndexEntry {
   file: string
@@ -88,32 +27,27 @@ interface IndexEntry {
 
 const indexCache = new Map<string, IndexEntry[]>()
 
-function buildIndex(subject: string): IndexEntry[] {
-  const cached = indexCache.get(subject)
+function buildIndex(subject: string, includeAnswers: boolean): IndexEntry[] {
+  const cacheKey = `${subject}|${includeAnswers ? "with-answers" : "papers-only"}`
+  const cached = indexCache.get(cacheKey)
   if (cached) return cached
 
   const entries: IndexEntry[] = []
   for (const type of TYPES) {
     const dir = path.join(SUBJECT_ROOT, type, subject)
-    let files: string[] = []
-    try {
-      files = readdirSync(dir)
-    } catch {
-      continue
-    }
-    for (const f of files) {
+    for (const f of listFiles(dir)) {
       if (!/\.pdf$/i.test(f)) continue
+      // 参考答案 PDF 默认不能混进来当原卷（否则找不到原卷时可能误配成答案）；
+      // 但库里确实有「标题本身就是参考答案」的卷（如 2019丰台/朝阳期末参考答案英语），
+      // 那种卷的原卷就是答案文件，由 includeAnswers 放行。
+      if (!includeAnswers && isAnswerFile(f)) continue
       const full = path.join(dir, f)
-      try {
-        if (!statSync(full).isFile()) continue
-      } catch {
-        continue
-      }
+      if (!isFile(full)) continue
       const name = f.replace(/\.pdf$/i, "")
       entries.push({ file: full, name, norm: normalize(name, subject) })
     }
   }
-  indexCache.set(subject, entries)
+  indexCache.set(cacheKey, entries)
   return entries
 }
 
@@ -128,7 +62,8 @@ export interface SourcePdfMatch {
 export function findSourcePdf(title: string, subject: string): SourcePdfMatch | null {
   const target = normalize(title, subject)
   if (!target) return null
-  const all = buildIndex(subject)
+  // 标题本身就是「参考答案」卷时，原卷只能从答案文件里找（见 buildIndex 注释）
+  const all = buildIndex(subject, isAnswerFile(title))
   if (!all.length) return null
   // 先剔掉卷别/学期对不上的候选：否则「期中」会被相似度兜底成「期末」（只差一个字，score≈0.92）
   const entries = all.filter((e) => !conflicts(title, e.name) && !conflicts(title, e.norm))

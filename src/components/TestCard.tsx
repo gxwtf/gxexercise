@@ -32,6 +32,8 @@ interface TestCardProps {
     subject: string
     latestSubmissionId?: string | null
     submissionCount?: number
+    /** 素材目录里有该套试卷的参考答案时，多给一个「下载答案」按钮 */
+    hasAnswer?: boolean
 }
 
 export function TestCard({
@@ -43,6 +45,7 @@ export function TestCard({
     subject,
     latestSubmissionId,
     submissionCount = 0,
+    hasAnswer = false,
 }: TestCardProps) {
     const [showResumeDialog, setShowResumeDialog] = useState(false)
     const [hasSavedData, setHasSavedData] = useState(false)
@@ -126,6 +129,13 @@ export function TestCard({
                             下载试卷
                         </a>
                     </Button>
+                    {hasAnswer && (
+                        <Button variant="outline" asChild onClick={(e) => e.stopPropagation()}>
+                            <a href={`/api/test-paper/${id}/answer`} download>
+                                下载答案
+                            </a>
+                        </Button>
+                    )}
                     <Button
                         variant="default"
                         onClick={(e) => {

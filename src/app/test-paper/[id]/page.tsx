@@ -8,6 +8,7 @@ import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import { TestPaperInfo } from "./TestPaperInfo"
+import { findSourceAnswer } from "@/lib/pdf/find-source-answer"
 
 interface PageProps {
   params: Promise<{
@@ -60,6 +61,7 @@ export default async function TestPaperPage({ params }: PageProps) {
       duration={testPaper.duration}
       descriptionMdx={descriptionMdx}
       groupCount={testPaper.paperItems.length}
+      hasAnswer={Boolean(findSourceAnswer(testPaper.title, testPaper.subject))}
     />
   )
 }

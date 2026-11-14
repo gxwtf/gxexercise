@@ -45,6 +45,8 @@ type ListPaper = {
   year?: number | null;
   grade?: string | null;
   tags: string[];
+  /** 素材目录里有该套试卷的参考答案时，卡片上多显示一个「下载答案」按钮 */
+  hasAnswer?: boolean;
 };
 
 interface Filters {
@@ -328,6 +330,7 @@ export function QuestionOverview({
                         subject={paper.subject}
                         latestSubmissionId={testSubmissions[paper.id]}
                         submissionCount={submissionCounts.testPapers[paper.id] || 0}
+                        hasAnswer={paper.hasAnswer}
                       />
                     </div>
                   ))}

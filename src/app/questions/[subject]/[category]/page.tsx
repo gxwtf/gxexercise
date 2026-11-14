@@ -3,6 +3,7 @@ import { routeToSubject, routeToCategory } from "@/constants/subjects";
 import { QuestionOverview } from "@/components/QuestionOverview";
 import { DISTRICT_ZHENTI, isDistrictValue } from "@/constants/districts";
 import { examTypeWhere } from "@/constants/exam-types";
+import { findSourceAnswer } from "@/lib/pdf/find-source-answer";
 
 interface PageProps {
   params: Promise<{
@@ -111,7 +112,10 @@ export default async function SubjectCategoryPage({ params, searchParams }: Page
       <QuestionOverview
         mode="papers"
         groups={[]}
-        papers={papers}
+        papers={papers.map((paper) => ({
+          ...paper,
+          hasAnswer: Boolean(findSourceAnswer(paper.title, paper.subject)),
+        }))}
         total={total}
         page={page}
         pageSize={PAGE_SIZE}
