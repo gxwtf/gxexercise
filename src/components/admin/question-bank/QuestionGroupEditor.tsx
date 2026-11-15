@@ -48,6 +48,10 @@ interface QuestionGroupEditorProps {
   coverCandidates: CoverCandidateSetView | null
   /** 题组所属套卷（用于下载原卷 PDF 对照改题；散题 / 不在套卷里时为 null） */
   sourcePaper: { id: string; title: string } | null
+  /** 深链：进来时打开哪个板块（回顾页「管理题目」用 ?tab=questions） */
+  initialTab?: EditorTabValue
+  /** 深链：进来时展开并滚到哪道单题（回顾页「管理题目」用 ?q=<questionId>） */
+  initialQuestionId?: string
 }
 
 type EditorTabValue = "basic" | "content" | "questions"
@@ -100,16 +104,38 @@ function restoreFields(
   return next
 }
 
-export function QuestionGroupEditor({ group, questions, logs, coverCandidates, sourcePaper }: QuestionGroupEditorProps) {
+export function QuestionGroupEditor({
+  group,
+  questions,
+  logs,
+  coverCandidates,
+  sourcePaper,
+  initialTab,
+  initialQuestionId,
+}: QuestionGroupEditorProps) {
   const router = useRouter()
   const [draft, setDraft] = React.useState<GroupFormValues>(() => toGroupValues(group))
   const [saving, setSaving] = React.useState(false)
   const [syncKey, setSyncKey] = React.useState(0)
-  const [activeTab, setActiveTab] = React.useState<EditorTabValue>("basic")
-  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(
-    () => new Set(questions.length > 0 ? [questions[0].id] : []),
-  )
+  const [activeTab, setActiveTab] = React.useState<EditorTabValue>(initialTab ?? "basic")
+  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(() => {
+    // 深链指定了单题就只展开它（找不到时退回第一题，与原先行为一致）
+    const target =
+      initialQuestionId && questions.some((question) => question.id === initialQuestionId)
+        ? initialQuestionId
+        : questions[0]?.id
+    return new Set(target ? [target] : [])
+  })
   const [dirtyQuestionIds, setDirtyQuestionIds] = React.useState<Set<string>>(new Set())
+
+  // 深链：等「单题」板块渲染出来后滚到目标卡片（父容器是 scrollIntoView 的最近可滚动祖先）
+  React.useEffect(() => {
+    if (!initialQuestionId) return
+    const timer = window.setTimeout(() => {
+      document.getElementById(`question-${initialQuestionId}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    }, 80)
+    return () => window.clearTimeout(timer)
+  }, [initialQuestionId])
 
   const basicChanges = pickChangedFields(group, draft, GROUP_BASIC_KEYS)
   const contentChanges = pickChangedFields(group, draft, GROUP_CONTENT_KEYS)
@@ -325,6 +351,7 @@ export function QuestionGroupEditor({ group, questions, logs, coverCandidates, s
                 {questions.map((question, index) => (
                   <QuestionEditorCard
                     key={question.id}
+                    id={`question-${question.id}`}
                     question={question}
                     index={index}
                     subject={draft.subject}

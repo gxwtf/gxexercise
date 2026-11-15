@@ -43,6 +43,8 @@ interface QuestionEditorCardProps {
   onToggle: () => void
   /** 通知父组件「这道题是否有未保存改动」，用于离开页面时提示 */
   onDirtyChange?: (questionId: string, dirty: boolean) => void
+  /** 可选的 DOM 锚点 id（回顾页「管理题目」深链按 question-<id> 滚到这张卡片） */
+  id?: string
 }
 
 /** 复制一份草稿（数组要深拷贝，否则会和 props 共享引用） */
@@ -89,6 +91,7 @@ export function QuestionEditorCard({
   expanded,
   onToggle,
   onDirtyChange,
+  id,
 }: QuestionEditorCardProps) {
   const router = useRouter()
   const values = question.values
@@ -156,7 +159,7 @@ export function QuestionEditorCard({
   const categoryOptions = categoriesBySubject[subject] ?? []
 
   return (
-    <div className="border-t border-border first:border-t-0">
+    <div id={id} className="border-t border-border first:border-t-0">
       <div className={cn("py-3", expanded && "pb-1")}>
         <button
           type="button"

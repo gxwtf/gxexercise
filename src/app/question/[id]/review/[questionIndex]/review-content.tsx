@@ -3,7 +3,7 @@
 import { resolveBackTarget } from "@/lib/practice-entry"
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Award, ChevronLeft, FileDown, FileText } from "lucide-react"
+import { Award, ChevronLeft, FileDown, FileText, SquarePen } from "lucide-react"
 import { EmptyState } from "@/components/EmptyState"
 import { MDXRemote, type MDXRemoteSerializeResult } from "next-mdx-remote"
 import { useMDXComponents, MathInput2Provider } from "@/mdx-components"
@@ -61,6 +61,8 @@ interface ReviewContentData {
     currentSubmissionId: string | null
     /** 本次回顾的那一次作答的提交时间（没有作答时 null） */
     submittedAt: Date | null
+    /** 当前用户能否管理题库（网站管理员 / 题目审核名单成员）：决定页头是否显示「管理题目」 */
+    canManageQuestions: boolean
     isSubjective: boolean
     userScore: number | null
     questionScore: number
@@ -279,6 +281,26 @@ export function ReviewContent({ data, basePath }: ReviewContentProps) {
                             {data.submittedAt ? `作答时间 ${formatDateTime(data.submittedAt)}` : "尚未作答"}
                         </p>
                     </div>
+                    {/* 题库管理入口：只有网站管理员 / 题目审核名单成员可见。
+                        新开标签页进编辑器并直达「单题」板块、展开当前这道小题，不打断回顾。 */}
+                    {data.canManageQuestions && (
+                        <Button
+                            asChild
+                            size="sm"
+                            variant="outline"
+                            className="shrink-0 gap-1"
+                            title="在题库管理里编辑这道题目"
+                        >
+                            <Link
+                                href={`/admin/questions/${questionGroup.id}?tab=questions&q=${currentQuestion.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <SquarePen className="size-4" />
+                                <span className="hidden md:inline">管理题目</span>
+                            </Link>
+                        </Button>
+                    )}
                     {/* 主入口：整组分析报告（全部小题 + 我的作答 + 正确答案 + 解析 + AI 批改） */}
                     <Button asChild size="sm" className="shrink-0" title="导出本题组的整份分析报告 PDF">
                         <a href={`/question/${questionGroup.id}/review/pdf`}>

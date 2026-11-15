@@ -15,6 +15,8 @@ export const dynamic = "force-dynamic"
 
 interface PageProps {
   params: Promise<{ groupId: string }>
+  /** 深链：回顾页「管理题目」会带 ?tab=questions&q=<questionId> 直达单题板块 */
+  searchParams: Promise<{ tab?: string; q?: string }>
 }
 
 /** 把 Prisma 的 Json 字段安全转成审计日志用的 changes（只保留字符串，脏数据直接忽略） */
@@ -53,9 +55,12 @@ function toOptions(value: unknown): QuestionOption[] | null {
  * 管理员：编辑某个题组（题组信息 + 题组下每一道单题）。
  * 权限校验必须放在查库之前：layout 的校验拦不住 page 的执行与 RSC 载荷。
  */
-export default async function AdminQuestionBankEditPage({ params }: PageProps) {
+export default async function AdminQuestionBankEditPage({ params, searchParams }: PageProps) {
   const viewer = await getQuestionBankViewer()
   const { groupId } = await params
+  const { tab, q } = await searchParams
+  const initialTab = tab === "questions" || tab === "content" ? tab : undefined
+  const initialQuestionId = typeof q === "string" && q ? q : undefined
   if (!viewer.ok) {
     if (viewer.reason === "anonymous") redirect(`/login?back=/admin/questions/${groupId}`)
     return null
@@ -155,6 +160,8 @@ export default async function AdminQuestionBankEditPage({ params }: PageProps) {
         logs={editorLogs}
         coverCandidates={coverCandidates}
         sourcePaper={paperItem?.paper ?? null}
+        initialTab={initialTab}
+        initialQuestionId={initialQuestionId}
       />
     </div>
   )

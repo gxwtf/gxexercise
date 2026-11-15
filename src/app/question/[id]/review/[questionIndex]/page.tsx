@@ -16,6 +16,7 @@ import { toPublicEssayReview, type EssayReviewPublic } from "@/lib/essay-review"
 import { isSubjectiveQuestion } from "@/lib/excellent-answer-rules"
 import { isPickOneMode, pickIndexFromRows } from "@/lib/pick-one"
 import { findExcellentAnswers } from "@/lib/excellent-answers"
+import { isQuestionBankReviewer } from "@/lib/question-bank-auth"
 import {
   annotateMaterialScores,
   annotateStemScore,
@@ -495,9 +496,14 @@ export default async function ReviewQuestionPage({ params }: PageProps) {
     basePath = `/question/${id}/review`
   }
 
+  // 题库管理权限（网站管理员 / 题目审核名单成员）：只决定页头是否显示「管理题目」入口，
+  // 编辑器页自身会再校验一次，这里不做任何写入。
+  const canManageQuestions =
+    Boolean(session.admin) || (await isQuestionBankReviewer(session.username))
+
   return (
     <ReviewContent
-      data={data}
+      data={{ ...data, canManageQuestions }}
       basePath={basePath}
     />
   )
