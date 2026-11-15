@@ -348,6 +348,22 @@ b12Evidence: string[], a7:{threeCell,body}, b7BoilerplateParagraphs, dFindings:[
 > 纪律后 B1 从 0/10 复发到 2/5、锚一 43 漂到 45/46。所以**提示词只描述事实字段（要数什么、单位是什么），
 > 不要写「不要写某个编号」这类禁令**。
 
+## 正文字体与排版约定（Web）
+
+所有 **MDX 正文**（题目材料、阅读文章、题干 / 选项、参考答案、题目解析、AI 批改内容）统一走
+`font-question`（`src/app/globals.css` 的 `@utility`：Times New Roman + SimSun / 宋体 + Songti SC /
+Noto Serif CJK，配 `.font-question p { line-height: 1.9 }`），字号统一 `text-lg`（18px）。
+
+**踩过的坑（2026-11-15）**：阅读正文组件 `EnglishReading` 的 `<article>` 上写死过内联
+`style={{ fontFamily: '"Times New Roman", serif' }}`。内联样式优先级最高，会盖掉外层
+`ReadingLayout` / 回顾页已经挂上的 `.font-question` 字体栈，于是阅读正文的中文只能落到浏览器默认
+`serif`（字形比「题目解析」的宋体栈小一圈，3x 截图实测墨迹 47×45px vs 48×48px），行高也只有
+`leading-7` 的 28px（解析是 34.2px）。现已改为在 `<article>` 上挂 `font-question`、删除内联字体：
+英语 / 语文的阅读正文与右侧「题目解析」的 MDX 正文完全同字号、同字体、同行高。
+
+约定：**新增正文容器不要再写内联 `fontFamily`**，统一挂 `font-question` 类；`QuestionSection`
+上那处内联字体只覆盖非 MDX 的 UI 文案，MDX 子节点各自都有 `font-question`。
+
 ## 题目 PDF 导出
 
 题库的 PDF 全部由**服务端生成**（`src/lib/pdf/`，HTML → LibreOffice headless 转 PDF），前端只放下载链接。
