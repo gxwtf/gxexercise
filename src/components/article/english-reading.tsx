@@ -273,10 +273,12 @@ export function EnglishReading({
     <BlankContext.Provider value={blankContextValue}>
       <ClozeContext.Provider value={clozeContextValue}>
         <InputChangeContext.Provider value={inputChangeContextValue}>
-          <article
-            className={cn('max-w-4xl mx-auto p-6', className)}
-            style={{ fontFamily: '"Times New Roman", serif' }}
-          >
+          {/* 正文统一走 font-question（Times New Roman + 宋体/SimSun + Noto Serif CJK）：
+              原先这里写死 `style={{ fontFamily: '"Times New Roman", serif' }}`，内联样式会
+              盖掉外层 .font-question 的字体栈，中文只能落到浏览器默认 serif，字形比
+              「题目解析」等其它 MDX 正文小一圈（2026-11-15 实测中文墨迹高 15.7px vs 16px）。
+              去掉内联字体、改挂 font-question，正文与解析的字体/行高就同一套了。 */}
+          <article className={cn('max-w-4xl mx-auto p-6 font-question', className)}>
             {title ? (
               <header className="mb-8">
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 text-center">
