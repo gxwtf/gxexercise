@@ -9,3 +9,9 @@ minimumReleaseAgeExclude:
   - lucide-react@1.45.0
   - openai@7.15.0
   - tailwind-merge@3.7.0
+
+# 2026-11-23：@prisma/adapter-pg 与主应用各自解析 pg，会出现两份 pg（8.23.0/8.23.1）；
+# 两份实例会让 adapter 的 `pool instanceof Pool` 判定失败，进而把 Pool 当连接参数 → pg-protocol 崩溃。
+# 统一到同一版本。
+overrides:
+  pg: 8.23.1
