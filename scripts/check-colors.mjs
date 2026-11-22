@@ -58,18 +58,46 @@ function walk(dir, out = []) {
 const problems = []
 const add = (file, line, rule, detail) => problems.push({ file: relative(ROOT, file), line, rule, detail })
 
-/** 抓取所有“像 class 名”的字符串字面量（含模板字符串与 CSS 片段） */
+/**
+ * 抓取所有“像 class 名”的字符串字面量（含模板字符串与 CSS 片段）
+ *
+ * 2026-11-23：原实现用 /(['"`])((?:\\.|(?!\1)[\s\S])*?)\1/g，交替分支里的回溯引用
+ * 会触发灾难性回溯 —— 实测 essay-review.ts 的前 7.9KB 就要跑 >60s，整个 check:colors
+ * 直接挂死。改成一次线性扫描：遇到引号就向前找配对引号，遇到反斜杠整对跳过。
+ * 语义与原正则一致（首个未转义的同类引号收尾；单双引号不跨行，模板字符串可跨行）。
+ */
 function classLiterals(text) {
   const lits = []
-  const re = /(['"`])((?:\\.|(?!\1)[\s\S])*?)\1/g
-  let m
-  while ((m = re.exec(text))) {
-    const body = m[2]
-    if (!/[a-z]/.test(body)) continue
-    // 只保留包含 Tailwind 颜色/边框写法的片段，避免误报普通文案
-    if (!new RegExp(`${COLOR_PREFIX}-|\\bborder\\b|dark:`).test(body)) continue
-    const start = text.slice(0, m.index).split('\n').length
-    lits.push({ body, start })
+  const interesting = new RegExp(`${COLOR_PREFIX}-|\\bborder\\b|dark:`)
+  const isQuote = (c) => c === "'" || c === '"' || c === '`'
+  let i = 0
+  let line = 1
+  while (i < text.length) {
+    const ch = text[i]
+    if (ch === '\n') { line += 1; i += 1; continue }
+    if (!isQuote(ch)) { i += 1; continue }
+
+    const quote = ch
+    const startLine = line
+    let j = i + 1
+    let closed = false
+    while (j < text.length) {
+      const c = text[j]
+      if (c === '\\') { j += 2; continue }          // 转义：连同下一个字符一起跳过
+      if (c === quote) { closed = true; break }        // 找到配对引号
+      if (c === '\n') {
+        if (quote !== '`') break                       // 单双引号不跨行 → 视为未闭合
+        line += 1
+      }
+      j += 1
+    }
+    if (!closed) { i += 1; continue }                  // 未闭合：跳过这个引号继续扫
+
+    const body = text.slice(i + 1, j)
+    if (/[a-z]/.test(body) && interesting.test(body)) {
+      lits.push({ body, start: startLine })
+    }
+    i = j + 1
   }
   return lits
 }
